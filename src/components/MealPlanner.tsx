@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles } from "lucide-react";
+import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles, Check, Play } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 import MealPlanCreator from "./MealPlanCreator";
 import MealPlanView from "./MealPlanView";
 import RecipeView from "./RecipeView";
@@ -13,8 +14,10 @@ interface Meal {
   calories: number;
   prepTime: number;
   servings: number;
+  difficulty: "easy" | "medium" | "hard";
   image?: string;
   ingredients: string[];
+  instructions: string[];
 }
 
 const MealPlanner = () => {
@@ -22,6 +25,7 @@ const MealPlanner = () => {
   const [view, setView] = useState<"planner" | "creator" | "plan" | "recipe">("planner");
   const [currentPlan, setCurrentPlan] = useState<any>(null);
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const { toggleMealCompletion, isMealCompleted } = useUser();
   
   const [meals] = useState<Meal[]>([
     {
@@ -31,7 +35,15 @@ const MealPlanner = () => {
       calories: 350,
       prepTime: 10,
       servings: 1,
-      ingredients: ["Whole grain bread", "Avocado", "Eggs", "Salt", "Pepper"]
+      difficulty: "easy",
+      ingredients: ["2 slices whole grain bread", "1 ripe avocado", "2 eggs", "Salt to taste", "Black pepper", "Olive oil"],
+      instructions: [
+        "Toast the bread slices until golden brown",
+        "Mash the avocado in a bowl with salt and pepper",
+        "Heat olive oil in a pan and fry the eggs",
+        "Spread mashed avocado on toast",
+        "Top with fried eggs and serve immediately"
+      ]
     },
     {
       id: "2",
@@ -40,7 +52,15 @@ const MealPlanner = () => {
       calories: 420,
       prepTime: 25,
       servings: 1,
-      ingredients: ["Chicken breast", "Mixed greens", "Cherry tomatoes", "Cucumber", "Olive oil"]
+      difficulty: "medium",
+      ingredients: ["1 chicken breast", "2 cups mixed greens", "1 cup cherry tomatoes", "1/2 cucumber", "2 tbsp olive oil", "1 tbsp lemon juice"],
+      instructions: [
+        "Season chicken breast with salt and pepper",
+        "Grill chicken for 6-7 minutes each side until cooked through",
+        "Wash and prepare the vegetables",
+        "Mix olive oil and lemon juice for dressing",
+        "Slice chicken and serve over greens with dressing"
+      ]
     },
     {
       id: "3",
@@ -49,7 +69,15 @@ const MealPlanner = () => {
       calories: 580,
       prepTime: 30,
       servings: 2,
-      ingredients: ["Salmon fillet", "Quinoa", "Broccoli", "Lemon", "Garlic"]
+      difficulty: "medium",
+      ingredients: ["2 salmon fillets", "1 cup quinoa", "2 cups broccoli florets", "1 lemon", "2 cloves garlic", "Olive oil"],
+      instructions: [
+        "Cook quinoa according to package instructions",
+        "Steam broccoli until tender",
+        "Season salmon with salt, pepper, and lemon juice",
+        "Heat olive oil in a pan and cook salmon 4-5 minutes each side",
+        "Serve salmon over quinoa with steamed broccoli"
+      ]
     }
   ]);
 
@@ -98,6 +126,16 @@ const MealPlanner = () => {
   const handleMealSelected = (meal: any) => {
     setSelectedMeal(meal);
     setView("recipe");
+  };
+
+  const handleMealCompletion = (mealId: string, date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    toggleMealCompletion(mealId, dateStr);
+  };
+
+  const checkMealCompletion = (mealId: string, date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return isMealCompleted(mealId, dateStr);
   };
 
   if (view === "creator") {
@@ -167,6 +205,12 @@ const MealPlanner = () => {
               >
                 <div className="font-semibold">{day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
                 <div className="text-sm">{day.getDate()}</div>
+                {/* Completion indicator */}
+                <div className="flex justify-center mt-1">
+                  {getMealsForDay(day).filter(meal => checkMealCompletion(meal.id, day)).length > 0 && (
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -187,39 +231,79 @@ const MealPlanner = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {getMealsForDay(selectedDate).map((meal) => (
-                <div key={meal.id} className="p-4 bg-white/50 rounded-lg border border-green-100 hover:bg-white/70 transition-colors">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getMealTypeColor(meal.type)}`}>
-                          {meal.type.charAt(0).toUpperCase() + meal.type.slice(1)}
-                        </span>
-                        <span className="text-sm text-gray-500">{meal.calories} cal</span>
+              {getMealsForDay(selectedDate).map((meal) => {
+                const isCompleted = checkMealCompletion(meal.id, selectedDate);
+                return (
+                  <div 
+                    key={meal.id} 
+                    className={`p-4 rounded-lg border transition-colors ${
+                      isCompleted 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-white/50 border-green-100 hover:bg-white/70'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getMealTypeColor(meal.type)}`}>
+                            {meal.type.charAt(0).toUpperCase() + meal.type.slice(1)}
+                          </span>
+                          <span className="text-sm text-gray-500">{meal.calories} cal</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleMealCompletion(meal.id, selectedDate)}
+                            className={`h-6 w-6 p-0 rounded-full ${
+                              isCompleted 
+                                ? 'bg-green-500 text-white hover:bg-green-600' 
+                                : 'border-2 border-green-300 hover:bg-green-50'
+                            }`}
+                          >
+                            {isCompleted && <Check className="h-3 w-3" />}
+                          </Button>
+                        </div>
+                        <h4 className={`font-semibold mb-2 ${isCompleted ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                          {meal.name}
+                        </h4>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <div className="flex items-center space-x-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{meal.prepTime}min</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Users className="h-4 w-4" />
+                            <span>{meal.servings} serving{meal.servings > 1 ? 's' : ''}</span>
+                          </div>
+                        </div>
                       </div>
-                      <h4 className="font-semibold text-gray-800 mb-2">{meal.name}</h4>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <div className="flex items-center space-x-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{meal.prepTime}min</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Users className="h-4 w-4" />
-                          <span>{meal.servings} serving{meal.servings > 1 ? 's' : ''}</span>
-                        </div>
+                      <div className="flex flex-col space-y-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-green-600 hover:text-green-700 h-8"
+                          onClick={() => handleMealSelected(meal)}
+                        >
+                          <ChefHat className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-600 hover:text-red-700 h-8"
+                          onClick={() => handleMealSelected(meal)}
+                        >
+                          <Play className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <Button variant="ghost" size="sm" className="text-green-600 hover:text-green-700">
-                      <ChefHat className="h-4 w-4" />
-                    </Button>
+                    <div className="mt-3 pt-3 border-t border-green-100">
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Ingredients:</span> {meal.ingredients.slice(0, 3).join(', ')}
+                        {meal.ingredients.length > 3 && '...'}
+                      </p>
+                    </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-green-100">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">Ingredients:</span> {meal.ingredients.join(', ')}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
 
               {getMealsForDay(selectedDate).length === 0 && (
                 <div className="text-center py-8 text-gray-500">

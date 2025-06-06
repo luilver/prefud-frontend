@@ -20,15 +20,55 @@ export interface User {
   createdAt: string;
 }
 
+export interface BillingHistory {
+  id: string;
+  date: string;
+  amount: number;
+  status: 'paid' | 'pending' | 'failed';
+  description: string;
+  invoiceUrl?: string;
+}
+
+export interface PaymentMethod {
+  id: string;
+  type: 'card';
+  last4: string;
+  brand: string;
+  expiryMonth: number;
+  expiryYear: number;
+  isDefault: boolean;
+}
+
+export interface MealCompletion {
+  mealId: string;
+  date: string;
+  completed: boolean;
+}
+
 interface UserContextType {
   user: User | null;
   isAuthenticated: boolean;
+  billingHistory: BillingHistory[];
+  paymentMethods: PaymentMethod[];
+  mealCompletions: MealCompletion[];
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, phone: string, wantsSubscription: boolean) => Promise<void>;
   logout: () => void;
   updateSubscription: (subscriptionData: any) => void;
   canCreatePlan: () => boolean;
   incrementPlanUsage: () => void;
+  // Billing management
+  getBillingHistory: () => Promise<BillingHistory[]>;
+  getPaymentMethods: () => Promise<PaymentMethod[]>;
+  addPaymentMethod: (paymentData: any) => Promise<void>;
+  updatePaymentMethod: (methodId: string, paymentData: any) => Promise<void>;
+  deletePaymentMethod: (methodId: string) => Promise<void>;
+  setDefaultPaymentMethod: (methodId: string) => Promise<void>;
+  acceptSubscription: (planType: 'premium') => Promise<void>;
+  cancelSubscription: () => Promise<void>;
+  // Meal completion
+  toggleMealCompletion: (mealId: string, date: string) => void;
+  isMealCompleted: (mealId: string, date: string) => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -36,13 +76,20 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [mealCompletions, setMealCompletions] = useState<MealCompletion[]>([]);
 
   useEffect(() => {
     // Check if user is logged in (from localStorage or your service)
     const savedUser = localStorage.getItem('user');
+    const savedCompletions = localStorage.getItem('mealCompletions');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
+    }
+    if (savedCompletions) {
+      setMealCompletions(JSON.parse(savedCompletions));
     }
   }, []);
 
@@ -153,17 +200,148 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Billing management methods
+  const getBillingHistory = async (): Promise<BillingHistory[]> => {
+    // TODO: Replace with your API call
+    const mockHistory: BillingHistory[] = [
+      {
+        id: '1',
+        date: '2024-05-01',
+        amount: 9.99,
+        status: 'paid',
+        description: 'Pantry Premium - Monthly',
+        invoiceUrl: '#'
+      },
+      {
+        id: '2',
+        date: '2024-04-01',
+        amount: 9.99,
+        status: 'paid',
+        description: 'Pantry Premium - Monthly',
+        invoiceUrl: '#'
+      }
+    ];
+    setBillingHistory(mockHistory);
+    return mockHistory;
+  };
+
+  const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
+    // TODO: Replace with your API call
+    const mockMethods: PaymentMethod[] = [
+      {
+        id: '1',
+        type: 'card',
+        last4: '4242',
+        brand: 'visa',
+        expiryMonth: 12,
+        expiryYear: 2025,
+        isDefault: true
+      }
+    ];
+    setPaymentMethods(mockMethods);
+    return mockMethods;
+  };
+
+  const addPaymentMethod = async (paymentData: any) => {
+    // TODO: Replace with your API call
+    console.log('Adding payment method:', paymentData);
+  };
+
+  const updatePaymentMethod = async (methodId: string, paymentData: any) => {
+    // TODO: Replace with your API call
+    console.log('Updating payment method:', methodId, paymentData);
+  };
+
+  const deletePaymentMethod = async (methodId: string) => {
+    // TODO: Replace with your API call
+    console.log('Deleting payment method:', methodId);
+    setPaymentMethods(methods => methods.filter(m => m.id !== methodId));
+  };
+
+  const setDefaultPaymentMethod = async (methodId: string) => {
+    // TODO: Replace with your API call
+    console.log('Setting default payment method:', methodId);
+    setPaymentMethods(methods => 
+      methods.map(m => ({ ...m, isDefault: m.id === methodId }))
+    );
+  };
+
+  const acceptSubscription = async (planType: 'premium') => {
+    // TODO: Replace with your API call
+    console.log('Accepting subscription:', planType);
+    updateSubscription({
+      isSubscribed: true,
+      plan: planType,
+      planLimits: {
+        plansPerMonth: 5,
+        usedPlans: user?.subscription.planLimits.usedPlans || 0,
+      },
+      nextBilling: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+  };
+
+  const cancelSubscription = async () => {
+    // TODO: Replace with your API call
+    console.log('Cancelling subscription');
+    updateSubscription({
+      cancelAtPeriodEnd: true,
+    });
+  };
+
+  // Meal completion methods
+  const toggleMealCompletion = (mealId: string, date: string) => {
+    const completionKey = `${mealId}-${date}`;
+    const existingIndex = mealCompletions.findIndex(
+      c => c.mealId === mealId && c.date === date
+    );
+
+    let newCompletions;
+    if (existingIndex >= 0) {
+      newCompletions = [...mealCompletions];
+      newCompletions[existingIndex].completed = !newCompletions[existingIndex].completed;
+    } else {
+      newCompletions = [...mealCompletions, {
+        mealId,
+        date,
+        completed: true
+      }];
+    }
+
+    setMealCompletions(newCompletions);
+    localStorage.setItem('mealCompletions', JSON.stringify(newCompletions));
+  };
+
+  const isMealCompleted = (mealId: string, date: string) => {
+    const completion = mealCompletions.find(
+      c => c.mealId === mealId && c.date === date
+    );
+    return completion?.completed || false;
+  };
+
   return (
     <UserContext.Provider
       value={{
         user,
         isAuthenticated,
+        billingHistory,
+        paymentMethods,
+        mealCompletions,
         login,
         signup,
         logout,
         updateSubscription,
         canCreatePlan,
         incrementPlanUsage,
+        getBillingHistory,
+        getPaymentMethods,
+        addPaymentMethod,
+        updatePaymentMethod,
+        deletePaymentMethod,
+        setDefaultPaymentMethod,
+        acceptSubscription,
+        cancelSubscription,
+        toggleMealCompletion,
+        isMealCompleted,
       }}
     >
       {children}
