@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Clock, Users, ChefHat, Play, BookOpen, ShoppingCart } from "lucide-react";
+import ShoppingList from "./ShoppingList";
 
 interface MealPlanViewProps {
   plan: any;
@@ -13,6 +14,7 @@ interface MealPlanViewProps {
 
 const MealPlanView = ({ plan, onBack, onSelectMeal }: MealPlanViewProps) => {
   const [selectedWeek, setSelectedWeek] = useState(1);
+  const [showShoppingList, setShowShoppingList] = useState(false);
 
   const getMealTypeColor = (type: string) => {
     switch (type) {
@@ -24,7 +26,32 @@ const MealPlanView = ({ plan, onBack, onSelectMeal }: MealPlanViewProps) => {
     }
   };
 
+  const generateShoppingList = () => {
+    console.log("Generating shopping list for meal plan:", plan);
+    setShowShoppingList(true);
+  };
+
   const currentWeek = plan.weeks.find((w: any) => w.week === selectedWeek);
+
+  if (showShoppingList) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" onClick={() => setShowShoppingList(false)} className="mb-4">
+            ← Back to Meal Plan
+          </Button>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-800">Shopping List for Your Meal Plan</h2>
+            <p className="text-gray-600">
+              {plan.duration === "2weeks" ? "2-week" : "4-week"} plan for {plan.preferences.people} people
+            </p>
+          </div>
+          <div></div>
+        </div>
+        <ShoppingList />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -38,7 +65,10 @@ const MealPlanView = ({ plan, onBack, onSelectMeal }: MealPlanViewProps) => {
             {plan.duration === "2weeks" ? "2-week" : "4-week"} personalized plan for {plan.preferences.people} people
           </p>
         </div>
-        <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50">
+        <Button 
+          onClick={generateShoppingList}
+          className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+        >
           <ShoppingCart className="h-4 w-4 mr-2" />
           Generate Shopping List
         </Button>
