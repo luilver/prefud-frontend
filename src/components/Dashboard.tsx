@@ -3,15 +3,18 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Utensils, Calendar, ShoppingCart, User, Bell, TrendingUp } from "lucide-react";
+import { Utensils, Calendar, ShoppingCart, User, Bell, TrendingUp, Settings } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
 import IngredientTracker from "./IngredientTracker";
 import ShoppingList from "./ShoppingList";
 import UserProfile from "./UserProfile";
+import SubscriptionManager from "./SubscriptionManager";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("planner");
+  const { user, logout } = useUser();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
@@ -30,8 +33,11 @@ const Dashboard = () => {
             <Button variant="ghost" size="icon" className="text-green-700">
               <Bell className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-green-700">
-              <User className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="text-green-700" onClick={() => setActiveTab("subscription")}>
+              <Settings className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" onClick={logout} className="text-green-700">
+              Logout
             </Button>
           </div>
         </div>
@@ -41,8 +47,10 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome back!</h2>
-          <p className="text-gray-600">Let's plan some delicious and healthy meals today.</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome back, {user?.name || 'User'}!</h2>
+          <p className="text-gray-600">
+            You're on the {user?.subscription.plan} plan with {user?.subscription.planLimits.plansPerMonth - (user?.subscription.planLimits.usedPlans || 0)} meal plans remaining this month.
+          </p>
         </div>
 
         {/* Quick Stats */}
@@ -63,8 +71,10 @@ const Dashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Meals Planned</p>
-                  <p className="text-2xl font-bold text-orange-700">12</p>
+                  <p className="text-sm text-gray-600">Plans Used</p>
+                  <p className="text-2xl font-bold text-orange-700">
+                    {user?.subscription.planLimits.usedPlans}/{user?.subscription.planLimits.plansPerMonth}
+                  </p>
                 </div>
                 <Calendar className="h-8 w-8 text-orange-500" />
               </div>
@@ -98,7 +108,7 @@ const Dashboard = () => {
 
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-white/70 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-6 bg-white/70 backdrop-blur-sm">
             <TabsTrigger value="planner" className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
               <span>Planner</span>
@@ -118,6 +128,10 @@ const Dashboard = () => {
             <TabsTrigger value="profile" className="flex items-center space-x-2">
               <User className="h-4 w-4" />
               <span>Profile</span>
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="flex items-center space-x-2">
+              <Settings className="h-4 w-4" />
+              <span>Subscription</span>
             </TabsTrigger>
           </TabsList>
 
@@ -139,6 +153,10 @@ const Dashboard = () => {
 
           <TabsContent value="profile" className="mt-6">
             <UserProfile />
+          </TabsContent>
+
+          <TabsContent value="subscription" className="mt-6">
+            <SubscriptionManager />
           </TabsContent>
         </Tabs>
       </div>

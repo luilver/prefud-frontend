@@ -6,27 +6,60 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Utensils } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 import Dashboard from "@/components/Dashboard";
+import SignupForm from "@/components/SignupForm";
 
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, login } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showSignup, setShowSignup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - in real app this would integrate with Supabase
-    setIsLoggedIn(true);
+    setIsLoading(true);
+    try {
+      await login(email, password);
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock signup - in real app this would integrate with Supabase
-    setIsLoggedIn(true);
-  };
-
-  if (isLoggedIn) {
+  if (isAuthenticated) {
     return <Dashboard />;
+  }
+
+  if (showSignup) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-sm border-b border-green-200 sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+                <Utensils className="h-6 w-6 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent">
+                MealCraft
+              </h1>
+            </div>
+            <Button variant="ghost" onClick={() => setShowSignup(false)}>
+              Back to Login
+            </Button>
+          </div>
+        </header>
+
+        <section className="py-20 px-4">
+          <div className="container mx-auto">
+            <SignupForm />
+          </div>
+        </section>
+      </div>
+    );
   }
 
   return (
@@ -106,7 +139,7 @@ const Index = () => {
               <Tabs defaultValue="login" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  <TabsTrigger value="signup" onClick={() => setShowSignup(true)}>Sign Up</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">
@@ -133,40 +166,26 @@ const Index = () => {
                         className="border-green-200 focus:border-green-400"
                       />
                     </div>
-                    <Button type="submit" className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-                      Login
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Logging in...' : 'Login'}
                     </Button>
                   </form>
                 </TabsContent>
                 
                 <TabsContent value="signup">
-                  <form onSubmit={handleSignup} className="space-y-4">
-                    <div>
-                      <Label htmlFor="signup-email">Email</Label>
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="border-green-200 focus:border-green-400"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="signup-password">Password</Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="border-green-200 focus:border-green-400"
-                      />
-                    </div>
-                    <Button type="submit" className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+                  <div className="text-center space-y-4">
+                    <p className="text-gray-600">Create your account with plan selection</p>
+                    <Button 
+                      onClick={() => setShowSignup(true)}
+                      className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                    >
                       Create Account
                     </Button>
-                  </form>
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
