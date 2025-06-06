@@ -1,8 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock, Users, Utensils, Plus, ChefHat } from "lucide-react";
+import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles } from "lucide-react";
+import MealPlanCreator from "./MealPlanCreator";
+import MealPlanView from "./MealPlanView";
+import RecipeView from "./RecipeView";
 
 interface Meal {
   id: string;
@@ -17,6 +19,10 @@ interface Meal {
 
 const MealPlanner = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [view, setView] = useState<"planner" | "creator" | "plan" | "recipe">("planner");
+  const [currentPlan, setCurrentPlan] = useState<any>(null);
+  const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  
   const [meals] = useState<Meal[]>([
     {
       id: "1",
@@ -58,7 +64,6 @@ const MealPlanner = () => {
   }
 
   const getMealsForDay = (date: Date) => {
-    // Mock data - in real app this would come from state/database
     return meals;
   };
 
@@ -85,6 +90,44 @@ const MealPlanner = () => {
     }
   };
 
+  const handlePlanCreated = (plan: any) => {
+    setCurrentPlan(plan);
+    setView("plan");
+  };
+
+  const handleMealSelected = (meal: any) => {
+    setSelectedMeal(meal);
+    setView("recipe");
+  };
+
+  if (view === "creator") {
+    return (
+      <MealPlanCreator
+        onPlanCreated={handlePlanCreated}
+        onBack={() => setView("planner")}
+      />
+    );
+  }
+
+  if (view === "plan" && currentPlan) {
+    return (
+      <MealPlanView
+        plan={currentPlan}
+        onBack={() => setView("planner")}
+        onSelectMeal={handleMealSelected}
+      />
+    );
+  }
+
+  if (view === "recipe" && selectedMeal) {
+    return (
+      <RecipeView
+        meal={selectedMeal}
+        onBack={() => setView("plan")}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -93,10 +136,19 @@ const MealPlanner = () => {
           <h2 className="text-2xl font-bold text-gray-800">Weekly Meal Planner</h2>
           <p className="text-gray-600">Plan your meals for a healthier week</p>
         </div>
-        <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Meal
-        </Button>
+        <div className="flex space-x-3">
+          <Button 
+            onClick={() => setView("creator")}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            AI Meal Plan
+          </Button>
+          <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Meal
+          </Button>
+        </div>
       </div>
 
       {/* Week Navigator */}
