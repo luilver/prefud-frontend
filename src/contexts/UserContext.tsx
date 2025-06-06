@@ -133,7 +133,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const canCreatePlan = () => {
     if (!user) return false;
-    return user.subscription.usedPlans < user.subscription.planLimits.plansPerMonth;
+    return user.subscription.planLimits.usedPlans < user.subscription.planLimits.plansPerMonth;
   };
 
   const incrementPlanUsage = () => {
