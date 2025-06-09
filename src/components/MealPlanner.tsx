@@ -30,7 +30,7 @@ const MealPlanner = () => {
     toggleMealCompletion, 
     isMealCompleted, 
     updatePantryFromMeal,
-    mealPlans,
+    mealPlans = [], // Add default empty array
     deleteMealPlan,
     deleteMealFromPlan,
     addMealPlan
@@ -102,13 +102,13 @@ const MealPlanner = () => {
 
   const getMealsForDay = (date: Date) => {
     // Get meals from current active meal plan for this date
-    const activePlan = mealPlans.find(plan => {
+    const activePlan = (mealPlans || []).find(plan => {
       const planStart = new Date(plan.startDate);
       const planEnd = new Date(plan.endDate);
       return date >= planStart && date <= planEnd;
     });
 
-    return activePlan?.meals || meals; // Fallback to default meals
+    return (activePlan?.meals || meals || []); // Add proper fallbacks
   };
 
   const formatDate = (date: Date) => {
@@ -153,8 +153,9 @@ const MealPlanner = () => {
     
     // If meal is being completed (not uncompleted), update pantry
     if (!wasCompleted) {
-      const meal = meals.find(m => m.id === mealId);
-      if (meal) {
+      const dayMeals = getMealsForDay(date);
+      const meal = dayMeals.find(m => m.id === mealId);
+      if (meal && meal.ingredients) {
         updatePantryFromMeal(meal.ingredients);
       }
     }
@@ -167,11 +168,11 @@ const MealPlanner = () => {
 
   const getCompletedMealsForDay = (date: Date) => {
     const dayMeals = getMealsForDay(date);
-    return dayMeals.filter(meal => checkMealCompletion(meal.id, date)).length;
+    return (dayMeals || []).filter(meal => checkMealCompletion(meal.id, date)).length;
   };
 
   const handleDeleteMeal = (mealId: string) => {
-    const activePlan = mealPlans.find(plan => {
+    const activePlan = (mealPlans || []).find(plan => {
       const planStart = new Date(plan.startDate);
       const planEnd = new Date(plan.endDate);
       const today = new Date();
@@ -235,7 +236,7 @@ const MealPlanner = () => {
       </div>
 
       {/* Meal Plans List */}
-      {mealPlans.length > 0 && (
+      {mealPlans && mealPlans.length > 0 && (
         <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -248,7 +249,7 @@ const MealPlanner = () => {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mealPlans.map((plan) => (
+              {(mealPlans || []).map((plan) => (
                 <Card key={plan.id} className="border-purple-100 hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -266,7 +267,7 @@ const MealPlanner = () => {
                       {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
                     </div>
                     <div className="text-sm text-purple-600">
-                      {plan.meals.length} meals planned
+                      {(plan.meals || []).length} meals planned
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -338,7 +339,7 @@ const MealPlanner = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {getMealsForDay(selectedDate).map((meal) => {
+              {(getMealsForDay(selectedDate) || []).map((meal) => {
                 const isCompleted = checkMealCompletion(meal.id, selectedDate);
                 return (
                   <div 
@@ -412,8 +413,8 @@ const MealPlanner = () => {
                     </div>
                     <div className="mt-3 pt-3 border-t border-green-100">
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">Ingredients:</span> {meal.ingredients.slice(0, 3).join(', ')}
-                        {meal.ingredients.length > 3 && '...'}
+                        <span className="font-medium">Ingredients:</span> {(meal.ingredients || []).slice(0, 3).join(', ')}
+                        {(meal.ingredients || []).length > 3 && '...'}
                       </p>
                     </div>
                   </div>
