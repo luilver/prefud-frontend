@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,87 +7,33 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Bell, Package, Calendar, AlertTriangle, Plus, Search, Trash2 } from "lucide-react";
 import AddIngredientForm from "./AddIngredientForm";
 import AIMealSuggestions from "./AIMealSuggestions";
-import { useToast } from "@/hooks/use-toast";
-
-interface Ingredient {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: string;
-  expiryDate: Date;
-  category: string;
-  location?: string;
-}
+import { useUser } from "@/contexts/UserContext";
 
 const IngredientTracker = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const { toast } = useToast();
-  
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    {
-      id: "1",
-      name: "Chicken Breast",
-      quantity: 2,
-      unit: "lbs",
-      expiryDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-      category: "Meat",
-      location: "Refrigerator"
-    },
-    {
-      id: "2",
-      name: "Greek Yogurt",
-      quantity: 1,
-      unit: "container",
-      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      category: "Dairy",
-      location: "Refrigerator"
-    },
-    {
-      id: "3",
-      name: "Bananas",
-      quantity: 6,
-      unit: "pieces",
-      expiryDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-      category: "Fruits",
-      location: "Counter"
-    },
-    {
-      id: "4",
-      name: "Brown Rice",
-      quantity: 1,
-      unit: "bag",
-      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-      category: "Grains",
-      location: "Pantry"
-    },
-    {
-      id: "5",
-      name: "Milk",
-      quantity: 1,
-      unit: "gallon",
-      expiryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-      category: "Dairy",
-      location: "Refrigerator"
-    }
-  ]);
+  const { 
+    ingredients, 
+    deleteIngredient, 
+    updatePantryFromIngredients,
+    addIngredient 
+  } = useUser();
 
-  const handleAddIngredient = (newIngredient: Ingredient) => {
-    setIngredients(prev => [...prev, newIngredient]);
+  const handleAddIngredient = (newIngredient: any) => {
+    addIngredient(newIngredient);
+    setShowAddForm(false);
   };
 
   const handleDeleteIngredient = (id: string) => {
-    const ingredient = ingredients.find(ing => ing.id === id);
-    setIngredients(prev => prev.filter(ing => ing.id !== id));
-    toast({
-      title: "Ingredient removed",
-      description: `${ingredient?.name} has been removed from your pantry.`,
-    });
+    deleteIngredient(id);
   };
 
   const handleAddMealFromAI = (meal: any) => {
-    // TODO: Add meal to meal plan
-    console.log('Adding AI suggested meal to plan:', meal);
+    // When a meal is added from AI suggestions, update pantry
+    if (meal.ingredients) {
+      // This would typically happen when the meal is actually prepared
+      console.log('Adding AI suggested meal to plan:', meal);
+    }
   };
 
   const getDaysUntilExpiry = (expiryDate: Date) => {
@@ -126,7 +73,7 @@ const IngredientTracker = () => {
     }
     acc[ingredient.category].push(ingredient);
     return acc;
-  }, {} as Record<string, Ingredient[]>);
+  }, {} as Record<string, any[]>);
 
   const getCategoryIcon = (category: string) => {
     const icons: Record<string, string> = {
@@ -172,7 +119,6 @@ const IngredientTracker = () => {
 
       {/* Quick Stats */}
       <div className="grid md:grid-cols-4 gap-6">
-        {/* ... keep existing code (stats cards) */}
         <Card className="bg-white/70 backdrop-blur-sm border-green-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">

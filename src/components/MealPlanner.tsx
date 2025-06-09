@@ -1,7 +1,8 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles, Check, Play } from "lucide-react";
+import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles, Check, Play, Trash2, CalendarDays } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreator from "./MealPlanCreator";
 import MealPlanView from "./MealPlanView";
@@ -25,7 +26,15 @@ const MealPlanner = () => {
   const [view, setView] = useState<"planner" | "creator" | "plan" | "recipe">("planner");
   const [currentPlan, setCurrentPlan] = useState<any>(null);
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
-  const { toggleMealCompletion, isMealCompleted } = useUser();
+  const { 
+    toggleMealCompletion, 
+    isMealCompleted, 
+    updatePantryFromMeal,
+    mealPlans,
+    deleteMealPlan,
+    deleteMealFromPlan,
+    addMealPlan
+  } = useUser();
   
   const [meals] = useState<Meal[]>([
     {
@@ -92,7 +101,14 @@ const MealPlanner = () => {
   }
 
   const getMealsForDay = (date: Date) => {
-    return meals;
+    // Get meals from current active meal plan for this date
+    const activePlan = mealPlans.find(plan => {
+      const planStart = new Date(plan.startDate);
+      const planEnd = new Date(plan.endDate);
+      return date >= planStart && date <= planEnd;
+    });
+
+    return activePlan?.meals || meals; // Fallback to default meals
   };
 
   const formatDate = (date: Date) => {
@@ -119,6 +135,7 @@ const MealPlanner = () => {
   };
 
   const handlePlanCreated = (plan: any) => {
+    addMealPlan(plan);
     setCurrentPlan(plan);
     setView("plan");
   };
@@ -130,12 +147,40 @@ const MealPlanner = () => {
 
   const handleMealCompletion = (mealId: string, date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
+    const wasCompleted = isMealCompleted(mealId, dateStr);
+    
     toggleMealCompletion(mealId, dateStr);
+    
+    // If meal is being completed (not uncompleted), update pantry
+    if (!wasCompleted) {
+      const meal = meals.find(m => m.id === mealId);
+      if (meal) {
+        updatePantryFromMeal(meal.ingredients);
+      }
+    }
   };
 
   const checkMealCompletion = (mealId: string, date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
     return isMealCompleted(mealId, dateStr);
+  };
+
+  const getCompletedMealsForDay = (date: Date) => {
+    const dayMeals = getMealsForDay(date);
+    return dayMeals.filter(meal => checkMealCompletion(meal.id, date)).length;
+  };
+
+  const handleDeleteMeal = (mealId: string) => {
+    const activePlan = mealPlans.find(plan => {
+      const planStart = new Date(plan.startDate);
+      const planEnd = new Date(plan.endDate);
+      const today = new Date();
+      return today >= planStart && today <= planEnd;
+    });
+
+    if (activePlan) {
+      deleteMealFromPlan(activePlan.id, mealId);
+    }
   };
 
   if (view === "creator") {
@@ -189,30 +234,92 @@ const MealPlanner = () => {
         </div>
       </div>
 
+      {/* Meal Plans List */}
+      {mealPlans.length > 0 && (
+        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <CalendarDays className="h-5 w-5 text-purple-600" />
+              <span>Your Meal Plans</span>
+            </CardTitle>
+            <CardDescription>
+              Manage your created meal plans
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {mealPlans.map((plan) => (
+                <Card key={plan.id} className="border-purple-100 hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{plan.name}</CardTitle>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => deleteMealPlan(plan.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                    </div>
+                    <div className="text-sm text-purple-600">
+                      {plan.meals.length} meals planned
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setCurrentPlan(plan);
+                        setView("plan");
+                      }}
+                      className="w-full"
+                    >
+                      View Plan
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Week Navigator */}
       <Card className="bg-white/70 backdrop-blur-sm border-green-200">
         <CardContent className="p-6">
           <div className="grid grid-cols-7 gap-4">
-            {weekDays.map((day, index) => (
-              <div
-                key={index}
-                className={`text-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                  isToday(day)
-                    ? 'bg-gradient-to-r from-green-500 to-orange-500 text-white shadow-lg'
-                    : 'bg-white/50 hover:bg-white/70 border border-green-100'
-                }`}
-                onClick={() => setSelectedDate(day)}
-              >
-                <div className="font-semibold">{day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                <div className="text-sm">{day.getDate()}</div>
-                {/* Completion indicator */}
-                <div className="flex justify-center mt-1">
-                  {getMealsForDay(day).filter(meal => checkMealCompletion(meal.id, day)).length > 0 && (
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  )}
+            {weekDays.map((day, index) => {
+              const completedMeals = getCompletedMealsForDay(day);
+              const totalMeals = getMealsForDay(day).length;
+              
+              return (
+                <div
+                  key={index}
+                  className={`text-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                    isToday(day)
+                      ? 'bg-gradient-to-r from-green-500 to-orange-500 text-white shadow-lg'
+                      : 'bg-white/50 hover:bg-white/70 border border-green-100'
+                  }`}
+                  onClick={() => setSelectedDate(day)}
+                >
+                  <div className="font-semibold">{day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                  <div className="text-sm">{day.getDate()}</div>
+                  {/* Completion indicator */}
+                  <div className="flex justify-center mt-1">
+                    {completedMeals > 0 && (
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-xs">{completedMeals}/{totalMeals}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -288,10 +395,18 @@ const MealPlanner = () => {
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="text-red-600 hover:text-red-700 h-8"
+                          className="text-blue-600 hover:text-blue-700 h-8"
                           onClick={() => handleMealSelected(meal)}
                         >
                           <Play className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-600 hover:text-red-700 h-8"
+                          onClick={() => handleDeleteMeal(meal.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>

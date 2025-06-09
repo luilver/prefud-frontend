@@ -1,5 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useToast } from "@/hooks/use-toast";
 
 export interface User {
   id: string;
@@ -45,12 +45,33 @@ export interface MealCompletion {
   completed: boolean;
 }
 
+export interface Ingredient {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  expiryDate: Date;
+  category: string;
+  location?: string;
+}
+
+export interface MealPlan {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  meals: any[];
+  createdAt: string;
+}
+
 interface UserContextType {
   user: User | null;
   isAuthenticated: boolean;
   billingHistory: BillingHistory[];
   paymentMethods: PaymentMethod[];
   mealCompletions: MealCompletion[];
+  ingredients: Ingredient[];
+  mealPlans: MealPlan[];
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, phone: string, wantsSubscription: boolean) => Promise<void>;
   logout: () => void;
@@ -69,6 +90,15 @@ interface UserContextType {
   // Meal completion
   toggleMealCompletion: (mealId: string, date: string) => void;
   isMealCompleted: (mealId: string, date: string) => boolean;
+  // Pantry management
+  updatePantryFromMeal: (mealIngredients: string[]) => void;
+  updatePantryFromIngredients: (updatedIngredients: Ingredient[]) => void;
+  addIngredient: (ingredient: Ingredient) => void;
+  deleteIngredient: (ingredientId: string) => void;
+  // Meal plan management
+  addMealPlan: (plan: MealPlan) => void;
+  deleteMealPlan: (planId: string) => void;
+  deleteMealFromPlan: (planId: string, mealId: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -79,11 +109,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [mealCompletions, setMealCompletions] = useState<MealCompletion[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is logged in (from localStorage or your service)
+    // Load saved data from localStorage
     const savedUser = localStorage.getItem('user');
     const savedCompletions = localStorage.getItem('mealCompletions');
+    const savedIngredients = localStorage.getItem('ingredients');
+    const savedMealPlans = localStorage.getItem('mealPlans');
+    
     if (savedUser) {
       setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
@@ -91,14 +127,70 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedCompletions) {
       setMealCompletions(JSON.parse(savedCompletions));
     }
+    if (savedIngredients) {
+      const parsedIngredients = JSON.parse(savedIngredients);
+      // Convert date strings back to Date objects
+      const ingredientsWithDates = parsedIngredients.map((ing: any) => ({
+        ...ing,
+        expiryDate: new Date(ing.expiryDate)
+      }));
+      setIngredients(ingredientsWithDates);
+    } else {
+      // Initialize with default ingredients
+      const defaultIngredients: Ingredient[] = [
+        {
+          id: "1",
+          name: "Chicken Breast",
+          quantity: 2,
+          unit: "lbs",
+          expiryDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+          category: "Meat",
+          location: "Refrigerator"
+        },
+        {
+          id: "2",
+          name: "Greek Yogurt",
+          quantity: 1,
+          unit: "container",
+          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          category: "Dairy",
+          location: "Refrigerator"
+        },
+        {
+          id: "3",
+          name: "Bananas",
+          quantity: 6,
+          unit: "pieces",
+          expiryDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+          category: "Fruits",
+          location: "Counter"
+        }
+      ];
+      setIngredients(defaultIngredients);
+    }
+    if (savedMealPlans) {
+      setMealPlans(JSON.parse(savedMealPlans));
+    }
   }, []);
+
+  // Save ingredients to localStorage whenever they change
+  useEffect(() => {
+    if (ingredients.length > 0) {
+      localStorage.setItem('ingredients', JSON.stringify(ingredients));
+    }
+  }, [ingredients]);
+
+  // Save meal plans to localStorage whenever they change
+  useEffect(() => {
+    if (mealPlans.length > 0) {
+      localStorage.setItem('mealPlans', JSON.stringify(mealPlans));
+    }
+  }, [mealPlans]);
 
   const login = async (email: string, password: string) => {
     try {
-      // TODO: Replace with your service call
       console.log('Login attempt:', { email, password });
       
-      // Mock user data - replace with actual API response
       const mockUser: User = {
         id: '1',
         email,
@@ -127,10 +219,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (email: string, password: string, phone: string, wantsSubscription: boolean) => {
     try {
-      // TODO: Replace with your service call
       console.log('Signup attempt:', { email, password, phone, wantsSubscription });
       
-      // Mock user data - replace with actual API response
       const mockUser: User = {
         id: Date.now().toString(),
         email,
@@ -202,7 +292,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Billing management methods
   const getBillingHistory = async (): Promise<BillingHistory[]> => {
-    // TODO: Replace with your API call
     const mockHistory: BillingHistory[] = [
       {
         id: '1',
@@ -226,7 +315,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
-    // TODO: Replace with your API call
     const mockMethods: PaymentMethod[] = [
       {
         id: '1',
@@ -243,23 +331,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addPaymentMethod = async (paymentData: any) => {
-    // TODO: Replace with your API call
     console.log('Adding payment method:', paymentData);
   };
 
   const updatePaymentMethod = async (methodId: string, paymentData: any) => {
-    // TODO: Replace with your API call
     console.log('Updating payment method:', methodId, paymentData);
   };
 
   const deletePaymentMethod = async (methodId: string) => {
-    // TODO: Replace with your API call
     console.log('Deleting payment method:', methodId);
     setPaymentMethods(methods => methods.filter(m => m.id !== methodId));
   };
 
   const setDefaultPaymentMethod = async (methodId: string) => {
-    // TODO: Replace with your API call
     console.log('Setting default payment method:', methodId);
     setPaymentMethods(methods => 
       methods.map(m => ({ ...m, isDefault: m.id === methodId }))
@@ -267,7 +351,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const acceptSubscription = async (planType: 'premium') => {
-    // TODO: Replace with your API call
     console.log('Accepting subscription:', planType);
     updateSubscription({
       isSubscribed: true,
@@ -281,7 +364,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const cancelSubscription = async () => {
-    // TODO: Replace with your API call
     console.log('Cancelling subscription');
     updateSubscription({
       cancelAtPeriodEnd: true,
@@ -290,7 +372,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Meal completion methods
   const toggleMealCompletion = (mealId: string, date: string) => {
-    const completionKey = `${mealId}-${date}`;
     const existingIndex = mealCompletions.findIndex(
       c => c.mealId === mealId && c.date === date
     );
@@ -318,6 +399,107 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return completion?.completed || false;
   };
 
+  // New pantry management methods
+  const updatePantryFromMeal = (mealIngredients: string[]) => {
+    const updatedIngredients = ingredients.map(ingredient => {
+      const usedIngredient = mealIngredients.find(mealIng => 
+        mealIng.toLowerCase().includes(ingredient.name.toLowerCase())
+      );
+      
+      if (usedIngredient) {
+        // Reduce quantity by 1 or remove if quantity becomes 0
+        const newQuantity = Math.max(0, ingredient.quantity - 1);
+        return newQuantity > 0 ? { ...ingredient, quantity: newQuantity } : null;
+      }
+      return ingredient;
+    }).filter(Boolean) as Ingredient[];
+
+    setIngredients(updatedIngredients);
+    
+    toast({
+      title: "Pantry Updated",
+      description: "Ingredients have been updated based on meal completion.",
+    });
+  };
+
+  const updatePantryFromIngredients = (updatedIngredients: Ingredient[]) => {
+    setIngredients(updatedIngredients);
+    
+    toast({
+      title: "Pantry Updated",
+      description: "Your ingredient list has been updated.",
+    });
+  };
+
+  const addIngredient = (ingredient: Ingredient) => {
+    setIngredients(prev => [...prev, ingredient]);
+    
+    toast({
+      title: "Ingredient Added",
+      description: `${ingredient.name} has been added to your pantry.`,
+    });
+  };
+
+  const deleteIngredient = (ingredientId: string) => {
+    const ingredient = ingredients.find(ing => ing.id === ingredientId);
+    setIngredients(prev => prev.filter(ing => ing.id !== ingredientId));
+    
+    toast({
+      title: "Ingredient Removed",
+      description: `${ingredient?.name} has been removed from your pantry.`,
+    });
+  };
+
+  // Meal plan management methods
+  const addMealPlan = (plan: MealPlan) => {
+    setMealPlans(prev => [...prev, plan]);
+    
+    toast({
+      title: "Meal Plan Created",
+      description: `${plan.name} has been added to your meal plans.`,
+    });
+  };
+
+  const deleteMealPlan = (planId: string) => {
+    const plan = mealPlans.find(p => p.id === planId);
+    setMealPlans(prev => prev.filter(p => p.id !== planId));
+    
+    // Also remove meal completions for this plan
+    const planMealIds = plan?.meals.map(meal => meal.id) || [];
+    setMealCompletions(prev => 
+      prev.filter(completion => !planMealIds.includes(completion.mealId))
+    );
+    
+    toast({
+      title: "Meal Plan Deleted",
+      description: `${plan?.name} and all its meals have been removed.`,
+    });
+  };
+
+  const deleteMealFromPlan = (planId: string, mealId: string) => {
+    setMealPlans(prev => 
+      prev.map(plan => {
+        if (plan.id === planId) {
+          return {
+            ...plan,
+            meals: plan.meals.filter(meal => meal.id !== mealId)
+          };
+        }
+        return plan;
+      })
+    );
+
+    // Remove meal completions for this meal
+    setMealCompletions(prev => 
+      prev.filter(completion => completion.mealId !== mealId)
+    );
+    
+    toast({
+      title: "Meal Removed",
+      description: "The meal has been removed from your plan.",
+    });
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -326,6 +508,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         billingHistory,
         paymentMethods,
         mealCompletions,
+        ingredients,
+        mealPlans,
         login,
         signup,
         logout,
@@ -342,6 +526,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cancelSubscription,
         toggleMealCompletion,
         isMealCompleted,
+        updatePantryFromMeal,
+        updatePantryFromIngredients,
+        addIngredient,
+        deleteIngredient,
+        addMealPlan,
+        deleteMealPlan,
+        deleteMealFromPlan,
       }}
     >
       {children}
