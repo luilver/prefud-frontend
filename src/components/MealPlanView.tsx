@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Users, ChefHat, Play, BookOpen, ShoppingCart } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Calendar, Clock, Users, ChefHat, Play, BookOpen, ShoppingCart, Plus, CheckCircle } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 import ShoppingList from "./ShoppingList";
+import { useToast } from "@/hooks/use-toast";
 
 interface MealPlanViewProps {
   plan: any;
@@ -15,6 +17,8 @@ interface MealPlanViewProps {
 const MealPlanView = ({ plan, onBack, onSelectMeal }: MealPlanViewProps) => {
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [showShoppingList, setShowShoppingList] = useState(false);
+  const { isMealCompleted, toggleMealCompletion } = useUser();
+  const { toast } = useToast();
 
   const getMealTypeColor = (type: string) => {
     switch (type) {
@@ -29,6 +33,15 @@ const MealPlanView = ({ plan, onBack, onSelectMeal }: MealPlanViewProps) => {
   const generateShoppingList = () => {
     console.log("Generating shopping list for meal plan:", plan);
     setShowShoppingList(true);
+  };
+
+  const handleMealCompletion = (meal: any, date: string) => {
+    toggleMealCompletion(meal.id, date);
+    const completed = !isMealCompleted(meal.id, date);
+    toast({
+      title: completed ? "Meal completed!" : "Meal unchecked",
+      description: completed ? `Great job completing ${meal.name}!` : `${meal.name} marked as incomplete.`,
+    });
   };
 
   const currentWeek = plan.weeks.find((w: any) => w.week === selectedWeek);
@@ -78,16 +91,26 @@ const MealPlanView = ({ plan, onBack, onSelectMeal }: MealPlanViewProps) => {
       <Card className="bg-white/70 backdrop-blur-sm border-green-200">
         <CardContent className="p-6">
           <div className="flex space-x-2">
-            {plan.weeks.map((week: any) => (
-              <Button
-                key={week.week}
-                variant={selectedWeek === week.week ? "default" : "outline"}
-                onClick={() => setSelectedWeek(week.week)}
-                className={selectedWeek === week.week ? "bg-gradient-to-r from-green-500 to-orange-500" : ""}
-              >
-                Week {week.week}
-              </Button>
-            ))}
+            {plan.weeks.map((week: any) => {
+              const weekMeals = week.days.flatMap((day: any) => day.meals);
+              const completedMeals = weekMeals.filter((meal: any) => isMealCompleted(meal.id, week.week.toString()));
+              const completionPercentage = weekMeals.length > 0 ? (completedMeals.length / weekMeals.length) * 100 : 0;
+              
+              return (
+                <div key={week.week} className="flex flex-col items-center">
+                  <Button
+                    variant={selectedWeek === week.week ? "default" : "outline"}
+                    onClick={() => setSelectedWeek(week.week)}
+                    className={selectedWeek === week.week ? "bg-gradient-to-r from-green-500 to-orange-500" : ""}
+                  >
+                    Week {week.week}
+                  </Button>
+                  <div className="mt-2 text-xs text-gray-500">
+                    {Math.round(completionPercentage)}% complete
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -110,46 +133,128 @@ const MealPlanView = ({ plan, onBack, onSelectMeal }: MealPlanViewProps) => {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {day.meals.map((meal: any) => (
-                    <div
-                      key={meal.id}
-                      className="p-4 bg-white/50 rounded-lg border border-green-100 hover:bg-white/70 transition-colors cursor-pointer"
-                      onClick={() => onSelectMeal(meal)}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getMealTypeColor(meal.type)}`}>
-                          {meal.type.charAt(0).toUpperCase() + meal.type.slice(1)}
-                        </span>
-                        <span className="text-sm text-gray-500">{meal.calories} cal</span>
-                      </div>
-                      
-                      <h4 className="font-semibold text-gray-800 mb-2">{meal.name}</h4>
-                      
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <div className="flex items-center space-x-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{meal.prepTime}min</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <ChefHat className="h-3 w-3" />
-                          <span className="capitalize">{meal.difficulty}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-3 pt-3 border-t border-green-100">
-                        <div className="flex items-center justify-between">
-                          <Button size="sm" variant="ghost" className="text-green-600 hover:text-green-700 p-0">
-                            <BookOpen className="h-4 w-4 mr-1" />
-                            Recipe
-                          </Button>
-                          <Button size="sm" variant="ghost" className="text-orange-600 hover:text-orange-700 p-0">
-                            <Play className="h-4 w-4 mr-1" />
-                            Video
+                  {day.meals.map((meal: any) => {
+                    const isCompleted = isMealCompleted(meal.id, day.day.toString());
+                    
+                    return (
+                      <div
+                        key={meal.id}
+                        className={`p-4 bg-white/50 rounded-lg border border-green-100 hover:bg-white/70 transition-colors relative ${
+                          isCompleted ? 'bg-green-50 border-green-200' : ''
+                        }`}
+                      >
+                        <div className="absolute top-2 right-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleMealCompletion(meal, day.day.toString())}
+                            className={`h-8 w-8 p-0 ${isCompleted ? 'text-green-600 hover:text-green-700' : 'text-gray-400 hover:text-gray-600'}`}
+                          >
+                            <CheckCircle className={`h-5 w-5 ${isCompleted ? 'fill-current' : ''}`} />
                           </Button>
                         </div>
+
+                        <div className="pr-8">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getMealTypeColor(meal.type)}`}>
+                              {meal.type.charAt(0).toUpperCase() + meal.type.slice(1)}
+                            </span>
+                            <span className="text-sm text-gray-500">{meal.calories} cal</span>
+                          </div>
+                          
+                          <h4 className={`font-semibold text-gray-800 mb-2 ${isCompleted ? 'line-through opacity-75' : ''}`}>
+                            {meal.name}
+                          </h4>
+                          
+                          <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{meal.prepTime}min</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <ChefHat className="h-3 w-3" />
+                              <span className="capitalize">{meal.difficulty}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="pt-3 border-t border-green-100">
+                            <div className="flex items-center justify-between">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button size="sm" variant="ghost" className="text-green-600 hover:text-green-700 p-0">
+                                    <BookOpen className="h-4 w-4 mr-1" />
+                                    Recipe
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                  <DialogHeader>
+                                    <DialogTitle className="flex items-center space-x-2">
+                                      <ChefHat className="h-5 w-5 text-green-600" />
+                                      <span>{meal.name}</span>
+                                    </DialogTitle>
+                                  </DialogHeader>
+                                  <div className="space-y-4">
+                                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                      <div className="flex items-center space-x-1">
+                                        <Clock className="h-4 w-4" />
+                                        <span>{meal.prepTime} minutes</span>
+                                      </div>
+                                      <div className="flex items-center space-x-1">
+                                        <Users className="h-4 w-4" />
+                                        <span>{meal.servings || 4} servings</span>
+                                      </div>
+                                      <span>{meal.calories} calories per serving</span>
+                                    </div>
+                                    
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Ingredients:</h4>
+                                      <ul className="list-disc list-inside space-y-1 text-sm">
+                                        {(meal.ingredients || [
+                                          "2 chicken breasts",
+                                          "1 tbsp olive oil",
+                                          "Salt and pepper to taste",
+                                          "1 tsp garlic powder"
+                                        ]).map((ingredient: string, index: number) => (
+                                          <li key={index}>{ingredient}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                    
+                                    <div>
+                                      <h4 className="font-semibold mb-2">Instructions:</h4>
+                                      <ol className="list-decimal list-inside space-y-2 text-sm">
+                                        {(meal.steps || [
+                                          "Preheat oven to 375°F (190°C)",
+                                          "Season chicken with salt, pepper, and garlic powder",
+                                          "Heat olive oil in an oven-safe pan over medium-high heat",
+                                          "Sear chicken for 3-4 minutes per side until golden brown",
+                                          "Transfer pan to oven and bake for 15-20 minutes until cooked through",
+                                          "Let rest for 5 minutes before serving"
+                                        ]).map((step: string, index: number) => (
+                                          <li key={index} className="mb-2">{step}</li>
+                                        ))}
+                                      </ol>
+                                    </div>
+                                    
+                                    <div className="pt-4 border-t">
+                                      <Button className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+                                        <Play className="h-4 w-4 mr-2" />
+                                        Watch Cooking Video
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                              <Button size="sm" variant="ghost" className="text-orange-600 hover:text-orange-700 p-0">
+                                <Play className="h-4 w-4 mr-1" />
+                                Video
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

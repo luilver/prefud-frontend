@@ -1,9 +1,12 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Bell, Package, Calendar, AlertTriangle, Plus, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Bell, Package, Calendar, AlertTriangle, Plus, Search, Trash2 } from "lucide-react";
+import AddIngredientForm from "./AddIngredientForm";
+import AIMealSuggestions from "./AIMealSuggestions";
+import { useToast } from "@/hooks/use-toast";
 
 interface Ingredient {
   id: string;
@@ -17,7 +20,10 @@ interface Ingredient {
 
 const IngredientTracker = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [ingredients] = useState<Ingredient[]>([
+  const [showAddForm, setShowAddForm] = useState(false);
+  const { toast } = useToast();
+  
+  const [ingredients, setIngredients] = useState<Ingredient[]>([
     {
       id: "1",
       name: "Chicken Breast",
@@ -64,6 +70,24 @@ const IngredientTracker = () => {
       location: "Refrigerator"
     }
   ]);
+
+  const handleAddIngredient = (newIngredient: Ingredient) => {
+    setIngredients(prev => [...prev, newIngredient]);
+  };
+
+  const handleDeleteIngredient = (id: string) => {
+    const ingredient = ingredients.find(ing => ing.id === id);
+    setIngredients(prev => prev.filter(ing => ing.id !== id));
+    toast({
+      title: "Ingredient removed",
+      description: `${ingredient?.name} has been removed from your pantry.`,
+    });
+  };
+
+  const handleAddMealFromAI = (meal: any) => {
+    // TODO: Add meal to meal plan
+    console.log('Adding AI suggested meal to plan:', meal);
+  };
 
   const getDaysUntilExpiry = (expiryDate: Date) => {
     const today = new Date();
@@ -124,14 +148,31 @@ const IngredientTracker = () => {
           <h2 className="text-2xl font-bold text-gray-800">Pantry Tracker</h2>
           <p className="text-gray-600">Keep track of your ingredients and their expiration dates</p>
         </div>
-        <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Ingredient
-        </Button>
+        <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Ingredient
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <AddIngredientForm 
+              onClose={() => setShowAddForm(false)}
+              onAdd={handleAddIngredient}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
+
+      {/* AI Suggestions */}
+      <AIMealSuggestions 
+        ingredients={ingredients}
+        onAddMeal={handleAddMealFromAI}
+      />
 
       {/* Quick Stats */}
       <div className="grid md:grid-cols-4 gap-6">
+        {/* ... keep existing code (stats cards) */}
         <Card className="bg-white/70 backdrop-blur-sm border-green-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -266,7 +307,7 @@ const IngredientTracker = () => {
                       const daysLeft = getDaysUntilExpiry(ingredient.expiryDate);
                       
                       return (
-                        <div key={ingredient.id} className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor}`}>
+                        <div key={ingredient.id} className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor} group`}>
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <h4 className="font-medium text-gray-800">{ingredient.name}</h4>
@@ -277,13 +318,23 @@ const IngredientTracker = () => {
                                 <p className="text-xs text-gray-500">{ingredient.location}</p>
                               )}
                             </div>
-                            <div className="text-right">
-                              <p className={`text-sm font-medium ${expiryInfo.color}`}>
-                                {daysLeft < 0 ? 'Expired' : daysLeft === 0 ? 'Today' : `${daysLeft}d`}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {formatExpiryDate(ingredient.expiryDate)}
-                              </p>
+                            <div className="flex items-center space-x-2">
+                              <div className="text-right">
+                                <p className={`text-sm font-medium ${expiryInfo.color}`}>
+                                  {daysLeft < 0 ? 'Expired' : daysLeft === 0 ? 'Today' : `${daysLeft}d`}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {formatExpiryDate(ingredient.expiryDate)}
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteIngredient(ingredient.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
                         </div>
