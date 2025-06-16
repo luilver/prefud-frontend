@@ -44,18 +44,18 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        videoRef.current.onloadedmetadata = () => {
-          console.log('Video metadata loaded');
+        videoRef.current.addEventListener('loadedmetadata', () => {
+          console.log('Video metadata loaded, dimensions:', videoRef.current?.videoWidth, 'x', videoRef.current?.videoHeight);
           if (videoRef.current) {
             videoRef.current.play().then(() => {
-              console.log('Video playing');
+              console.log('Video playing successfully');
               setIsScanning(true);
             }).catch(err => {
               console.error('Error playing video:', err);
               setCameraError("Error starting video playback");
             });
           }
-        };
+        });
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -228,18 +228,21 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
               autoPlay
               playsInline
               muted
-              className="w-full rounded-lg border-2 border-green-300"
-              style={{ maxHeight: '400px', backgroundColor: '#000' }}
+              className="w-full h-80 rounded-lg border-2 border-green-300 object-cover bg-black"
             />
-            <div className="absolute inset-0 border-2 border-dashed border-white rounded-lg flex items-center justify-center pointer-events-none">
-              <div className="bg-black/50 text-white px-4 py-2 rounded-lg">
+            <div className="absolute inset-4 border-2 border-dashed border-white/70 rounded-lg flex items-center justify-center pointer-events-none">
+              <div className="bg-black/60 text-white px-4 py-2 rounded-lg text-sm">
                 Position product in frame
               </div>
             </div>
             <div className="flex justify-center space-x-4 mt-4">
-              <Button onClick={captureImage} size="lg">
+              <Button 
+                onClick={captureImage} 
+                size="lg"
+                className="bg-green-600 hover:bg-green-700"
+              >
                 <Camera className="h-4 w-4 mr-2" />
-                Capture
+                Capture Photo
               </Button>
               <Button variant="outline" onClick={stopCamera}>
                 Cancel
