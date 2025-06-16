@@ -99,6 +99,8 @@ interface UserContextType {
   addMealPlan: (plan: MealPlan) => void;
   deleteMealPlan: (planId: string) => void;
   deleteMealFromPlan: (planId: string, mealId: string) => void;
+  // User profile management
+  updateUserProfile: (profileData: Partial<User>) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -500,6 +502,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // User profile management methods
+  const updateUserProfile = (profileData: Partial<User>) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        ...profileData,
+      };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      toast({
+        title: "Profile Updated",
+        description: "Your profile information has been successfully updated.",
+      });
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -533,6 +552,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addMealPlan,
         deleteMealPlan,
         deleteMealFromPlan,
+        updateUserProfile,
       }}
     >
       {children}

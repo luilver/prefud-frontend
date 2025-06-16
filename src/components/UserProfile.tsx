@@ -1,15 +1,19 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { User, Settings, Target, Crown, Bell, Shield } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 
-interface UserData {
+interface UserFormData {
   name: string;
   email: string;
+  phone: string;
   age: number;
   weight: number;
   height: number;
@@ -22,33 +26,50 @@ interface UserData {
 }
 
 const UserProfile = () => {
-  const [userData, setUserData] = useState<UserData>({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    age: 32,
-    weight: 175,
-    height: 70,
-    activity_level: "moderate",
-    dietary_preferences: ["Balanced", "High Protein"],
-    allergies: ["Nuts"],
-    daily_calorie_goal: 2000,
-    meals_per_day: 3,
-    people_count: 2
+  const { user, updateUserProfile } = useUser();
+  const [isSubscribed] = useState(user?.subscription?.isSubscribed || false);
+  const [subscriptionPlan] = useState(user?.subscription?.plan === 'premium' ? 'Premium' : 'Free');
+  
+  const form = useForm<UserFormData>({
+    defaultValues: {
+      name: user?.name || "John Doe",
+      email: user?.email || "john.doe@example.com",
+      phone: user?.phone || "+1234567890",
+      age: 32,
+      weight: 175,
+      height: 70,
+      activity_level: "moderate",
+      dietary_preferences: ["Balanced", "High Protein"],
+      allergies: ["Nuts"],
+      daily_calorie_goal: 2000,
+      meals_per_day: 3,
+      people_count: 2
+    }
   });
 
-  const [isSubscribed] = useState(true);
-  const [subscriptionPlan] = useState("Premium");
+  const [dietaryPrefs, setDietaryPrefs] = useState<string[]>(["Balanced", "High Protein"]);
 
-  const handleInputChange = (field: keyof UserData, value: any) => {
-    setUserData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  useEffect(() => {
+    if (user) {
+      form.setValue('name', user.name);
+      form.setValue('email', user.email);
+      form.setValue('phone', user.phone);
+    }
+  }, [user, form]);
+
+  const onSubmit = (data: UserFormData) => {
+    updateUserProfile({
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+    });
   };
 
   const calculateBMI = () => {
-    const heightInMeters = (userData.height * 2.54) / 100;
-    const weightInKg = userData.weight * 0.453592;
+    const weight = form.watch('weight');
+    const height = form.watch('height');
+    const heightInMeters = (height * 2.54) / 100;
+    const weightInKg = weight * 0.453592;
     return (weightInKg / (heightInMeters * heightInMeters)).toFixed(1);
   };
 
@@ -57,6 +78,15 @@ const UserProfile = () => {
     if (bmi < 25) return { category: "Normal", color: "text-green-600" };
     if (bmi < 30) return { category: "Overweight", color: "text-orange-600" };
     return { category: "Obese", color: "text-red-600" };
+  };
+
+  const handleDietaryPrefToggle = (diet: string) => {
+    const currentPrefs = dietaryPrefs;
+    const newPrefs = currentPrefs.includes(diet)
+      ? currentPrefs.filter(p => p !== diet)
+      : [...currentPrefs, diet];
+    setDietaryPrefs(newPrefs);
+    form.setValue('dietary_preferences', newPrefs);
   };
 
   const bmi = parseFloat(calculateBMI());
@@ -75,14 +105,11 @@ const UserProfile = () => {
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
-          <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-            Save Changes
-          </Button>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Personal Information */}
+        {/* Personal Information Form */}
         <Card className="lg:col-span-2 bg-white/70 backdrop-blur-sm border-green-200">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -93,175 +120,242 @@ const UserProfile = () => {
               Update your basic information and physical stats
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Basic Info */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={userData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="border-green-200 focus:border-green-400"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={userData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className="border-green-200 focus:border-green-400"
-                />
-              </div>
-              <div>
-                <Label htmlFor="age">Age</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  value={userData.age}
-                  onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
-                  className="border-green-200 focus:border-green-400"
-                />
-              </div>
-              <div>
-                <Label htmlFor="activity">Activity Level</Label>
-                <select
-                  id="activity"
-                  value={userData.activity_level}
-                  onChange={(e) => handleInputChange('activity_level', e.target.value)}
-                  className="w-full h-10 px-3 py-2 border border-green-200 rounded-md focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-200"
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Basic Info */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="border-green-200 focus:border-green-400" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} className="border-green-200 focus:border-green-400" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="border-green-200 focus:border-green-400" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="age"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Age</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            {...field} 
+                            onChange={e => field.onChange(parseInt(e.target.value))}
+                            className="border-green-200 focus:border-green-400" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Physical Stats */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Physical Stats & Health Goals</h3>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="weight"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Weight (lbs)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              {...field} 
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              className="border-green-200 focus:border-green-400" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="height"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Height (inches)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              {...field} 
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              className="border-green-200 focus:border-green-400" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div>
+                      <Label>BMI</Label>
+                      <div className="p-2 border border-gray-200 rounded-md bg-gray-50">
+                        <span className="font-medium">{calculateBMI()}</span>
+                        <span className={`ml-2 text-sm ${bmiInfo.color}`}>
+                          ({bmiInfo.category})
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Health Goals */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Health Goals</h3>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="daily_calorie_goal"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Daily Calorie Goal</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              {...field} 
+                              onChange={e => field.onChange(parseInt(e.target.value))}
+                              className="border-green-200 focus:border-green-400" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="meals_per_day"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Meals per Day</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="1" 
+                              max="6" 
+                              {...field} 
+                              onChange={e => field.onChange(parseInt(e.target.value))}
+                              className="border-green-200 focus:border-green-400" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="people_count"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>People Count</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="1" 
+                              {...field} 
+                              onChange={e => field.onChange(parseInt(e.target.value))}
+                              className="border-green-200 focus:border-green-400" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Dietary Preferences */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Dietary Preferences</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Diet Types</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {['Balanced', 'High Protein', 'Low Carb', 'Vegetarian', 'Vegan', 'Keto', 'Mediterranean'].map((diet) => (
+                          <button
+                            key={diet}
+                            type="button"
+                            onClick={() => handleDietaryPrefToggle(diet)}
+                            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                              dietaryPrefs.includes(diet)
+                                ? 'bg-green-500 text-white border-green-500'
+                                : 'bg-white text-gray-700 border-gray-300 hover:border-green-400'
+                            }`}
+                          >
+                            {diet}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="allergies"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Allergies & Restrictions</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="List any food allergies or restrictions..."
+                              value={field.value.join(', ')}
+                              onChange={(e) => field.onChange(e.target.value.split(', ').filter(a => a.trim()))}
+                              className="border-green-200 focus:border-green-400"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
                 >
-                  <option value="sedentary">Sedentary</option>
-                  <option value="light">Light Exercise</option>
-                  <option value="moderate">Moderate Exercise</option>
-                  <option value="active">Very Active</option>
-                  <option value="extra">Extra Active</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Physical Stats */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Physical Stats</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="weight">Weight (lbs)</Label>
-                  <Input
-                    id="weight"
-                    type="number"
-                    value={userData.weight}
-                    onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
-                    className="border-green-200 focus:border-green-400"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="height">Height (inches)</Label>
-                  <Input
-                    id="height"
-                    type="number"
-                    value={userData.height}
-                    onChange={(e) => handleInputChange('height', parseFloat(e.target.value))}
-                    className="border-green-200 focus:border-green-400"
-                  />
-                </div>
-                <div>
-                  <Label>BMI</Label>
-                  <div className="p-2 border border-gray-200 rounded-md bg-gray-50">
-                    <span className="font-medium">{calculateBMI()}</span>
-                    <span className={`ml-2 text-sm ${bmiInfo.color}`}>
-                      ({bmiInfo.category})
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Meal Planning Preferences */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Meal Planning</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="calories">Daily Calorie Goal</Label>
-                  <Input
-                    id="calories"
-                    type="number"
-                    value={userData.daily_calorie_goal}
-                    onChange={(e) => handleInputChange('daily_calorie_goal', parseInt(e.target.value))}
-                    className="border-green-200 focus:border-green-400"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="meals">Meals per Day</Label>
-                  <Input
-                    id="meals"
-                    type="number"
-                    min="1"
-                    max="6"
-                    value={userData.meals_per_day}
-                    onChange={(e) => handleInputChange('meals_per_day', parseInt(e.target.value))}
-                    className="border-green-200 focus:border-green-400"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="people">People Count</Label>
-                  <Input
-                    id="people"
-                    type="number"
-                    min="1"
-                    value={userData.people_count}
-                    onChange={(e) => handleInputChange('people_count', parseInt(e.target.value))}
-                    className="border-green-200 focus:border-green-400"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Dietary Preferences */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Dietary Preferences</h3>
-              <div className="space-y-4">
-                <div>
-                  <Label>Diet Types</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {['Balanced', 'High Protein', 'Low Carb', 'Vegetarian', 'Vegan', 'Keto', 'Mediterranean'].map((diet) => (
-                      <button
-                        key={diet}
-                        onClick={() => {
-                          const currentPrefs = userData.dietary_preferences;
-                          const newPrefs = currentPrefs.includes(diet)
-                            ? currentPrefs.filter(p => p !== diet)
-                            : [...currentPrefs, diet];
-                          handleInputChange('dietary_preferences', newPrefs);
-                        }}
-                        className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-                          userData.dietary_preferences.includes(diet)
-                            ? 'bg-green-500 text-white border-green-500'
-                            : 'bg-white text-gray-700 border-gray-300 hover:border-green-400'
-                        }`}
-                      >
-                        {diet}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="allergies">Allergies & Restrictions</Label>
-                  <Textarea
-                    id="allergies"
-                    placeholder="List any food allergies or restrictions..."
-                    value={userData.allergies.join(', ')}
-                    onChange={(e) => handleInputChange('allergies', e.target.value.split(', ').filter(a => a.trim()))}
-                    className="border-green-200 focus:border-green-400"
-                  />
-                </div>
-              </div>
-            </div>
+                  Save Changes
+                </Button>
+              </form>
+            </Form>
           </CardContent>
         </Card>
 
-        {/* Subscription & Health Stats */}
+        {/* Right sidebar with subscription and health stats */}
         <div className="space-y-6">
           {/* Subscription Status */}
           <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
@@ -315,7 +409,6 @@ const UserProfile = () => {
             </CardContent>
           </Card>
 
-          {/* Health Goals */}
           <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-blue-700">
@@ -333,13 +426,13 @@ const UserProfile = () => {
                 
                 <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                   <h4 className="font-medium text-green-800">Daily Calories</h4>
-                  <p className="text-2xl font-bold text-green-700">{userData.daily_calorie_goal}</p>
+                  <p className="text-2xl font-bold text-green-700">{form.watch('daily_calorie_goal')}</p>
                   <p className="text-sm text-green-600">Target intake</p>
                 </div>
 
                 <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
                   <h4 className="font-medium text-orange-800">Meal Planning</h4>
-                  <p className="text-2xl font-bold text-orange-700">{userData.meals_per_day}</p>
+                  <p className="text-2xl font-bold text-orange-700">{form.watch('meals_per_day')}</p>
                   <p className="text-sm text-orange-600">Meals per day</p>
                 </div>
               </div>
