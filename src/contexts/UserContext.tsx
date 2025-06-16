@@ -53,6 +53,8 @@ export interface Ingredient {
   expiryDate: Date;
   category: string;
   location?: string;
+  image?: string;
+  addedViaCamera?: boolean;
 }
 
 export interface MealPlan {
@@ -438,7 +440,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     toast({
       title: "Ingredient Added",
-      description: `${ingredient.name} has been added to your pantry.`,
+      description: `${ingredient.name} has been added to your pantry${ingredient.addedViaCamera ? ' via camera scan' : ''}.`,
     });
   };
 

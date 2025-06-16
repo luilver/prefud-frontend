@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Plus, X } from "lucide-react";
+import { CalendarIcon, Plus, X, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import CameraProductScanner from "./CameraProductScanner";
 
 interface AddIngredientFormProps {
   onClose: () => void;
@@ -24,7 +24,37 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
   const [location, setLocation] = useState("");
   const [expiryDate, setExpiryDate] = useState<Date>();
   const [isLoading, setIsLoading] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const [productImage, setProductImage] = useState<Blob | null>(null);
   const { toast } = useToast();
+
+  const handleProductDetected = (productName: string, imageBlob: Blob) => {
+    setName(productName);
+    setProductImage(imageBlob);
+    setShowCamera(false);
+    
+    // Auto-suggest category based on product name
+    const categoryMap: Record<string, string> = {
+      'chicken': 'Meat', 'beef': 'Meat', 'pork': 'Meat', 'turkey': 'Meat',
+      'milk': 'Dairy', 'cheese': 'Dairy', 'yogurt': 'Dairy', 'butter': 'Dairy',
+      'banana': 'Fruits', 'apple': 'Fruits', 'orange': 'Fruits', 'grapes': 'Fruits',
+      'tomato': 'Vegetables', 'onion': 'Vegetables', 'carrot': 'Vegetables', 'pepper': 'Vegetables',
+      'bread': 'Grains', 'rice': 'Grains', 'pasta': 'Grains', 'cereal': 'Grains'
+    };
+
+    const detectedCategory = Object.entries(categoryMap).find(([key]) => 
+      productName.toLowerCase().includes(key)
+    )?.[1];
+
+    if (detectedCategory) {
+      setCategory(detectedCategory);
+    }
+
+    toast({
+      title: "Product Added!",
+      description: `${productName} detected. Please fill in the remaining details.`,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,9 +78,10 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
         category,
         location: location || "Pantry",
         expiryDate,
+        image: productImage ? URL.createObjectURL(productImage) : undefined,
+        addedViaCamera: !!productImage
       };
 
-      // TODO: Replace with your API call
       console.log('Adding ingredient:', newIngredient);
       
       onAdd(newIngredient);
@@ -69,6 +100,15 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
       setIsLoading(false);
     }
   };
+
+  if (showCamera) {
+    return (
+      <CameraProductScanner
+        onProductDetected={handleProductDetected}
+        onClose={() => setShowCamera(false)}
+      />
+    );
+  }
 
   return (
     <Card className="bg-white/90 backdrop-blur-sm border-green-200">
@@ -89,6 +129,18 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
         </div>
       </CardHeader>
       <CardContent>
+        <div className="mb-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowCamera(true)}
+            className="w-full border-green-300 text-green-700 hover:bg-green-50"
+          >
+            <Camera className="h-4 w-4 mr-2" />
+            Scan Product with Camera
+          </Button>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
@@ -195,6 +247,12 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
               </PopoverContent>
             </Popover>
           </div>
+
+          {productImage && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <p className="text-sm text-green-700">✓ Product image captured via camera</p>
+            </div>
+          )}
 
           <div className="flex space-x-2 pt-4">
             <Button 
