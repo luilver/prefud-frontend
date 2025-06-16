@@ -12,12 +12,20 @@ import SignupForm from "@/components/SignupForm";
 import PasswordRecovery from "@/components/PasswordRecovery";
 
 const Index = () => {
-  const { isAuthenticated, login } = useUser();
+  const userContext = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showSignup, setShowSignup] = useState(false);
   const [showPasswordRecovery, setShowPasswordRecovery] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Add safety check for context
+  if (!userContext) {
+    console.error('Index component not wrapped in UserProvider');
+    return <div>Loading...</div>;
+  }
+
+  const { isAuthenticated, login } = userContext;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

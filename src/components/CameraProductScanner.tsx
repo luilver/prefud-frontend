@@ -1,5 +1,5 @@
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, X, RotateCcw, Check, Loader2 } from "lucide-react";
@@ -16,53 +16,109 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
   const [detectedProduct, setDetectedProduct] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [cameraError, setCameraError] = useState<string>("");
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
+    console.log('Starting camera...');
+    setCameraError("");
+    
     try {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } // Use back camera on mobile
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
       });
+      
+      console.log('Camera stream obtained:', mediaStream);
       setStream(mediaStream);
+      
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        setIsScanning(true);
+        videoRef.current.onloadedmetadata = () => {
+          console.log('Video metadata loaded');
+          if (videoRef.current) {
+            videoRef.current.play().then(() => {
+              console.log('Video playing');
+              setIsScanning(true);
+            }).catch(err => {
+              console.error('Error playing video:', err);
+              setCameraError("Error starting video playback");
+            });
+          }
+        };
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
+      setCameraError(`Camera access failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       toast({
         title: "Camera Error",
-        description: "Unable to access camera. Please check permissions.",
+        description: "Unable to access camera. Please check permissions and try again.",
         variant: "destructive",
       });
     }
-  };
+  }, [stream, toast]);
 
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
+    console.log('Stopping camera...');
     if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach(track => {
+        console.log('Stopping track:', track.kind);
+        track.stop();
+      });
       setStream(null);
     }
     setIsScanning(false);
-  };
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, [stream]);
+
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
 
   const captureImage = () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    console.log('Capturing image...');
+    if (!videoRef.current || !canvasRef.current) {
+      console.error('Video or canvas ref not available');
+      return;
+    }
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('Canvas context not available');
+      return;
+    }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth || video.clientWidth;
+    canvas.height = video.videoHeight || video.clientHeight;
+    
+    console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+    
+    // Draw the current video frame to canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+    console.log('Image captured, data URL length:', imageDataUrl.length);
+    
     setCapturedImage(imageDataUrl);
     stopCamera();
     processImage(imageDataUrl);
@@ -70,6 +126,7 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
 
   const processImage = async (imageDataUrl: string) => {
     setIsProcessing(true);
+    console.log('Processing image for product detection...');
     
     try {
       // Simulate AI product detection (replace with actual AI service)
@@ -84,6 +141,8 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
       
       const randomProduct = mockProducts[Math.floor(Math.random() * mockProducts.length)];
       setDetectedProduct(randomProduct);
+      
+      console.log('Product detected:', randomProduct);
       
       toast({
         title: "Product Detected!",
@@ -107,12 +166,14 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
       fetch(capturedImage)
         .then(res => res.blob())
         .then(blob => {
+          console.log('Confirming product:', detectedProduct);
           onProductDetected(detectedProduct, blob);
         });
     }
   };
 
   const retryCapture = () => {
+    console.log('Retrying capture...');
     setCapturedImage(null);
     setDetectedProduct("");
     startCamera();
@@ -137,7 +198,16 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {!isScanning && !capturedImage && (
+        {cameraError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-700 text-sm">{cameraError}</p>
+            <Button onClick={startCamera} className="mt-2" size="sm">
+              Retry Camera Access
+            </Button>
+          </div>
+        )}
+
+        {!isScanning && !capturedImage && !cameraError && (
           <div className="text-center py-8">
             <Camera className="h-16 w-16 mx-auto mb-4 text-gray-400" />
             <p className="text-gray-600 mb-4">Start your camera to scan products</p>
@@ -157,8 +227,9 @@ const CameraProductScanner = ({ onProductDetected, onClose }: CameraProductScann
               ref={videoRef}
               autoPlay
               playsInline
+              muted
               className="w-full rounded-lg border-2 border-green-300"
-              style={{ maxHeight: '400px' }}
+              style={{ maxHeight: '400px', backgroundColor: '#000' }}
             />
             <div className="absolute inset-0 border-2 border-dashed border-white rounded-lg flex items-center justify-center pointer-events-none">
               <div className="bg-black/50 text-white px-4 py-2 rounded-lg">
