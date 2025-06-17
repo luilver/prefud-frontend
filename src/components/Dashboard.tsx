@@ -16,6 +16,20 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("planner");
   const { user, logout } = useUser();
 
+  const handleStartPlanning = () => {
+    setActiveTab("planner");
+    // Smooth scroll to the meal planner section after a brief delay to ensure tab switch
+    setTimeout(() => {
+      const mealPlannerSection = document.getElementById("meal-planner-section");
+      if (mealPlannerSection) {
+        mealPlannerSection.scrollIntoView({ 
+          behavior: "smooth", 
+          block: "start" 
+        });
+      }
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
       {/* Header */}
@@ -68,7 +82,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <Button 
-                  onClick={() => setActiveTab("planner")}
+                  onClick={handleStartPlanning}
                   className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 w-full sm:w-auto"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
@@ -163,7 +177,9 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="planner" className="mt-4 sm:mt-6">
-            <MealPlanner />
+            <div id="meal-planner-section">
+              <MealPlanner />
+            </div>
           </TabsContent>
 
           <TabsContent value="ingredients" className="mt-4 sm:mt-6">
