@@ -30,6 +30,19 @@ const Dashboard = () => {
     }, 100);
   };
 
+  const handleAIMealPlan = () => {
+    // Smooth scroll to the meal planner section
+    setTimeout(() => {
+      const mealPlannerSection = document.getElementById("meal-planner-section");
+      if (mealPlannerSection) {
+        mealPlannerSection.scrollIntoView({ 
+          behavior: "smooth", 
+          block: "start" 
+        });
+      }
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
       {/* Header */}
@@ -178,26 +191,27 @@ const Dashboard = () => {
 
           <TabsContent value="planner" className="mt-4 sm:mt-6">
             <div id="meal-planner-section" className="space-y-4">
-              {/* Mobile-optimized meal planner header */}
+              {/* Mobile-optimized meal planner header with responsive buttons */}
               <div className="flex flex-col space-y-4">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 w-full sm:w-auto text-center sm:text-left px-2 sm:px-0" 
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 w-full text-center sm:text-left" 
                     style={{ width: window.innerWidth < 640 ? '90%' : 'auto', margin: window.innerWidth < 640 ? '0 auto' : '0' }}>
                   Weekly Meal Planner
                 </h3>
                 {/* Mobile row layout for AI Meal and Add Meal buttons */}
-                <div className="flex flex-row sm:flex-col gap-2 sm:gap-4 w-full">
+                <div className="flex flex-row gap-2 w-full">
                   <Button 
+                    onClick={handleAIMealPlan}
                     variant="outline" 
-                    className="flex-1 sm:flex-initial border-green-200 text-green-700 hover:bg-green-50 h-10 sm:h-auto px-3 sm:px-4 text-sm sm:text-base"
+                    className="flex-1 border-green-200 text-green-700 hover:bg-green-50 h-10 px-3 text-sm"
                   >
-                    <Sparkles className="h-4 w-4 mr-1 sm:mr-2" />
+                    <Sparkles className="h-4 w-4 mr-1" />
                     <span className="hidden xs:inline">AI Meal</span>
                     <span className="xs:hidden">AI</span>
                   </Button>
                   <Button 
-                    className="flex-1 sm:flex-initial bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-auto px-3 sm:px-4 text-sm sm:text-base"
+                    className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 px-3 text-sm"
                   >
-                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                    <Plus className="h-4 w-4 mr-1" />
                     <span className="hidden xs:inline">Add Meal</span>
                     <span className="xs:hidden">Add</span>
                   </Button>
