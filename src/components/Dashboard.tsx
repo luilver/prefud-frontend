@@ -25,18 +25,18 @@ const Dashboard = () => {
             <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
               <Utensils className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent">
+            <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent">
               Pantry
             </h1>
           </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="text-green-700">
-              <Bell className="h-5 w-5" />
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <Button variant="ghost" size="icon" className="text-green-700 h-8 w-8 sm:h-10 sm:w-10">
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-green-700" onClick={() => setActiveTab("subscription")}>
-              <Settings className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="text-green-700 h-8 w-8 sm:h-10 sm:w-10" onClick={() => setActiveTab("subscription")}>
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <Button variant="ghost" onClick={logout} className="text-green-700">
+            <Button variant="ghost" onClick={logout} className="text-green-700 text-sm sm:text-base px-2 sm:px-4">
               Logout
             </Button>
           </div>
@@ -44,32 +44,32 @@ const Dashboard = () => {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
         {/* Welcome Section with Meal Planner Emphasis */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome back, {user?.name || 'User'}!</h2>
-          <p className="text-gray-600 mb-6">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Welcome back, {user?.name || 'User'}!</h2>
+          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
             You're on the {user?.subscription.plan} plan with {user?.subscription.planLimits.plansPerMonth - (user?.subscription.planLimits.usedPlans || 0)} meal plans remaining this month.
           </p>
           
           {/* Featured Meal Planner Card */}
-          <Card className="bg-gradient-to-r from-green-500/10 via-orange-500/10 to-purple-500/10 border-green-300 mb-6">
-            <CardHeader>
-              <div className="flex items-center justify-between">
+          <Card className="bg-gradient-to-r from-green-500/10 via-orange-500/10 to-purple-500/10 border-green-300 mb-4 sm:mb-6">
+            <CardHeader className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                 <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
-                    <ChefHat className="h-6 w-6 text-white" />
+                  <div className="p-2 sm:p-3 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+                    <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl text-gray-800">Smart Meal Planning</CardTitle>
-                    <CardDescription className="text-gray-600">
+                    <CardTitle className="text-lg sm:text-xl text-gray-800">Smart Meal Planning</CardTitle>
+                    <CardDescription className="text-sm sm:text-base text-gray-600">
                       Plan your week with AI-powered suggestions
                     </CardDescription>
                   </div>
                 </div>
                 <Button 
                   onClick={() => setActiveTab("planner")}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 w-full sm:w-auto"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Start Planning
@@ -80,53 +80,53 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Plans Used</p>
-                  <p className="text-2xl font-bold text-green-700">
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-xs sm:text-sm text-gray-600">Plans Used</p>
+                  <p className="text-lg sm:text-2xl font-bold text-green-700">
                     {user?.subscription.planLimits.usedPlans}/{user?.subscription.planLimits.plansPerMonth}
                   </p>
                 </div>
-                <Calendar className="h-8 w-8 text-green-500" />
+                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 self-end sm:self-auto" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Today's Calories</p>
-                  <p className="text-2xl font-bold text-green-700">1,847</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-xs sm:text-sm text-gray-600">Today's Calories</p>
+                  <p className="text-lg sm:text-2xl font-bold text-green-700">1,847</p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-green-500" />
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 self-end sm:self-auto" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Shopping Items</p>
-                  <p className="text-2xl font-bold text-orange-700">23</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-xs sm:text-sm text-gray-600">Shopping Items</p>
+                  <p className="text-lg sm:text-2xl font-bold text-orange-700">23</p>
                 </div>
-                <ShoppingCart className="h-8 w-8 text-orange-500" />
+                <ShoppingCart className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 self-end sm:self-auto" />
               </div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Expiring Soon</p>
-                  <p className="text-2xl font-bold text-orange-700">3</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-xs sm:text-sm text-gray-600">Expiring Soon</p>
+                  <p className="text-lg sm:text-2xl font-bold text-orange-700">3</p>
                 </div>
-                <Bell className="h-8 w-8 text-orange-500" />
+                <Bell className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 self-end sm:self-auto" />
               </div>
             </CardContent>
           </Card>
@@ -134,54 +134,55 @@ const Dashboard = () => {
 
         {/* Main Navigation Tabs - Reorganized with Meal Planner First */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 bg-white/70 backdrop-blur-sm">
-            <TabsTrigger value="planner" className="flex items-center space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-orange-500 data-[state=active]:text-white">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 bg-white/70 backdrop-blur-sm h-auto p-1">
+            <TabsTrigger value="planner" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-orange-500 data-[state=active]:text-white p-2 text-xs sm:text-sm">
               <ChefHat className="h-4 w-4" />
-              <span>Meal Planner</span>
+              <span className="hidden sm:inline">Meal Planner</span>
+              <span className="sm:hidden">Planner</span>
             </TabsTrigger>
-            <TabsTrigger value="ingredients" className="flex items-center space-x-2">
+            <TabsTrigger value="ingredients" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm">
               <Utensils className="h-4 w-4" />
               <span>Pantry</span>
             </TabsTrigger>
-            <TabsTrigger value="shopping" className="flex items-center space-x-2">
+            <TabsTrigger value="shopping" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm">
               <ShoppingCart className="h-4 w-4" />
               <span>Shopping</span>
             </TabsTrigger>
-            <TabsTrigger value="calories" className="flex items-center space-x-2">
+            <TabsTrigger value="calories" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm">
               <TrendingUp className="h-4 w-4" />
               <span>Calories</span>
             </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center space-x-2">
+            <TabsTrigger value="profile" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm">
               <User className="h-4 w-4" />
               <span>Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="subscription" className="flex items-center space-x-2">
+            <TabsTrigger value="subscription" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm">
               <Settings className="h-4 w-4" />
               <span>Settings</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="planner" className="mt-6">
+          <TabsContent value="planner" className="mt-4 sm:mt-6">
             <MealPlanner />
           </TabsContent>
 
-          <TabsContent value="ingredients" className="mt-6">
+          <TabsContent value="ingredients" className="mt-4 sm:mt-6">
             <IngredientTracker />
           </TabsContent>
 
-          <TabsContent value="shopping" className="mt-6">
+          <TabsContent value="shopping" className="mt-4 sm:mt-6">
             <ShoppingList />
           </TabsContent>
 
-          <TabsContent value="calories" className="mt-6">
+          <TabsContent value="calories" className="mt-4 sm:mt-6">
             <CalorieTracker />
           </TabsContent>
 
-          <TabsContent value="profile" className="mt-6">
+          <TabsContent value="profile" className="mt-4 sm:mt-6">
             <UserProfile />
           </TabsContent>
 
-          <TabsContent value="subscription" className="mt-6">
+          <TabsContent value="subscription" className="mt-4 sm:mt-6">
             <SubscriptionManager />
           </TabsContent>
         </Tabs>
