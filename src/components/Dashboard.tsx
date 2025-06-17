@@ -177,7 +177,32 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="planner" className="mt-4 sm:mt-6">
-            <div id="meal-planner-section">
+            <div id="meal-planner-section" className="space-y-4">
+              {/* Mobile-optimized meal planner header */}
+              <div className="flex flex-col space-y-4">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-800 w-full sm:w-auto text-center sm:text-left px-2 sm:px-0" 
+                    style={{ width: window.innerWidth < 640 ? '90%' : 'auto', margin: window.innerWidth < 640 ? '0 auto' : '0' }}>
+                  Weekly Meal Planner
+                </h3>
+                {/* Mobile row layout for AI Meal and Add Meal buttons */}
+                <div className="flex flex-row sm:flex-col gap-2 sm:gap-4 w-full">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 sm:flex-initial border-green-200 text-green-700 hover:bg-green-50 h-10 sm:h-auto px-3 sm:px-4 text-sm sm:text-base"
+                  >
+                    <Sparkles className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">AI Meal</span>
+                    <span className="xs:hidden">AI</span>
+                  </Button>
+                  <Button 
+                    className="flex-1 sm:flex-initial bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-auto px-3 sm:px-4 text-sm sm:text-base"
+                  >
+                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Add Meal</span>
+                    <span className="xs:hidden">Add</span>
+                  </Button>
+                </div>
+              </div>
               <MealPlanner />
             </div>
           </TabsContent>
