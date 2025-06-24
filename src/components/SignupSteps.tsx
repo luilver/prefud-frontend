@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +35,7 @@ const SignupSteps = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [signupCompleted, setSignupCompleted] = useState(false);
   const { signup } = useUser();
 
   const handleBasicInfoSubmit = async (e: React.FormEvent) => {
@@ -43,9 +43,7 @@ const SignupSteps = () => {
     setIsLoading(true);
     
     try {
-      // Mock: Send OTP to email
       console.log('Mock: Sending OTP to:', signupData.email);
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
       setCurrentStep(2);
     } catch (error) {
@@ -85,7 +83,6 @@ const SignupSteps = () => {
     try {
       console.log('Mock: Completing signup with data:', signupData);
       
-      // Mock signup process
       await signup(
         signupData.email,
         signupData.password,
@@ -95,8 +92,7 @@ const SignupSteps = () => {
       );
       
       console.log('Mock: Signup completed, showing welcome modal');
-      
-      // Show welcome modal immediately
+      setSignupCompleted(true);
       setShowWelcome(true);
     } catch (error) {
       console.error('Mock: Signup failed:', error);
@@ -106,7 +102,7 @@ const SignupSteps = () => {
   const handleWelcomeClose = () => {
     console.log('Mock: Welcome modal closed, user should now see dashboard');
     setShowWelcome(false);
-    // The UserContext will handle showing the dashboard since user is now authenticated
+    setSignupCompleted(false);
   };
 
   const stepItems = [
@@ -118,7 +114,7 @@ const SignupSteps = () => {
   ];
 
   // Show welcome modal if signup is complete
-  if (showWelcome) {
+  if (signupCompleted && showWelcome) {
     return <WelcomeModal onClose={handleWelcomeClose} />;
   }
 
