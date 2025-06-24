@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface Subscription {
@@ -169,6 +168,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     console.log('Mock: User logged out');
     setUser(null);
+    
+    // Dispatch a custom event to notify other components about logout
+    window.dispatchEvent(new CustomEvent('user-logout'));
   };
 
   const updateUserProfile = async (profile: any) => {

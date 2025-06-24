@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,20 @@ const Index = () => {
   }
 
   const { isAuthenticated, login } = userContext;
+
+  // Listen for logout events and reset state
+  useEffect(() => {
+    const handleLogout = () => {
+      console.log('Logout event received, resetting UI state');
+      setShowSignup(false);
+      setShowPasswordRecovery(false);
+      setEmail("");
+      setPassword("");
+    };
+
+    window.addEventListener('user-logout', handleLogout);
+    return () => window.removeEventListener('user-logout', handleLogout);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
