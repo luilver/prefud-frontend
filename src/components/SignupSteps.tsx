@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Crown, Check, X, User, Mail, CreditCard, PartyPopper } from "lucide-react";
+import { Crown, Check, X, User, Mail, CreditCard } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import UserProfileForm from "./UserProfileForm";
 import OTPVerification from "./OTPVerification";
@@ -44,8 +43,10 @@ const SignupSteps = () => {
     setIsLoading(true);
     
     try {
-      // In a real app, this would send OTP to email
-      console.log('Sending OTP to:', signupData.email);
+      // Mock: Send OTP to email
+      console.log('Mock: Sending OTP to:', signupData.email);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
       setCurrentStep(2);
     } catch (error) {
       console.error('Failed to send OTP:', error);
@@ -55,15 +56,18 @@ const SignupSteps = () => {
   };
 
   const handleOTPVerified = () => {
+    console.log('Mock: OTP verified successfully');
     setCurrentStep(3);
   };
 
   const handleProfileComplete = (profileData: any) => {
+    console.log('Mock: Profile data saved:', profileData);
     setSignupData(prev => ({ ...prev, profile: profileData }));
     setCurrentStep(4);
   };
 
   const handleSubscriptionChoice = (wantsSubscription: boolean) => {
+    console.log('Mock: Subscription choice:', wantsSubscription);
     setSignupData(prev => ({ ...prev, wantsSubscription }));
     if (wantsSubscription) {
       setCurrentStep(5);
@@ -73,12 +77,15 @@ const SignupSteps = () => {
   };
 
   const handlePaymentSuccess = async (paymentData: any) => {
-    console.log('Payment processed:', paymentData);
+    console.log('Mock: Payment processed:', paymentData);
     completeSignup();
   };
 
   const completeSignup = async () => {
     try {
+      console.log('Mock: Completing signup with data:', signupData);
+      
+      // Mock signup process
       await signup(
         signupData.email,
         signupData.password,
@@ -86,13 +93,20 @@ const SignupSteps = () => {
         signupData.wantsSubscription,
         signupData.profile
       );
-      // Ensure welcome modal shows
-      setTimeout(() => {
-        setShowWelcome(true);
-      }, 100);
+      
+      console.log('Mock: Signup completed, showing welcome modal');
+      
+      // Show welcome modal immediately
+      setShowWelcome(true);
     } catch (error) {
-      console.error('Signup failed:', error);
+      console.error('Mock: Signup failed:', error);
     }
+  };
+
+  const handleWelcomeClose = () => {
+    console.log('Mock: Welcome modal closed, user should now see dashboard');
+    setShowWelcome(false);
+    // The UserContext will handle showing the dashboard since user is now authenticated
   };
 
   const stepItems = [
@@ -103,8 +117,9 @@ const SignupSteps = () => {
     { step: 5, title: "Payment", icon: CreditCard },
   ];
 
+  // Show welcome modal if signup is complete
   if (showWelcome) {
-    return <WelcomeModal onClose={() => setShowWelcome(false)} />;
+    return <WelcomeModal onClose={handleWelcomeClose} />;
   }
 
   return (
@@ -140,6 +155,7 @@ const SignupSteps = () => {
         </div>
       </div>
 
+      {/* Step 1: Basic Info */}
       {currentStep === 1 && (
         <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm">
           <CardHeader>
@@ -197,6 +213,7 @@ const SignupSteps = () => {
         </Card>
       )}
 
+      {/* Step 2: OTP Verification */}
       {currentStep === 2 && (
         <OTPVerification 
           email={signupData.email}
@@ -205,6 +222,7 @@ const SignupSteps = () => {
         />
       )}
 
+      {/* Step 3: User Profile */}
       {currentStep === 3 && (
         <UserProfileForm 
           onComplete={handleProfileComplete}
@@ -212,6 +230,7 @@ const SignupSteps = () => {
         />
       )}
 
+      {/* Step 4: Subscription Choice */}
       {currentStep === 4 && (
         <div className="space-y-6">
           <div className="text-center mb-8">
@@ -286,6 +305,7 @@ const SignupSteps = () => {
         </div>
       )}
 
+      {/* Step 5: Payment */}
       {currentStep === 5 && (
         <PaymentForm
           onSuccess={handlePaymentSuccess}
