@@ -86,7 +86,10 @@ const SignupSteps = () => {
         signupData.wantsSubscription,
         signupData.profile
       );
-      setShowWelcome(true);
+      // Ensure welcome modal shows
+      setTimeout(() => {
+        setShowWelcome(true);
+      }, 100);
     } catch (error) {
       console.error('Signup failed:', error);
     }

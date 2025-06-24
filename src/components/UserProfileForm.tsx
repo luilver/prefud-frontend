@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, User } from "lucide-react";
 
@@ -15,6 +15,7 @@ interface ProfileData {
   healthGoals: string[];
   dietTypes: string[];
   allergies: string[];
+  otherAllergies: string;
 }
 
 interface UserProfileFormProps {
@@ -30,6 +31,7 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
     healthGoals: [],
     dietTypes: [],
     allergies: [],
+    otherAllergies: "",
   });
 
   const healthGoalOptions = [
@@ -76,7 +78,16 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onComplete(profileData);
+    // Combine regular allergies with other allergies
+    const finalAllergies = [...profileData.allergies];
+    if (profileData.otherAllergies.trim()) {
+      finalAllergies.push(profileData.otherAllergies.trim());
+    }
+    
+    onComplete({
+      ...profileData,
+      allergies: finalAllergies
+    });
   };
 
   return (
@@ -171,7 +182,7 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
           {/* Allergies */}
           <div>
             <Label className="text-base font-medium mb-3 block">Allergies & Restrictions</Label>
-            <div className="grid md:grid-cols-2 gap-2">
+            <div className="grid md:grid-cols-2 gap-2 mb-4">
               {allergyOptions.map((allergy) => (
                 <div key={allergy} className="flex items-center space-x-2">
                   <Checkbox
@@ -182,6 +193,18 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
                   <Label htmlFor={`allergy-${allergy}`} className="text-sm">{allergy}</Label>
                 </div>
               ))}
+            </div>
+            
+            {/* Other Allergies Input */}
+            <div>
+              <Label htmlFor="otherAllergies" className="text-sm font-medium mb-2 block">Other allergies (specify)</Label>
+              <Textarea
+                id="otherAllergies"
+                placeholder="Enter any other allergies or dietary restrictions..."
+                value={profileData.otherAllergies}
+                onChange={(e) => setProfileData(prev => ({ ...prev, otherAllergies: e.target.value }))}
+                className="border-green-200 focus:border-green-400 min-h-[80px]"
+              />
             </div>
           </div>
 
