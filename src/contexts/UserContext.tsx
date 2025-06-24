@@ -6,6 +6,14 @@ export interface User {
   email: string;
   phone: string;
   name: string;
+  profile?: {
+    weight: number;
+    height: number;
+    birthday: string;
+    healthGoals: string[];
+    dietTypes: string[];
+    allergies: string[];
+  };
   subscription: {
     isSubscribed: boolean;
     plan: 'free' | 'premium';
@@ -75,7 +83,7 @@ interface UserContextType {
   ingredients: Ingredient[];
   mealPlans: MealPlan[];
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, phone: string, wantsSubscription: boolean) => Promise<void>;
+  signup: (email: string, password: string, phone: string, wantsSubscription: boolean, profile?: any) => Promise<void>;
   logout: () => void;
   updateSubscription: (subscriptionData: any) => void;
   canCreatePlan: () => boolean;
@@ -221,15 +229,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signup = async (email: string, password: string, phone: string, wantsSubscription: boolean) => {
+  const signup = async (email: string, password: string, phone: string, wantsSubscription: boolean, profile?: any) => {
     try {
-      console.log('Signup attempt:', { email, password, phone, wantsSubscription });
+      console.log('Signup attempt:', { email, password, phone, wantsSubscription, profile });
       
       const mockUser: User = {
         id: Date.now().toString(),
         email,
         phone,
         name: email.split('@')[0],
+        profile,
         subscription: {
           isSubscribed: wantsSubscription,
           plan: wantsSubscription ? 'premium' : 'free',
