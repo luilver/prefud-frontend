@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store } from "lucide-react";
+import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store, CheckSquare } from "lucide-react";
 
 interface MealPlanViewProps {
   plan: any;
@@ -140,6 +140,23 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   const weekDateRange = getCurrentWeekDateRange();
   const uncheckedItems = plan.shoppingList?.filter((item: any) => !checkedItems[item.id]) || [];
 
+  const handleSelectAll = () => {
+    if (!plan.shoppingList) return;
+    
+    const allChecked = plan.shoppingList.every((item: any) => checkedItems[item.id]);
+    const newCheckedItems: Record<string, boolean> = {};
+    
+    if (!allChecked) {
+      // Select all items
+      plan.shoppingList.forEach((item: any) => {
+        newCheckedItems[item.id] = true;
+      });
+    }
+    // If all are checked, uncheck all (empty object)
+    
+    setCheckedItems(newCheckedItems);
+  };
+
   if (showShoppingList && plan.shoppingList) {
     return (
       <div className="space-y-6">
@@ -206,13 +223,25 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
 
         <Card className="bg-white/70 backdrop-blur-sm border-green-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5 text-green-600" />
-              Shopping List ({plan.shoppingList.length} items)
-            </CardTitle>
-            <CardDescription>
-              Select ingredients to add to pantry or order online
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5 text-green-600" />
+                  Shopping List ({plan.shoppingList.length} items)
+                </CardTitle>
+                <CardDescription>
+                  Select ingredients to add to pantry or order online
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleSelectAll}
+                className="flex items-center gap-2"
+              >
+                <CheckSquare className="h-4 w-4" />
+                {plan.shoppingList.every((item: any) => checkedItems[item.id]) ? 'Unselect All' : 'Select All'}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
