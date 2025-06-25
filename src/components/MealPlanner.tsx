@@ -35,7 +35,9 @@ const MealPlanner = () => {
     deleteMealFromPlan,
     addMealPlan,
     setActiveShoppingList,
-    updateMealPlanShoppingList
+    updateMealPlanShoppingList,
+    activeMealPlan,
+    setActiveMealPlan
   } = useUser();
   
   const [meals] = useState<Meal[]>([
@@ -97,9 +99,9 @@ const MealPlanner = () => {
     if (mealPlans.length > 0 && !activePlanId) {
       const defaultPlan = mealPlans[0];
       setActivePlanId(defaultPlan.id);
-      setActiveShoppingList(defaultPlan.shoppingList || []);
+      setActiveMealPlan(defaultPlan);
     }
-  }, [mealPlans, activePlanId, setActiveShoppingList]);
+  }, [mealPlans, activePlanId, setActiveMealPlan]);
 
   const weekDays = [];
   const startOfWeek = new Date(selectedDate);
@@ -130,7 +132,7 @@ const MealPlanner = () => {
     const selectedPlan = mealPlans.find(plan => plan.id === planId);
     if (selectedPlan) {
       setActivePlanId(planId);
-      setActiveShoppingList(selectedPlan.shoppingList || []);
+      setActiveMealPlan(selectedPlan);
       console.log('Selected meal plan:', selectedPlan);
     }
   };
@@ -162,7 +164,7 @@ const MealPlanner = () => {
     addMealPlan(plan);
     setCurrentPlan(plan);
     setActivePlanId(plan.id);
-    setActiveShoppingList(plan.shoppingList || []);
+    setActiveMealPlan(plan);
     setView("plan");
   };
 
@@ -202,13 +204,12 @@ const MealPlanner = () => {
     
     // Update the current meal plan with the shopping list
     if (currentPlan) {
+      updateMealPlanShoppingList(currentPlan.id, uniqueItems);
       const updatedPlan = {
         ...currentPlan,
         shoppingList: uniqueItems
       };
-      updateMealPlanShoppingList(currentPlan.id, uniqueItems);
       setCurrentPlan(updatedPlan);
-      setActiveShoppingList(uniqueItems);
     }
   };
 
@@ -306,7 +307,7 @@ const MealPlanner = () => {
               <span>Your Meal Plans</span>
             </CardTitle>
             <CardDescription>
-              Select a meal plan to view and manage its shopping list
+              Select a meal plan to view and manage its shopping list. The selected plan's shopping list will be synchronized with the main shopping section.
             </CardDescription>
           </CardHeader>
           <CardContent>

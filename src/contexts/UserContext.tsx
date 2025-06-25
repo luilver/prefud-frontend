@@ -178,12 +178,30 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setMealPlans(plans);
       if (plans.length > 0) {
         setActiveMealPlan(plans[0]);
+        // Sync shopping items with active meal plan
+        syncShoppingItemsWithActivePlan(plans[0]);
       }
     }
     if (savedCompletedMeals) {
       setCompletedMeals(JSON.parse(savedCompletedMeals));
     }
   }, []);
+
+  // Sync shopping items with active meal plan
+  const syncShoppingItemsWithActivePlan = (plan: MealPlan | null) => {
+    if (plan && plan.shoppingList) {
+      // Convert meal plan shopping list to shopping items format
+      const planShoppingItems = plan.shoppingList.map((item: any) => ({
+        ...item,
+        category: item.category || 'meal-ingredient',
+        priority: item.priority || 'medium',
+        purchased: item.purchased || false,
+        estimatedPrice: item.estimatedPrice,
+        notes: item.notes || `From meal plan: ${plan.name}`
+      }));
+      setShoppingItems(planShoppingItems);
+    }
+  };
 
   // Save data to localStorage whenever state changes
   useEffect(() => {
@@ -207,6 +225,35 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     localStorage.setItem('completedMeals', JSON.stringify(completedMeals));
   }, [completedMeals]);
+
+  // Sync shopping items back to active meal plan when shopping items change
+  useEffect(() => {
+    if (activeMealPlan && shoppingItems.length > 0) {
+      const updatedPlan = {
+        ...activeMealPlan,
+        shoppingList: shoppingItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          category: item.category,
+          priority: item.priority,
+          purchased: item.purchased,
+          estimatedPrice: item.estimatedPrice,
+          notes: item.notes,
+          mealId: (item as any).mealId,
+          mealName: (item as any).mealName
+        }))
+      };
+      
+      setMealPlans(prev => 
+        prev.map(plan => 
+          plan.id === activeMealPlan.id ? updatedPlan : plan
+        )
+      );
+      setActiveMealPlan(updatedPlan);
+    }
+  }, [shoppingItems]);
 
   // Authentication methods
   const login = async (email: string, password: string) => {
@@ -314,7 +361,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  // Shopping methods
+  // Shopping methods - updated to sync with meal plans
   const addShoppingItem = (item: Omit<ShoppingItem, 'id'>) => {
     const newItem: ShoppingItem = {
       ...item,
@@ -343,11 +390,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  // Meal plan methods
+  // Meal plan methods - updated to sync with shopping list
   const addMealPlan = (plan: MealPlan) => {
     setMealPlans(prev => [...prev, plan]);
     if (!activeMealPlan) {
       setActiveMealPlan(plan);
+      syncShoppingItemsWithActivePlan(plan);
     }
   };
 
@@ -355,7 +403,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setMealPlans(prev => prev.filter(plan => plan.id !== id));
     if (activeMealPlan?.id === id) {
       const remainingPlans = mealPlans.filter(plan => plan.id !== id);
-      setActiveMealPlan(remainingPlans.length > 0 ? remainingPlans[0] : null);
+      const newActivePlan = remainingPlans.length > 0 ? remainingPlans[0] : null;
+      setActiveMealPlan(newActivePlan);
+      syncShoppingItemsWithActivePlan(newActivePlan);
     }
   };
 
@@ -377,8 +427,31 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           : plan
       )
     );
+    
+    // If this is the active plan, sync with shopping items
+    if (activeMealPlan?.id === planId) {
+      const planShoppingItems = shoppingList.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        category: item.category || 'meal-ingredient',
+        priority: item.priority || 'medium',
+        purchased: item.purchased || false,
+        estimatedPrice: item.estimatedPrice,
+        notes: item.notes || `From meal plan: ${activeMealPlan.name}`
+      }));
+      setShoppingItems(planShoppingItems);
+    }
   };
 
+  // Updated setActiveMealPlan to sync shopping items
+  const setActiveMealPlanUpdated = (plan: MealPlan | null) => {
+    setActiveMealPlan(plan);
+    syncShoppingItemsWithActivePlan(plan);
+  };
+
+  // Meal completion methods
   const toggleMealCompletion = (mealId: string, date: string) => {
     setCompletedMeals(prev => {
       const dateKey = date;
@@ -543,7 +616,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     isMealCompleted,
     updatePantryFromMeal,
     setActiveShoppingList,
-    setActiveMealPlan,
+    setActiveMealPlan: setActiveMealPlanUpdated,
     getBillingHistory,
     getPaymentMethods,
     addPaymentMethod,
