@@ -19,7 +19,9 @@ interface MealPlanCreatorProps {
 const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [planName, setPlanName] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [numberOfWeeks, setNumberOfWeeks] = useState(1);
+  const [numberOfPersons, setNumberOfPersons] = useState(1);
+  const [mealsPerDay, setMealsPerDay] = useState(3);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [dislikes, setDislikes] = useState<string[]>([]);
   const [newDislike, setNewDislike] = useState("");
@@ -38,6 +40,17 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     "weight-loss", "muscle-gain", "maintain-weight", "heart-health", 
     "diabetes-friendly", "high-protein", "low-sodium"
   ];
+
+  // Calculate end date based on start date and number of weeks
+  const calculateEndDate = (start: string, weeks: number) => {
+    if (!start) return "";
+    const startDateObj = new Date(start);
+    const endDateObj = new Date(startDateObj);
+    endDateObj.setDate(startDateObj.getDate() + (weeks * 7) - 1);
+    return endDateObj.toISOString().split('T')[0];
+  };
+
+  const endDate = calculateEndDate(startDate, numberOfWeeks);
 
   const addDislike = () => {
     if (newDislike.trim() && !dislikes.includes(newDislike.trim().toLowerCase())) {
@@ -67,10 +80,10 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   };
 
   const generateMealPlan = async () => {
-    if (!planName || !startDate || !endDate) {
+    if (!planName || !startDate || numberOfWeeks < 1 || numberOfPersons < 1 || mealsPerDay < 1) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields with valid values.",
         variant: "destructive"
       });
       return;
@@ -81,6 +94,12 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     try {
       // Mock AI generation process
       console.log('Generating meal plan with preferences:', {
+        planName,
+        startDate,
+        endDate,
+        numberOfWeeks,
+        numberOfPersons,
+        mealsPerDay,
         dietaryRestrictions,
         dislikes,
         healthGoals,
@@ -95,6 +114,9 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         name: planName,
         startDate,
         endDate,
+        numberOfWeeks,
+        numberOfPersons,
+        mealsPerDay,
         dietaryRestrictions,
         dislikes,
         healthGoals,
@@ -105,7 +127,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             type: "lunch",
             calories: 450,
             prepTime: 20,
-            servings: 2,
+            servings: numberOfPersons,
             difficulty: "easy",
             ingredients: ["quinoa", "chickpeas", "cucumber", "tomatoes", "feta cheese", "olive oil"],
             instructions: [
@@ -121,7 +143,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             type: "dinner",
             calories: 380,
             prepTime: 25,
-            servings: 2,
+            servings: numberOfPersons,
             difficulty: "medium",
             ingredients: ["salmon fillets", "asparagus", "lemon", "garlic", "olive oil"],
             instructions: [
@@ -138,7 +160,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       
       toast({
         title: "Meal Plan Generated!",
-        description: `Your personalized meal plan "${planName}" is ready.`,
+        description: `Your personalized meal plan "${planName}" is ready for ${numberOfWeeks} week${numberOfWeeks > 1 ? 's' : ''} and ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}.`,
       });
 
     } catch (error) {
@@ -183,28 +205,66 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="startDate">Start Date</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border-purple-200 focus:border-purple-400"
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="startDate">Start Date</Label>
+                <Label htmlFor="numberOfWeeks">Number of Weeks</Label>
                 <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  id="numberOfWeeks"
+                  type="number"
+                  min="1"
+                  max="12"
+                  value={numberOfWeeks}
+                  onChange={(e) => setNumberOfWeeks(parseInt(e.target.value) || 1)}
                   className="border-purple-200 focus:border-purple-400"
                 />
               </div>
               <div>
-                <Label htmlFor="endDate">End Date</Label>
+                <Label htmlFor="numberOfPersons">Number of Persons</Label>
                 <Input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                  id="numberOfPersons"
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={numberOfPersons}
+                  onChange={(e) => setNumberOfPersons(parseInt(e.target.value) || 1)}
+                  className="border-purple-200 focus:border-purple-400"
+                />
+              </div>
+              <div>
+                <Label htmlFor="mealsPerDay">Meals per Day</Label>
+                <Input
+                  id="mealsPerDay"
+                  type="number"
+                  min="1"
+                  max="6"
+                  value={mealsPerDay}
+                  onChange={(e) => setMealsPerDay(parseInt(e.target.value) || 3)}
                   className="border-purple-200 focus:border-purple-400"
                 />
               </div>
             </div>
+
+            {startDate && (
+              <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                <p className="text-sm text-purple-700">
+                  <strong>Plan Duration:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
+                </p>
+                <p className="text-xs text-purple-600 mt-1">
+                  {numberOfWeeks} week{numberOfWeeks > 1 ? 's' : ''} • {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} meal{mealsPerDay > 1 ? 's' : ''} per day
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
