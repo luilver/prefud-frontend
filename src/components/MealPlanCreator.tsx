@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
@@ -56,13 +54,9 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     "diabetes-friendly", "high-protein", "low-sodium"
   ];
 
-  const cookingSkillLevels = [
-    "beginner", "intermediate", "advanced", "expert"
-  ];
-
-  const budgetRanges = [
-    "budget", "moderate", "premium", "luxury"
-  ];
+  const cookTimesOptions = [15, 30, 45, 60];
+  const cookingSkillLevels = ["beginner", "intermediate", "advanced", "expert"];
+  const budgetRanges = ["low", "medium", "high"];
 
   // Calculate end date based on start date and number of weeks
   const calculateEndDate = (start: string, weeks: number) => {
@@ -432,51 +426,66 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="maxCookTime">Max Cook Time (minutes)</Label>
-              <Input
-                id="maxCookTime"
-                type="number"
-                min="10"
-                max="180"
-                value={maxCookTime}
-                onChange={(e) => setMaxCookTime(parseInt(e.target.value) || 30)}
-                className="border-blue-200 focus:border-blue-400"
-              />
+              <Label>Max Cook Time</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {cookTimesOptions.map((time) => (
+                  <Badge
+                    key={time}
+                    variant={maxCookTime === time ? "default" : "outline"}
+                    className={`cursor-pointer ${
+                      maxCookTime === time
+                        ? 'bg-blue-500 text-white'
+                        : 'border-blue-300 text-blue-700 hover:bg-blue-50'
+                    }`}
+                    onClick={() => setMaxCookTime(time)}
+                  >
+                    {time} min
+                  </Badge>
+                ))}
+              </div>
             </div>
 
             <div>
-              <Label htmlFor="cookingSkillLevel">Cooking Skill Level</Label>
-              <Select value={cookingSkillLevel} onValueChange={setCookingSkillLevel}>
-                <SelectTrigger className="border-blue-200 focus:border-blue-400">
-                  <SelectValue placeholder="Select skill level" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cookingSkillLevels.map((level) => (
-                    <SelectItem key={level} value={level}>
-                      {level.charAt(0).toUpperCase() + level.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Cooking Skill Level</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {cookingSkillLevels.map((level) => (
+                  <Badge
+                    key={level}
+                    variant={cookingSkillLevel === level ? "default" : "outline"}
+                    className={`cursor-pointer ${
+                      cookingSkillLevel === level
+                        ? 'bg-blue-500 text-white'
+                        : 'border-blue-300 text-blue-700 hover:bg-blue-50'
+                    }`}
+                    onClick={() => setCookingSkillLevel(level)}
+                  >
+                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                  </Badge>
+                ))}
+              </div>
             </div>
 
             <div>
-              <Label htmlFor="budgetRange" className="flex items-center gap-2">
+              <Label className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
                 Budget Range
               </Label>
-              <Select value={budgetRange} onValueChange={setBudgetRange}>
-                <SelectTrigger className="border-blue-200 focus:border-blue-400">
-                  <SelectValue placeholder="Select budget range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {budgetRanges.map((range) => (
-                    <SelectItem key={range} value={range}>
-                      {range.charAt(0).toUpperCase() + range.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {budgetRanges.map((range) => (
+                  <Badge
+                    key={range}
+                    variant={budgetRange === range ? "default" : "outline"}
+                    className={`cursor-pointer ${
+                      budgetRange === range
+                        ? 'bg-blue-500 text-white'
+                        : 'border-blue-300 text-blue-700 hover:bg-blue-50'
+                    }`}
+                    onClick={() => setBudgetRange(range)}
+                  >
+                    {range.charAt(0).toUpperCase() + range.slice(1)}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
