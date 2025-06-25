@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +24,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [cuisinePreferences, setCuisinePreferences] = useState<string[]>([]);
   const [allergiesIntolerances, setAllergiesIntolerances] = useState<string[]>([]);
+  const [additionalAllergies, setAdditionalAllergies] = useState("");
   const [maxCookTime, setMaxCookTime] = useState(30);
   const [cookingSkillLevel, setCookingSkillLevel] = useState("");
   const [budgetRange, setBudgetRange] = useState("");
@@ -136,6 +138,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         dietaryRestrictions,
         cuisinePreferences,
         allergiesIntolerances,
+        additionalAllergies,
         maxCookTime,
         cookingSkillLevel,
         budgetRange,
@@ -146,6 +149,91 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
 
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 3000));
+
+      // Generate meals for each week
+      const allMeals = [];
+      const mealTypes = ['breakfast', 'lunch', 'dinner'];
+      const sampleMeals = [
+        {
+          name: "Mediterranean Quinoa Bowl",
+          type: "lunch",
+          calories: 450,
+          prepTime: 20,
+          servings: numberOfPersons,
+          difficulty: "easy",
+          ingredients: ["quinoa", "chickpeas", "cucumber", "tomatoes", "feta cheese", "olive oil"],
+          instructions: [
+            "Cook quinoa according to package directions",
+            "Drain and rinse chickpeas",
+            "Dice cucumber and tomatoes",
+            "Combine all ingredients and drizzle with olive oil"
+          ]
+        },
+        {
+          name: "Grilled Salmon with Asparagus",
+          type: "dinner",
+          calories: 380,
+          prepTime: 25,
+          servings: numberOfPersons,
+          difficulty: "medium",
+          ingredients: ["salmon fillets", "asparagus", "lemon", "garlic", "olive oil"],
+          instructions: [
+            "Season salmon with salt and pepper",
+            "Grill salmon for 4-5 minutes per side",
+            "Sauté asparagus with garlic",
+            "Serve with lemon wedges"
+          ]
+        },
+        {
+          name: "Overnight Oats with Berries",
+          type: "breakfast",
+          calories: 320,
+          prepTime: 5,
+          servings: numberOfPersons,
+          difficulty: "easy",
+          ingredients: ["rolled oats", "milk", "greek yogurt", "honey", "mixed berries"],
+          instructions: [
+            "Mix oats with milk and yogurt",
+            "Add honey to taste",
+            "Refrigerate overnight",
+            "Top with berries before serving"
+          ]
+        },
+        {
+          name: "Thai Green Curry",
+          type: "dinner",
+          calories: 420,
+          prepTime: 35,
+          servings: numberOfPersons,
+          difficulty: "intermediate",
+          ingredients: ["chicken breast", "green curry paste", "coconut milk", "bell peppers", "basil"],
+          instructions: [
+            "Cut chicken into pieces",
+            "Sauté curry paste in oil",
+            "Add chicken and cook through",
+            "Add coconut milk and vegetables",
+            "Simmer until tender"
+          ]
+        }
+      ];
+
+      for (let week = 1; week <= numberOfWeeks; week++) {
+        for (let day = 1; day <= 7; day++) {
+          for (let mealIndex = 0; mealIndex < mealsPerDay; mealIndex++) {
+            const mealType = mealTypes[mealIndex] || 'snack';
+            const baseMeal = sampleMeals[Math.floor(Math.random() * sampleMeals.length)];
+            
+            allMeals.push({
+              id: `${week}-${day}-${mealIndex}`,
+              ...baseMeal,
+              type: mealType,
+              week,
+              day,
+              date: new Date(new Date(startDate).getTime() + ((week - 1) * 7 + (day - 1)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+            });
+          }
+        }
+      }
 
       const mockMealPlan = {
         id: Date.now().toString(),
@@ -158,45 +246,13 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         dietaryRestrictions,
         cuisinePreferences,
         allergiesIntolerances,
+        additionalAllergies,
         maxCookTime,
         cookingSkillLevel,
         budgetRange,
         dislikes,
         healthGoals,
-        meals: [
-          {
-            id: "1",
-            name: "Mediterranean Quinoa Bowl",
-            type: "lunch",
-            calories: 450,
-            prepTime: 20,
-            servings: numberOfPersons,
-            difficulty: "easy",
-            ingredients: ["quinoa", "chickpeas", "cucumber", "tomatoes", "feta cheese", "olive oil"],
-            instructions: [
-              "Cook quinoa according to package directions",
-              "Drain and rinse chickpeas",
-              "Dice cucumber and tomatoes",
-              "Combine all ingredients and drizzle with olive oil"
-            ]
-          },
-          {
-            id: "2",
-            name: "Grilled Salmon with Asparagus",
-            type: "dinner",
-            calories: 380,
-            prepTime: 25,
-            servings: numberOfPersons,
-            difficulty: "medium",
-            ingredients: ["salmon fillets", "asparagus", "lemon", "garlic", "olive oil"],
-            instructions: [
-              "Season salmon with salt and pepper",
-              "Grill salmon for 4-5 minutes per side",
-              "Sauté asparagus with garlic",
-              "Serve with lemon wedges"
-            ]
-          }
-        ]
+        meals: allMeals
       };
 
       onPlanCreated(mockMealPlan);
@@ -358,6 +414,18 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   </Badge>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <Label htmlFor="additionalAllergies">Additional Allergies</Label>
+              <Textarea
+                id="additionalAllergies"
+                placeholder="Please specify any other allergies or intolerances not listed above..."
+                value={additionalAllergies}
+                onChange={(e) => setAdditionalAllergies(e.target.value)}
+                className="border-red-200 focus:border-red-400 mt-2"
+                rows={3}
+              />
             </div>
 
             <div>
