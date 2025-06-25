@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,16 +26,14 @@ const MealPlanner = () => {
   const [view, setView] = useState<"planner" | "creator" | "plan" | "recipe">("planner");
   const [currentPlan, setCurrentPlan] = useState<any>(null);
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
-  const [activePlanId, setActivePlanId] = useState<string | null>(null);
   const { 
     toggleMealCompletion, 
     isMealCompleted, 
     updatePantryFromMeal,
-    mealPlans = [],
+    mealPlans = [], // Add default empty array
     deleteMealPlan,
     deleteMealFromPlan,
-    addMealPlan,
-    setActiveShoppingList
+    addMealPlan
   } = useUser();
   
   const [meals] = useState<Meal[]>([
@@ -91,15 +90,6 @@ const MealPlanner = () => {
     }
   ]);
 
-  // Set default active plan on component mount
-  useEffect(() => {
-    if (mealPlans.length > 0 && !activePlanId) {
-      const defaultPlan = mealPlans[0];
-      setActivePlanId(defaultPlan.id);
-      setActiveShoppingList(defaultPlan.shoppingList || []);
-    }
-  }, [mealPlans, activePlanId, setActiveShoppingList]);
-
   const weekDays = [];
   const startOfWeek = new Date(selectedDate);
   startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
@@ -111,27 +101,14 @@ const MealPlanner = () => {
   }
 
   const getMealsForDay = (date: Date) => {
-    // Get meals from currently active meal plan for this date
-    const activePlan = mealPlans.find(plan => plan.id === activePlanId);
-    if (!activePlan) return meals;
+    // Get meals from current active meal plan for this date
+    const activePlan = (mealPlans || []).find(plan => {
+      const planStart = new Date(plan.startDate);
+      const planEnd = new Date(plan.endDate);
+      return date >= planStart && date <= planEnd;
+    });
 
-    const planStart = new Date(activePlan.startDate);
-    const planEnd = new Date(activePlan.endDate);
-    
-    if (date >= planStart && date <= planEnd) {
-      return activePlan.meals || [];
-    }
-    
-    return meals;
-  };
-
-  const handlePlanSelection = (planId: string) => {
-    const selectedPlan = mealPlans.find(plan => plan.id === planId);
-    if (selectedPlan) {
-      setActivePlanId(planId);
-      setActiveShoppingList(selectedPlan.shoppingList || []);
-      console.log('Selected meal plan:', selectedPlan);
-    }
+    return (activePlan?.meals || meals || []); // Add proper fallbacks
   };
 
   const formatDate = (date: Date) => {
@@ -160,8 +137,6 @@ const MealPlanner = () => {
   const handlePlanCreated = (plan: any) => {
     addMealPlan(plan);
     setCurrentPlan(plan);
-    setActivePlanId(plan.id);
-    setActiveShoppingList(plan.shoppingList || []);
     setView("plan");
   };
 
@@ -197,7 +172,13 @@ const MealPlanner = () => {
   };
 
   const handleDeleteMeal = (mealId: string) => {
-    const activePlan = mealPlans.find(plan => plan.id === activePlanId);
+    const activePlan = (mealPlans || []).find(plan => {
+      const planStart = new Date(plan.startDate);
+      const planEnd = new Date(plan.endDate);
+      const today = new Date();
+      return today >= planStart && today <= planEnd;
+    });
+
     if (activePlan) {
       deleteMealFromPlan(activePlan.id, mealId);
     }
@@ -263,29 +244,20 @@ const MealPlanner = () => {
               <span>Your Meal Plans</span>
             </CardTitle>
             <CardDescription>
-              Select a meal plan to view and manage
+              Manage your created meal plans
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {(mealPlans || []).map((plan) => (
-                <Card 
-                  key={plan.id} 
-                  className={`border-purple-100 hover:shadow-md transition-shadow cursor-pointer ${
-                    activePlanId === plan.id ? 'ring-2 ring-purple-500 bg-purple-50' : ''
-                  }`}
-                  onClick={() => handlePlanSelection(plan.id)}
-                >
+                <Card key={plan.id} className="border-purple-100 hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg">{plan.name}</CardTitle>
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteMealPlan(plan.id);
-                        }}
+                        onClick={() => deleteMealPlan(plan.id)}
                         className="text-red-500 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -296,14 +268,12 @@ const MealPlanner = () => {
                     </div>
                     <div className="text-sm text-purple-600">
                       {(plan.meals || []).length} meals planned
-                      {activePlanId === plan.id && <span className="ml-2 text-green-600 font-semibold">(Active)</span>}
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <Button
                       size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         setCurrentPlan(plan);
                         setView("plan");
                       }}

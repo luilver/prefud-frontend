@@ -83,22 +83,13 @@ const SignupSteps = () => {
     try {
       console.log('Mock: Completing signup with data:', signupData);
       
-      // Update the signup call to match the new function signature
-      const userData = {
-        name: signupData.email.split('@')[0], // Use email prefix as name
-        email: signupData.email,
-        phone: signupData.phone,
-        preferences: signupData.profile ? {
-          dietaryRestrictions: [],
-          allergies: signupData.profile.allergies || [],
-          cuisinePreferences: [],
-          cookingSkillLevel: 'beginner' as const,
-          mealPrepTime: 30,
-          budgetRange: 'medium' as const
-        } : undefined
-      };
-      
-      await signup(userData);
+      await signup(
+        signupData.email,
+        signupData.password,
+        signupData.phone,
+        signupData.wantsSubscription,
+        signupData.profile
+      );
       
       console.log('Mock: Signup completed, showing welcome modal');
       

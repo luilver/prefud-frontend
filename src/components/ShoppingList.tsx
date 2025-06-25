@@ -157,12 +157,12 @@ const ShoppingList = () => {
 
   const addItemToPantry = (item: ShoppingItem) => {
     const ingredient = {
+      id: Date.now().toString() + Math.random(),
       name: item.name,
       quantity: item.quantity,
       unit: item.unit,
       category: item.category,
       expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default 1 week expiry
-      purchaseDate: new Date(), // Add missing purchaseDate
       location: "Pantry"
     };
     
@@ -223,12 +223,12 @@ const ShoppingList = () => {
     
     uncheckedItems.forEach(item => {
       const ingredient = {
+        id: Date.now().toString() + Math.random(),
         name: item.name,
         quantity: item.quantity,
         unit: item.unit,
         category: item.category,
         expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default 1 week expiry
-        purchaseDate: new Date(), // Add missing purchaseDate
         location: "Pantry"
       };
       addIngredient(ingredient);
