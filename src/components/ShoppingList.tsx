@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ShoppingCart, Plus, Trash2, Check, Package, Store, CheckSquare, ArrowLeft, CalendarDays } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 
@@ -22,6 +23,22 @@ const ShoppingList = () => {
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [showAddToPantryDialog, setShowAddToPantryDialog] = useState(false);
+  const [showOrderOnlineDialog, setShowOrderOnlineDialog] = useState(false);
+  
+  // Address and payment form states
+  const [address, setAddress] = useState({
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: ''
+  });
+  const [paymentMethod, setPaymentMethod] = useState({
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    cardholderName: ''
+  });
 
   const handleItemCheck = (itemId: string, checked: boolean) => {
     setCheckedItems(prev => ({
@@ -79,6 +96,14 @@ const ShoppingList = () => {
     }
   };
 
+  const validateAddress = () => {
+    return address.street && address.city && address.state && address.zipCode && address.country;
+  };
+
+  const validatePaymentMethod = () => {
+    return paymentMethod.cardNumber && paymentMethod.expiryDate && paymentMethod.cvv && paymentMethod.cardholderName;
+  };
+
   const handleOrderOnline = () => {
     const currentList = selectedMealPlan ? selectedMealPlan.shoppingList : shoppingItems;
     const checkedItemNames = Object.entries(checkedItems)
@@ -89,12 +114,29 @@ const ShoppingList = () => {
       })
       .filter(Boolean);
 
-    if (checkedItemNames.length > 0) {
-      alert(`Ordering ${checkedItemNames.length} items online...`);
-      // Here you would integrate with delivery service
-    } else {
+    if (checkedItemNames.length === 0) {
       alert('Please select items to order online.');
+      return;
     }
+
+    if (!validateAddress()) {
+      alert('Please fill in all address fields.');
+      return;
+    }
+
+    if (!validatePaymentMethod()) {
+      alert('Please fill in all payment method fields.');
+      return;
+    }
+
+    // Simulate order processing
+    alert(`Order placed successfully! ${checkedItemNames.length} items will be delivered to ${address.street}, ${address.city}, ${address.state} ${address.zipCode}`);
+    
+    // Reset form and close dialog
+    setCheckedItems({});
+    setShowOrderOnlineDialog(false);
+    setAddress({ street: '', city: '', state: '', zipCode: '', country: '' });
+    setPaymentMethod({ cardNumber: '', expiryDate: '', cvv: '', cardholderName: '' });
   };
 
   const currentShoppingList = selectedMealPlan ? selectedMealPlan.shoppingList : shoppingItems;
@@ -130,10 +172,19 @@ const ShoppingList = () => {
                     This will add all selected items from your shopping list to your pantry with default expiry dates.
                   </p>
                   <div className="bg-gray-50 p-3 rounded">
-                    <p className="text-sm font-medium mb-2">Items to add: {uncheckedItems.length}</p>
+                    <p className="text-sm font-medium mb-2">Items to add: {Object.keys(checkedItems).filter(key => checkedItems[key]).length}</p>
                     <div className="text-sm text-gray-600">
-                      {uncheckedItems.slice(0, 3).map((item: any) => item.name).join(', ')}
-                      {uncheckedItems.length > 3 && ` +${uncheckedItems.length - 3} more`}
+                      {Object.entries(checkedItems)
+                        .filter(([_, isChecked]) => isChecked)
+                        .slice(0, 3)
+                        .map(([itemId, _]) => {
+                          const item = selectedMealPlan.shoppingList?.find((item: any) => item.id === itemId);
+                          return item?.name;
+                        })
+                        .filter(Boolean)
+                        .join(', ')}
+                      {Object.keys(checkedItems).filter(key => checkedItems[key]).length > 3 && 
+                        ` +${Object.keys(checkedItems).filter(key => checkedItems[key]).length - 3} more`}
                     </div>
                   </div>
                   <div className="flex space-x-3">
@@ -154,14 +205,150 @@ const ShoppingList = () => {
                 </div>
               </DialogContent>
             </Dialog>
-            <Button 
-              variant="outline" 
-              className="bg-blue-500 text-white hover:bg-blue-600"
-              onClick={handleOrderOnline}
-            >
-              <Package className="h-4 w-4 mr-2" />
-              Order Online
-            </Button>
+            
+            <Dialog open={showOrderOnlineDialog} onOpenChange={setShowOrderOnlineDialog}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Order Online
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Order Online</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6">
+                  {/* Selected Items */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-medium mb-2">Selected Items ({Object.keys(checkedItems).filter(key => checkedItems[key]).length})</h3>
+                    <div className="text-sm text-gray-600">
+                      {Object.entries(checkedItems)
+                        .filter(([_, isChecked]) => isChecked)
+                        .map(([itemId, _]) => {
+                          const item = selectedMealPlan.shoppingList?.find((item: any) => item.id === itemId);
+                          return item?.name;
+                        })
+                        .filter(Boolean)
+                        .join(', ')}
+                    </div>
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Delivery Address</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <Label htmlFor="street">Street Address</Label>
+                        <Input
+                          id="street"
+                          value={address.street}
+                          onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
+                          placeholder="123 Main Street"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                          id="city"
+                          value={address.city}
+                          onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
+                          placeholder="New York"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="state">State</Label>
+                        <Input
+                          id="state"
+                          value={address.state}
+                          onChange={(e) => setAddress(prev => ({ ...prev, state: e.target.value }))}
+                          placeholder="NY"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="zipCode">ZIP Code</Label>
+                        <Input
+                          id="zipCode"
+                          value={address.zipCode}
+                          onChange={(e) => setAddress(prev => ({ ...prev, zipCode: e.target.value }))}
+                          placeholder="10001"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="country">Country</Label>
+                        <Input
+                          id="country"
+                          value={address.country}
+                          onChange={(e) => setAddress(prev => ({ ...prev, country: e.target.value }))}
+                          placeholder="United States"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Method */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Payment Method</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <Label htmlFor="cardholderName">Cardholder Name</Label>
+                        <Input
+                          id="cardholderName"
+                          value={paymentMethod.cardholderName}
+                          onChange={(e) => setPaymentMethod(prev => ({ ...prev, cardholderName: e.target.value }))}
+                          placeholder="John Doe"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="cardNumber">Card Number</Label>
+                        <Input
+                          id="cardNumber"
+                          value={paymentMethod.cardNumber}
+                          onChange={(e) => setPaymentMethod(prev => ({ ...prev, cardNumber: e.target.value }))}
+                          placeholder="1234 5678 9012 3456"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="expiryDate">Expiry Date</Label>
+                        <Input
+                          id="expiryDate"
+                          value={paymentMethod.expiryDate}
+                          onChange={(e) => setPaymentMethod(prev => ({ ...prev, expiryDate: e.target.value }))}
+                          placeholder="MM/YY"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cvv">CVV</Label>
+                        <Input
+                          id="cvv"
+                          value={paymentMethod.cvv}
+                          onChange={(e) => setPaymentMethod(prev => ({ ...prev, cvv: e.target.value }))}
+                          placeholder="123"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <Button 
+                      onClick={handleOrderOnline}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600"
+                    >
+                      Place Order
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowOrderOnlineDialog(false)}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
