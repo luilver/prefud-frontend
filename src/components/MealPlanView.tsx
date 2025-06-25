@@ -1,20 +1,22 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus } from "lucide-react";
 
 interface MealPlanViewProps {
   plan: any;
   onBack: () => void;
   onSelectMeal: (meal: any) => void;
   onGenerateShoppingList: (meals: any[]) => void;
+  onAddToPantry: (items: string[]) => void;
 }
 
-const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: MealPlanViewProps) => {
+const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAddToPantry }: MealPlanViewProps) => {
   const [currentWeek, setCurrentWeek] = useState(1);
   const [showShoppingList, setShowShoppingList] = useState(false);
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   if (!plan) {
     return (
@@ -42,6 +44,49 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: Me
     console.log('Generating shopping list for plan:', plan.name);
     onGenerateShoppingList(meals);
     setShowShoppingList(true);
+  };
+
+  const handleItemCheck = (itemId: string, checked: boolean) => {
+    setCheckedItems(prev => ({
+      ...prev,
+      [itemId]: checked
+    }));
+  };
+
+  const handleBuyMyself = () => {
+    const checkedItemNames = Object.entries(checkedItems)
+      .filter(([_, isChecked]) => isChecked)
+      .map(([itemId, _]) => {
+        const item = plan.shoppingList?.find((item: any) => item.id === itemId);
+        return item?.name;
+      })
+      .filter(Boolean);
+
+    if (checkedItemNames.length > 0) {
+      onAddToPantry(checkedItemNames);
+      // Reset checkboxes after adding to pantry
+      setCheckedItems({});
+      alert(`${checkedItemNames.length} items added to your pantry!`);
+    } else {
+      alert('Please select items to add to your pantry.');
+    }
+  };
+
+  const handleOrderOnline = () => {
+    const checkedItemNames = Object.entries(checkedItems)
+      .filter(([_, isChecked]) => isChecked)
+      .map(([itemId, _]) => {
+        const item = plan.shoppingList?.find((item: any) => item.id === itemId);
+        return item?.name;
+      })
+      .filter(Boolean);
+
+    if (checkedItemNames.length > 0) {
+      alert(`Ordering ${checkedItemNames.length} items online...`);
+      // Here you would integrate with delivery service
+    } else {
+      alert('Please select items to order online.');
+    }
   };
 
   const goToPreviousWeek = () => {
@@ -82,43 +127,77 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: Me
           </Button>
           <h2 className="text-2xl font-bold text-gray-800">Shopping List - {plan.name}</h2>
           <div className="flex gap-2">
-            <Button variant="outline" className="bg-blue-500 text-white hover:bg-blue-600">
+            <Button 
+              variant="outline" 
+              className="bg-blue-500 text-white hover:bg-blue-600"
+              onClick={handleOrderOnline}
+            >
               <Package className="h-4 w-4 mr-2" />
               Order Online
             </Button>
-            <Button variant="outline" className="bg-green-500 text-white hover:bg-green-600">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Buy Myself
+            <Button 
+              variant="outline" 
+              className="bg-green-500 text-white hover:bg-green-600"
+              onClick={handleBuyMyself}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add to Pantry
             </Button>
           </div>
         </div>
 
-        <Card className="bg-white/70 backdrop-blur-sm">
+        <Card className="bg-white/70 backdrop-blur-sm border-green-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-5 w-5 text-green-600" />
               Shopping List ({plan.shoppingList.length} items)
             </CardTitle>
             <CardDescription>
-              Ingredients needed for your meal plan
+              Select ingredients to add to pantry or order online
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3">
+            <div className="space-y-3">
               {plan.shoppingList.map((item: any) => (
-                <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                <div key={item.id} className="flex items-center space-x-3 p-4 bg-white/80 rounded-lg border border-green-100 hover:bg-white/90 transition-colors">
+                  <Checkbox
+                    id={item.id}
+                    checked={checkedItems[item.id] || false}
+                    onCheckedChange={(checked) => handleItemCheck(item.id, checked as boolean)}
+                    className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                  />
                   <div className="flex-1">
-                    <h4 className="font-medium">{item.name}</h4>
-                    <p className="text-sm text-gray-600">
-                      From: {item.mealName || 'Various meals'} • Qty: {item.quantity} {item.unit}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-gray-800">{item.name}</h4>
+                        <p className="text-sm text-gray-600">
+                          From: {item.mealName || 'Various meals'} • Qty: {item.quantity} {item.unit}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge 
+                          variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {item.priority}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {item.category}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
-                  <Badge variant={item.purchased ? "default" : "outline"}>
-                    {item.purchased ? "Purchased" : "Needed"}
-                  </Badge>
                 </div>
               ))}
             </div>
+            
+            {plan.shoppingList.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No shopping list generated yet</p>
+                <p className="text-sm">Go back and generate a shopping list from your meals</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -142,10 +221,11 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: Me
         </Button>
       </div>
 
-      <Card className="bg-white/70 backdrop-blur-sm">
+      {/* Enhanced Plan Overview Card */}
+      <Card className="bg-gradient-to-br from-white/80 to-purple-50/80 backdrop-blur-sm border-purple-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+            <Calendar className="h-5 w-5 text-purple-600" />
             Plan Overview
           </CardTitle>
           <CardDescription>
@@ -154,21 +234,21 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: Me
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{plan.numberOfWeeks}</div>
-              <div className="text-sm text-gray-600">Weeks</div>
+            <div className="text-center p-4 bg-white/60 rounded-lg border border-purple-100">
+              <div className="text-3xl font-bold text-purple-600 mb-1">{plan.numberOfWeeks}</div>
+              <div className="text-sm text-gray-600 font-medium">Weeks</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{plan.numberOfPersons}</div>
-              <div className="text-sm text-gray-600">Persons</div>
+            <div className="text-center p-4 bg-white/60 rounded-lg border border-green-100">
+              <div className="text-3xl font-bold text-green-600 mb-1">{plan.numberOfPersons}</div>
+              <div className="text-sm text-gray-600 font-medium">Persons</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{plan.mealsPerDay}</div>
-              <div className="text-sm text-gray-600">Meals/Day</div>
+            <div className="text-center p-4 bg-white/60 rounded-lg border border-blue-100">
+              <div className="text-3xl font-bold text-blue-600 mb-1">{plan.mealsPerDay}</div>
+              <div className="text-sm text-gray-600 font-medium">Meals/Day</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{meals.length}</div>
-              <div className="text-sm text-gray-600">Total Meals</div>
+            <div className="text-center p-4 bg-white/60 rounded-lg border border-orange-100">
+              <div className="text-3xl font-bold text-orange-600 mb-1">{meals.length}</div>
+              <div className="text-sm text-gray-600 font-medium">Total Meals</div>
             </div>
           </div>
         </CardContent>

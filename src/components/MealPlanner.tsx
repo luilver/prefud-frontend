@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles, Check, Play, Trash2, CalendarDays } from "lucide-react";
+import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles, Check, Play, Trash2, CalendarDays, CookingPot } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreator from "./MealPlanCreator";
 import MealPlanView from "./MealPlanView";
@@ -37,7 +37,8 @@ const MealPlanner = () => {
     setActiveShoppingList,
     updateMealPlanShoppingList,
     activeMealPlan,
-    setActiveMealPlan
+    setActiveMealPlan,
+    addPantryItem
   } = useUser();
   
   const [meals] = useState<Meal[]>([
@@ -188,7 +189,8 @@ const MealPlanner = () => {
           priority: 'medium' as const,
           purchased: false,
           mealId: meal.id,
-          mealName: meal.name
+          mealName: meal.name,
+          checked: false
         }));
         acc.push(...mealItems);
       }
@@ -211,6 +213,20 @@ const MealPlanner = () => {
       };
       setCurrentPlan(updatedPlan);
     }
+  };
+
+  const handleAddToPantry = (items: string[]) => {
+    items.forEach(itemName => {
+      addPantryItem({
+        name: itemName,
+        quantity: 1,
+        unit: 'item',
+        category: 'meal-ingredient',
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        purchaseDate: new Date(),
+        notes: 'Added from meal plan shopping list'
+      });
+    });
   };
 
   const handleMealCompletion = (mealId: string, date: Date) => {
@@ -262,6 +278,7 @@ const MealPlanner = () => {
         onBack={() => setView("planner")}
         onSelectMeal={handleMealSelected}
         onGenerateShoppingList={handleGenerateShoppingList}
+        onAddToPantry={handleAddToPantry}
       />
     );
   }
@@ -272,6 +289,87 @@ const MealPlanner = () => {
         meal={selectedMeal}
         onBack={() => setView("plan")}
       />
+    );
+  }
+
+  // Empty state when no meal plans exist
+  if (mealPlans.length === 0) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Weekly Meal Planner</h2>
+            <p className="text-gray-600">Plan your meals for a healthier week</p>
+          </div>
+        </div>
+
+        {/* Empty State */}
+        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
+          <CardContent className="text-center py-16">
+            <div className="mx-auto w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-6">
+              <CookingPot className="h-12 w-12 text-purple-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">No Meal Plans Yet</h3>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              Get started by creating your first AI-powered meal plan. We'll help you plan delicious, healthy meals that fit your lifestyle.
+            </p>
+            <Button 
+              onClick={() => setView("creator")}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              size="lg"
+            >
+              <Sparkles className="h-5 w-5 mr-2" />
+              Create Your First Meal Plan
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Benefits Cards */}
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="bg-white/70 backdrop-blur-sm border-green-200">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-2">
+                <ChefHat className="h-6 w-6 text-green-600" />
+              </div>
+              <CardTitle className="text-lg">AI-Powered Planning</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-gray-600 text-sm">
+                Let AI create personalized meal plans based on your preferences, dietary restrictions, and cooking skills.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
+                <Calendar className="h-6 w-6 text-blue-600" />
+              </div>
+              <CardTitle className="text-lg">Weekly Organization</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-gray-600 text-sm">
+                Plan your entire week with breakfast, lunch, dinner, and snacks organized by day and time.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-2">
+                <Utensils className="h-6 w-6 text-orange-600" />
+              </div>
+              <CardTitle className="text-lg">Smart Shopping</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-gray-600 text-sm">
+                Automatically generate shopping lists and sync with your pantry for efficient meal preparation.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     );
   }
 
@@ -298,75 +396,80 @@ const MealPlanner = () => {
         </div>
       </div>
 
-      {/* Meal Plans List */}
-      {mealPlans && mealPlans.length > 0 && (
-        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <CalendarDays className="h-5 w-5 text-purple-600" />
-              <span>Your Meal Plans</span>
-            </CardTitle>
-            <CardDescription>
-              Select a meal plan to view and manage its shopping list. The selected plan's shopping list will be synchronized with the main shopping section.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(mealPlans || []).map((plan) => (
-                <Card 
-                  key={plan.id} 
-                  className={`border-purple-100 hover:shadow-md transition-shadow cursor-pointer ${
-                    activePlanId === plan.id ? 'ring-2 ring-purple-500 bg-purple-50' : ''
-                  }`}
-                  onClick={() => handlePlanSelection(plan.id)}
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{plan.name}</CardTitle>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteMealPlan(plan.id);
-                        }}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
-                    </div>
-                    <div className="text-sm text-purple-600">
+      {/* Meal Plans List - Enhanced Design */}
+      <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <CalendarDays className="h-5 w-5 text-purple-600" />
+            <span>Your Meal Plans</span>
+          </CardTitle>
+          <CardDescription>
+            Select a meal plan to view and manage its shopping list. The selected plan's shopping list will be synchronized with the main shopping section.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(mealPlans || []).map((plan) => (
+              <Card 
+                key={plan.id} 
+                className={`border-purple-100 hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-105 ${
+                  activePlanId === plan.id 
+                    ? 'ring-2 ring-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg' 
+                    : 'bg-white/80 hover:bg-white/90'
+                }`}
+                onClick={() => handlePlanSelection(plan.id)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-bold text-gray-800">{plan.name}</CardTitle>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteMealPlan(plan.id);
+                      }}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-70 hover:opacity-100"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="text-sm text-gray-500 font-medium">
+                    {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-purple-600 font-semibold">
                       {(plan.meals || []).length} meals planned
-                      {activePlanId === plan.id && <span className="ml-2 text-green-600 font-semibold">(Active)</span>}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      Shopping list: {(plan.shoppingList || []).length} items
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentPlan(plan);
-                          setView("plan");
-                        }}
-                        className="flex-1"
-                      >
-                        View Plan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                    {activePlanId === plan.id && (
+                      <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Shopping list: {(plan.shoppingList || []).length} items
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentPlan(plan);
+                      setView("plan");
+                    }}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                  >
+                    <ChefHat className="h-4 w-4 mr-2" />
+                    View Plan
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Week Navigator */}
       <Card className="bg-white/70 backdrop-blur-sm border-green-200">
