@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -105,14 +104,21 @@ const ShoppingList = () => {
   ]);
 
   const [newItemName, setNewItemName] = useState("");
+  const [newItemQuantity, setNewItemQuantity] = useState(1);
+  const [newItemUnit, setNewItemUnit] = useState("piece");
+  const [newItemCategory, setNewItemCategory] = useState("Other");
   const [deliveryAddress, setDeliveryAddress] = useState("123 Main St, Anytown, USA");
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [showDeliveryFlow, setShowDeliveryFlow] = useState(false);
   const [deliveryTime, setDeliveryTime] = useState("asap");
   const [showAddToPantryDialog, setShowAddToPantryDialog] = useState(false);
+  const [showAddItemDialog, setShowAddItemDialog] = useState(false);
 
   const { addIngredient } = useUser();
   const { toast } = useToast();
+
+  const categories = ["Meat", "Dairy", "Fruits", "Vegetables", "Grains", "Other"];
+  const units = ["piece", "lbs", "kg", "containers", "bunch", "bag", "bottle", "box"];
 
   const toggleItem = (id: string) => {
     setShoppingItems(items =>
@@ -127,15 +133,43 @@ const ShoppingList = () => {
       const newItem: ShoppingItem = {
         id: Date.now().toString(),
         name: newItemName,
-        quantity: 1,
-        unit: "piece",
-        category: "Other",
+        quantity: newItemQuantity,
+        unit: newItemUnit,
+        category: newItemCategory,
         estimated_price: 2.99,
         checked: false
       };
       setShoppingItems([...shoppingItems, newItem]);
       setNewItemName("");
+      setNewItemQuantity(1);
+      setNewItemUnit("piece");
+      setNewItemCategory("Other");
+      setShowAddItemDialog(false);
+      
+      toast({
+        title: "Item Added",
+        description: `${newItem.name} has been added to your shopping list.`,
+      });
     }
+  };
+
+  const addItemToPantry = (item: ShoppingItem) => {
+    const ingredient = {
+      id: Date.now().toString() + Math.random(),
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      category: item.category,
+      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default 1 week expiry
+      location: "Pantry"
+    };
+    
+    addIngredient(ingredient);
+    
+    toast({
+      title: "Added to Pantry",
+      description: `${item.name} has been added to your pantry.`,
+    });
   };
 
   const removeItem = (id: string) => {
@@ -475,9 +509,82 @@ const ShoppingList = () => {
                 onKeyPress={(e) => e.key === 'Enter' && addItem()}
                 className="border-green-200 focus:border-green-400"
               />
-              <Button onClick={addItem} size="sm" className="bg-green-500 hover:bg-green-600">
-                <Plus className="h-4 w-4" />
-              </Button>
+              <Dialog open={showAddItemDialog} onOpenChange={setShowAddItemDialog}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="bg-green-500 hover:bg-green-600">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Item</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="item-name">Item Name</Label>
+                      <Input
+                        id="item-name"
+                        placeholder="e.g., Chicken Breast"
+                        value={newItemName}
+                        onChange={(e) => setNewItemName(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="item-quantity">Quantity</Label>
+                        <Input
+                          id="item-quantity"
+                          type="number"
+                          min="1"
+                          value={newItemQuantity}
+                          onChange={(e) => setNewItemQuantity(parseInt(e.target.value) || 1)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="item-unit">Unit</Label>
+                        <Select value={newItemUnit} onValueChange={setNewItemUnit}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {units.map(unit => (
+                              <SelectItem key={unit} value={unit}>
+                                {unit}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="item-category">Category</Label>
+                      <Select value={newItemCategory} onValueChange={setNewItemCategory}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map(category => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex space-x-3">
+                      <Button onClick={addItem} className="flex-1">
+                        Add Item
+                      </Button>
+                      <Button variant="outline" onClick={() => setShowAddItemDialog(false)} className="flex-1">
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardHeader>
           <CardContent>
@@ -511,6 +618,15 @@ const ShoppingList = () => {
                           <span className="text-sm font-medium text-gray-700">
                             ${item.estimated_price.toFixed(2)}
                           </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => addItemToPantry(item)}
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            title="Add to Pantry"
+                          >
+                            <Store className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

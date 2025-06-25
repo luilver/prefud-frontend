@@ -4,21 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChefHat, Clock, Users, Target, Calendar, Sparkles, ArrowRight } from "lucide-react";
-
-interface MealPlanPreferences {
-  duration: "2weeks" | "4weeks";
-  people: number;
-  mealsPerDay: number;
-  dietaryRestrictions: string[];
-  cuisinePreferences: string[];
-  cookingTime: string;
-  skillLevel: string;
-  budget: string;
-  allergies: string;
-  healthGoals: string[];
-}
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Sparkles, X, Plus } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface MealPlanCreatorProps {
   onPlanCreated: (plan: any) => void;
@@ -26,475 +17,329 @@ interface MealPlanCreatorProps {
 }
 
 const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [planName, setPlanName] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
+  const [dislikes, setDislikes] = useState<string[]>([]);
+  const [newDislike, setNewDislike] = useState("");
+  const [healthGoals, setHealthGoals] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [preferences, setPreferences] = useState<MealPlanPreferences>({
-    duration: "2weeks",
-    people: 2,
-    mealsPerDay: 3,
-    dietaryRestrictions: [],
-    cuisinePreferences: [],
-    cookingTime: "30min",
-    skillLevel: "beginner",
-    budget: "medium",
-    allergies: "",
-    healthGoals: []
-  });
+  
+  const { ingredients } = useUser();
+  const { toast } = useToast();
 
-  const steps = [
-    "Basic Info",
-    "Dietary Preferences", 
-    "Cooking Preferences",
-    "Health Goals",
-    "Review & Generate"
+  const availableDiets = [
+    "vegetarian", "vegan", "keto", "paleo", "mediterranean", 
+    "low-carb", "gluten-free", "dairy-free", "pescatarian"
   ];
 
-  const dietaryOptions = [
-    "Vegetarian", "Vegan", "Keto", "Paleo", "Mediterranean", 
-    "Low-carb", "Gluten-free", "Dairy-free", "Pescatarian"
+  const availableGoals = [
+    "weight-loss", "muscle-gain", "maintain-weight", "heart-health", 
+    "diabetes-friendly", "high-protein", "low-sodium"
   ];
 
-  const cuisineOptions = [
-    "Italian", "Mexican", "Asian", "Mediterranean", "American",
-    "Indian", "Thai", "French", "Japanese", "Middle Eastern"
-  ];
-
-  const healthGoalOptions = [
-    "Weight loss", "Muscle gain", "Heart health", "Energy boost",
-    "Better digestion", "Lower cholesterol", "Balanced nutrition"
-  ];
-
-  const toggleArrayOption = (array: string[], option: string, setter: (value: string[]) => void) => {
-    if (array.includes(option)) {
-      setter(array.filter(item => item !== option));
-    } else {
-      setter([...array, option]);
+  const addDislike = () => {
+    if (newDislike.trim() && !dislikes.includes(newDislike.trim().toLowerCase())) {
+      setDislikes([...dislikes, newDislike.trim().toLowerCase()]);
+      setNewDislike("");
     }
+  };
+
+  const removeDislike = (dislike: string) => {
+    setDislikes(dislikes.filter(d => d !== dislike));
+  };
+
+  const toggleDiet = (diet: string) => {
+    setDietaryRestrictions(prev =>
+      prev.includes(diet) 
+        ? prev.filter(d => d !== diet)
+        : [...prev, diet]
+    );
+  };
+
+  const toggleGoal = (goal: string) => {
+    setHealthGoals(prev =>
+      prev.includes(goal) 
+        ? prev.filter(g => g !== goal)
+        : [...prev, goal]
+    );
   };
 
   const generateMealPlan = async () => {
-    setIsGenerating(true);
-    
-    // Simulate AI generation
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Mock generated plan
-    const mockPlan = {
-      id: Date.now().toString(),
-      duration: preferences.duration,
-      preferences,
-      createdAt: new Date(),
-      weeks: generateMockWeeks()
-    };
-    
-    setIsGenerating(false);
-    onPlanCreated(mockPlan);
-  };
-
-  const generateMockWeeks = () => {
-    const weeks = [];
-    const weekCount = preferences.duration === "2weeks" ? 2 : 4;
-    
-    for (let week = 1; week <= weekCount; week++) {
-      const days = [];
-      for (let day = 1; day <= 7; day++) {
-        const meals = [];
-        const mealTypes = ["breakfast", "lunch", "dinner", "snack"];
-        
-        for (let i = 0; i < preferences.mealsPerDay; i++) {
-          meals.push({
-            id: `${week}-${day}-${i}`,
-            type: mealTypes[i] || "snack",
-            name: getMockMealName(mealTypes[i] || "snack"),
-            calories: Math.floor(Math.random() * 400) + 200,
-            prepTime: Math.floor(Math.random() * 45) + 15,
-            difficulty: preferences.skillLevel,
-            ingredients: getMockIngredients(),
-            instructions: getMockInstructions(),
-            videoUrl: "https://example.com/video.mp4"
-          });
-        }
-        
-        days.push({
-          day: day,
-          dayName: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day - 1],
-          meals
-        });
-      }
-      weeks.push({ week, days });
+    if (!planName || !startDate || !endDate) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
     }
-    
-    return weeks;
+
+    setIsGenerating(true);
+
+    try {
+      // Mock AI generation process
+      console.log('Generating meal plan with preferences:', {
+        dietaryRestrictions,
+        dislikes,
+        healthGoals,
+        availableIngredients: ingredients
+      });
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      const mockMealPlan = {
+        id: Date.now().toString(),
+        name: planName,
+        startDate,
+        endDate,
+        dietaryRestrictions,
+        dislikes,
+        healthGoals,
+        meals: [
+          {
+            id: "1",
+            name: "Mediterranean Quinoa Bowl",
+            type: "lunch",
+            calories: 450,
+            prepTime: 20,
+            servings: 2,
+            difficulty: "easy",
+            ingredients: ["quinoa", "chickpeas", "cucumber", "tomatoes", "feta cheese", "olive oil"],
+            instructions: [
+              "Cook quinoa according to package directions",
+              "Drain and rinse chickpeas",
+              "Dice cucumber and tomatoes",
+              "Combine all ingredients and drizzle with olive oil"
+            ]
+          },
+          {
+            id: "2",
+            name: "Grilled Salmon with Asparagus",
+            type: "dinner",
+            calories: 380,
+            prepTime: 25,
+            servings: 2,
+            difficulty: "medium",
+            ingredients: ["salmon fillets", "asparagus", "lemon", "garlic", "olive oil"],
+            instructions: [
+              "Season salmon with salt and pepper",
+              "Grill salmon for 4-5 minutes per side",
+              "Sauté asparagus with garlic",
+              "Serve with lemon wedges"
+            ]
+          }
+        ]
+      };
+
+      onPlanCreated(mockMealPlan);
+      
+      toast({
+        title: "Meal Plan Generated!",
+        description: `Your personalized meal plan "${planName}" is ready.`,
+      });
+
+    } catch (error) {
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate meal plan. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const getMockMealName = (type: string) => {
-    const meals = {
-      breakfast: ["Avocado Toast", "Greek Yogurt Bowl", "Overnight Oats", "Scrambled Eggs"],
-      lunch: ["Caesar Salad", "Quinoa Bowl", "Chicken Wrap", "Veggie Burger"],
-      dinner: ["Grilled Salmon", "Pasta Primavera", "Stir-fry", "Roasted Chicken"],
-      snack: ["Mixed Nuts", "Fruit Bowl", "Smoothie", "Protein Bar"]
-    };
-    const options = meals[type as keyof typeof meals] || meals.snack;
-    return options[Math.floor(Math.random() * options.length)];
-  };
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" onClick={onBack}>
+          ← Back to Meal Planner
+        </Button>
+        <h2 className="text-2xl font-bold text-gray-800">Create AI Meal Plan</h2>
+        <div></div>
+      </div>
 
-  const getMockIngredients = () => [
-    "2 slices whole grain bread",
-    "1 avocado",
-    "2 eggs",
-    "Salt and pepper to taste",
-    "1 tbsp olive oil"
-  ];
-
-  const getMockInstructions = () => [
-    "Preheat your cooking surface",
-    "Prepare all ingredients",
-    "Cook according to recipe",
-    "Season to taste",
-    "Serve immediately"
-  ];
-
-  const renderStep = () => {
-    switch (currentStep) {
-      case 0:
-        return (
-          <div className="space-y-6">
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Plan Details */}
+        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
+          <CardHeader>
+            <CardTitle className="text-purple-700">Plan Details</CardTitle>
+            <CardDescription>
+              Set up your meal planning preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="duration" className="text-base font-medium">Plan Duration</Label>
-              <div className="grid grid-cols-2 gap-4 mt-2">
-                {["2weeks", "4weeks"].map((duration) => (
-                  <Button
-                    key={duration}
-                    variant={preferences.duration === duration ? "default" : "outline"}
-                    onClick={() => setPreferences({...preferences, duration: duration as "2weeks" | "4weeks"})}
-                    className="h-12"
-                  >
-                    {duration === "2weeks" ? "2 Weeks" : "4 Weeks"}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="people" className="text-base font-medium">Number of People</Label>
+              <Label htmlFor="planName">Plan Name</Label>
               <Input
-                id="people"
-                type="number"
-                min="1"
-                max="10"
-                value={preferences.people}
-                onChange={(e) => setPreferences({...preferences, people: parseInt(e.target.value) || 2})}
-                className="mt-2"
+                id="planName"
+                placeholder="e.g., Weekly Healthy Meals"
+                value={planName}
+                onChange={(e) => setPlanName(e.target.value)}
+                className="border-purple-200 focus:border-purple-400"
               />
-            </div>
-
-            <div>
-              <Label htmlFor="meals" className="text-base font-medium">Meals per Day</Label>
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {[2, 3, 4, 5].map((count) => (
-                  <Button
-                    key={count}
-                    variant={preferences.mealsPerDay === count ? "default" : "outline"}
-                    onClick={() => setPreferences({...preferences, mealsPerDay: count})}
-                    size="sm"
-                  >
-                    {count}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-base font-medium">Dietary Restrictions</Label>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {dietaryOptions.map((option) => (
-                  <Button
-                    key={option}
-                    variant={preferences.dietaryRestrictions.includes(option) ? "default" : "outline"}
-                    onClick={() => toggleArrayOption(
-                      preferences.dietaryRestrictions, 
-                      option, 
-                      (value) => setPreferences({...preferences, dietaryRestrictions: value})
-                    )}
-                    size="sm"
-                    className="text-xs"
-                  >
-                    {option}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-base font-medium">Cuisine Preferences</Label>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {cuisineOptions.map((option) => (
-                  <Button
-                    key={option}
-                    variant={preferences.cuisinePreferences.includes(option) ? "default" : "outline"}
-                    onClick={() => toggleArrayOption(
-                      preferences.cuisinePreferences, 
-                      option, 
-                      (value) => setPreferences({...preferences, cuisinePreferences: value})
-                    )}
-                    size="sm"
-                    className="text-xs"
-                  >
-                    {option}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="allergies" className="text-base font-medium">Allergies & Intolerances</Label>
-              <Input
-                id="allergies"
-                placeholder="e.g., nuts, shellfish, lactose..."
-                value={preferences.allergies}
-                onChange={(e) => setPreferences({...preferences, allergies: e.target.value})}
-                className="mt-2"
-              />
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-base font-medium">Maximum Cooking Time</Label>
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {["15min", "30min", "45min", "60min+"].map((time) => (
-                  <Button
-                    key={time}
-                    variant={preferences.cookingTime === time ? "default" : "outline"}
-                    onClick={() => setPreferences({...preferences, cookingTime: time})}
-                    size="sm"
-                  >
-                    {time}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-base font-medium">Cooking Skill Level</Label>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {["beginner", "intermediate", "advanced"].map((skill) => (
-                  <Button
-                    key={skill}
-                    variant={preferences.skillLevel === skill ? "default" : "outline"}
-                    onClick={() => setPreferences({...preferences, skillLevel: skill})}
-                    className="capitalize"
-                  >
-                    {skill}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-base font-medium">Budget Range</Label>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {["low", "medium", "high"].map((budget) => (
-                  <Button
-                    key={budget}
-                    variant={preferences.budget === budget ? "default" : "outline"}
-                    onClick={() => setPreferences({...preferences, budget: budget})}
-                    className="capitalize"
-                  >
-                    {budget}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-base font-medium">Health Goals</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {healthGoalOptions.map((goal) => (
-                  <Button
-                    key={goal}
-                    variant={preferences.healthGoals.includes(goal) ? "default" : "outline"}
-                    onClick={() => toggleArrayOption(
-                      preferences.healthGoals, 
-                      goal, 
-                      (value) => setPreferences({...preferences, healthGoals: value})
-                    )}
-                    size="sm"
-                    className="text-xs"
-                  >
-                    {goal}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <Sparkles className="h-12 w-12 mx-auto mb-4 text-orange-500" />
-              <h3 className="text-xl font-bold mb-2">Ready to Generate Your Plan!</h3>
-              <p className="text-gray-600">AI will create a personalized meal plan based on your preferences</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Calendar className="h-5 w-5 text-green-600" />
-                  <span className="font-medium">Duration</span>
-                </div>
-                <p className="text-sm text-gray-600">{preferences.duration === "2weeks" ? "2 Weeks" : "4 Weeks"}</p>
+              <div>
+                <Label htmlFor="startDate">Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="border-purple-200 focus:border-purple-400"
+                />
               </div>
-
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Users className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium">People</span>
-                </div>
-                <p className="text-sm text-gray-600">{preferences.people} people</p>
+              <div>
+                <Label htmlFor="endDate">End Date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="border-purple-200 focus:border-purple-400"
+                />
               </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Target className="h-5 w-5 text-orange-600" />
-                  <span className="font-medium">Meals/Day</span>
-                </div>
-                <p className="text-sm text-gray-600">{preferences.mealsPerDay} meals</p>
-              </div>
-
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Clock className="h-5 w-5 text-purple-600" />
-                  <span className="font-medium">Max Time</span>
-                </div>
-                <p className="text-sm text-gray-600">{preferences.cookingTime}</p>
+        {/* Dietary Preferences */}
+        <Card className="bg-white/70 backdrop-blur-sm border-green-200">
+          <CardHeader>
+            <CardTitle className="text-green-700">Dietary Preferences</CardTitle>
+            <CardDescription>
+              Tell us about your dietary needs and restrictions
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Dietary Restrictions</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {availableDiets.map((diet) => (
+                  <Badge
+                    key={diet}
+                    variant={dietaryRestrictions.includes(diet) ? "default" : "outline"}
+                    className={`cursor-pointer ${
+                      dietaryRestrictions.includes(diet)
+                        ? 'bg-green-500 text-white'
+                        : 'border-green-300 text-green-700 hover:bg-green-50'
+                    }`}
+                    onClick={() => toggleDiet(diet)}
+                  >
+                    {diet.charAt(0).toUpperCase() + diet.slice(1)}
+                  </Badge>
+                ))}
               </div>
             </div>
 
-            {preferences.dietaryRestrictions.length > 0 && (
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium mb-2">Dietary Restrictions</h4>
-                <div className="flex flex-wrap gap-2">
-                  {preferences.dietaryRestrictions.map((restriction) => (
-                    <span key={restriction} className="px-2 py-1 bg-white rounded-full text-xs border">
-                      {restriction}
-                    </span>
+            <div>
+              <Label>Health Goals</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {availableGoals.map((goal) => (
+                  <Badge
+                    key={goal}
+                    variant={healthGoals.includes(goal) ? "default" : "outline"}
+                    className={`cursor-pointer ${
+                      healthGoals.includes(goal)
+                        ? 'bg-blue-500 text-white'
+                        : 'border-blue-300 text-blue-700 hover:bg-blue-50'
+                    }`}
+                    onClick={() => toggleGoal(goal)}
+                  >
+                    {goal.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Food Dislikes */}
+        <Card className="bg-white/70 backdrop-blur-sm border-red-200">
+          <CardHeader>
+            <CardTitle className="text-red-700">Food Dislikes</CardTitle>
+            <CardDescription>
+              Add foods you want to avoid in your meal plan
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex space-x-2">
+              <Input
+                placeholder="e.g., mushrooms, cilantro, spicy food..."
+                value={newDislike}
+                onChange={(e) => setNewDislike(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addDislike()}
+                className="border-red-200 focus:border-red-400"
+              />
+              <Button
+                onClick={addDislike}
+                size="sm"
+                className="bg-red-500 hover:bg-red-600"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {dislikes.length > 0 && (
+              <div>
+                <Label className="text-sm text-gray-600">Your dislikes:</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {dislikes.map((dislike) => (
+                    <Badge
+                      key={dislike}
+                      variant="destructive"
+                      className="cursor-pointer"
+                      onClick={() => removeDislike(dislike)}
+                    >
+                      {dislike}
+                      <X className="h-3 w-3 ml-1" />
+                    </Badge>
                   ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Click on any item to remove it
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Generate Button */}
+        <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-700">Generate Your Plan</CardTitle>
+            <CardDescription>
+              Create a personalized meal plan with AI
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={generateMealPlan}
+              disabled={isGenerating}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg py-6"
+            >
+              <Sparkles className="h-5 w-5 mr-2" />
+              {isGenerating ? "Generating Your Plan..." : "Generate AI Meal Plan"}
+            </Button>
+            
+            {isGenerating && (
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
+                  <span>Analyzing your preferences...</span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  This may take a few moments while we create your personalized meal plan.
                 </div>
               </div>
             )}
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  if (isGenerating) {
-    return (
-      <div className="min-h-[500px] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-500 mx-auto mb-4"></div>
-          <h3 className="text-xl font-bold mb-2">Creating Your Meal Plan</h3>
-          <p className="text-gray-600">AI is generating personalized recipes and schedules...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-8">
-        <Button variant="ghost" onClick={onBack} className="mb-4">
-          ← Back to Planner
-        </Button>
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Create AI Meal Plan</h2>
-        <p className="text-gray-600">Answer a few questions to get a personalized meal plan</p>
-      </div>
-
-      {/* Progress Steps */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {steps.map((step, index) => (
-            <div key={index} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                index <= currentStep 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-gray-200 text-gray-600'
-              }`}>
-                {index + 1}
-              </div>
-              <span className={`ml-2 text-sm font-medium ${
-                index <= currentStep ? 'text-green-600' : 'text-gray-500'
-              }`}>
-                {step}
-              </span>
-              {index < steps.length - 1 && (
-                <div className={`mx-4 h-1 w-16 rounded ${
-                  index < currentStep ? 'bg-green-500' : 'bg-gray-200'
-                }`} />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Current Step */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <ChefHat className="h-5 w-5 text-orange-600" />
-            <span>{steps[currentStep]}</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {renderStep()}
-        </CardContent>
-      </Card>
-
-      {/* Navigation */}
-      <div className="flex justify-between">
-        <Button
-          variant="outline"
-          onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-          disabled={currentStep === 0}
-        >
-          Previous
-        </Button>
-        
-        {currentStep < steps.length - 1 ? (
-          <Button
-            onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
-            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
-          >
-            Next
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
-        ) : (
-          <Button
-            onClick={generateMealPlan}
-            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
-          >
-            <Sparkles className="h-4 w-4 mr-2" />
-            Generate Plan
-          </Button>
-        )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
