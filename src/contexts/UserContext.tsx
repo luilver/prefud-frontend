@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
@@ -110,6 +109,7 @@ interface UserContextType {
   addMealPlan: (plan: MealPlan) => void;
   deleteMealPlan: (id: string) => void;
   deleteMealFromPlan: (planId: string, mealId: string) => void;
+  updateMealPlanShoppingList: (planId: string, shoppingList: any[]) => void;
   toggleMealCompletion: (mealId: string, date: string) => void;
   isMealCompleted: (mealId: string, date: string) => boolean;
   updatePantryFromMeal: (ingredients: string[]) => void;
@@ -369,6 +369,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
+  const updateMealPlanShoppingList = (planId: string, shoppingList: any[]) => {
+    setMealPlans(prev => 
+      prev.map(plan => 
+        plan.id === planId 
+          ? { ...plan, shoppingList }
+          : plan
+      )
+    );
+  };
+
   const toggleMealCompletion = (mealId: string, date: string) => {
     setCompletedMeals(prev => {
       const dateKey = date;
@@ -528,6 +538,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     addMealPlan,
     deleteMealPlan,
     deleteMealFromPlan,
+    updateMealPlanShoppingList,
     toggleMealCompletion,
     isMealCompleted,
     updatePantryFromMeal,

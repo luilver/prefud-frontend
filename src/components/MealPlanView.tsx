@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle } from "lucide-react";
 
 interface MealPlanViewProps {
   plan: any;
@@ -14,6 +14,7 @@ interface MealPlanViewProps {
 
 const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: MealPlanViewProps) => {
   const [currentWeek, setCurrentWeek] = useState(1);
+  const [showShoppingList, setShowShoppingList] = useState(false);
 
   if (!plan) {
     return (
@@ -38,7 +39,9 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: Me
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const handleGenerateShoppingList = () => {
+    console.log('Generating shopping list for plan:', plan.name);
     onGenerateShoppingList(meals);
+    setShowShoppingList(true);
   };
 
   const goToPreviousWeek = () => {
@@ -68,6 +71,59 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList }: Me
   };
 
   const weekDateRange = getCurrentWeekDateRange();
+
+  if (showShoppingList && plan.shoppingList) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" onClick={() => setShowShoppingList(false)} className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Meal Plan
+          </Button>
+          <h2 className="text-2xl font-bold text-gray-800">Shopping List - {plan.name}</h2>
+          <div className="flex gap-2">
+            <Button variant="outline" className="bg-blue-500 text-white hover:bg-blue-600">
+              <Package className="h-4 w-4 mr-2" />
+              Order Online
+            </Button>
+            <Button variant="outline" className="bg-green-500 text-white hover:bg-green-600">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Buy Myself
+            </Button>
+          </div>
+        </div>
+
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              Shopping List ({plan.shoppingList.length} items)
+            </CardTitle>
+            <CardDescription>
+              Ingredients needed for your meal plan
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3">
+              {plan.shoppingList.map((item: any) => (
+                <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                  <div className="flex-1">
+                    <h4 className="font-medium">{item.name}</h4>
+                    <p className="text-sm text-gray-600">
+                      From: {item.mealName || 'Various meals'} • Qty: {item.quantity} {item.unit}
+                    </p>
+                  </div>
+                  <Badge variant={item.purchased ? "default" : "outline"}>
+                    {item.purchased ? "Purchased" : "Needed"}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

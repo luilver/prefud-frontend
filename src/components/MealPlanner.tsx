@@ -34,7 +34,8 @@ const MealPlanner = () => {
     deleteMealPlan,
     deleteMealFromPlan,
     addMealPlan,
-    setActiveShoppingList
+    setActiveShoppingList,
+    updateMealPlanShoppingList
   } = useUser();
   
   const [meals] = useState<Meal[]>([
@@ -171,19 +172,44 @@ const MealPlanner = () => {
   };
 
   const handleGenerateShoppingList = (meals: any[]) => {
+    console.log('Generating shopping list for meals:', meals);
+    
     // Generate shopping list from meals
-    const shoppingList = meals.reduce((acc: string[], meal: any) => {
-      if (meal.ingredients) {
-        acc.push(...meal.ingredients);
+    const shoppingListItems = meals.reduce((acc: any[], meal: any) => {
+      if (meal.ingredients && Array.isArray(meal.ingredients)) {
+        const mealItems = meal.ingredients.map((ingredient: string) => ({
+          id: `${meal.id}_${ingredient.replace(/\s+/g, '_')}`,
+          name: ingredient,
+          quantity: 1,
+          unit: 'item',
+          category: 'meal-ingredient',
+          priority: 'medium' as const,
+          purchased: false,
+          mealId: meal.id,
+          mealName: meal.name
+        }));
+        acc.push(...mealItems);
       }
       return acc;
     }, []);
     
-    // Remove duplicates and set active shopping list
-    const uniqueShoppingList = [...new Set(shoppingList)];
-    setActiveShoppingList(uniqueShoppingList);
+    // Remove duplicates based on ingredient name
+    const uniqueItems = shoppingListItems.filter((item, index, self) => 
+      index === self.findIndex(t => t.name === item.name)
+    );
     
-    console.log('Generated shopping list:', uniqueShoppingList);
+    console.log('Generated shopping list items:', uniqueItems);
+    
+    // Update the current meal plan with the shopping list
+    if (currentPlan) {
+      const updatedPlan = {
+        ...currentPlan,
+        shoppingList: uniqueItems
+      };
+      updateMealPlanShoppingList(currentPlan.id, uniqueItems);
+      setCurrentPlan(updatedPlan);
+      setActiveShoppingList(uniqueItems);
+    }
   };
 
   const handleMealCompletion = (mealId: string, date: Date) => {
@@ -280,7 +306,7 @@ const MealPlanner = () => {
               <span>Your Meal Plans</span>
             </CardTitle>
             <CardDescription>
-              Select a meal plan to view and manage
+              Select a meal plan to view and manage its shopping list
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -315,19 +341,24 @@ const MealPlanner = () => {
                       {(plan.meals || []).length} meals planned
                       {activePlanId === plan.id && <span className="ml-2 text-green-600 font-semibold">(Active)</span>}
                     </div>
+                    <div className="text-xs text-gray-500">
+                      Shopping list: {(plan.shoppingList || []).length} items
+                    </div>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <Button
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentPlan(plan);
-                        setView("plan");
-                      }}
-                      className="w-full"
-                    >
-                      View Plan
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentPlan(plan);
+                          setView("plan");
+                        }}
+                        className="flex-1"
+                      >
+                        View Plan
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
