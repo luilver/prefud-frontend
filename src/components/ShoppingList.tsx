@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShoppingCart, Plus, Trash2, Check, Package, Store, CheckSquare, ArrowLeft, CalendarDays } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
 
 const ShoppingList = () => {
   const { 
@@ -19,6 +20,8 @@ const ShoppingList = () => {
     mealPlans,
     addPantryItem
   } = useUser();
+  
+  const { toast } = useToast();
   
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
@@ -90,9 +93,16 @@ const ShoppingList = () => {
       // Reset checkboxes after adding to pantry
       setCheckedItems({});
       setShowAddToPantryDialog(false);
-      alert(`${checkedItemNames.length} items added to your pantry!`);
+      toast({
+        title: "Items Added to Pantry",
+        description: `${checkedItemNames.length} items have been successfully added to your pantry!`,
+      });
     } else {
-      alert('Please select items to add to your pantry.');
+      toast({
+        title: "No Items Selected",
+        description: "Please select items to add to your pantry.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -115,22 +125,37 @@ const ShoppingList = () => {
       .filter(Boolean);
 
     if (checkedItemNames.length === 0) {
-      alert('Please select items to order online.');
+      toast({
+        title: "No Items Selected",
+        description: "Please select items to order online.",
+        variant: "destructive",
+      });
       return;
     }
 
     if (!validateAddress()) {
-      alert('Please fill in all address fields.');
+      toast({
+        title: "Address Required",
+        description: "Please fill in all address fields.",
+        variant: "destructive",
+      });
       return;
     }
 
     if (!validatePaymentMethod()) {
-      alert('Please fill in all payment method fields.');
+      toast({
+        title: "Payment Method Required",
+        description: "Please fill in all payment method fields.",
+        variant: "destructive",
+      });
       return;
     }
 
     // Simulate order processing
-    alert(`Order placed successfully! ${checkedItemNames.length} items will be delivered to ${address.street}, ${address.city}, ${address.state} ${address.zipCode}`);
+    toast({
+      title: "Order Placed Successfully!",
+      description: `${checkedItemNames.length} items will be delivered to ${address.street}, ${address.city}, ${address.state} ${address.zipCode}`,
+    });
     
     // Reset form and close dialog
     setCheckedItems({});
