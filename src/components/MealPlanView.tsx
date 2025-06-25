@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store } from "lucide-react";
 
 interface MealPlanViewProps {
   plan: any;
@@ -17,6 +18,7 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   const [currentWeek, setCurrentWeek] = useState(1);
   const [showShoppingList, setShowShoppingList] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+  const [showAddToPantryDialog, setShowAddToPantryDialog] = useState(false);
 
   if (!plan) {
     return (
@@ -29,7 +31,7 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   const meals = plan.meals || [];
   const weekMeals = meals.filter((meal: any) => meal.week === currentWeek);
   
-  // Group meals by day
+  // Group meals by day  
   const mealsByDay = weekMeals.reduce((acc: any, meal: any) => {
     if (!acc[meal.day]) {
       acc[meal.day] = [];
@@ -66,6 +68,26 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
       onAddToPantry(checkedItemNames);
       // Reset checkboxes after adding to pantry
       setCheckedItems({});
+      alert(`${checkedItemNames.length} items added to your pantry!`);
+    } else {
+      alert('Please select items to add to your pantry.');
+    }
+  };
+
+  const handleAddToPantry = () => {
+    const checkedItemNames = Object.entries(checkedItems)
+      .filter(([_, isChecked]) => isChecked)
+      .map(([itemId, _]) => {
+        const item = plan.shoppingList?.find((item: any) => item.id === itemId);
+        return item?.name;
+      })
+      .filter(Boolean);
+
+    if (checkedItemNames.length > 0) {
+      onAddToPantry(checkedItemNames);
+      // Reset checkboxes after adding to pantry
+      setCheckedItems({});
+      setShowAddToPantryDialog(false);
       alert(`${checkedItemNames.length} items added to your pantry!`);
     } else {
       alert('Please select items to add to your pantry.');
@@ -116,6 +138,7 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   };
 
   const weekDateRange = getCurrentWeekDateRange();
+  const uncheckedItems = plan.shoppingList?.filter((item: any) => !checkedItems[item.id]) || [];
 
   if (showShoppingList && plan.shoppingList) {
     return (
@@ -127,6 +150,49 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
           </Button>
           <h2 className="text-2xl font-bold text-gray-800">Shopping List - {plan.name}</h2>
           <div className="flex gap-2">
+            <Dialog open={showAddToPantryDialog} onOpenChange={setShowAddToPantryDialog}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="border-green-300 text-green-700 hover:bg-green-50"
+                >
+                  <Store className="h-4 w-4 mr-2" />
+                  Shop In-Store
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Items to Pantry</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    This will add all selected items from your shopping list to your pantry with default expiry dates.
+                  </p>
+                  <div className="bg-gray-50 p-3 rounded">
+                    <p className="text-sm font-medium mb-2">Items to add: {uncheckedItems.length}</p>
+                    <div className="text-sm text-gray-600">
+                      {uncheckedItems.slice(0, 3).map((item: any) => item.name).join(', ')}
+                      {uncheckedItems.length > 3 && ` +${uncheckedItems.length - 3} more`}
+                    </div>
+                  </div>
+                  <div className="flex space-x-3">
+                    <Button 
+                      onClick={handleAddToPantry}
+                      className="flex-1 bg-green-500 hover:bg-green-600"
+                    >
+                      Add to Pantry
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowAddToPantryDialog(false)}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button 
               variant="outline" 
               className="bg-blue-500 text-white hover:bg-blue-600"
@@ -134,14 +200,6 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
             >
               <Package className="h-4 w-4 mr-2" />
               Order Online
-            </Button>
-            <Button 
-              variant="outline" 
-              className="bg-green-500 text-white hover:bg-green-600"
-              onClick={handleBuyMyself}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add to Pantry
             </Button>
           </div>
         </div>
