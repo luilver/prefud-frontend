@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Sparkles, X, Plus } from "lucide-react";
+import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,6 +23,11 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [mealsPerDay, setMealsPerDay] = useState(3);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
+  const [cuisinePreferences, setCuisinePreferences] = useState<string[]>([]);
+  const [allergiesIntolerances, setAllergiesIntolerances] = useState<string[]>([]);
+  const [maxCookTime, setMaxCookTime] = useState(30);
+  const [cookingSkillLevel, setCookingSkillLevel] = useState("");
+  const [budgetRange, setBudgetRange] = useState("");
   const [dislikes, setDislikes] = useState<string[]>([]);
   const [newDislike, setNewDislike] = useState("");
   const [healthGoals, setHealthGoals] = useState<string[]>([]);
@@ -36,9 +41,27 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     "low-carb", "gluten-free", "dairy-free", "pescatarian"
   ];
 
+  const availableCuisines = [
+    "italian", "mexican", "asian", "indian", "mediterranean", 
+    "american", "french", "thai", "japanese", "chinese", "korean", "greek"
+  ];
+
+  const availableAllergies = [
+    "nuts", "peanuts", "shellfish", "fish", "eggs", "dairy", 
+    "soy", "gluten", "sesame", "sulfites"
+  ];
+
   const availableGoals = [
     "weight-loss", "muscle-gain", "maintain-weight", "heart-health", 
     "diabetes-friendly", "high-protein", "low-sodium"
+  ];
+
+  const cookingSkillLevels = [
+    "beginner", "intermediate", "advanced", "expert"
+  ];
+
+  const budgetRanges = [
+    "budget", "moderate", "premium", "luxury"
   ];
 
   // Calculate end date based on start date and number of weeks
@@ -71,6 +94,22 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     );
   };
 
+  const toggleCuisine = (cuisine: string) => {
+    setCuisinePreferences(prev =>
+      prev.includes(cuisine) 
+        ? prev.filter(c => c !== cuisine)
+        : [...prev, cuisine]
+    );
+  };
+
+  const toggleAllergy = (allergy: string) => {
+    setAllergiesIntolerances(prev =>
+      prev.includes(allergy) 
+        ? prev.filter(a => a !== allergy)
+        : [...prev, allergy]
+    );
+  };
+
   const toggleGoal = (goal: string) => {
     setHealthGoals(prev =>
       prev.includes(goal) 
@@ -80,7 +119,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   };
 
   const generateMealPlan = async () => {
-    if (!planName || !startDate || numberOfWeeks < 1 || numberOfPersons < 1 || mealsPerDay < 1) {
+    if (!planName || !startDate || numberOfWeeks < 1 || numberOfPersons < 1 || mealsPerDay < 1 || !cookingSkillLevel || !budgetRange) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields with valid values.",
@@ -101,6 +140,11 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         numberOfPersons,
         mealsPerDay,
         dietaryRestrictions,
+        cuisinePreferences,
+        allergiesIntolerances,
+        maxCookTime,
+        cookingSkillLevel,
+        budgetRange,
         dislikes,
         healthGoals,
         availableIngredients: ingredients
@@ -118,6 +162,11 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         numberOfPersons,
         mealsPerDay,
         dietaryRestrictions,
+        cuisinePreferences,
+        allergiesIntolerances,
+        maxCookTime,
+        cookingSkillLevel,
+        budgetRange,
         dislikes,
         healthGoals,
         meals: [
@@ -298,6 +347,26 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
+              <Label>Allergies & Intolerances</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {availableAllergies.map((allergy) => (
+                  <Badge
+                    key={allergy}
+                    variant={allergiesIntolerances.includes(allergy) ? "default" : "outline"}
+                    className={`cursor-pointer ${
+                      allergiesIntolerances.includes(allergy)
+                        ? 'bg-red-500 text-white'
+                        : 'border-red-300 text-red-700 hover:bg-red-50'
+                    }`}
+                    onClick={() => toggleAllergy(allergy)}
+                  >
+                    {allergy.charAt(0).toUpperCase() + allergy.slice(1)}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <Label>Health Goals</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {availableGoals.map((goal) => (
@@ -315,6 +384,99 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   </Badge>
                 ))}
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Cuisine Preferences */}
+        <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-700 flex items-center gap-2">
+              <ChefHat className="h-5 w-5" />
+              Cuisine Preferences
+            </CardTitle>
+            <CardDescription>
+              Select your favorite cuisines
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {availableCuisines.map((cuisine) => (
+                <Badge
+                  key={cuisine}
+                  variant={cuisinePreferences.includes(cuisine) ? "default" : "outline"}
+                  className={`cursor-pointer ${
+                    cuisinePreferences.includes(cuisine)
+                      ? 'bg-orange-500 text-white'
+                      : 'border-orange-300 text-orange-700 hover:bg-orange-50'
+                  }`}
+                  onClick={() => toggleCuisine(cuisine)}
+                >
+                  {cuisine.charAt(0).toUpperCase() + cuisine.slice(1)}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Cooking Preferences */}
+        <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-blue-700 flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Cooking Preferences
+            </CardTitle>
+            <CardDescription>
+              Set your cooking constraints and skill level
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="maxCookTime">Max Cook Time (minutes)</Label>
+              <Input
+                id="maxCookTime"
+                type="number"
+                min="10"
+                max="180"
+                value={maxCookTime}
+                onChange={(e) => setMaxCookTime(parseInt(e.target.value) || 30)}
+                className="border-blue-200 focus:border-blue-400"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="cookingSkillLevel">Cooking Skill Level</Label>
+              <Select value={cookingSkillLevel} onValueChange={setCookingSkillLevel}>
+                <SelectTrigger className="border-blue-200 focus:border-blue-400">
+                  <SelectValue placeholder="Select skill level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cookingSkillLevels.map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="budgetRange" className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Budget Range
+              </Label>
+              <Select value={budgetRange} onValueChange={setBudgetRange}>
+                <SelectTrigger className="border-blue-200 focus:border-blue-400">
+                  <SelectValue placeholder="Select budget range" />
+                </SelectTrigger>
+                <SelectContent>
+                  {budgetRanges.map((range) => (
+                    <SelectItem key={range} value={range}>
+                      {range.charAt(0).toUpperCase() + range.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
