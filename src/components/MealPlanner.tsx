@@ -170,6 +170,22 @@ const MealPlanner = () => {
     setView("recipe");
   };
 
+  const handleGenerateShoppingList = (meals: any[]) => {
+    // Generate shopping list from meals
+    const shoppingList = meals.reduce((acc: string[], meal: any) => {
+      if (meal.ingredients) {
+        acc.push(...meal.ingredients);
+      }
+      return acc;
+    }, []);
+    
+    // Remove duplicates and set active shopping list
+    const uniqueShoppingList = [...new Set(shoppingList)];
+    setActiveShoppingList(uniqueShoppingList);
+    
+    console.log('Generated shopping list:', uniqueShoppingList);
+  };
+
   const handleMealCompletion = (mealId: string, date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
     const wasCompleted = isMealCompleted(mealId, dateStr);
@@ -218,6 +234,7 @@ const MealPlanner = () => {
         plan={currentPlan}
         onBack={() => setView("planner")}
         onSelectMeal={handleMealSelected}
+        onGenerateShoppingList={handleGenerateShoppingList}
       />
     );
   }
