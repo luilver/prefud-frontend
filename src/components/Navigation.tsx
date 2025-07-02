@@ -1,6 +1,12 @@
-
 import { Button } from "@/components/ui/button";
-import { ChefHat, BarChart3, Utensils, ShoppingCart, TrendingUp, User } from "lucide-react";
+import {
+  ChefHat,
+  BarChart3,
+  Utensils,
+  ShoppingCart,
+  TrendingUp,
+  User,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavigationProps {
@@ -11,11 +17,27 @@ interface NavigationProps {
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const navItems = [
     { id: "planner", label: "Meal Plans", icon: ChefHat, shortLabel: "Plans" },
-    { id: "highlights", label: "Highlights", icon: BarChart3, shortLabel: "Stats" },
-    { id: "ingredients", label: "Pantry", icon: Utensils, shortLabel: "Pantry" },
-    { id: "shopping", label: "Shopping", icon: ShoppingCart, shortLabel: "Shop" },
+
+    {
+      id: "ingredients",
+      label: "Pantry",
+      icon: Utensils,
+      shortLabel: "Pantry",
+    },
+    {
+      id: "shopping",
+      label: "Shopping",
+      icon: ShoppingCart,
+      shortLabel: "Shop",
+    },
     { id: "calories", label: "Calories", icon: TrendingUp, shortLabel: "Cals" },
-    { id: "profile", label: "Profile", icon: User, shortLabel: "Profile" }
+    { id: "profile", label: "Profile", icon: User, shortLabel: "Profile" },
+    {
+      id: "highlights",
+      label: "Highlights",
+      icon: BarChart3,
+      shortLabel: "Stats",
+    },
   ];
 
   return (
@@ -58,7 +80,9 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               )}
             >
               <item.icon className="h-4 w-4" />
-              <span className="text-[10px] leading-tight">{item.shortLabel}</span>
+              <span className="text-[10px] leading-tight">
+                {item.shortLabel}
+              </span>
             </Button>
           ))}
         </div>
