@@ -1,0 +1,134 @@
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Utensils, ArrowLeft } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+
+const SignIn = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useUser();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
+    } catch (error) {
+      toast({
+        title: "Sign in failed",
+        description: "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-green-200">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+              <Utensils className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent">
+              Pantry
+            </h1>
+          </div>
+          <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-2">
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Home</span>
+          </Button>
+        </div>
+      </header>
+
+      {/* Sign In Form */}
+      <section className="py-8 md:py-20 px-4">
+        <div className="container mx-auto max-w-md">
+          <Card className="bg-white/90 backdrop-blur-sm border-green-200 shadow-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl md:text-3xl text-green-700 mb-2">Welcome Back</CardTitle>
+              <CardDescription className="text-base md:text-lg">
+                Sign in to your Pantry account
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="text-base">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="border-green-200 focus:border-green-400 h-12 text-base mt-1"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password" className="text-base">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="border-green-200 focus:border-green-400 h-12 text-base mt-1"
+                    placeholder="Enter your password"
+                  />
+                </div>
+                <div className="text-right">
+                  <Button 
+                    type="button"
+                    variant="link" 
+                    className="text-green-600 hover:text-green-700 p-0"
+                  >
+                    Forgot password?
+                  </Button>
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 text-base bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </form>
+              
+              <div className="mt-6 text-center">
+                <p className="text-gray-600">
+                  Don't have an account?{' '}
+                  <Button
+                    variant="link"
+                    onClick={() => navigate('/signup')}
+                    className="text-green-600 hover:text-green-700 p-0 font-semibold"
+                  >
+                    Create one here
+                  </Button>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default SignIn;
