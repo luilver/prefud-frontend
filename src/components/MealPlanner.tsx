@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles, Check, Play, Trash2, CalendarDays, CookingPot } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreator from "./MealPlanCreator";
