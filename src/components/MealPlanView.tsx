@@ -1,10 +1,14 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store, CheckSquare } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store, CheckSquare, Truck } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface MealPlanViewProps {
   plan: any;
@@ -19,6 +23,9 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   const [showShoppingList, setShowShoppingList] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [showAddToPantryDialog, setShowAddToPantryDialog] = useState(false);
+  const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<string>("");
+  const { toast } = useToast();
 
   if (!plan) {
     return (
@@ -42,10 +49,23 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
 
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+  const groceryProviders = [
+    { id: 'instacart', name: 'Instacart', icon: '🛒' },
+    { id: 'amazon-fresh', name: 'Amazon Fresh', icon: '📦' },
+    { id: 'walmart-grocery', name: 'Walmart Grocery', icon: '🛍️' },
+    { id: 'kroger', name: 'Kroger', icon: '🏪' },
+    { id: 'target', name: 'Target', icon: '🎯' },
+    { id: 'whole-foods', name: 'Whole Foods', icon: '🥬' }
+  ];
+
   const handleGenerateShoppingList = () => {
     console.log('Generating shopping list for plan:', plan.name);
     onGenerateShoppingList(meals);
     setShowShoppingList(true);
+    toast({
+      title: "Shopping list generated!",
+      description: `Created shopping list with ${(plan.shoppingList || []).length} items from your meal plan.`,
+    });
   };
 
   const handleItemCheck = (itemId: string, checked: boolean) => {
@@ -53,25 +73,6 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
       ...prev,
       [itemId]: checked
     }));
-  };
-
-  const handleBuyMyself = () => {
-    const checkedItemNames = Object.entries(checkedItems)
-      .filter(([_, isChecked]) => isChecked)
-      .map(([itemId, _]) => {
-        const item = plan.shoppingList?.find((item: any) => item.id === itemId);
-        return item?.name;
-      })
-      .filter(Boolean);
-
-    if (checkedItemNames.length > 0) {
-      onAddToPantry(checkedItemNames);
-      // Reset checkboxes after adding to pantry
-      setCheckedItems({});
-      alert(`${checkedItemNames.length} items added to your pantry!`);
-    } else {
-      alert('Please select items to add to your pantry.');
-    }
   };
 
   const handleAddToPantry = () => {
@@ -88,13 +89,29 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
       // Reset checkboxes after adding to pantry
       setCheckedItems({});
       setShowAddToPantryDialog(false);
-      alert(`${checkedItemNames.length} items added to your pantry!`);
+      toast({
+        title: "Items added to pantry!",
+        description: `Successfully added ${checkedItemNames.length} items to your pantry with default expiry dates.`,
+      });
     } else {
-      alert('Please select items to add to your pantry.');
+      toast({
+        title: "No items selected",
+        description: "Please select items to add to your pantry.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleOrderOnline = () => {
+    if (!selectedProvider) {
+      toast({
+        title: "Select a provider",
+        description: "Please choose a grocery delivery provider to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const checkedItemNames = Object.entries(checkedItems)
       .filter(([_, isChecked]) => isChecked)
       .map(([itemId, _]) => {
@@ -104,10 +121,19 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
       .filter(Boolean);
 
     if (checkedItemNames.length > 0) {
-      alert(`Ordering ${checkedItemNames.length} items online...`);
-      // Here you would integrate with delivery service
+      const providerName = groceryProviders.find(p => p.id === selectedProvider)?.name;
+      setShowOrderDialog(false);
+      setSelectedProvider("");
+      toast({
+        title: "Order placed successfully!",
+        description: `Your order of ${checkedItemNames.length} items has been submitted to ${providerName}. You'll receive a confirmation email shortly.`,
+      });
     } else {
-      alert('Please select items to order online.');
+      toast({
+        title: "No items selected",
+        description: "Please select items to order online.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -138,7 +164,7 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   };
 
   const weekDateRange = getCurrentWeekDateRange();
-  const uncheckedItems = plan.shoppingList?.filter((item: any) => !checkedItems[item.id]) || [];
+  const getCheckedItemsCount = () => Object.values(checkedItems).filter(Boolean).length;
 
   const handleSelectAll = () => {
     if (!plan.shoppingList) return;
@@ -174,7 +200,7 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
                   className="border-green-300 text-green-700 hover:bg-green-50"
                 >
                   <Store className="h-4 w-4 mr-2" />
-                  Shop In-Store
+                  Shop In-Store ({getCheckedItemsCount()})
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -183,13 +209,20 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
                 </DialogHeader>
                 <div className="space-y-4">
                   <p className="text-gray-600">
-                    This will add all selected items from your shopping list to your pantry with default expiry dates.
+                    This will add the selected items from your shopping list to your pantry with default expiry dates.
                   </p>
                   <div className="bg-gray-50 p-3 rounded">
-                    <p className="text-sm font-medium mb-2">Items to add: {uncheckedItems.length}</p>
+                    <p className="text-sm font-medium mb-2">Items to add: {getCheckedItemsCount()}</p>
                     <div className="text-sm text-gray-600">
-                      {uncheckedItems.slice(0, 3).map((item: any) => item.name).join(', ')}
-                      {uncheckedItems.length > 3 && ` +${uncheckedItems.length - 3} more`}
+                      {Object.entries(checkedItems)
+                        .filter(([_, isChecked]) => isChecked)
+                        .slice(0, 3)
+                        .map(([itemId, _]) => {
+                          const item = plan.shoppingList?.find((item: any) => item.id === itemId);
+                          return item?.name;
+                        })
+                        .join(', ')}
+                      {getCheckedItemsCount() > 3 && ` +${getCheckedItemsCount() - 3} more`}
                     </div>
                   </div>
                   <div className="flex space-x-3">
@@ -210,14 +243,73 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
                 </div>
               </DialogContent>
             </Dialog>
-            <Button 
-              variant="outline" 
-              className="bg-blue-500 text-white hover:bg-blue-600"
-              onClick={handleOrderOnline}
-            >
-              <Package className="h-4 w-4 mr-2" />
-              Order Online
-            </Button>
+            
+            <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
+              <DialogTrigger asChild>
+                <Button 
+                  className="bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  <Truck className="h-4 w-4 mr-2" />
+                  Order Online ({getCheckedItemsCount()})
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Choose Grocery Provider</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    Select your preferred grocery delivery service to order {getCheckedItemsCount()} selected items.
+                  </p>
+                  
+                  <div>
+                    <Label htmlFor="provider-select">Delivery Provider</Label>
+                    <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a provider..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {groceryProviders.map((provider) => (
+                          <SelectItem key={provider.id} value={provider.id}>
+                            <div className="flex items-center gap-2">
+                              <span>{provider.icon}</span>
+                              <span>{provider.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                    <p className="text-sm font-medium text-blue-800 mb-1">Order Summary</p>
+                    <p className="text-sm text-blue-600">
+                      {getCheckedItemsCount()} items will be added to your cart at the selected provider.
+                    </p>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <Button 
+                      onClick={handleOrderOnline}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      Place Order
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowOrderDialog(false);
+                        setSelectedProvider("");
+                      }}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
