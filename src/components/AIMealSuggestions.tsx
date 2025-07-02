@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -206,42 +205,42 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
             {suggestions.map((meal) => (
               <Card key={meal.id} className="border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-lg text-orange-700">{meal.name}</CardTitle>
-                      <CardDescription className="text-orange-600">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-base sm:text-lg text-orange-700 break-words">{meal.name}</CardTitle>
+                      <CardDescription className="text-orange-600 text-sm break-words">
                         {meal.description}
                       </CardDescription>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 shrink-0">
                       <Button 
                         size="sm"
                         variant="outline"
                         onClick={() => handleQuickAdd(meal)}
-                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                        className="border-orange-300 text-orange-700 hover:bg-orange-50 text-xs sm:text-sm w-full sm:w-auto"
                       >
-                        <Plus className="h-4 w-4 mr-1" />
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                         Quick Add
                       </Button>
                       <Dialog open={showDaySelector === meal.id} onOpenChange={(open) => setShowDaySelector(open ? meal.id : null)}>
                         <DialogTrigger asChild>
                           <Button 
                             size="sm"
-                            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-xs sm:text-sm w-full sm:w-auto"
                           >
-                            <Calendar className="h-4 w-4 mr-1" />
+                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                             Add to Day
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="w-[95vw] max-w-md mx-auto">
                           <DialogHeader>
-                            <DialogTitle>Choose Day for {meal.name}</DialogTitle>
+                            <DialogTitle className="text-base sm:text-lg">Choose Day for {meal.name}</DialogTitle>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
-                              <Label htmlFor="day-select">Select Day</Label>
+                              <Label htmlFor="day-select" className="text-sm">Select Day</Label>
                               <Select value={selectedDay} onValueChange={setSelectedDay}>
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1">
                                   <SelectValue placeholder="Choose a day..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -253,19 +252,20 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                                 </SelectContent>
                               </Select>
                             </div>
-                            <div className="flex justify-end space-x-2">
+                            <div className="flex flex-col sm:flex-row justify-end gap-2">
                               <Button 
                                 variant="outline" 
                                 onClick={() => {
                                   setShowDaySelector(null);
                                   setSelectedDay("");
                                 }}
+                                className="text-sm w-full sm:w-auto"
                               >
                                 Cancel
                               </Button>
                               <Button 
                                 onClick={() => handleAddMealWithDay(meal)}
-                                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-sm w-full sm:w-auto"
                               >
                                 Add Meal
                               </Button>
@@ -276,7 +276,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                     <div className="flex items-center space-x-1">
                       <Clock className="h-3 w-3" />
                       <span>{meal.prepTime}min</span>
@@ -289,12 +289,14 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                   </div>
 
                   {meal.usesExpiringIngredients?.length > 0 && (
-                    <div className="flex items-center space-x-2">
-                      <AlertTriangle className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm text-orange-600">Uses expiring:</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <div className="flex items-center space-x-2 shrink-0">
+                        <AlertTriangle className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm text-orange-600">Uses expiring:</span>
+                      </div>
                       <div className="flex flex-wrap gap-1">
                         {meal.usesExpiringIngredients.map((ing: any, index: number) => (
-                          <Badge key={index} variant="outline" className="text-xs border-orange-300 text-orange-700">
+                          <Badge key={index} variant="outline" className="text-xs border-orange-300 text-orange-700 break-all">
                             {ing.name}
                           </Badge>
                         ))}
@@ -309,7 +311,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
               onClick={generateSuggestions}
               variant="outline"
               disabled={isGenerating}
-              className="w-full border-green-200 text-green-700 hover:bg-green-50"
+              className="w-full border-green-200 text-green-700 hover:bg-green-50 text-sm sm:text-base"
             >
               <Sparkles className="h-4 w-4 mr-2" />
               {isGenerating ? 'Generating...' : 'Generate More Suggestions'}
