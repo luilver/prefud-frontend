@@ -180,16 +180,16 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
       .filter(Boolean);
 
     if (checkedItemsData.length > 0) {
-      // Add each item to pantry with proper structure
+      // Add each item to pantry with proper structure including purchaseDate
       checkedItemsData.forEach((item: any) => {
         const ingredientData = {
-          id: `pantry-${Date.now()}-${Math.random()}`,
           name: item.name,
           quantity: item.quantity || 1,
           unit: item.unit || 'pieces',
           category: item.category || 'Pantry',
           location: 'Pantry',
           expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+          purchaseDate: new Date(), // Add the missing purchaseDate
           addedFromShoppingList: true
         };
         
@@ -197,8 +197,9 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
         addIngredient(ingredientData);
       });
 
-      // Update pantry from ingredients context
-      updatePantryFromIngredients();
+      // Update pantry from ingredients context with ingredient names
+      const ingredientNames = checkedItemsData.map((item: any) => item.name);
+      updatePantryFromIngredients(ingredientNames);
 
       // Reset checkboxes after adding to pantry
       setCheckedItems({});
