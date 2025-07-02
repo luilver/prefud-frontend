@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Utensils, Calendar, ShoppingCart, User, Bell, TrendingUp, Settings, ChefHat, Sparkles, Plus, BarChart3 } from "lucide-react";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Utensils, Bell, ChefHat, Sparkles, Plus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import Navigation from "./Navigation";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
 import IngredientTracker from "./IngredientTracker";
@@ -55,83 +55,61 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Navigation */}
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+
       {/* Main Content */}
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-6 lg:py-8">
-        {/* Welcome Section */}
-        <div className="mb-4 sm:mb-6 lg:mb-8">
-          <div className="text-center mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-2">
-              Welcome back, {user?.name || 'User'}!
-            </h2>
-            <p className="text-sm sm:text-base text-gray-600 mb-4">
-              You have <span className="font-semibold text-green-600">{user?.subscription.planLimits.plansPerMonth - (user?.subscription.planLimits.usedPlans || 0)}</span> meal plans remaining this month.
-            </p>
+        {/* Welcome Section - Only show on planner tab */}
+        {activeTab === "planner" && (
+          <div className="mb-4 sm:mb-6 lg:mb-8">
+            <div className="text-center mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-2">
+                Welcome back, {user?.name || 'User'}!
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600 mb-4">
+                You have <span className="font-semibold text-green-600">{user?.subscription.planLimits.plansPerMonth - (user?.subscription.planLimits.usedPlans || 0)}</span> meal plans remaining this month.
+              </p>
+            </div>
+            
+            {/* Main Action Card */}
+            <Card className="bg-gradient-to-r from-green-500/10 via-orange-500/10 to-purple-500/10 border-green-300 max-w-2xl mx-auto">
+              <CardHeader className="text-center p-4 sm:p-6">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="p-3 sm:p-4 bg-gradient-to-r from-green-500 to-orange-500 rounded-xl">
+                    <ChefHat className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg sm:text-xl lg:text-2xl text-gray-800 mb-2">Your Meal Plans</CardTitle>
+                    <CardDescription className="text-sm sm:text-base text-gray-600">
+                      Plan your week with AI-powered suggestions and manage your meals
+                    </CardDescription>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+                    <Button 
+                      onClick={handleStartPlanning}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 flex-1"
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      View Plans
+                    </Button>
+                    <Button 
+                      onClick={handleStartPlanning}
+                      variant="outline"
+                      className="border-green-300 text-green-700 hover:bg-green-50 flex-1"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Plan
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
           </div>
-          
-          {/* Main Action Card */}
-          <Card className="bg-gradient-to-r from-green-500/10 via-orange-500/10 to-purple-500/10 border-green-300 max-w-2xl mx-auto">
-            <CardHeader className="text-center p-4 sm:p-6">
-              <div className="flex flex-col items-center space-y-4">
-                <div className="p-3 sm:p-4 bg-gradient-to-r from-green-500 to-orange-500 rounded-xl">
-                  <ChefHat className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg sm:text-xl lg:text-2xl text-gray-800 mb-2">Your Meal Plans</CardTitle>
-                  <CardDescription className="text-sm sm:text-base text-gray-600">
-                    Plan your week with AI-powered suggestions and manage your meals
-                  </CardDescription>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-                  <Button 
-                    onClick={handleStartPlanning}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 flex-1"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    View Plans
-                  </Button>
-                  <Button 
-                    onClick={handleStartPlanning}
-                    variant="outline"
-                    className="border-green-300 text-green-700 hover:bg-green-50 flex-1"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Plan
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        </div>
+        )}
 
-        {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 bg-white/70 backdrop-blur-sm h-auto p-1 gap-1">
-            <TabsTrigger value="planner" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-orange-500 data-[state=active]:text-white p-2 text-xs sm:text-sm min-h-[3rem] sm:min-h-[2.5rem]">
-              <ChefHat className="h-4 w-4" />
-              <span>Meal Plans</span>
-            </TabsTrigger>
-            <TabsTrigger value="highlights" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm min-h-[3rem] sm:min-h-[2.5rem]">
-              <BarChart3 className="h-4 w-4" />
-              <span>Highlights</span>
-            </TabsTrigger>
-            <TabsTrigger value="ingredients" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm min-h-[3rem] sm:min-h-[2.5rem]">
-              <Utensils className="h-4 w-4" />
-              <span>Pantry</span>
-            </TabsTrigger>
-            <TabsTrigger value="shopping" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm min-h-[3rem] sm:min-h-[2.5rem]">
-              <ShoppingCart className="h-4 w-4" />
-              <span>Shopping</span>
-            </TabsTrigger>
-            <TabsTrigger value="calories" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm min-h-[3rem] sm:min-h-[2.5rem]">
-              <TrendingUp className="h-4 w-4" />
-              <span>Calories</span>
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 p-2 text-xs sm:text-sm min-h-[3rem] sm:min-h-[2.5rem]">
-              <User className="h-4 w-4" />
-              <span>Profile</span>
-            </TabsTrigger>
-          </TabsList>
-
+        {/* Tab Content */}
+        <Tabs value={activeTab} className="w-full">
           <TabsContent value="planner" className="mt-4 sm:mt-6">
             <div id="meal-planner-section">
               <MealPlanner />
