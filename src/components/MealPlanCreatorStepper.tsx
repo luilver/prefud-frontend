@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,11 +37,11 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
   const { toast } = useToast();
 
   const steps = [
-    { title: "Plan Details", description: "Basic information about your meal plan" },
-    { title: "Dietary Preferences", description: "Your dietary needs and restrictions" },
-    { title: "Cuisine & Cooking", description: "Cuisine preferences and cooking constraints" },
-    { title: "Food Preferences", description: "Foods you like and dislike (optional)" },
-    { title: "Generate Plan", description: "Review and create your meal plan" }
+    { title: "Plan Details", description: "Basic information about your meal plan", shortTitle: "Details" },
+    { title: "Dietary Preferences", description: "Your dietary needs and restrictions", shortTitle: "Diet" },
+    { title: "Cuisine & Cooking", description: "Cuisine preferences and cooking constraints", shortTitle: "Cuisine" },
+    { title: "Food Preferences", description: "Foods you like and dislike (optional)", shortTitle: "Prefs" },
+    { title: "Generate Plan", description: "Review and create your meal plan", shortTitle: "Generate" }
   ];
 
   const availableDiets = [
@@ -310,9 +309,9 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
       case 0:
         return (
           <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
-            <CardHeader>
-              <CardTitle className="text-purple-700">Plan Details</CardTitle>
-              <CardDescription>Set up your meal planning preferences</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-purple-700 text-lg sm:text-xl">Plan Details</CardTitle>
+              <CardDescription className="text-sm">Set up your meal planning preferences</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -337,7 +336,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="numberOfWeeks">Number of Weeks *</Label>
                   <Input
@@ -393,19 +392,19 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
       case 1:
         return (
           <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-            <CardHeader>
-              <CardTitle className="text-green-700">Dietary Preferences</CardTitle>
-              <CardDescription>Tell us about your dietary needs and restrictions</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-green-700 text-lg sm:text-xl">Dietary Preferences</CardTitle>
+              <CardDescription className="text-sm">Tell us about your dietary needs and restrictions</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Dietary Restrictions</Label>
+                <Label className="text-sm font-medium">Dietary Restrictions</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {availableDiets.map((diet) => (
                     <Badge
                       key={diet}
                       variant={dietaryRestrictions.includes(diet) ? "default" : "outline"}
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer text-xs ${
                         dietaryRestrictions.includes(diet)
                           ? 'bg-green-500 text-white'
                           : 'border-green-300 text-green-700 hover:bg-green-50'
@@ -419,13 +418,13 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
               </div>
 
               <div>
-                <Label>Allergies & Intolerances</Label>
+                <Label className="text-sm font-medium">Allergies & Intolerances</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {availableAllergies.map((allergy) => (
                     <Badge
                       key={allergy}
                       variant={allergiesIntolerances.includes(allergy) ? "default" : "outline"}
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer text-xs ${
                         allergiesIntolerances.includes(allergy)
                           ? 'bg-red-500 text-white'
                           : 'border-red-300 text-red-700 hover:bg-red-50'
@@ -439,25 +438,25 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
               </div>
 
               <div>
-                <Label htmlFor="additionalAllergies">Additional Allergies (Optional)</Label>
+                <Label htmlFor="additionalAllergies" className="text-sm font-medium">Additional Allergies (Optional)</Label>
                 <Textarea
                   id="additionalAllergies"
                   placeholder="Please specify any other allergies or intolerances not listed above..."
                   value={additionalAllergies}
                   onChange={(e) => setAdditionalAllergies(e.target.value)}
-                  className="border-red-200 focus:border-red-400 mt-2"
+                  className="border-red-200 focus:border-red-400 mt-2 text-sm"
                   rows={3}
                 />
               </div>
 
               <div>
-                <Label>Health Goals</Label>
+                <Label className="text-sm font-medium">Health Goals</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {availableGoals.map((goal) => (
                     <Badge
                       key={goal}
                       variant={healthGoals.includes(goal) ? "default" : "outline"}
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer text-xs ${
                         healthGoals.includes(goal)
                           ? 'bg-blue-500 text-white'
                           : 'border-blue-300 text-blue-700 hover:bg-blue-50'
@@ -475,14 +474,14 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
 
       case 2:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
-              <CardHeader>
-                <CardTitle className="text-orange-700 flex items-center gap-2">
-                  <ChefHat className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="text-orange-700 flex items-center gap-2 text-lg sm:text-xl">
+                  <ChefHat className="h-4 w-4 sm:h-5 sm:w-5" />
                   Cuisine Preferences
                 </CardTitle>
-                <CardDescription>Select your favorite cuisines</CardDescription>
+                <CardDescription className="text-sm">Select your favorite cuisines</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -490,7 +489,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                     <Badge
                       key={cuisine}
                       variant={cuisinePreferences.includes(cuisine) ? "default" : "outline"}
-                      className={`cursor-pointer ${
+                      className={`cursor-pointer text-xs ${
                         cuisinePreferences.includes(cuisine)
                           ? 'bg-orange-500 text-white'
                           : 'border-orange-300 text-orange-700 hover:bg-orange-50'
@@ -505,22 +504,23 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
             </Card>
 
             <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
-              <CardHeader>
-                <CardTitle className="text-blue-700 flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="text-blue-700 flex items-center gap-2 text-lg sm:text-xl">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
                   Cooking Preferences
                 </CardTitle>
-                <CardDescription>Set your cooking constraints and skill level</CardDescription>
+                <CardDescription className="text-sm">Set your cooking constraints and skill level</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Max Cook Time</Label>
+                  <Label className="text-sm font-medium">Max Cook Time</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {cookTimesOptions.map((time) => (
-                      <Badge
+                      <Button
                         key={time}
                         variant={maxCookTime === time ? "default" : "outline"}
-                        className={`cursor-pointer ${
+                        size="sm"
+                        className={`text-xs ${
                           maxCookTime === time
                             ? 'bg-blue-500 text-white'
                             : 'border-blue-300 text-blue-700 hover:bg-blue-50'
@@ -528,19 +528,20 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                         onClick={() => setMaxCookTime(time)}
                       >
                         {time} min
-                      </Badge>
+                      </Button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <Label>Cooking Skill Level *</Label>
+                  <Label className="text-sm font-medium">Cooking Skill Level *</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {cookingSkillLevels.map((level) => (
-                      <Badge
+                      <Button
                         key={level}
                         variant={cookingSkillLevel === level ? "default" : "outline"}
-                        className={`cursor-pointer ${
+                        size="sm"
+                        className={`text-xs ${
                           cookingSkillLevel === level
                             ? 'bg-blue-500 text-white'
                             : 'border-blue-300 text-blue-700 hover:bg-blue-50'
@@ -548,22 +549,23 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                         onClick={() => setCookingSkillLevel(level)}
                       >
                         {level.charAt(0).toUpperCase() + level.slice(1)}
-                      </Badge>
+                      </Button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <Label className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
+                  <Label className="flex items-center gap-2 text-sm font-medium">
+                    <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
                     Budget Range *
                   </Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {budgetRanges.map((range) => (
-                      <Badge
+                      <Button
                         key={range}
                         variant={budgetRange === range ? "default" : "outline"}
-                        className={`cursor-pointer ${
+                        size="sm"
+                        className={`text-xs ${
                           budgetRange === range
                             ? 'bg-blue-500 text-white'
                             : 'border-blue-300 text-blue-700 hover:bg-blue-50'
@@ -571,7 +573,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                         onClick={() => setBudgetRange(range)}
                       >
                         {range.charAt(0).toUpperCase() + range.slice(1)}
-                      </Badge>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -583,9 +585,9 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
       case 3:
         return (
           <Card className="bg-white/70 backdrop-blur-sm border-red-200">
-            <CardHeader>
-              <CardTitle className="text-red-700">Food Preferences (Optional)</CardTitle>
-              <CardDescription>Add foods you want to avoid in your meal plan</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-red-700 text-lg sm:text-xl">Food Preferences (Optional)</CardTitle>
+              <CardDescription className="text-sm">Add foods you want to avoid in your meal plan</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex space-x-2">
@@ -594,14 +596,14 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                   value={newDislike}
                   onChange={(e) => setNewDislike(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && addDislike()}
-                  className="border-red-200 focus:border-red-400"
+                  className="border-red-200 focus:border-red-400 text-sm"
                 />
                 <Button
                   onClick={addDislike}
                   size="sm"
-                  className="bg-red-500 hover:bg-red-600"
+                  className="bg-red-500 hover:bg-red-600 px-3"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
 
@@ -613,11 +615,11 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                       <Badge
                         key={dislike}
                         variant="destructive"
-                        className="cursor-pointer"
+                        className="cursor-pointer text-xs"
                         onClick={() => removeDislike(dislike)}
                       >
                         {dislike}
-                        <X className="h-3 w-3 ml-1" />
+                        <X className="h-2 w-2 sm:h-3 sm:w-3 ml-1" />
                       </Badge>
                     ))}
                   </div>
@@ -633,37 +635,39 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
       case 4:
         return (
           <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
-            <CardHeader>
-              <CardTitle className="text-orange-700">Generate Your Plan</CardTitle>
-              <CardDescription>Review your preferences and create your personalized meal plan</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-orange-700 text-lg sm:text-xl">Generate Your Plan</CardTitle>
+              <CardDescription className="text-sm">Review your preferences and create your personalized meal plan</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <h4 className="font-semibold text-gray-800">Plan Summary:</h4>
-                <p className="text-sm text-gray-600">• <strong>Name:</strong> {planName}</p>
-                <p className="text-sm text-gray-600">• <strong>Duration:</strong> {numberOfWeeks} week{numberOfWeeks > 1 ? 's' : ''}</p>
-                <p className="text-sm text-gray-600">• <strong>People:</strong> {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''}</p>
-                <p className="text-sm text-gray-600">• <strong>Meals per day:</strong> {mealsPerDay}</p>
-                <p className="text-sm text-gray-600">• <strong>Skill level:</strong> {cookingSkillLevel}</p>
-                <p className="text-sm text-gray-600">• <strong>Budget:</strong> {budgetRange}</p>
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg space-y-2">
+                <h4 className="font-semibold text-gray-800 text-sm sm:text-base">Plan Summary:</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                  <p>• <strong>Name:</strong> {planName}</p>
+                  <p>• <strong>Duration:</strong> {numberOfWeeks} week{numberOfWeeks > 1 ? 's' : ''}</p>
+                  <p>• <strong>People:</strong> {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''}</p>
+                  <p>• <strong>Meals per day:</strong> {mealsPerDay}</p>
+                  <p>• <strong>Skill level:</strong> {cookingSkillLevel}</p>
+                  <p>• <strong>Budget:</strong> {budgetRange}</p>
+                </div>
                 {dietaryRestrictions.length > 0 && (
-                  <p className="text-sm text-gray-600">• <strong>Dietary restrictions:</strong> {dietaryRestrictions.join(', ')}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">• <strong>Dietary restrictions:</strong> {dietaryRestrictions.join(', ')}</p>
                 )}
               </div>
               
               <Button
                 onClick={generateMealPlan}
                 disabled={isGenerating}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg py-6"
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-sm sm:text-lg py-4 sm:py-6"
               >
-                <Sparkles className="h-5 w-5 mr-2" />
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 {isGenerating ? "Generating Your Plan..." : "Generate AI Meal Plan"}
               </Button>
               
               {isGenerating && (
                 <div className="mt-4 space-y-2">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
+                  <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-purple-500"></div>
                     <span>Analyzing your preferences...</span>
                   </div>
                   <div className="text-xs text-gray-500">
@@ -681,74 +685,138 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={onBack}>
-          ← Back to Meal Planner
-        </Button>
-        <h2 className="text-2xl font-bold text-gray-800">Create AI Meal Plan</h2>
-        <div></div>
-      </div>
-
-      {/* Stepper */}
-      <div className="flex items-center justify-between mb-8">
-        {steps.map((step, index) => (
-          <div key={index} className="flex flex-col items-center flex-1">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-              index <= currentStep 
-                ? 'bg-purple-500 text-white' 
-                : 'bg-gray-200 text-gray-500'
-            }`}>
-              {index + 1}
+    <>
+      {/* Cooking Animation Overlay */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm mx-4 text-center shadow-2xl">
+            <div className="relative mb-6">
+              {/* Main cooking pot */}
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 relative">
+                <div className="w-full h-full bg-gray-800 rounded-full animate-pulse"></div>
+                {/* Steam animation */}
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                  <div className="w-1 h-4 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                </div>
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 -translate-x-2">
+                  <div className="w-1 h-3 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 translate-x-2">
+                  <div className="w-1 h-3 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+              </div>
+              
+              {/* Chef hat */}
+              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                <ChefHat className="h-8 w-8 sm:h-10 sm:w-10 text-orange-500 animate-bounce" />
+              </div>
             </div>
-            <div className="text-center mt-2">
-              <p className={`text-xs font-medium ${
-                index <= currentStep ? 'text-purple-700' : 'text-gray-500'
-              }`}>
-                {step.title}
-              </p>
-              <p className="text-xs text-gray-400 hidden sm:block">
-                {step.description}
-              </p>
+            
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">Cooking Your Perfect Plan</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-4">Our AI chef is preparing your personalized meal plan...</p>
+            
+            {/* Progress indicators */}
+            <div className="flex justify-center space-x-1">
+              <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+              <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
             </div>
-            {index < steps.length - 1 && (
-              <div className={`w-full h-0.5 mt-4 ${
-                index < currentStep ? 'bg-purple-500' : 'bg-gray-200'
-              }`} />
-            )}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
-      {/* Step Content */}
-      <div className="min-h-[400px]">
-        {renderStepContent()}
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="flex justify-between pt-6">
-        <Button
-          variant="outline"
-          onClick={prevStep}
-          disabled={currentStep === 0}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Previous
-        </Button>
-        
-        {currentStep < steps.length - 1 && (
-          <Button
-            onClick={nextStep}
-            disabled={!canGoNext()}
-            className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600"
-          >
-            Next
-            <ArrowRight className="h-4 w-4" />
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" onClick={onBack} size="sm" className="text-xs sm:text-sm">
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            Back
           </Button>
-        )}
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-800">AI Meal Plan</h2>
+          <div></div>
+        </div>
+
+        {/* Desktop Stepper */}
+        <div className="hidden sm:flex items-center justify-between mb-8">
+          {steps.map((step, index) => (
+            <div key={index} className="flex flex-col items-center flex-1">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                index <= currentStep 
+                  ? 'bg-purple-500 text-white' 
+                  : 'bg-gray-200 text-gray-500'
+              }`}>
+                {index + 1}
+              </div>
+              <div className="text-center mt-2">
+                <p className={`text-xs font-medium ${
+                  index <= currentStep ? 'text-purple-700' : 'text-gray-500'
+                }`}>
+                  {step.title}
+                </p>
+                <p className="text-xs text-gray-400 hidden lg:block">
+                  {step.description}
+                </p>
+              </div>
+              {index < steps.length - 1 && (
+                <div className={`w-full h-0.5 mt-4 ${
+                  index < currentStep ? 'bg-purple-500' : 'bg-gray-200'
+                }`} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile Stepper */}
+        <div className="sm:hidden mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-sm text-gray-600">
+              Step {currentStep + 1} of {steps.length}
+            </div>
+            <div className="text-sm font-medium text-purple-700">
+              {steps[currentStep].shortTitle}
+            </div>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <div className="min-h-[300px] sm:min-h-[400px]">
+          {renderStepContent()}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between pt-4 sm:pt-6">
+          <Button
+            variant="outline"
+            onClick={prevStep}
+            disabled={currentStep === 0}
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4"
+            size="sm"
+          >
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Previous</span>
+            <span className="sm:hidden">Prev</span>
+          </Button>
+          
+          {currentStep < steps.length - 1 && (
+            <Button
+              onClick={nextStep}
+              disabled={!canGoNext()}
+              className="flex items-center gap-1 sm:gap-2 bg-purple-500 hover:bg-purple-600 text-xs sm:text-sm px-3 sm:px-4"
+              size="sm"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <span className="sm:hidden">Next</span>
+              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
