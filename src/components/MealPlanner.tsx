@@ -1,607 +1,244 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, Clock, Users, Utensils, Plus, ChefHat, Sparkles, Check, Play, Trash2, CalendarDays, CookingPot } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, Users, ChefHat, Plus, Eye, Edit, Trash2, Sparkles } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import MealPlanCreator from "./MealPlanCreator";
+import { useToast } from "@/hooks/use-toast";
+import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
-import RecipeView from "./RecipeView";
 
 interface Meal {
   id: string;
   name: string;
-  type: "breakfast" | "lunch" | "dinner" | "snack";
+  type: string;
   calories: number;
   prepTime: number;
   servings: number;
-  difficulty: "easy" | "medium" | "hard";
-  image?: string;
+  difficulty: string;
   ingredients: string[];
   instructions: string[];
+  week: number;
+  day: number;
+  date: string;
 }
 
+interface MealPlan {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  numberOfWeeks: number;
+  numberOfPersons: number;
+  mealsPerDay: number;
+  dietaryRestrictions: string[];
+  cuisinePreferences: string[];
+  allergiesIntolerances: string[];
+  additionalAllergies: string;
+  maxCookTime: number;
+  cookingSkillLevel: string;
+  budgetRange: string;
+  dislikes: string[];
+  healthGoals: string[];
+  meals: Meal[];
+}
+
+type View = "list" | "create" | "view" | "edit";
+
 const MealPlanner = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [view, setView] = useState<"planner" | "creator" | "plan" | "recipe">("planner");
-  const [currentPlan, setCurrentPlan] = useState<any>(null);
-  const [selectedMeal, setSelectedMeal] = useState<any>(null);
-  const [activePlanId, setActivePlanId] = useState<string | null>(null);
-  const { 
-    toggleMealCompletion, 
-    isMealCompleted, 
-    updatePantryFromMeal,
-    mealPlans = [],
-    deleteMealPlan,
-    deleteMealFromPlan,
-    addMealPlan,
-    setActiveShoppingList,
-    updateMealPlanShoppingList,
-    activeMealPlan,
-    setActiveMealPlan,
-    addPantryItem
-  } = useUser();
-  
-  const [meals] = useState<Meal[]>([
-    {
-      id: "1",
-      name: "Avocado Toast with Eggs",
-      type: "breakfast",
-      calories: 350,
-      prepTime: 10,
-      servings: 1,
-      difficulty: "easy",
-      ingredients: ["2 slices whole grain bread", "1 ripe avocado", "2 eggs", "Salt to taste", "Black pepper", "Olive oil"],
-      instructions: [
-        "Toast the bread slices until golden brown",
-        "Mash the avocado in a bowl with salt and pepper",
-        "Heat olive oil in a pan and fry the eggs",
-        "Spread mashed avocado on toast",
-        "Top with fried eggs and serve immediately"
-      ]
-    },
-    {
-      id: "2",
-      name: "Grilled Chicken Salad",
-      type: "lunch",
-      calories: 420,
-      prepTime: 25,
-      servings: 1,
-      difficulty: "medium",
-      ingredients: ["1 chicken breast", "2 cups mixed greens", "1 cup cherry tomatoes", "1/2 cucumber", "2 tbsp olive oil", "1 tbsp lemon juice"],
-      instructions: [
-        "Season chicken breast with salt and pepper",
-        "Grill chicken for 6-7 minutes each side until cooked through",
-        "Wash and prepare the vegetables",
-        "Mix olive oil and lemon juice for dressing",
-        "Slice chicken and serve over greens with dressing"
-      ]
-    },
-    {
-      id: "3",
-      name: "Salmon with Quinoa",
-      type: "dinner",
-      calories: 580,
-      prepTime: 30,
-      servings: 2,
-      difficulty: "medium",
-      ingredients: ["2 salmon fillets", "1 cup quinoa", "2 cups broccoli florets", "1 lemon", "2 cloves garlic", "Olive oil"],
-      instructions: [
-        "Cook quinoa according to package instructions",
-        "Steam broccoli until tender",
-        "Season salmon with salt, pepper, and lemon juice",
-        "Heat olive oil in a pan and cook salmon 4-5 minutes each side",
-        "Serve salmon over quinoa with steamed broccoli"
-      ]
-    }
-  ]);
+  const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
+  const [currentView, setCurrentView] = useState<View>("list");
+  const [selectedPlan, setSelectedPlan] = useState<MealPlan | null>(null);
+  const { toast } = useToast();
+  const { user } = useUser();
 
-  // Set default active plan on component mount
-  useEffect(() => {
-    if (mealPlans.length > 0 && !activePlanId) {
-      const defaultPlan = mealPlans[0];
-      setActivePlanId(defaultPlan.id);
-      setActiveMealPlan(defaultPlan);
-    }
-  }, [mealPlans, activePlanId, setActiveMealPlan]);
-
-  const weekDays = [];
-  const startOfWeek = new Date(selectedDate);
-  startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
-
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(startOfWeek);
-    day.setDate(startOfWeek.getDate() + i);
-    weekDays.push(day);
-  }
-
-  const getMealsForDay = (date: Date) => {
-    // Get meals from currently active meal plan for this date
-    const activePlan = mealPlans.find(plan => plan.id === activePlanId);
-    if (!activePlan) return meals;
-
-    const planStart = new Date(activePlan.startDate);
-    const planEnd = new Date(activePlan.endDate);
-    
-    if (date >= planStart && date <= planEnd) {
-      return activePlan.meals || [];
-    }
-    
-    return meals;
+  const handleCreateNew = () => {
+    setCurrentView("create");
   };
 
-  const handlePlanSelection = (planId: string) => {
-    const selectedPlan = mealPlans.find(plan => plan.id === planId);
-    if (selectedPlan) {
-      setActivePlanId(planId);
-      setActiveMealPlan(selectedPlan);
-      console.log('Selected meal plan:', selectedPlan);
-    }
+  const handlePlanCreated = (newPlan: MealPlan) => {
+    setMealPlans([...mealPlans, newPlan]);
+    setCurrentView("list");
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
+  const handleViewPlan = (plan: MealPlan) => {
+    setSelectedPlan(plan);
+    setCurrentView("view");
+  };
+
+  const handleEditPlan = (plan: MealPlan) => {
+    setSelectedPlan(plan);
+    setCurrentView("edit");
+  };
+
+  const handleDeletePlan = (planId: string) => {
+    setMealPlans(mealPlans.filter(plan => plan.id !== planId));
+    toast({
+      title: "Plan Deleted",
+      description: "Meal plan has been successfully deleted.",
     });
   };
 
-  const isToday = (date: Date) => {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-  };
-
-  const getMealTypeColor = (type: Meal['type']) => {
-    switch (type) {
-      case 'breakfast': return 'bg-yellow-100 border-yellow-300 text-yellow-800';
-      case 'lunch': return 'bg-blue-100 border-blue-300 text-blue-800';
-      case 'dinner': return 'bg-purple-100 border-purple-300 text-purple-800';
-      case 'snack': return 'bg-green-100 border-green-300 text-green-800';
-      default: return 'bg-gray-100 border-gray-300 text-gray-800';
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "easy":
+        return "bg-green-100 text-green-700";
+      case "intermediate":
+        return "bg-yellow-100 text-yellow-700";
+      case "advanced":
+        return "bg-orange-100 text-orange-700";
+      case "expert":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-100 text-gray-700";
     }
   };
 
-  const handlePlanCreated = (plan: any) => {
-    addMealPlan(plan);
-    setCurrentPlan(plan);
-    setActivePlanId(plan.id);
-    setActiveMealPlan(plan);
-    setView("plan");
-  };
-
-  const handleMealSelected = (meal: any) => {
-    setSelectedMeal(meal);
-    setView("recipe");
-  };
-
-  const handleGenerateShoppingList = (meals: any[]) => {
-    console.log('Generating shopping list for meals:', meals);
-    
-    // Generate shopping list from meals
-    const shoppingListItems = meals.reduce((acc: any[], meal: any) => {
-      if (meal.ingredients && Array.isArray(meal.ingredients)) {
-        const mealItems = meal.ingredients.map((ingredient: string) => ({
-          id: `${meal.id}_${ingredient.replace(/\s+/g, '_')}`,
-          name: ingredient,
-          quantity: 1,
-          unit: 'item',
-          category: 'meal-ingredient',
-          priority: 'medium' as const,
-          purchased: false,
-          mealId: meal.id,
-          mealName: meal.name,
-          checked: false
-        }));
-        acc.push(...mealItems);
-      }
-      return acc;
-    }, []);
-    
-    // Remove duplicates based on ingredient name
-    const uniqueItems = shoppingListItems.filter((item, index, self) => 
-      index === self.findIndex(t => t.name === item.name)
-    );
-    
-    console.log('Generated shopping list items:', uniqueItems);
-    
-    // Update the current meal plan with the shopping list
-    if (currentPlan) {
-      updateMealPlanShoppingList(currentPlan.id, uniqueItems);
-      const updatedPlan = {
-        ...currentPlan,
-        shoppingList: uniqueItems
-      };
-      setCurrentPlan(updatedPlan);
-    }
-  };
-
-  const handleAddToPantry = (items: string[]) => {
-    items.forEach(itemName => {
-      addPantryItem({
-        name: itemName,
-        quantity: 1,
-        unit: 'item',
-        category: 'meal-ingredient',
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        purchaseDate: new Date(),
-        notes: 'Added from meal plan shopping list'
-      });
-    });
-  };
-
-  const handleMealCompletion = (mealId: string, date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    const wasCompleted = isMealCompleted(mealId, dateStr);
-    
-    toggleMealCompletion(mealId, dateStr);
-    
-    // If meal is being completed (not uncompleted), update pantry
-    if (!wasCompleted) {
-      const dayMeals = getMealsForDay(date);
-      const meal = dayMeals.find(m => m.id === mealId);
-      if (meal && meal.ingredients) {
-        updatePantryFromMeal(meal.ingredients);
-      }
-    }
-  };
-
-  const checkMealCompletion = (mealId: string, date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return isMealCompleted(mealId, dateStr);
-  };
-
-  const getCompletedMealsForDay = (date: Date) => {
-    const dayMeals = getMealsForDay(date);
-    return (dayMeals || []).filter(meal => checkMealCompletion(meal.id, date)).length;
-  };
-
-  const handleDeleteMeal = (mealId: string) => {
-    const activePlan = mealPlans.find(plan => plan.id === activePlanId);
-    if (activePlan) {
-      deleteMealFromPlan(activePlan.id, mealId);
-    }
-  };
-
-  if (view === "creator") {
+  if (currentView === "create") {
     return (
-      <MealPlanCreator
+      <MealPlanCreatorStepper
         onPlanCreated={handlePlanCreated}
-        onBack={() => setView("planner")}
+        onBack={() => setCurrentView("list")}
       />
     );
   }
 
-  if (view === "plan" && currentPlan) {
+  if (currentView === "view" && selectedPlan) {
     return (
       <MealPlanView
-        plan={currentPlan}
-        onBack={() => setView("planner")}
-        onSelectMeal={handleMealSelected}
-        onGenerateShoppingList={handleGenerateShoppingList}
-        onAddToPantry={handleAddToPantry}
+        plan={selectedPlan}
+        onBack={() => setCurrentView("list")}
+        onEdit={() => handleEditPlan(selectedPlan)}
       />
-    );
-  }
-
-  if (view === "recipe" && selectedMeal) {
-    return (
-      <RecipeView
-        meal={selectedMeal}
-        onBack={() => setView("plan")}
-      />
-    );
-  }
-
-  // Empty state when no meal plans exist
-  if (mealPlans.length === 0) {
-    return (
-      <div className="space-y-6">
-        {/* Empty State */}
-        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
-          <CardContent className="text-center py-16">
-            <div className="mx-auto w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-6">
-              <CookingPot className="h-12 w-12 text-purple-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No Meal Plans Yet</h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Get started by creating your first AI-powered meal plan. We'll help you plan delicious, healthy meals that fit your lifestyle.
-            </p>
-            <Button 
-              onClick={() => setView("creator")}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-              size="lg"
-            >
-              <Sparkles className="h-5 w-5 mr-2" />
-              Create Your First Meal Plan
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Benefits Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-2">
-                <ChefHat className="h-6 w-6 text-green-600" />
-              </div>
-              <CardTitle className="text-lg">AI-Powered Planning</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-600 text-sm">
-                Let AI create personalized meal plans based on your preferences, dietary restrictions, and cooking skills.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
-                <Calendar className="h-6 w-6 text-blue-600" />
-              </div>
-              <CardTitle className="text-lg">Weekly Organization</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-600 text-sm">
-                Plan your entire week with breakfast, lunch, dinner, and snacks organized by day and time.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-2">
-                <Utensils className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle className="text-lg">Smart Shopping</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-600 text-sm">
-                Automatically generate shopping lists and sync with your pantry for efficient meal preparation.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Action Buttons */}
-      <div className="flex justify-end space-x-3">
-        <Button 
-          onClick={() => setView("creator")}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Your Meal Plans</h2>
+          <p className="text-gray-600 mt-1">
+            Manage and create AI-powered meal plans
+          </p>
+        </div>
+        <Button
+          onClick={handleCreateNew}
+          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 w-full sm:w-auto"
         >
-          <Sparkles className="h-4 w-4 mr-2" />
-          AI Meal Plan
-        </Button>
-        <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
           <Plus className="h-4 w-4 mr-2" />
-          Add Meal
+          Create New Plan
         </Button>
       </div>
 
-      {/* Meal Plans List - Horizontal Scroll */}
-      <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center space-x-2">
-            <CalendarDays className="h-5 w-5 text-purple-600" />
-            <span>Your Meal Plans</span>
-          </CardTitle>
-          <CardDescription>
-            Select a meal plan to view and manage its shopping list.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Plans List - Horizontal Scroll */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-700">Recent Plans</h3>
+        
+        {mealPlans.length === 0 ? (
+          <Card className="bg-white/70 backdrop-blur-sm border-dashed border-2 border-gray-300">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <ChefHat className="h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-500 mb-2">No meal plans yet</h3>
+              <p className="text-gray-400 text-center mb-4 max-w-md">
+                Create your first AI-powered meal plan to get personalized recipes and shopping lists.
+              </p>
+              <Button
+                onClick={handleCreateNew}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Create Your First Plan
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
           <ScrollArea className="w-full">
             <div className="flex space-x-4 pb-4">
-              {(mealPlans || []).map((plan) => (
-                <Card 
-                  key={plan.id} 
-                  className={`min-w-[280px] border-purple-100 hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-105 ${
-                    activePlanId === plan.id 
-                      ? 'ring-2 ring-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg' 
-                      : 'bg-white/80 hover:bg-white/90'
-                  }`}
-                  onClick={() => handlePlanSelection(plan.id)}
-                >
+              {mealPlans.map((plan) => (
+                <Card key={plan.id} className="bg-white/70 backdrop-blur-sm border-green-200 flex-shrink-0 w-80">
                   <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg font-bold text-gray-800 truncate">{plan.name}</CardTitle>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteMealPlan(plan.id);
-                        }}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-70 hover:opacity-100"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="text-sm text-gray-500 font-medium">
-                      {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-purple-600 font-semibold">
-                        {(plan.meals || []).length} meals planned
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg text-green-700 truncate">{plan.name}</CardTitle>
+                        <CardDescription className="text-sm">
+                          {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                        </CardDescription>
                       </div>
-                      {activePlanId === plan.id && (
-                        <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium">
-                          Active
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Shopping list: {(plan.shoppingList || []).length} items
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <Button
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentPlan(plan);
-                        setView("plan");
-                      }}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                    >
-                      <ChefHat className="h-4 w-4 mr-2" />
-                      View Plan
-                    </Button>
+                  <CardContent className="space-y-3">
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {plan.numberOfWeeks}w
+                      </Badge>
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <Users className="h-3 w-3" />
+                        {plan.numberOfPersons}p
+                      </Badge>
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {plan.maxCookTime}min
+                      </Badge>
+                    </div>
+
+                    {plan.dietaryRestrictions.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {plan.dietaryRestrictions.slice(0, 3).map((diet) => (
+                          <Badge key={diet} variant="secondary" className="text-xs">
+                            {diet}
+                          </Badge>
+                        ))}
+                        {plan.dietaryRestrictions.length > 3 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{plan.dietaryRestrictions.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="text-xs text-gray-500">
+                      {plan.meals.length} meals planned
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleViewPlan(plan)}
+                        className="flex-1 text-xs"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditPlan(plan)}
+                        className="flex-1 text-xs"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeletePlan(plan.id)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </ScrollArea>
-        </CardContent>
-      </Card>
-
-      {/* Week Navigator */}
-      <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-7 gap-4">
-            {weekDays.map((day, index) => {
-              const completedMeals = getCompletedMealsForDay(day);
-              const totalMeals = getMealsForDay(day).length;
-              
-              return (
-                <div
-                  key={index}
-                  className={`text-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                    isToday(day)
-                      ? 'bg-gradient-to-r from-green-500 to-orange-500 text-white shadow-lg'
-                      : 'bg-white/50 hover:bg-white/70 border border-green-100'
-                  }`}
-                  onClick={() => setSelectedDate(day)}
-                >
-                  <div className="font-semibold">{day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                  <div className="text-sm">{day.getDate()}</div>
-                  {/* Completion indicator */}
-                  <div className="flex justify-center mt-1">
-                    {completedMeals > 0 && (
-                      <div className="flex items-center space-x-1">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span className="text-xs">{completedMeals}/{totalMeals}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Selected Day Meals */}
-      <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5 text-green-600" />
-            <span>Meals for {formatDate(selectedDate)}</span>
-          </CardTitle>
-          <CardDescription>
-            Your planned meals for the selected day
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {(getMealsForDay(selectedDate) || []).map((meal) => {
-              const isCompleted = checkMealCompletion(meal.id, selectedDate);
-              return (
-                <div 
-                  key={meal.id} 
-                  className={`p-4 rounded-lg border transition-colors ${
-                    isCompleted 
-                      ? 'bg-green-50 border-green-200' 
-                      : 'bg-white/50 border-green-100 hover:bg-white/70'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getMealTypeColor(meal.type)}`}>
-                          {meal.type.charAt(0).toUpperCase() + meal.type.slice(1)}
-                        </span>
-                        <span className="text-sm text-gray-500">{meal.calories} cal</span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleMealCompletion(meal.id, selectedDate)}
-                          className={`h-6 w-6 p-0 rounded-full ${
-                            isCompleted 
-                              ? 'bg-green-500 text-white hover:bg-green-600' 
-                              : 'border-2 border-green-300 hover:bg-green-50'
-                          }`}
-                        >
-                          {isCompleted && <Check className="h-3 w-3" />}
-                        </Button>
-                      </div>
-                      <h4 className={`font-semibold mb-2 ${isCompleted ? 'line-through text-gray-500' : 'text-gray-800'}`}>
-                        {meal.name}
-                      </h4>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <div className="flex items-center space-x-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{meal.prepTime}min</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Users className="h-4 w-4" />
-                          <span>{meal.servings} serving{meal.servings > 1 ? 's' : ''}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col space-y-1">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-green-600 hover:text-green-700 h-8"
-                        onClick={() => handleMealSelected(meal)}
-                      >
-                        <ChefHat className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-blue-600 hover:text-blue-700 h-8"
-                        onClick={() => handleMealSelected(meal)}
-                      >
-                        <Play className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-red-600 hover:text-red-700 h-8"
-                        onClick={() => handleDeleteMeal(meal.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-green-100">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">Ingredients:</span> {(meal.ingredients || []).slice(0, 3).join(', ')}
-                      {(meal.ingredients || []).length > 3 && '...'}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-
-            {getMealsForDay(selectedDate).length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <Utensils className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No meals planned for this day</p>
-                <p className="text-sm">Add some meals to get started</p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   );
 };

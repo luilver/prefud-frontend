@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Utensils, Bell, ChefHat, Sparkles, Plus } from "lucide-react";
+import { Utensils, ChefHat, Sparkles, Plus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import Navigation from "./Navigation";
 import MealPlanner from "./MealPlanner";
@@ -44,10 +44,13 @@ const Dashboard = () => {
               Pantry
             </h1>
           </div>
-          <div className="flex items-center space-x-1 sm:space-x-2">
-            <Button variant="ghost" size="icon" className="text-green-700 h-7 w-7 sm:h-8 sm:w-8 lg:h-10 lg:w-10">
-              <Bell className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
-            </Button>
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <span className="text-sm sm:text-base text-green-700 font-medium hidden sm:block">
+              {user?.name || 'User'}
+            </span>
+            <span className="text-xs text-green-700 font-medium sm:hidden">
+              {user?.name?.split(' ')[0] || 'User'}
+            </span>
             <Button variant="ghost" onClick={logout} className="text-green-700 text-xs sm:text-sm lg:text-base px-2 sm:px-3 lg:px-4 py-1 sm:py-2">
               Logout
             </Button>
