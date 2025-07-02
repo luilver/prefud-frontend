@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,8 +6,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store, CheckSquare, Truck } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store, CheckSquare, Truck, CreditCard, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/contexts/UserContext";
 
 interface MealPlanViewProps {
   plan: any;
@@ -24,8 +25,27 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [showAddToPantryDialog, setShowAddToPantryDialog] = useState(false);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState<string>("");
   const { toast } = useToast();
+
+  // Get user context for payment methods
+  const { paymentMethods, addPaymentMethod, getPaymentMethods } = useUser();
+  
+  // Payment and address states
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
+  const [newPaymentMethod, setNewPaymentMethod] = useState({
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    cardholderName: ''
+  });
+  const [deliveryAddress, setDeliveryAddress] = useState({
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: ''
+  });
 
   if (!plan) {
     return (
@@ -48,15 +68,6 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
   }, {});
 
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-  const groceryProviders = [
-    { id: 'instacart', name: 'Instacart', icon: '🛒' },
-    { id: 'amazon-fresh', name: 'Amazon Fresh', icon: '📦' },
-    { id: 'walmart-grocery', name: 'Walmart Grocery', icon: '🛍️' },
-    { id: 'kroger', name: 'Kroger', icon: '🏪' },
-    { id: 'target', name: 'Target', icon: '🎯' },
-    { id: 'whole-foods', name: 'Whole Foods', icon: '🥬' }
-  ];
 
   const handleGenerateShoppingList = () => {
     console.log('Generating shopping list for plan:', plan.name);
@@ -102,16 +113,56 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
     }
   };
 
-  const handleOrderOnline = () => {
-    if (!selectedProvider) {
+  // Load payment methods when dialog opens
+  const handleOrderDialogOpen = (open: boolean) => {
+    if (open) {
+      getPaymentMethods();
+    }
+    setShowOrderDialog(open);
+  };
+
+  const validateDeliveryAddress = () => {
+    return deliveryAddress.street && deliveryAddress.city && deliveryAddress.state && deliveryAddress.zipCode;
+  };
+
+  const validateNewPaymentMethod = () => {
+    return newPaymentMethod.cardNumber && newPaymentMethod.expiryDate && newPaymentMethod.cvv && newPaymentMethod.cardholderName;
+  };
+
+  const handleAddNewPaymentMethod = async () => {
+    if (!validateNewPaymentMethod()) {
       toast({
-        title: "Select a provider",
-        description: "Please choose a grocery delivery provider to continue.",
+        title: "Invalid Payment Method",
+        description: "Please fill in all payment method fields.",
         variant: "destructive",
       });
       return;
     }
 
+    try {
+      await addPaymentMethod(newPaymentMethod);
+      setShowAddPaymentMethod(false);
+      setNewPaymentMethod({ cardNumber: '', expiryDate: '', cvv: '', cardholderName: '' });
+      toast({
+        title: "Payment Method Added",
+        description: "Your new payment method has been added successfully.",
+      });
+      // Refresh payment methods and select the new one
+      await getPaymentMethods();
+      const newMethodId = paymentMethods[paymentMethods.length - 1]?.id;
+      if (newMethodId) {
+        setSelectedPaymentMethod(newMethodId);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add payment method. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOrderOnline = () => {
     const checkedItemNames = Object.entries(checkedItems)
       .filter(([_, isChecked]) => isChecked)
       .map(([itemId, _]) => {
@@ -120,21 +171,50 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
       })
       .filter(Boolean);
 
-    if (checkedItemNames.length > 0) {
-      const providerName = groceryProviders.find(p => p.id === selectedProvider)?.name;
-      setShowOrderDialog(false);
-      setSelectedProvider("");
-      toast({
-        title: "Order placed successfully!",
-        description: `Your order of ${checkedItemNames.length} items has been submitted to ${providerName}. You'll receive a confirmation email shortly.`,
-      });
-    } else {
+    if (checkedItemNames.length === 0) {
       toast({
         title: "No items selected",
         description: "Please select items to order online.",
         variant: "destructive",
       });
+      return;
     }
+
+    if (!validateDeliveryAddress()) {
+      toast({
+        title: "Address Required",
+        description: "Please fill in all delivery address fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedPaymentMethod && !showAddPaymentMethod) {
+      toast({
+        title: "Payment Method Required",
+        description: "Please select a payment method or add a new one.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Get selected payment method details
+    const paymentMethod = paymentMethods.find(pm => pm.id === selectedPaymentMethod);
+    const paymentDisplay = paymentMethod ? `****${paymentMethod.last4}` : 'New card';
+
+    // Simulate order processing
+    toast({
+      title: "Order Placed Successfully! 🎉",
+      description: `${checkedItemNames.length} items ordered with ${paymentDisplay}. Delivery to ${deliveryAddress.street}, ${deliveryAddress.city}.`,
+    });
+    
+    // Reset form and close dialog
+    setCheckedItems({});
+    setShowOrderDialog(false);
+    setSelectedPaymentMethod("");
+    setDeliveryAddress({ street: '', city: '', state: '', zipCode: '', country: '' });
+    setShowAddPaymentMethod(false);
+    setNewPaymentMethod({ cardNumber: '', expiryDate: '', cvv: '', cardholderName: '' });
   };
 
   const goToPreviousWeek = () => {
@@ -244,7 +324,7 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
               </DialogContent>
             </Dialog>
             
-            <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
+            <Dialog open={showOrderDialog} onOpenChange={handleOrderDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
                   className="bg-blue-500 text-white hover:bg-blue-600"
@@ -253,54 +333,191 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
                   Order Online ({getCheckedItemsCount()})
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Choose Grocery Provider</DialogTitle>
+                  <DialogTitle>Complete Your Order</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
-                  <p className="text-gray-600">
-                    Select your preferred grocery delivery service to order {getCheckedItemsCount()} selected items.
-                  </p>
-                  
-                  <div>
-                    <Label htmlFor="provider-select">Delivery Provider</Label>
-                    <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a provider..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {groceryProviders.map((provider) => (
-                          <SelectItem key={provider.id} value={provider.id}>
-                            <div className="flex items-center gap-2">
-                              <span>{provider.icon}</span>
-                              <span>{provider.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="space-y-6">
+                  {/* Selected Items */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="font-medium mb-2">Selected Items ({getCheckedItemsCount()})</h3>
+                    <div className="text-sm text-gray-600">
+                      {Object.entries(checkedItems)
+                        .filter(([_, isChecked]) => isChecked)
+                        .map(([itemId, _]) => {
+                          const item = plan.shoppingList?.find((item: any) => item.id === itemId);
+                          return item?.name;
+                        })
+                        .filter(Boolean)
+                        .join(', ')}
+                    </div>
                   </div>
 
-                  <div className="bg-blue-50 p-3 rounded border border-blue-200">
-                    <p className="text-sm font-medium text-blue-800 mb-1">Order Summary</p>
-                    <p className="text-sm text-blue-600">
-                      {getCheckedItemsCount()} items will be added to your cart at the selected provider.
-                    </p>
+                  {/* Payment Method Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium flex items-center gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        Payment Method
+                      </h3>
+                      {paymentMethods.length > 0 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowAddPaymentMethod(!showAddPaymentMethod)}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add New
+                        </Button>
+                      )}
+                    </div>
+
+                    {paymentMethods.length > 0 && !showAddPaymentMethod ? (
+                      <div>
+                        <Label htmlFor="payment-method">Select Payment Method</Label>
+                        <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Choose a payment method..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {paymentMethods.map((method) => (
+                              <SelectItem key={method.id} value={method.id}>
+                                <div className="flex items-center gap-2">
+                                  <CreditCard className="h-4 w-4" />
+                                  <span className="capitalize">{method.brand}</span>
+                                  <span>****{method.last4}</span>
+                                  {method.isDefault && <Badge variant="secondary" className="text-xs">Default</Badge>}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 border border-gray-200 rounded-lg p-4">
+                        <h4 className="font-medium text-sm">Add New Payment Method</h4>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="col-span-2">
+                            <Label htmlFor="cardholderName">Cardholder Name</Label>
+                            <Input
+                              id="cardholderName"
+                              value={newPaymentMethod.cardholderName}
+                              onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, cardholderName: e.target.value }))}
+                              placeholder="John Doe"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Label htmlFor="cardNumber">Card Number</Label>
+                            <Input
+                              id="cardNumber"
+                              value={newPaymentMethod.cardNumber}
+                              onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, cardNumber: e.target.value }))}
+                              placeholder="1234 5678 9012 3456"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="expiryDate">Expiry Date</Label>
+                            <Input
+                              id="expiryDate"
+                              value={newPaymentMethod.expiryDate}
+                              onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, expiryDate: e.target.value }))}
+                              placeholder="MM/YY"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="cvv">CVV</Label>
+                            <Input
+                              id="cvv"
+                              value={newPaymentMethod.cvv}
+                              onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, cvv: e.target.value }))}
+                              placeholder="123"
+                            />
+                          </div>
+                        </div>
+                        {paymentMethods.length > 0 && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowAddPaymentMethod(false)}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      Delivery Address
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <Label htmlFor="street">Street Address</Label>
+                        <Input
+                          id="street"
+                          value={deliveryAddress.street}
+                          onChange={(e) => setDeliveryAddress(prev => ({ ...prev, street: e.target.value }))}
+                          placeholder="123 Main Street"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                          id="city"
+                          value={deliveryAddress.city}
+                          onChange={(e) => setDeliveryAddress(prev => ({ ...prev, city: e.target.value }))}
+                          placeholder="New York"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="state">State</Label>
+                        <Input
+                          id="state"
+                          value={deliveryAddress.state}
+                          onChange={(e) => setDeliveryAddress(prev => ({ ...prev, state: e.target.value }))}
+                          placeholder="NY"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="zipCode">ZIP Code</Label>
+                        <Input
+                          id="zipCode"
+                          value={deliveryAddress.zipCode}
+                          onChange={(e) => setDeliveryAddress(prev => ({ ...prev, zipCode: e.target.value }))}
+                          placeholder="10001"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="country">Country</Label>
+                        <Input
+                          id="country"
+                          value={deliveryAddress.country}
+                          onChange={(e) => setDeliveryAddress(prev => ({ ...prev, country: e.target.value }))}
+                          placeholder="United States"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex space-x-3">
                     <Button 
-                      onClick={handleOrderOnline}
+                      onClick={showAddPaymentMethod && paymentMethods.length === 0 ? handleAddNewPaymentMethod : handleOrderOnline}
                       className="flex-1 bg-blue-500 hover:bg-blue-600"
                     >
                       <Package className="h-4 w-4 mr-2" />
-                      Place Order
+                      {showAddPaymentMethod && paymentMethods.length === 0 ? 'Add Payment & Place Order' : 'Place Order'}
                     </Button>
                     <Button 
                       variant="outline" 
                       onClick={() => {
                         setShowOrderDialog(false);
-                        setSelectedProvider("");
+                        setSelectedPaymentMethod("");
+                        setDeliveryAddress({ street: '', city: '', state: '', zipCode: '', country: '' });
+                        setShowAddPaymentMethod(false);
+                        setNewPaymentMethod({ cardNumber: '', expiryDate: '', cvv: '', cardholderName: '' });
                       }}
                       className="flex-1"
                     >
