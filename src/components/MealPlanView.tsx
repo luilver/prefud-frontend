@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar, Clock, Users, ChefHat, ArrowLeft, ShoppingCart, ChevronLeft, ChevronRight, Package, CheckCircle, Plus, Store, CheckSquare, Truck, CreditCard, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import RecipeView from "./RecipeView";
 
 interface MealPlanViewProps {
   plan: any;
@@ -26,6 +28,8 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [showAddToPantryDialog, setShowAddToPantryDialog] = useState(false);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const [completedMeals, setCompletedMeals] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   // Get user context for payment methods
@@ -56,6 +60,16 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
     );
   }
 
+  // Show recipe view if a meal is selected
+  if (selectedMeal) {
+    return (
+      <RecipeView 
+        meal={selectedMeal} 
+        onBack={() => setSelectedMeal(null)}
+      />
+    );
+  }
+
   const meals = plan.meals || [];
   const weekMeals = meals.filter((meal: any) => meal.week === currentWeek);
   
@@ -69,6 +83,27 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
   }, {});
 
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  const handleMealClick = (meal: any) => {
+    setSelectedMeal(meal);
+    if (onSelectMeal) {
+      onSelectMeal(meal);
+    }
+  };
+
+  const toggleMealCompletion = (mealId: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent meal click when checking completion
+    setCompletedMeals(prev => ({
+      ...prev,
+      [mealId]: !prev[mealId]
+    }));
+    
+    const isCompleted = !completedMeals[mealId];
+    toast({
+      title: isCompleted ? "Meal completed! 🎉" : "Meal unchecked",
+      description: isCompleted ? "Great job on cooking this meal!" : "Meal marked as not completed",
+    });
+  };
 
   const handleGenerateShoppingList = () => {
     console.log('Generating shopping list for plan:', plan.name);
@@ -288,18 +323,19 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
   if (showShoppingList && plan.shoppingList) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <Button variant="ghost" onClick={() => setShowShoppingList(false)} className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back to Meal Plan
           </Button>
-          <h2 className="text-2xl font-bold text-gray-800">Shopping List - {plan.name}</h2>
-          <div className="flex gap-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Shopping List - {plan.name}</h2>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Dialog open={showAddToPantryDialog} onOpenChange={setShowAddToPantryDialog}>
               <DialogTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="border-green-300 text-green-700 hover:bg-green-50"
+                  className="border-green-300 text-green-700 hover:bg-green-50 w-full sm:w-auto"
+                  size="sm"
                 >
                   <Store className="h-4 w-4 mr-2" />
                   Shop In-Store ({getCheckedItemsCount()})
@@ -349,7 +385,8 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
             <Dialog open={showOrderDialog} onOpenChange={handleOrderDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
-                  className="bg-blue-500 text-white hover:bg-blue-600"
+                  className="bg-blue-500 text-white hover:bg-blue-600 w-full sm:w-auto"
+                  size="sm"
                 >
                   <Truck className="h-4 w-4 mr-2" />
                   Order Online ({getCheckedItemsCount()})
@@ -554,7 +591,7 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
 
         <Card className="bg-white/70 backdrop-blur-sm border-green-200">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5 text-green-600" />
@@ -567,7 +604,8 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
               <Button
                 variant="outline"
                 onClick={handleSelectAll}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 w-full sm:w-auto"
+                size="sm"
               >
                 <CheckSquare className="h-4 w-4" />
                 {plan.shoppingList.every((item: any) => checkedItems[item.id]) ? 'Unselect All' : 'Select All'}
@@ -577,7 +615,7 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
           <CardContent>
             <div className="space-y-3">
               {plan.shoppingList.map((item: any) => (
-                <div key={item.id} className="flex items-center space-x-3 p-4 bg-white/80 rounded-lg border border-green-100 hover:bg-white/90 transition-colors">
+                <div key={item.id} className="flex items-center space-x-3 p-3 sm:p-4 bg-white/80 rounded-lg border border-green-100 hover:bg-white/90 transition-colors">
                   <Checkbox
                     id={item.id}
                     checked={checkedItems[item.id] || false}
@@ -585,7 +623,7 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
                     className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
                   />
                   <div className="flex-1">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
                         <h4 className="font-medium text-gray-800">{item.name}</h4>
                         <p className="text-sm text-gray-600">
@@ -624,23 +662,25 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
           <ArrowLeft className="h-4 w-4" />
           Back to Meal Planner
         </Button>
-        <h2 className="text-2xl font-bold text-gray-800">{plan.name}</h2>
-        <div className="flex gap-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">{plan.name}</h2>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button 
             onClick={onEdit}
             variant="outline"
-            className="border-blue-300 text-blue-700 hover:bg-blue-50"
+            className="border-blue-300 text-blue-700 hover:bg-blue-50 w-full sm:w-auto"
+            size="sm"
           >
             Edit Plan
           </Button>
           <Button 
             onClick={handleGenerateShoppingList}
-            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 w-full sm:w-auto"
+            size="sm"
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
             Generate Shopping List
@@ -661,21 +701,21 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-white/60 rounded-lg border border-purple-100">
-              <div className="text-3xl font-bold text-purple-600 mb-1">{plan.numberOfWeeks}</div>
-              <div className="text-sm text-gray-600 font-medium">Weeks</div>
+            <div className="text-center p-3 sm:p-4 bg-white/60 rounded-lg border border-purple-100">
+              <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">{plan.numberOfWeeks}</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Weeks</div>
             </div>
-            <div className="text-center p-4 bg-white/60 rounded-lg border border-green-100">
-              <div className="text-3xl font-bold text-green-600 mb-1">{plan.numberOfPersons}</div>
-              <div className="text-sm text-gray-600 font-medium">Persons</div>
+            <div className="text-center p-3 sm:p-4 bg-white/60 rounded-lg border border-green-100">
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">{plan.numberOfPersons}</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Persons</div>
             </div>
-            <div className="text-center p-4 bg-white/60 rounded-lg border border-blue-100">
-              <div className="text-3xl font-bold text-blue-600 mb-1">{plan.mealsPerDay}</div>
-              <div className="text-sm text-gray-600 font-medium">Meals/Day</div>
+            <div className="text-center p-3 sm:p-4 bg-white/60 rounded-lg border border-blue-100">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">{plan.mealsPerDay}</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Meals/Day</div>
             </div>
-            <div className="text-center p-4 bg-white/60 rounded-lg border border-orange-100">
-              <div className="text-3xl font-bold text-orange-600 mb-1">{meals.length}</div>
-              <div className="text-sm text-gray-600 font-medium">Total Meals</div>
+            <div className="text-center p-3 sm:p-4 bg-white/60 rounded-lg border border-orange-100">
+              <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1">{meals.length}</div>
+              <div className="text-xs sm:text-sm text-gray-600 font-medium">Total Meals</div>
             </div>
           </div>
         </CardContent>
@@ -684,19 +724,20 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
       {/* Week Navigation */}
       <Card className="bg-white/70 backdrop-blur-sm">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <CardTitle>Week {currentWeek} of {plan.numberOfWeeks}</CardTitle>
               <CardDescription>
                 {weekDateRange.start} - {weekDateRange.end}
               </CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={goToPreviousWeek}
                 disabled={currentWeek === 1}
+                className="flex-1 sm:flex-none"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Previous
@@ -706,6 +747,7 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
                 size="sm"
                 onClick={goToNextWeek}
                 disabled={currentWeek === plan.numberOfWeeks}
+                className="flex-1 sm:flex-none"
               >
                 Next
                 <ChevronRight className="h-4 w-4" />
@@ -730,24 +772,29 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
                       {dayMeals.map((meal: any) => (
                         <div
                           key={meal.id}
-                          className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors bg-white/50"
-                          onClick={() => onSelectMeal && onSelectMeal(meal)}
+                          className="p-3 sm:p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors bg-white/50 relative"
+                          onClick={() => handleMealClick(meal)}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
+                              <div className="flex flex-wrap items-center gap-2 mb-1">
                                 <Badge variant="outline" className="text-xs">
                                   {meal.type?.charAt(0).toUpperCase() + meal.type?.slice(1)}
                                 </Badge>
                                 <Badge variant="outline" className="text-xs">
                                   {meal.difficulty}
                                 </Badge>
+                                {completedMeals[meal.id] && (
+                                  <Badge className="text-xs bg-green-500">
+                                    Completed
+                                  </Badge>
+                                )}
                               </div>
                               <h4 className="font-semibold text-gray-800">{meal.name}</h4>
                               <p className="text-sm text-gray-600 mt-1">
                                 {meal.calories} cal
                               </p>
-                              <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                              <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-4 w-4" />
                                   {meal.prepTime}min
@@ -758,7 +805,17 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
                                 </div>
                               </div>
                             </div>
-                            <ChefHat className="h-5 w-5 text-gray-400" />
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => toggleMealCompletion(meal.id, e)}
+                                className={`p-2 ${completedMeals[meal.id] ? 'text-green-600' : 'text-gray-400'}`}
+                              >
+                                <CheckCircle className="h-5 w-5" />
+                              </Button>
+                              <ChefHat className="h-5 w-5 text-gray-400" />
+                            </div>
                           </div>
                         </div>
                       ))}
