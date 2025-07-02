@@ -130,30 +130,30 @@ const SignupSteps = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Progress Steps */}
-      <div className="flex justify-center mb-8">
-        <div className="flex items-center space-x-4">
+    <div className="max-w-full sm:max-w-4xl mx-auto space-y-4 sm:space-y-6">
+      {/* Progress Steps - Mobile Responsive */}
+      <div className="flex justify-center mb-6 sm:mb-8 overflow-x-auto">
+        <div className="flex items-center space-x-2 sm:space-x-4 px-4 sm:px-0 min-w-max">
           {stepItems.map(({ step, title, icon: Icon }) => (
             <div key={step} className="flex items-center">
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+              <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${
                 currentStep >= step 
                   ? 'bg-green-500 border-green-500 text-white' 
                   : 'border-gray-300 text-gray-400'
               }`}>
                 {currentStep > step ? (
-                  <Check className="h-5 w-5" />
+                  <Check className="h-3 w-3 sm:h-5 sm:w-5" />
                 ) : (
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-3 w-3 sm:h-5 sm:w-5" />
                 )}
               </div>
-              <span className={`ml-2 text-sm font-medium ${
+              <span className={`ml-1 sm:ml-2 text-xs sm:text-sm font-medium ${
                 currentStep >= step ? 'text-green-600' : 'text-gray-400'
               }`}>
                 {title}
               </span>
               {step < stepItems.length && (
-                <div className={`w-8 h-0.5 ml-4 ${
+                <div className={`w-4 sm:w-8 h-0.5 ml-2 sm:ml-4 ${
                   currentStep > step ? 'bg-green-500' : 'bg-gray-300'
                 }`} />
               )}
@@ -164,53 +164,53 @@ const SignupSteps = () => {
 
       {/* Step 1: Basic Info */}
       {currentStep === 1 && (
-        <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Create Your Account</CardTitle>
-            <CardDescription>Enter your basic information to get started</CardDescription>
+        <Card className="max-w-full sm:max-w-md mx-auto bg-white/90 backdrop-blur-sm">
+          <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+            <CardTitle className="text-lg sm:text-xl">Create Your Account</CardTitle>
+            <CardDescription className="text-sm sm:text-base">Enter your basic information to get started</CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleBasicInfoSubmit} className="space-y-4">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <form onSubmit={handleBasicInfoSubmit} className="space-y-3 sm:space-y-4">
               <div>
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email" className="text-sm sm:text-base">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
                   value={signupData.email}
                   onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
                   required
-                  className="border-green-200 focus:border-green-400"
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                 />
               </div>
               
               <div>
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={signupData.phone}
                   onChange={(e) => setSignupData(prev => ({ ...prev, phone: e.target.value }))}
                   required
-                  className="border-green-200 focus:border-green-400"
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                   placeholder="+1 (555) 123-4567"
                 />
               </div>
               
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   value={signupData.password}
                   onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
                   required
-                  className="border-green-200 focus:border-green-400"
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                 />
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
                 disabled={isLoading}
               >
                 {isLoading ? 'Sending Verification...' : 'Continue'}
@@ -239,38 +239,38 @@ const SignupSteps = () => {
 
       {/* Step 4: Subscription Choice */}
       {currentStep === 4 && (
-        <div className="space-y-6">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Choose Your Plan</h2>
-            <p className="text-gray-600">Select the plan that works best for you</p>
+        <div className="space-y-4 sm:space-y-6">
+          <div className="text-center mb-6 sm:mb-8 px-4 sm:px-0">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Choose Your Plan</h2>
+            <p className="text-gray-600 text-sm sm:text-base">Select the plan that works best for you</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
             <Card className="border-2 border-gray-200 hover:border-green-500 cursor-pointer transition-all"
                   onClick={() => handleSubscriptionChoice(false)}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+              <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+                <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
                   <span>Free Plan</span>
-                  <span className="text-2xl font-bold text-green-600">$0</span>
+                  <span className="text-xl sm:text-2xl font-bold text-green-600">$0</span>
                 </CardTitle>
-                <CardDescription>Perfect for trying out Pantry</CardDescription>
+                <CardDescription className="text-sm sm:text-base">Perfect for trying out Pantry</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <ul className="space-y-2 sm:space-y-3">
                   <li className="flex items-center space-x-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>1 AI meal plan per month</span>
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                    <span className="text-sm sm:text-base">1 AI meal plan per month</span>
                   </li>
                   <li className="flex items-center space-x-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>Basic calorie tracking</span>
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                    <span className="text-sm sm:text-base">Basic calorie tracking</span>
                   </li>
                   <li className="flex items-center space-x-2">
-                    <X className="h-4 w-4 text-red-500" />
-                    <span>No grocery store integration</span>
+                    <X className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
+                    <span className="text-sm sm:text-base">No grocery store integration</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-4" variant="outline">
+                <Button className="w-full mt-3 sm:mt-4 h-10 sm:h-12 text-sm sm:text-base" variant="outline">
                   Choose Free Plan
                 </Button>
               </CardContent>
@@ -278,32 +278,32 @@ const SignupSteps = () => {
 
             <Card className="border-2 border-orange-500 ring-2 ring-orange-200 cursor-pointer"
                   onClick={() => handleSubscriptionChoice(true)}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+              <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+                <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
                   <div className="flex items-center space-x-2">
-                    <Crown className="h-5 w-5 text-orange-500" />
+                    <Crown className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
                     <span>Premium Plan</span>
                   </div>
-                  <span className="text-2xl font-bold text-orange-600">$9.99</span>
+                  <span className="text-xl sm:text-2xl font-bold text-orange-600">$9.99</span>
                 </CardTitle>
-                <CardDescription>Everything you need for meal planning success</CardDescription>
+                <CardDescription className="text-sm sm:text-base">Everything you need for meal planning success</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <ul className="space-y-2 sm:space-y-3">
                   <li className="flex items-center space-x-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>5 AI meal plans per month</span>
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                    <span className="text-sm sm:text-base">5 AI meal plans per month</span>
                   </li>
                   <li className="flex items-center space-x-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>Advanced nutrition tracking</span>
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                    <span className="text-sm sm:text-base">Advanced nutrition tracking</span>
                   </li>
                   <li className="flex items-center space-x-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>Walmart & Smith's integration</span>
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                    <span className="text-sm sm:text-base">Walmart & Smith's integration</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                <Button className="w-full mt-3 sm:mt-4 h-10 sm:h-12 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
                   Choose Premium Plan
                 </Button>
               </CardContent>

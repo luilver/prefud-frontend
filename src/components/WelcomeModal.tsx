@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PartyPopper, Sparkles, ChefHat, Calendar, TrendingUp, Camera } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ interface WelcomeModalProps {
 
 const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const slides = [
     {
@@ -54,7 +56,7 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
     } else {
-      onClose();
+      handleComplete();
     }
   };
 
@@ -64,31 +66,36 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
     }
   };
 
+  const handleComplete = () => {
+    onClose();
+    navigate('/');
+  };
+
   const IconComponent = slides[currentSlide].icon;
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg mx-auto">
+    <Dialog open={true} onOpenChange={handleComplete}>
+      <DialogContent className="max-w-sm sm:max-w-lg mx-auto p-0">
         <Card className="border-0 shadow-none">
-          <CardHeader className="text-center pb-2">
-            <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-green-100 to-orange-100 flex items-center justify-center`}>
-              <IconComponent className={`h-8 w-8 ${slides[currentSlide].color}`} />
+          <CardHeader className="text-center pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+            <div className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-r from-green-100 to-orange-100 flex items-center justify-center`}>
+              <IconComponent className={`h-6 w-6 sm:h-8 sm:w-8 ${slides[currentSlide].color}`} />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-800">
+            <CardTitle className="text-lg sm:text-2xl font-bold text-gray-800">
               {slides[currentSlide].title}
             </CardTitle>
-            <CardDescription className="text-base text-gray-600 mt-2">
+            <CardDescription className="text-sm sm:text-base text-gray-600 mt-2">
               {slides[currentSlide].description}
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="text-center space-y-6">
+          <CardContent className="text-center space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
             {/* Feature Image */}
             <div className="rounded-lg overflow-hidden">
               <img 
                 src={slides[currentSlide].image} 
                 alt={slides[currentSlide].title}
-                className="w-full h-48 object-cover"
+                className="w-full h-32 sm:h-48 object-cover"
               />
             </div>
 
@@ -106,12 +113,12 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
             </div>
 
             {/* Navigation buttons */}
-            <div className="flex space-x-3">
+            <div className="flex space-x-2 sm:space-x-3">
               {currentSlide > 0 && (
                 <Button 
                   variant="outline"
                   onClick={prevSlide}
-                  className="flex-1"
+                  className="flex-1 text-sm sm:text-base"
                 >
                   Previous
                 </Button>
@@ -119,17 +126,17 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
               
               <Button 
                 onClick={nextSlide}
-                className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-sm sm:text-base"
               >
                 {currentSlide < slides.length - 1 ? (
                   <>
                     Next
-                    <Sparkles className="h-4 w-4 ml-2" />
+                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                   </>
                 ) : (
                   <>
                     Start Cooking!
-                    <ChefHat className="h-4 w-4 ml-2" />
+                    <ChefHat className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                   </>
                 )}
               </Button>
@@ -139,8 +146,8 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
             {currentSlide < slides.length - 1 && (
               <Button 
                 variant="ghost" 
-                onClick={onClose}
-                className="w-full text-gray-600 hover:text-gray-800"
+                onClick={handleComplete}
+                className="w-full text-gray-600 hover:text-gray-800 text-sm sm:text-base"
               >
                 Skip Tutorial
               </Button>
