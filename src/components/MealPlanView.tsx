@@ -14,12 +14,13 @@ import { useUser } from "@/contexts/UserContext";
 interface MealPlanViewProps {
   plan: any;
   onBack: () => void;
-  onSelectMeal: (meal: any) => void;
-  onGenerateShoppingList: (meals: any[]) => void;
-  onAddToPantry: (items: string[]) => void;
+  onEdit: () => void;
+  onSelectMeal?: (meal: any) => void;
+  onGenerateShoppingList?: (meals: any[]) => void;
+  onAddToPantry?: (items: string[]) => void;
 }
 
-const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAddToPantry }: MealPlanViewProps) => {
+const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingList, onAddToPantry }: MealPlanViewProps) => {
   const [currentWeek, setCurrentWeek] = useState(1);
   const [showShoppingList, setShowShoppingList] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
@@ -71,7 +72,9 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
 
   const handleGenerateShoppingList = () => {
     console.log('Generating shopping list for plan:', plan.name);
-    onGenerateShoppingList(meals);
+    if (onGenerateShoppingList) {
+      onGenerateShoppingList(meals);
+    }
     setShowShoppingList(true);
     toast({
       title: "Shopping list generated!",
@@ -96,7 +99,9 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
       .filter(Boolean);
 
     if (checkedItemNames.length > 0) {
-      onAddToPantry(checkedItemNames);
+      if (onAddToPantry) {
+        onAddToPantry(checkedItemNames);
+      }
       // Reset checkboxes after adding to pantry
       setCheckedItems({});
       setShowAddToPantryDialog(false);
@@ -608,13 +613,22 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
           Back to Meal Planner
         </Button>
         <h2 className="text-2xl font-bold text-gray-800">{plan.name}</h2>
-        <Button 
-          onClick={handleGenerateShoppingList}
-          className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
-        >
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          Generate Shopping List
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={onEdit}
+            variant="outline"
+            className="border-blue-300 text-blue-700 hover:bg-blue-50"
+          >
+            Edit Plan
+          </Button>
+          <Button 
+            onClick={handleGenerateShoppingList}
+            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            Generate Shopping List
+          </Button>
+        </div>
       </div>
 
       {/* Enhanced Plan Overview Card */}
@@ -700,7 +714,7 @@ const MealPlanView = ({ plan, onBack, onSelectMeal, onGenerateShoppingList, onAd
                         <div
                           key={meal.id}
                           className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors bg-white/50"
-                          onClick={() => onSelectMeal(meal)}
+                          onClick={() => onSelectMeal && onSelectMeal(meal)}
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
