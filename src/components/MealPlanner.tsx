@@ -383,78 +383,80 @@ const MealPlanner = () => {
         </Button>
       </div>
 
-      {/* Meal Plans List - Enhanced Design */}
+      {/* Meal Plans List - Horizontal Scroll */}
       <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
-        <CardHeader>
+        <CardHeader className="pb-4">
           <CardTitle className="flex items-center space-x-2">
             <CalendarDays className="h-5 w-5 text-purple-600" />
             <span>Your Meal Plans</span>
           </CardTitle>
           <CardDescription>
-            Select a meal plan to view and manage its shopping list. The selected plan's shopping list will be synchronized with the main shopping section.
+            Select a meal plan to view and manage its shopping list.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(mealPlans || []).map((plan) => (
-              <Card 
-                key={plan.id} 
-                className={`border-purple-100 hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-105 ${
-                  activePlanId === plan.id 
-                    ? 'ring-2 ring-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg' 
-                    : 'bg-white/80 hover:bg-white/90'
-                }`}
-                onClick={() => handlePlanSelection(plan.id)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-bold text-gray-800">{plan.name}</CardTitle>
+          <ScrollArea className="w-full">
+            <div className="flex space-x-4 pb-4">
+              {(mealPlans || []).map((plan) => (
+                <Card 
+                  key={plan.id} 
+                  className={`min-w-[280px] border-purple-100 hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-105 ${
+                    activePlanId === plan.id 
+                      ? 'ring-2 ring-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg' 
+                      : 'bg-white/80 hover:bg-white/90'
+                  }`}
+                  onClick={() => handlePlanSelection(plan.id)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-bold text-gray-800 truncate">{plan.name}</CardTitle>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteMealPlan(plan.id);
+                        }}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-70 hover:opacity-100"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="text-sm text-gray-500 font-medium">
+                      {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-purple-600 font-semibold">
+                        {(plan.meals || []).length} meals planned
+                      </div>
+                      {activePlanId === plan.id && (
+                        <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Shopping list: {(plan.shoppingList || []).length} items
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
                     <Button
                       size="sm"
-                      variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteMealPlan(plan.id);
+                        setCurrentPlan(plan);
+                        setView("plan");
                       }}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-70 hover:opacity-100"
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <ChefHat className="h-4 w-4 mr-2" />
+                      View Plan
                     </Button>
-                  </div>
-                  <div className="text-sm text-gray-500 font-medium">
-                    {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-purple-600 font-semibold">
-                      {(plan.meals || []).length} meals planned
-                    </div>
-                    {activePlanId === plan.id && (
-                      <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-medium">
-                        Active
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    Shopping list: {(plan.shoppingList || []).length} items
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentPlan(plan);
-                      setView("plan");
-                    }}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                  >
-                    <ChefHat className="h-4 w-4 mr-2" />
-                    View Plan
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
         </CardContent>
       </Card>
 
