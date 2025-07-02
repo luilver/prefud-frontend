@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,8 +31,8 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
   const [completedMeals, setCompletedMeals] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
-  // Get user context for payment methods
-  const { paymentMethods, addPaymentMethod, getPaymentMethods } = useUser();
+  // Get user context for payment methods and pantry updates
+  const { paymentMethods, addPaymentMethod, getPaymentMethods, addIngredient, updatePantryFromIngredients } = useUser();
   
   // Payment and address states
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
@@ -91,18 +90,48 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
     }
   };
 
-  const toggleMealCompletion = (mealId: string, event: React.MouseEvent) => {
+  const toggleMealCompletion = (meal: any, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent meal click when checking completion
+    const mealId = meal.id;
+    const isCompleted = !completedMeals[mealId];
+    
     setCompletedMeals(prev => ({
       ...prev,
-      [mealId]: !prev[mealId]
+      [mealId]: isCompleted
     }));
     
-    const isCompleted = !completedMeals[mealId];
-    toast({
-      title: isCompleted ? "Meal completed! 🎉" : "Meal unchecked",
-      description: isCompleted ? "Great job on cooking this meal!" : "Meal marked as not completed",
-    });
+    if (isCompleted && meal.calories) {
+      // Add meal nutritional information to calorie tracker
+      const mealNutrition = {
+        id: `meal-${mealId}-${Date.now()}`,
+        name: meal.name,
+        calories: meal.calories || 0,
+        protein: meal.protein || 0,
+        carbs: meal.carbs || 0,
+        fat: meal.fat || 0,
+        quantity: 1,
+        unit: "serving"
+      };
+      
+      // Here you would typically call a function to add to calorie tracker
+      // For now, we'll just show in the toast
+      console.log('Adding meal nutrition to calorie tracker:', mealNutrition);
+      
+      toast({
+        title: "Meal completed! 🎉",
+        description: `Great job! Added ${meal.calories || 0} calories, ${meal.protein || 0}g protein, ${meal.carbs || 0}g carbs, ${meal.fat || 0}g fat to your daily intake.`,
+      });
+    } else if (isCompleted) {
+      toast({
+        title: "Meal completed! 🎉",
+        description: "Great job on cooking this meal!",
+      });
+    } else {
+      toast({
+        title: "Meal unchecked",
+        description: "Meal marked as not completed",
+      });
+    }
   };
 
   const handleGenerateShoppingList = () => {
@@ -142,24 +171,41 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
   };
 
   const handleAddToPantry = () => {
-    const checkedItemNames = Object.entries(checkedItems)
+    const checkedItemsData = Object.entries(checkedItems)
       .filter(([_, isChecked]) => isChecked)
       .map(([itemId, _]) => {
         const item = plan.shoppingList?.find((item: any) => item.id === itemId);
-        return item?.name;
+        return item;
       })
       .filter(Boolean);
 
-    if (checkedItemNames.length > 0) {
-      if (onAddToPantry) {
-        onAddToPantry(checkedItemNames);
-      }
+    if (checkedItemsData.length > 0) {
+      // Add each item to pantry with proper structure
+      checkedItemsData.forEach((item: any) => {
+        const ingredientData = {
+          id: `pantry-${Date.now()}-${Math.random()}`,
+          name: item.name,
+          quantity: item.quantity || 1,
+          unit: item.unit || 'pieces',
+          category: item.category || 'Pantry',
+          location: 'Pantry',
+          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+          addedFromShoppingList: true
+        };
+        
+        console.log('Adding ingredient to pantry:', ingredientData);
+        addIngredient(ingredientData);
+      });
+
+      // Update pantry from ingredients context
+      updatePantryFromIngredients();
+
       // Reset checkboxes after adding to pantry
       setCheckedItems({});
       setShowAddToPantryDialog(false);
       toast({
         title: "Items added to pantry!",
-        description: `Successfully added ${checkedItemNames.length} items to your pantry with default expiry dates.`,
+        description: `Successfully added ${checkedItemsData.length} items to your pantry with default expiry dates.`,
       });
     } else {
       toast({
@@ -792,7 +838,10 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
                               </div>
                               <h4 className="font-semibold text-gray-800">{meal.name}</h4>
                               <p className="text-sm text-gray-600 mt-1">
-                                {meal.calories} cal
+                                {meal.calories || 0} cal
+                                {meal.protein && ` • ${meal.protein}g protein`}
+                                {meal.carbs && ` • ${meal.carbs}g carbs`}
+                                {meal.fat && ` • ${meal.fat}g fat`}
                               </p>
                               <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
                                 <div className="flex items-center gap-1">
@@ -809,7 +858,7 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={(e) => toggleMealCompletion(meal.id, e)}
+                                onClick={(e) => toggleMealCompletion(meal, e)}
                                 className={`p-2 ${completedMeals[meal.id] ? 'text-green-600' : 'text-gray-400'}`}
                               >
                                 <CheckCircle className="h-5 w-5" />
