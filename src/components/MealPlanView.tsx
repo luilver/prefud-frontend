@@ -72,6 +72,23 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
 
   const handleGenerateShoppingList = () => {
     console.log('Generating shopping list for plan:', plan.name);
+    
+    // Generate a mock shopping list if it doesn't exist
+    if (!plan.shoppingList || plan.shoppingList.length === 0) {
+      const mockShoppingList = meals.flatMap((meal: any, index: number) => 
+        (meal.ingredients || []).map((ingredient: string, ingredientIndex: number) => ({
+          id: `${meal.id}-${ingredientIndex}`,
+          name: ingredient,
+          quantity: Math.floor(Math.random() * 3) + 1,
+          unit: ['cups', 'lbs', 'oz', 'pieces'][Math.floor(Math.random() * 4)],
+          category: ['Protein', 'Vegetables', 'Dairy', 'Grains', 'Spices'][Math.floor(Math.random() * 5)],
+          priority: ['high', 'medium', 'low'][Math.floor(Math.random() * 3)],
+          mealName: meal.name
+        }))
+      );
+      plan.shoppingList = mockShoppingList;
+    }
+    
     if (onGenerateShoppingList) {
       onGenerateShoppingList(meals);
     }
