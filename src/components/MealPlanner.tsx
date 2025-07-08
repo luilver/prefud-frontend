@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,24 +6,13 @@ import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
 
-interface MealPlan {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  numberOfWeeks: number;
-  numberOfPersons: number;
-  mealsPerDay: number;
-  meals: any[];
-}
-
 const MealPlanner = () => {
   const [showCreator, setShowCreator] = useState(false);
-  const [selectedMealPlan, setSelectedMealPlan] = useState<MealPlan | null>(null);
+  const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const { user, mealPlans, addMealPlan } = useUser();
 
-  const handlePlanCreated = (newPlan: MealPlan) => {
+  const handlePlanCreated = (newPlan: any) => {
     addMealPlan(newPlan);
     setShowCreator(false);
     setSelectedMealPlan(newPlan); // Automatically show the newly created plan
@@ -99,18 +87,18 @@ const MealPlanner = () => {
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{plan.numberOfWeeks} week{plan.numberOfWeeks > 1 ? 's' : ''}</span>
+                    <span>{plan.duration || 'Custom duration'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    <span>{plan.numberOfPersons} person{plan.numberOfPersons > 1 ? 's' : ''}</span>
+                    <span>For {plan.preferences?.people || 'N/A'} people</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <span>{plan.mealsPerDay} meals per day</span>
+                    <span>{plan.preferences?.mealsPerDay || '3'} meals per day</span>
                   </div>
                   <div className="mt-3 text-xs text-gray-500">
-                    {plan.meals.length} total meals planned
+                    {plan.meals?.length || 0} total meals planned
                   </div>
                 </div>
               </CardContent>
@@ -118,7 +106,6 @@ const MealPlanner = () => {
           ))}
         </div>
       ) : (
-        // Empty State
         <Card className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
           <CardContent>
             <div className="flex flex-col items-center space-y-4">

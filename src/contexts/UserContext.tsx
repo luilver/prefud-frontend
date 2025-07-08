@@ -107,6 +107,7 @@ interface UserContextType {
   deleteShoppingItem: (id: string) => void;
   toggleShoppingItemPurchased: (id: string) => void;
   addMealPlan: (plan: MealPlan) => void;
+  updateMealPlan: (id: string, updates: Partial<MealPlan>) => void;
   deleteMealPlan: (id: string) => void;
   deleteMealFromPlan: (planId: string, mealId: string) => void;
   updateMealPlanShoppingList: (planId: string, shoppingList: any[]) => void;
@@ -399,6 +400,21 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateMealPlan = (id: string, updates: Partial<MealPlan>) => {
+    setMealPlans(prev => 
+      prev.map(plan => 
+        plan.id === id ? { ...plan, ...updates } : plan
+      )
+    );
+    
+    // Update active meal plan if it's the one being updated
+    if (activeMealPlan?.id === id) {
+      const updatedPlan = { ...activeMealPlan, ...updates };
+      setActiveMealPlan(updatedPlan);
+      syncShoppingItemsWithActivePlan(updatedPlan);
+    }
+  };
+
   const deleteMealPlan = (id: string) => {
     setMealPlans(prev => prev.filter(plan => plan.id !== id));
     if (activeMealPlan?.id === id) {
@@ -609,6 +625,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     deleteShoppingItem,
     toggleShoppingItemPurchased,
     addMealPlan,
+    updateMealPlan,
     deleteMealPlan,
     deleteMealFromPlan,
     updateMealPlanShoppingList,
