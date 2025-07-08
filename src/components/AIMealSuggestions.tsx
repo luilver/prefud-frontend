@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sparkles, Clock, Users, AlertTriangle, Plus, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import { addMealToPlan, substituteMealInPlan } from "@/services/mealPlanService";
 
 interface AIMealSuggestionsProps {
   ingredients: any[];
@@ -25,7 +26,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
   const [conflictResolution, setConflictResolution] = useState<'snack' | 'substitute'>('snack');
   const [mealToSubstitute, setMealToSubstitute] = useState<string>("");
   const { toast } = useToast();
-  const { mealPlans, activeMealPlan } = useUser();
+  const { mealPlans, updateMealPlan } = useUser();
 
   const getDaysUntilExpiry = (expiryDate: Date) => {
     const today = new Date();
@@ -181,7 +182,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     }
 
     // Add meal directly if less than 3 meals
-    await addMealToPlan(meal, selectedMealPlan, selectedDate, 'meal');
+    await handleAddMealToPlan(meal, selectedMealPlan, selectedDate, 'meal');
   };
 
   const handleConflictResolution = async () => {
@@ -190,9 +191,9 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     const selectedDate = new Date(selectedDay);
     
     if (conflictResolution === 'snack') {
-      await addMealToPlan(showMealConflictDialog, selectedMealPlan, selectedDate, 'snack');
+      await handleAddMealToPlan(showMealConflictDialog, selectedMealPlan, selectedDate, 'snack');
     } else if (conflictResolution === 'substitute' && mealToSubstitute) {
-      await substituteMeal(showMealConflictDialog, selectedMealPlan, selectedDate, mealToSubstitute);
+      await handleSubstituteMeal(showMealConflictDialog, selectedMealPlan, selectedDate, mealToSubstitute);
     }
 
     setShowMealConflictDialog(null);
@@ -200,56 +201,90 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     setMealToSubstitute("");
   };
 
-  // Mock service functions
-  const addMealToPlan = async (meal: any, planId: string, date: Date, mealType: 'meal' | 'snack') => {
+  const handleAddMealToPlan = async (meal: any, planId: string, date: Date, mealType: 'meal' | 'snack') => {
     console.log('Adding meal to plan:', { meal, planId, date, mealType });
     
-    // Mock API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Update local state through context (this would normally be handled by the service)
-    onAddMeal({
-      ...meal,
-      id: `meal-${Date.now()}`,
-      date: date.toISOString().split('T')[0],
-      planId: planId,
-      mealType: mealType
-    }, date);
-    
-    toast({
-      title: `${mealType === 'snack' ? 'Snack' : 'Meal'} added!`,
-      description: `${meal.name} has been added as a ${mealType} to your meal plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
-    });
-    
-    setShowDaySelector(null);
-    setSelectedDay("");
-    setSelectedMealPlan("");
+    try {
+      const newMeal = {
+        ...meal,
+        id: `meal-${Date.now()}`,
+        date: date.toISOString().split('T')[0],
+        planId: planId,
+        mealType: mealType
+      };
+
+      // Use the service to add the meal
+      await addMealToPlan(planId, newMeal);
+      
+      // Update the meal plan in context
+      const updatedPlan = mealPlans.find(p => p.id === planId);
+      if (updatedPlan) {
+        const updatedMeals = [...updatedPlan.meals, newMeal];
+        updateMealPlan(planId, { ...updatedPlan, meals: updatedMeals });
+      }
+      
+      // Also call the original callback
+      onAddMeal(newMeal, date);
+      
+      toast({
+        title: `${mealType === 'snack' ? 'Snack' : 'Meal'} added!`,
+        description: `${meal.name} has been added as a ${mealType} to your meal plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
+      });
+      
+      setShowDaySelector(null);
+      setSelectedDay("");
+      setSelectedMealPlan("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add meal to plan. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const substituteMeal = async (newMeal: any, planId: string, date: Date, mealIdToReplace: string) => {
+  const handleSubstituteMeal = async (newMeal: any, planId: string, date: Date, mealIdToReplace: string) => {
     console.log('Substituting meal:', { newMeal, planId, date, mealIdToReplace });
     
-    // Mock API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // This would update the existing meal in the plan
-    onAddMeal({
-      ...newMeal,
-      id: mealIdToReplace,
-      date: date.toISOString().split('T')[0],
-      planId: planId,
-      mealType: 'meal',
-      isSubstitution: true
-    }, date);
-    
-    toast({
-      title: "Meal substituted!",
-      description: `${newMeal.name} has replaced the selected meal in your plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
-    });
-    
-    setShowDaySelector(null);
-    setSelectedDay("");
-    setSelectedMealPlan("");
+    try {
+      const substituteMeal = {
+        ...newMeal,
+        id: mealIdToReplace,
+        date: date.toISOString().split('T')[0],
+        planId: planId,
+        mealType: 'meal'
+      };
+
+      // Use the service to substitute the meal
+      await substituteMealInPlan(planId, mealIdToReplace, substituteMeal);
+      
+      // Update the meal plan in context
+      const updatedPlan = mealPlans.find(p => p.id === planId);
+      if (updatedPlan) {
+        const updatedMeals = updatedPlan.meals.map((meal: any) => 
+          meal.id === mealIdToReplace ? substituteMeal : meal
+        );
+        updateMealPlan(planId, { ...updatedPlan, meals: updatedMeals });
+      }
+      
+      // Also call the original callback
+      onAddMeal(substituteMeal, date);
+      
+      toast({
+        title: "Meal substituted!",
+        description: `${newMeal.name} has replaced the selected meal in your plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
+      });
+      
+      setShowDaySelector(null);
+      setSelectedDay("");
+      setSelectedMealPlan("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to substitute meal. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleQuickAdd = (meal: any) => {

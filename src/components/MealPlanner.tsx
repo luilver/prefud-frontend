@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Calendar, Users, ChefHat, Clock, Sparkles } from "lucide-react";
@@ -22,24 +22,10 @@ const MealPlanner = () => {
   const [showCreator, setShowCreator] = useState(false);
   const [selectedMealPlan, setSelectedMealPlan] = useState<MealPlan | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
-  const { user } = useUser();
-
-  // Load meal plans from localStorage on component mount
-  useEffect(() => {
-    const savedPlans = localStorage.getItem('mealPlans');
-    if (savedPlans) {
-      setMealPlans(JSON.parse(savedPlans));
-    }
-  }, []);
-
-  // Save meal plans to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('mealPlans', JSON.stringify(mealPlans));
-  }, [mealPlans]);
+  const { user, mealPlans, addMealPlan } = useUser();
 
   const handlePlanCreated = (newPlan: MealPlan) => {
-    setMealPlans(prev => [...prev, newPlan]);
+    addMealPlan(newPlan);
     setShowCreator(false);
     setSelectedMealPlan(newPlan); // Automatically show the newly created plan
   };

@@ -1,157 +1,74 @@
 
 // Mock service for meal plan operations
-export interface MealPlanUpdateRequest {
-  planId: string;
+// In a real app, these would be API calls to your backend
+
+export interface MealPlan {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  numberOfWeeks: number;
+  numberOfPersons: number;
+  mealsPerDay: number;
+  meals: any[];
+}
+
+export interface Meal {
+  id: string;
+  name: string;
+  description?: string;
+  ingredients: string[];
+  steps: string[];
+  prepTime: number;
+  calories: number;
+  difficulty: string;
+  type: string;
   date: string;
-  meal: any;
-  operation: 'add' | 'substitute' | 'remove';
-  mealType?: 'meal' | 'snack';
-  targetMealId?: string;
+  planId: string;
+  mealType: 'meal' | 'snack';
 }
 
-export interface MealPlanUpdateResponse {
-  success: boolean;
-  message: string;
-  updatedPlan?: any;
-}
+// Mock delay to simulate API calls
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-class MealPlanService {
-  // Mock API delay
-  private delay(ms: number = 500): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+export const addMealToPlan = async (planId: string, meal: Meal): Promise<void> => {
+  console.log('Service: Adding meal to plan', { planId, meal });
+  
+  // Simulate API call delay
+  await delay(500);
+  
+  // In a real app, this would make an API call to add the meal to the plan
+  // For now, we'll just log the action
+  console.log('Service: Meal added successfully');
+};
 
-  // Add meal to a specific day in meal plan
-  async addMealToPlan(request: MealPlanUpdateRequest): Promise<MealPlanUpdateResponse> {
-    console.log('MealPlanService: Adding meal to plan', request);
-    
-    await this.delay();
-    
-    try {
-      // Mock validation
-      if (!request.planId || !request.date || !request.meal) {
-        throw new Error('Missing required fields');
-      }
+export const substituteMealInPlan = async (planId: string, mealIdToReplace: string, newMeal: Meal): Promise<void> => {
+  console.log('Service: Substituting meal in plan', { planId, mealIdToReplace, newMeal });
+  
+  // Simulate API call delay
+  await delay(500);
+  
+  // In a real app, this would make an API call to replace the meal in the plan
+  // For now, we'll just log the action
+  console.log('Service: Meal substituted successfully');
+};
 
-      // Mock successful response
-      return {
-        success: true,
-        message: `Meal "${request.meal.name}" added successfully`,
-        updatedPlan: {
-          id: request.planId,
-          lastUpdated: new Date().toISOString(),
-          // In a real implementation, this would return the full updated plan
-        }
-      };
-    } catch (error) {
-      console.error('MealPlanService: Error adding meal', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to add meal'
-      };
-    }
-  }
+export const removeMealFromPlan = async (planId: string, mealId: string): Promise<void> => {
+  console.log('Service: Removing meal from plan', { planId, mealId });
+  
+  // Simulate API call delay
+  await delay(300);
+  
+  // In a real app, this would make an API call to remove the meal from the plan
+  console.log('Service: Meal removed successfully');
+};
 
-  // Substitute an existing meal
-  async substituteMeal(request: MealPlanUpdateRequest): Promise<MealPlanUpdateResponse> {
-    console.log('MealPlanService: Substituting meal', request);
-    
-    await this.delay();
-    
-    try {
-      if (!request.planId || !request.date || !request.meal || !request.targetMealId) {
-        throw new Error('Missing required fields for substitution');
-      }
-
-      return {
-        success: true,
-        message: `Meal substituted successfully`,
-        updatedPlan: {
-          id: request.planId,
-          lastUpdated: new Date().toISOString(),
-        }
-      };
-    } catch (error) {
-      console.error('MealPlanService: Error substituting meal', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to substitute meal'
-      };
-    }
-  }
-
-  // Remove meal from plan
-  async removeMealFromPlan(request: MealPlanUpdateRequest): Promise<MealPlanUpdateResponse> {
-    console.log('MealPlanService: Removing meal from plan', request);
-    
-    await this.delay();
-    
-    try {
-      if (!request.planId || !request.targetMealId) {
-        throw new Error('Missing required fields for removal');
-      }
-
-      return {
-        success: true,
-        message: 'Meal removed successfully',
-        updatedPlan: {
-          id: request.planId,
-          lastUpdated: new Date().toISOString(),
-        }
-      };
-    } catch (error) {
-      console.error('MealPlanService: Error removing meal', error);
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to remove meal'
-      };
-    }
-  }
-
-  // Get meals for a specific date
-  async getMealsForDate(planId: string, date: string): Promise<any[]> {
-    console.log('MealPlanService: Getting meals for date', { planId, date });
-    
-    await this.delay(200);
-    
-    // Mock response - in real implementation, this would fetch from API
-    return [
-      // This would return actual meals from the database
-    ];
-  }
-
-  // Validate meal plan constraints
-  validateMealAddition(existingMeals: any[], newMeal: any, mealType: 'meal' | 'snack'): {
-    canAdd: boolean;
-    requiresConflictResolution: boolean;
-    message: string;
-  } {
-    const regularMeals = existingMeals.filter(meal => meal.mealType !== 'snack');
-    
-    if (mealType === 'snack') {
-      return {
-        canAdd: true,
-        requiresConflictResolution: false,
-        message: 'Can add as snack'
-      };
-    }
-
-    if (regularMeals.length >= 3) {
-      return {
-        canAdd: false,
-        requiresConflictResolution: true,
-        message: 'Day already has 3 meals. Choose to add as snack or substitute existing meal.'
-      };
-    }
-
-    return {
-      canAdd: true,
-      requiresConflictResolution: false,
-      message: 'Can add meal'
-    };
-  }
-}
-
-// Export singleton instance
-export const mealPlanService = new MealPlanService();
-export default mealPlanService;
+export const updateMealInPlan = async (planId: string, mealId: string, updatedMeal: Partial<Meal>): Promise<void> => {
+  console.log('Service: Updating meal in plan', { planId, mealId, updatedMeal });
+  
+  // Simulate API call delay
+  await delay(400);
+  
+  // In a real app, this would make an API call to update the meal in the plan
+  console.log('Service: Meal updated successfully');
+};
