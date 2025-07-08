@@ -82,6 +82,30 @@ const ShoppingList = () => {
     setCheckedItems(newCheckedItems);
   };
 
+  // Group items by category
+  const groupItemsByCategory = (items: any[]) => {
+    const grouped = items.reduce((acc: any, item: any) => {
+      const category = item.category || 'Other';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(item);
+      return acc;
+    }, {});
+    
+    // Sort categories alphabetically, but put 'Other' at the end
+    const sortedCategories = Object.keys(grouped).sort((a, b) => {
+      if (a === 'Other') return 1;
+      if (b === 'Other') return -1;
+      return a.localeCompare(b);
+    });
+    
+    return sortedCategories.map(category => ({
+      category,
+      items: grouped[category]
+    }));
+  };
+
   const handleAddToPantry = () => {
     const currentList = selectedMealPlan ? selectedMealPlan.shoppingList : shoppingItems;
     const checkedItemNames = Object.entries(checkedItems)
@@ -221,6 +245,8 @@ const ShoppingList = () => {
 
   // If a meal plan is selected, show its shopping list
   if (selectedMealPlan) {
+    const groupedItems = groupItemsByCategory(selectedMealPlan.shoppingList || []);
+    
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -513,41 +539,50 @@ const ShoppingList = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {(selectedMealPlan.shoppingList || []).map((item: any) => (
-                <div key={item.id} className="flex items-center space-x-3 p-4 bg-white/80 rounded-lg border border-green-100 hover:bg-white/90 transition-colors">
-                  <Checkbox
-                    id={item.id}
-                    checked={checkedItems[item.id] || false}
-                    onCheckedChange={(checked) => handleItemCheck(item.id, checked as boolean)}
-                    className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-gray-800">{item.name}</h4>
-                        <p className="text-sm text-gray-600">
-                          From: {item.mealName || 'Various meals'} • Qty: {item.quantity} {item.unit}
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge 
-                          variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
-                          className="text-xs"
-                        >
-                          {item.priority}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {item.category}
-                        </Badge>
-                      </div>
+            {groupedItems.length > 0 ? (
+              <div className="space-y-6">
+                {groupedItems.map(({ category, items }) => (
+                  <div key={category} className="space-y-3">
+                    <div className="flex items-center gap-2 border-b border-green-100 pb-2">
+                      <h3 className="font-semibold text-lg text-gray-800">{category}</h3>
+                      <Badge variant="secondary" className="text-xs">
+                        {items.length} items
+                      </Badge>
+                    </div>
+                    <div className="space-y-3">
+                      {items.map((item: any) => (
+                        <div key={item.id} className="flex items-center space-x-3 p-4 bg-white/80 rounded-lg border border-green-100 hover:bg-white/90 transition-colors">
+                          <Checkbox
+                            id={item.id}
+                            checked={checkedItems[item.id] || false}
+                            onCheckedChange={(checked) => handleItemCheck(item.id, checked as boolean)}
+                            className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="font-medium text-gray-800">{item.name}</h4>
+                                <p className="text-sm text-gray-600">
+                                  From: {item.mealName || 'Various meals'} • Qty: {item.quantity} {item.unit}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Badge 
+                                  variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
+                                  className="text-xs"
+                                >
+                                  {item.priority}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            
-            {(selectedMealPlan.shoppingList || []).length === 0 && (
+                ))}
+              </div>
+            ) : (
               <div className="text-center py-8 text-gray-500">
                 <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>No shopping list generated yet</p>
@@ -559,6 +594,9 @@ const ShoppingList = () => {
       </div>
     );
   }
+
+  // Main shopping lists view with grouped personal shopping list
+  const groupedPersonalItems = groupItemsByCategory(shoppingItems);
 
   return (
     <div className="space-y-6">
@@ -634,7 +672,7 @@ const ShoppingList = () => {
                 Personal Shopping List ({shoppingItems.length} items)
               </CardTitle>
               <CardDescription>
-                Your personal shopping items
+                Your personal shopping items grouped by category
               </CardDescription>
             </div>
             <Button
@@ -648,57 +686,66 @@ const ShoppingList = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {shoppingItems.map((item) => (
-              <div
-                key={item.id}
-                className={`flex items-center space-x-3 p-4 rounded-lg border transition-colors ${
-                  item.purchased
-                    ? "bg-green-50 border-green-200"
-                    : "bg-white/80 border-green-100 hover:bg-white/90"
-                }`}
-              >
-                <Checkbox
-                  checked={item.purchased}
-                  onCheckedChange={() => toggleShoppingItemPurchased(item.id)}
-                  className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className={`font-medium ${item.purchased ? "line-through text-gray-500" : "text-gray-800"}`}>
-                        {item.name}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        Qty: {item.quantity} {item.unit}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge 
-                        variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
-                        className="text-xs"
+          {groupedPersonalItems.length > 0 ? (
+            <div className="space-y-6">
+              {groupedPersonalItems.map(({ category, items }) => (
+                <div key={category} className="space-y-3">
+                  <div className="flex items-center gap-2 border-b border-green-100 pb-2">
+                    <h3 className="font-semibold text-lg text-gray-800">{category}</h3>
+                    <Badge variant="secondary" className="text-xs">
+                      {items.length} items
+                    </Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {items.map((item: any) => (
+                      <div
+                        key={item.id}
+                        className={`flex items-center space-x-3 p-4 rounded-lg border transition-colors ${
+                          item.purchased
+                            ? "bg-green-50 border-green-200"
+                            : "bg-white/80 border-green-100 hover:bg-white/90"
+                        }`}
                       >
-                        {item.priority}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {item.category}
-                      </Badge>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => deleteShoppingItem(item.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                        <Checkbox
+                          checked={item.purchased}
+                          onCheckedChange={() => toggleShoppingItemPurchased(item.id)}
+                          className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className={`font-medium ${item.purchased ? "line-through text-gray-500" : "text-gray-800"}`}>
+                                {item.name}
+                              </h4>
+                              <p className="text-sm text-gray-600">
+                                Qty: {item.quantity} {item.unit}
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Badge 
+                                variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {item.priority}
+                              </Badge>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => deleteShoppingItem(item.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {shoppingItems.length === 0 && (
+              ))}
+            </div>
+          ) : (
             <div className="text-center py-8 text-gray-500">
               <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Your shopping list is empty</p>
