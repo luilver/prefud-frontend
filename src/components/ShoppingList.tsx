@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ShoppingCart, Plus, Trash2, Check, Package, Store, CheckSquare, ArrowLeft, CalendarDays, CreditCard, MapPin } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
@@ -540,45 +541,68 @@ const ShoppingList = () => {
           </CardHeader>
           <CardContent>
             {groupedItems.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {groupedItems.map(({ category, items }) => (
-                  <div key={category} className="space-y-3">
-                    <div className="flex items-center gap-2 border-b border-green-100 pb-2">
-                      <h3 className="font-semibold text-lg text-gray-800">{category}</h3>
-                      <Badge variant="secondary" className="text-xs">
+                  <div key={category} className="space-y-4">
+                    <div className="flex items-center justify-between py-2 border-b-2 border-green-200">
+                      <h3 className="text-xl font-bold text-gray-800 uppercase tracking-wide">{category}</h3>
+                      <Badge variant="secondary" className="text-xs px-2 py-1">
                         {items.length} items
                       </Badge>
                     </div>
-                    <div className="space-y-3">
-                      {items.map((item: any) => (
-                        <div key={item.id} className="flex items-center space-x-3 p-4 bg-white/80 rounded-lg border border-green-100 hover:bg-white/90 transition-colors">
-                          <Checkbox
-                            id={item.id}
-                            checked={checkedItems[item.id] || false}
-                            onCheckedChange={(checked) => handleItemCheck(item.id, checked as boolean)}
-                            className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="font-medium text-gray-800">{item.name}</h4>
-                                <p className="text-sm text-gray-600">
-                                  From: {item.mealName || 'Various meals'} • Qty: {item.quantity} {item.unit}
-                                </p>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Badge 
-                                  variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
-                                  className="text-xs"
-                                >
-                                  {item.priority}
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12"></TableHead>
+                          <TableHead>Item</TableHead>
+                          <TableHead>Quantity</TableHead>
+                          <TableHead>From</TableHead>
+                          <TableHead>Priority</TableHead>
+                          <TableHead className="w-12"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {items.map((item: any) => (
+                          <TableRow key={item.id} className="hover:bg-green-50/50">
+                            <TableCell>
+                              <Checkbox
+                                id={item.id}
+                                checked={checkedItems[item.id] || false}
+                                onCheckedChange={(checked) => handleItemCheck(item.id, checked as boolean)}
+                                className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium text-gray-800">{item.name}</div>
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-sm text-gray-600">{item.quantity} {item.unit}</span>
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-sm text-gray-600">{item.mealName || 'Various meals'}</span>
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {item.priority}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => deleteShoppingItem(item.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
                 ))}
               </div>
@@ -687,61 +711,70 @@ const ShoppingList = () => {
         </CardHeader>
         <CardContent>
           {groupedPersonalItems.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {groupedPersonalItems.map(({ category, items }) => (
-                <div key={category} className="space-y-3">
-                  <div className="flex items-center gap-2 border-b border-green-100 pb-2">
-                    <h3 className="font-semibold text-lg text-gray-800">{category}</h3>
-                    <Badge variant="secondary" className="text-xs">
+                <div key={category} className="space-y-4">
+                  <div className="flex items-center justify-between py-2 border-b-2 border-green-200">
+                    <h3 className="text-xl font-bold text-gray-800 uppercase tracking-wide">{category}</h3>
+                    <Badge variant="secondary" className="text-xs px-2 py-1">
                       {items.length} items
                     </Badge>
                   </div>
-                  <div className="space-y-3">
-                    {items.map((item: any) => (
-                      <div
-                        key={item.id}
-                        className={`flex items-center space-x-3 p-4 rounded-lg border transition-colors ${
-                          item.purchased
-                            ? "bg-green-50 border-green-200"
-                            : "bg-white/80 border-green-100 hover:bg-white/90"
-                        }`}
-                      >
-                        <Checkbox
-                          checked={item.purchased}
-                          onCheckedChange={() => toggleShoppingItemPurchased(item.id)}
-                          className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className={`font-medium ${item.purchased ? "line-through text-gray-500" : "text-gray-800"}`}>
-                                {item.name}
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                Qty: {item.quantity} {item.unit}
-                              </p>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12"></TableHead>
+                        <TableHead>Item</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Priority</TableHead>
+                        <TableHead className="w-12"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {items.map((item: any) => (
+                        <TableRow 
+                          key={item.id} 
+                          className={`hover:bg-green-50/50 ${
+                            item.purchased ? "opacity-60" : ""
+                          }`}
+                        >
+                          <TableCell>
+                            <Checkbox
+                              checked={item.purchased}
+                              onCheckedChange={() => toggleShoppingItemPurchased(item.id)}
+                              className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <div className={`font-medium ${item.purchased ? "line-through text-gray-500" : "text-gray-800"}`}>
+                              {item.name}
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <Badge 
-                                variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
-                                className="text-xs"
-                              >
-                                {item.priority}
-                              </Badge>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => deleteShoppingItem(item.id)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-gray-600">{item.quantity} {item.unit}</span>
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {item.priority}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deleteShoppingItem(item.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               ))}
             </div>
