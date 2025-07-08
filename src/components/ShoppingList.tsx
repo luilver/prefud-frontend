@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,8 +84,10 @@ const ShoppingList = () => {
     setCheckedItems(newCheckedItems);
   };
 
-  // Group items by category
+  // Group items by category with better organization
   const groupItemsByCategory = (items: any[]) => {
+    if (!items || items.length === 0) return [];
+    
     const grouped = items.reduce((acc: any, item: any) => {
       const category = item.category || 'Other';
       if (!acc[category]) {
@@ -544,65 +547,67 @@ const ShoppingList = () => {
               <div className="space-y-8">
                 {groupedItems.map(({ category, items }) => (
                   <div key={category} className="space-y-4">
-                    <div className="flex items-center justify-between py-2 border-b-2 border-green-200">
+                    <div className="flex items-center justify-between py-3 border-b-2 border-green-200 bg-green-50/50 px-4 rounded-t-lg">
                       <h3 className="text-xl font-bold text-gray-800 uppercase tracking-wide">{category}</h3>
-                      <Badge variant="secondary" className="text-xs px-2 py-1">
+                      <Badge variant="secondary" className="text-xs px-3 py-1 bg-green-100 text-green-800">
                         {items.length} items
                       </Badge>
                     </div>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-12"></TableHead>
-                          <TableHead>Item</TableHead>
-                          <TableHead>Quantity</TableHead>
-                          <TableHead>From</TableHead>
-                          <TableHead>Priority</TableHead>
-                          <TableHead className="w-12"></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {items.map((item: any) => (
-                          <TableRow key={item.id} className="hover:bg-green-50/50">
-                            <TableCell>
-                              <Checkbox
-                                id={item.id}
-                                checked={checkedItems[item.id] || false}
-                                onCheckedChange={(checked) => handleItemCheck(item.id, checked as boolean)}
-                                className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium text-gray-800">{item.name}</div>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm text-gray-600">{item.quantity} {item.unit}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm text-gray-600">{item.mealName || 'Various meals'}</span>
-                            </TableCell>
-                            <TableCell>
-                              <Badge 
-                                variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
-                                className="text-xs"
-                              >
-                                {item.priority}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => deleteShoppingItem(item.id)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
+                    <div className="bg-white rounded-lg border border-green-100 overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-gray-50">
+                            <TableHead className="w-12"></TableHead>
+                            <TableHead className="font-semibold">Item</TableHead>
+                            <TableHead className="font-semibold">Quantity</TableHead>
+                            <TableHead className="font-semibold">From</TableHead>
+                            <TableHead className="font-semibold">Priority</TableHead>
+                            <TableHead className="w-12"></TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {items.map((item: any) => (
+                            <TableRow key={item.id} className="hover:bg-green-50/50">
+                              <TableCell>
+                                <Checkbox
+                                  id={item.id}
+                                  checked={checkedItems[item.id] || false}
+                                  onCheckedChange={(checked) => handleItemCheck(item.id, checked as boolean)}
+                                  className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <div className="font-medium text-gray-800">{item.name}</div>
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-sm text-gray-600">{item.quantity} {item.unit}</span>
+                              </TableCell>
+                              <TableCell>
+                                <span className="text-sm text-gray-600">{item.mealName || 'Various meals'}</span>
+                              </TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
+                                  className="text-xs"
+                                >
+                                  {item.priority}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => deleteShoppingItem(item.id)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -714,67 +719,69 @@ const ShoppingList = () => {
             <div className="space-y-8">
               {groupedPersonalItems.map(({ category, items }) => (
                 <div key={category} className="space-y-4">
-                  <div className="flex items-center justify-between py-2 border-b-2 border-green-200">
+                  <div className="flex items-center justify-between py-3 border-b-2 border-green-200 bg-green-50/50 px-4 rounded-t-lg">
                     <h3 className="text-xl font-bold text-gray-800 uppercase tracking-wide">{category}</h3>
-                    <Badge variant="secondary" className="text-xs px-2 py-1">
+                    <Badge variant="secondary" className="text-xs px-3 py-1 bg-green-100 text-green-800">
                       {items.length} items
                     </Badge>
                   </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-12"></TableHead>
-                        <TableHead>Item</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Priority</TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {items.map((item: any) => (
-                        <TableRow 
-                          key={item.id} 
-                          className={`hover:bg-green-50/50 ${
-                            item.purchased ? "opacity-60" : ""
-                          }`}
-                        >
-                          <TableCell>
-                            <Checkbox
-                              checked={item.purchased}
-                              onCheckedChange={() => toggleShoppingItemPurchased(item.id)}
-                              className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className={`font-medium ${item.purchased ? "line-through text-gray-500" : "text-gray-800"}`}>
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm text-gray-600">{item.quantity} {item.unit}</span>
-                          </TableCell>
-                          <TableCell>
-                            <Badge 
-                              variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
-                              className="text-xs"
-                            >
-                              {item.priority}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => deleteShoppingItem(item.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
+                  <div className="bg-white rounded-lg border border-green-100 overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead className="w-12"></TableHead>
+                          <TableHead className="font-semibold">Item</TableHead>
+                          <TableHead className="font-semibold">Quantity</TableHead>
+                          <TableHead className="font-semibold">Priority</TableHead>
+                          <TableHead className="w-12"></TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {items.map((item: any) => (
+                          <TableRow 
+                            key={item.id} 
+                            className={`hover:bg-green-50/50 ${
+                              item.purchased ? "opacity-60" : ""
+                            }`}
+                          >
+                            <TableCell>
+                              <Checkbox
+                                checked={item.purchased}
+                                onCheckedChange={() => toggleShoppingItemPurchased(item.id)}
+                                className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className={`font-medium ${item.purchased ? "line-through text-gray-500" : "text-gray-800"}`}>
+                                {item.name}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-sm text-gray-600">{item.quantity} {item.unit}</span>
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {item.priority}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => deleteShoppingItem(item.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               ))}
             </div>
