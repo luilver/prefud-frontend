@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sparkles, Clock, Users, AlertTriangle, Plus, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/contexts/UserContext";
 
 interface AIMealSuggestionsProps {
   ingredients: any[];
@@ -17,8 +19,13 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
   const [isGenerating, setIsGenerating] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>("");
+  const [selectedMealPlan, setSelectedMealPlan] = useState<string>("");
   const [showDaySelector, setShowDaySelector] = useState<any>(null);
+  const [showMealConflictDialog, setShowMealConflictDialog] = useState<any>(null);
+  const [conflictResolution, setConflictResolution] = useState<'snack' | 'substitute'>('snack');
+  const [mealToSubstitute, setMealToSubstitute] = useState<string>("");
   const { toast } = useToast();
+  const { mealPlans, activeMealPlan } = useUser();
 
   const getDaysUntilExpiry = (expiryDate: Date) => {
     const today = new Date();
@@ -147,26 +154,102 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     }
   };
 
-  const handleAddMealWithDay = (meal: any) => {
-    if (!selectedDay) {
+  const getMealsForDate = (planId: string, date: string) => {
+    const plan = mealPlans.find(p => p.id === planId);
+    if (!plan) return [];
+    
+    return plan.meals.filter((meal: any) => meal.date === date) || [];
+  };
+
+  const handleAddMealWithDay = async (meal: any) => {
+    if (!selectedDay || !selectedMealPlan) {
       toast({
-        title: "Please select a day",
-        description: "Choose which day to add this meal to your plan.",
+        title: "Please select a day and meal plan",
+        description: "Choose which meal plan and day to add this meal to.",
         variant: "destructive",
       });
       return;
     }
 
     const selectedDate = new Date(selectedDay);
-    onAddMeal(meal, selectedDate);
+    const existingMeals = getMealsForDate(selectedMealPlan, selectedDay);
+    
+    // Check if there are already 3 meals for this day
+    if (existingMeals.length >= 3) {
+      setShowMealConflictDialog(meal);
+      return;
+    }
+
+    // Add meal directly if less than 3 meals
+    await addMealToPlan(meal, selectedMealPlan, selectedDate, 'meal');
+  };
+
+  const handleConflictResolution = async () => {
+    if (!showMealConflictDialog || !selectedDay || !selectedMealPlan) return;
+
+    const selectedDate = new Date(selectedDay);
+    
+    if (conflictResolution === 'snack') {
+      await addMealToPlan(showMealConflictDialog, selectedMealPlan, selectedDate, 'snack');
+    } else if (conflictResolution === 'substitute' && mealToSubstitute) {
+      await substituteMeal(showMealConflictDialog, selectedMealPlan, selectedDate, mealToSubstitute);
+    }
+
+    setShowMealConflictDialog(null);
+    setConflictResolution('snack');
+    setMealToSubstitute("");
+  };
+
+  // Mock service functions
+  const addMealToPlan = async (meal: any, planId: string, date: Date, mealType: 'meal' | 'snack') => {
+    console.log('Adding meal to plan:', { meal, planId, date, mealType });
+    
+    // Mock API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Update local state through context (this would normally be handled by the service)
+    onAddMeal({
+      ...meal,
+      id: `meal-${Date.now()}`,
+      date: date.toISOString().split('T')[0],
+      planId: planId,
+      mealType: mealType
+    }, date);
     
     toast({
-      title: "Meal added!",
-      description: `${meal.name} has been added to your meal plan for ${selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
+      title: `${mealType === 'snack' ? 'Snack' : 'Meal'} added!`,
+      description: `${meal.name} has been added as a ${mealType} to your meal plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
     });
     
     setShowDaySelector(null);
     setSelectedDay("");
+    setSelectedMealPlan("");
+  };
+
+  const substituteMeal = async (newMeal: any, planId: string, date: Date, mealIdToReplace: string) => {
+    console.log('Substituting meal:', { newMeal, planId, date, mealIdToReplace });
+    
+    // Mock API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // This would update the existing meal in the plan
+    onAddMeal({
+      ...newMeal,
+      id: mealIdToReplace,
+      date: date.toISOString().split('T')[0],
+      planId: planId,
+      mealType: 'meal',
+      isSubstitution: true
+    }, date);
+    
+    toast({
+      title: "Meal substituted!",
+      description: `${newMeal.name} has replaced the selected meal in your plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
+    });
+    
+    setShowDaySelector(null);
+    setSelectedDay("");
+    setSelectedMealPlan("");
   };
 
   const handleQuickAdd = (meal: any) => {
@@ -238,6 +321,21 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
+                              <Label htmlFor="meal-plan-select" className="text-sm">Select Meal Plan</Label>
+                              <Select value={selectedMealPlan} onValueChange={setSelectedMealPlan}>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Choose a meal plan..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {mealPlans.map((plan) => (
+                                    <SelectItem key={plan.id} value={plan.id}>
+                                      {plan.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
                               <Label htmlFor="day-select" className="text-sm">Select Day</Label>
                               <Select value={selectedDay} onValueChange={setSelectedDay}>
                                 <SelectTrigger className="mt-1">
@@ -258,6 +356,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                                 onClick={() => {
                                   setShowDaySelector(null);
                                   setSelectedDay("");
+                                  setSelectedMealPlan("");
                                 }}
                                 className="text-sm w-full sm:w-auto"
                               >
@@ -319,6 +418,65 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
           </div>
         </CardContent>
       )}
+
+      {/* Meal Conflict Resolution Dialog */}
+      <Dialog open={!!showMealConflictDialog} onOpenChange={(open) => !open && setShowMealConflictDialog(null)}>
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle>Day Already Has 3 Meals</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              This day already has 3 meals planned. How would you like to add "{showMealConflictDialog?.name}"?
+            </p>
+            
+            <RadioGroup value={conflictResolution} onValueChange={(value: 'snack' | 'substitute') => setConflictResolution(value)}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="snack" id="snack" />
+                <Label htmlFor="snack">Add as a snack</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="substitute" id="substitute" />
+                <Label htmlFor="substitute">Substitute an existing meal</Label>
+              </div>
+            </RadioGroup>
+
+            {conflictResolution === 'substitute' && (
+              <div>
+                <Label htmlFor="meal-to-substitute" className="text-sm">Select meal to substitute</Label>
+                <Select value={mealToSubstitute} onValueChange={setMealToSubstitute}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Choose a meal to replace..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getMealsForDate(selectedMealPlan, selectedDay).map((meal: any, index: number) => (
+                      <SelectItem key={meal.id || index} value={meal.id || `meal-${index}`}>
+                        {meal.name || `Meal ${index + 1}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            <div className="flex justify-end gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowMealConflictDialog(null)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleConflictResolution}
+                disabled={conflictResolution === 'substitute' && !mealToSubstitute}
+                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
