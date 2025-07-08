@@ -9,7 +9,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sparkles, Clock, Users, AlertTriangle, Plus, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import { addMealToPlan, substituteMealInPlan } from "@/services/mealPlanService";
 
 interface AIMealSuggestionsProps {
   ingredients: any[];
@@ -34,22 +33,26 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const getNextSevenDays = () => {
+  const getAvailableDaysForPlan = (planId: string) => {
+    const plan = mealPlans.find(p => p.id === planId);
+    if (!plan) return [];
+
+    const startDate = new Date(plan.startDate);
+    const endDate = new Date(plan.endDate);
     const days = [];
-    const today = new Date();
     
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
       days.push({
-        value: date.toISOString().split('T')[0],
-        label: date.toLocaleDateString('en-US', { 
+        value: currentDate.toISOString().split('T')[0],
+        label: currentDate.toLocaleDateString('en-US', { 
           weekday: 'long', 
           month: 'short', 
           day: 'numeric' 
         }),
-        date: date
+        date: new Date(currentDate)
       });
+      currentDate.setDate(currentDate.getDate() + 1);
     }
     
     return days;
@@ -207,21 +210,22 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     try {
       const newMeal = {
         ...meal,
-        id: `meal-${Date.now()}`,
+        id: `meal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         date: date.toISOString().split('T')[0],
         planId: planId,
         mealType: mealType
       };
 
-      // Use the service to add the meal
-      await addMealToPlan(planId, newMeal);
+      // Find the current plan and update it
+      const currentPlan = mealPlans.find(p => p.id === planId);
+      if (!currentPlan) {
+        throw new Error('Meal plan not found');
+      }
+
+      const updatedMeals = [...(currentPlan.meals || []), newMeal];
       
       // Update the meal plan in context
-      const updatedPlan = mealPlans.find(p => p.id === planId);
-      if (updatedPlan) {
-        const updatedMeals = [...updatedPlan.meals, newMeal];
-        updateMealPlan(planId, { ...updatedPlan, meals: updatedMeals });
-      }
+      updateMealPlan(planId, { meals: updatedMeals });
       
       // Also call the original callback
       onAddMeal(newMeal, date);
@@ -235,6 +239,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
       setSelectedDay("");
       setSelectedMealPlan("");
     } catch (error) {
+      console.error('Error adding meal:', error);
       toast({
         title: "Error",
         description: "Failed to add meal to plan. Please try again.",
@@ -255,17 +260,18 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
         mealType: 'meal'
       };
 
-      // Use the service to substitute the meal
-      await substituteMealInPlan(planId, mealIdToReplace, substituteMeal);
+      // Find the current plan and update it
+      const currentPlan = mealPlans.find(p => p.id === planId);
+      if (!currentPlan) {
+        throw new Error('Meal plan not found');
+      }
+
+      const updatedMeals = (currentPlan.meals || []).map((meal: any) => 
+        meal.id === mealIdToReplace ? substituteMeal : meal
+      );
       
       // Update the meal plan in context
-      const updatedPlan = mealPlans.find(p => p.id === planId);
-      if (updatedPlan) {
-        const updatedMeals = updatedPlan.meals.map((meal: any) => 
-          meal.id === mealIdToReplace ? substituteMeal : meal
-        );
-        updateMealPlan(planId, { ...updatedPlan, meals: updatedMeals });
-      }
+      updateMealPlan(planId, { meals: updatedMeals });
       
       // Also call the original callback
       onAddMeal(substituteMeal, date);
@@ -279,6 +285,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
       setSelectedDay("");
       setSelectedMealPlan("");
     } catch (error) {
+      console.error('Error substituting meal:', error);
       toast({
         title: "Error",
         description: "Failed to substitute meal. Please try again.",
@@ -357,7 +364,10 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                           <div className="space-y-4">
                             <div>
                               <Label htmlFor="meal-plan-select" className="text-sm">Select Meal Plan</Label>
-                              <Select value={selectedMealPlan} onValueChange={setSelectedMealPlan}>
+                              <Select value={selectedMealPlan} onValueChange={(value) => {
+                                setSelectedMealPlan(value);
+                                setSelectedDay(""); // Reset day when plan changes
+                              }}>
                                 <SelectTrigger className="mt-1">
                                   <SelectValue placeholder="Choose a meal plan..." />
                                 </SelectTrigger>
@@ -370,21 +380,23 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                                 </SelectContent>
                               </Select>
                             </div>
-                            <div>
-                              <Label htmlFor="day-select" className="text-sm">Select Day</Label>
-                              <Select value={selectedDay} onValueChange={setSelectedDay}>
-                                <SelectTrigger className="mt-1">
-                                  <SelectValue placeholder="Choose a day..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getNextSevenDays().map((day) => (
-                                    <SelectItem key={day.value} value={day.value}>
-                                      {day.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
+                            {selectedMealPlan && (
+                              <div>
+                                <Label htmlFor="day-select" className="text-sm">Select Day</Label>
+                                <Select value={selectedDay} onValueChange={setSelectedDay}>
+                                  <SelectTrigger className="mt-1">
+                                    <SelectValue placeholder="Choose a day..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {getAvailableDaysForPlan(selectedMealPlan).map((day) => (
+                                      <SelectItem key={day.value} value={day.value}>
+                                        {day.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            )}
                             <div className="flex flex-col sm:flex-row justify-end gap-2">
                               <Button 
                                 variant="outline" 
@@ -399,6 +411,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                               </Button>
                               <Button 
                                 onClick={() => handleAddMealWithDay(meal)}
+                                disabled={!selectedDay || !selectedMealPlan}
                                 className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-sm w-full sm:w-auto"
                               >
                                 Add Meal
