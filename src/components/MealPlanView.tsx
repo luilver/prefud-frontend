@@ -347,6 +347,25 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
     };
   };
 
+  const getDayWithDate = (dayName: string, dayIndex: number) => {
+    const startDate = new Date(plan.startDate);
+    const weekStart = new Date(startDate);
+    weekStart.setDate(startDate.getDate() + (currentWeek - 1) * 7);
+    
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + dayIndex);
+    
+    const dayNumber = dayDate.getDate();
+    const monthName = dayDate.toLocaleDateString('en-US', { month: 'short' });
+    
+    return {
+      name: dayName,
+      dayNumber,
+      monthName,
+      fullDate: dayDate
+    };
+  };
+
   const weekDateRange = getCurrentWeekDateRange();
   const getCheckedItemsCount = () => Object.values(checkedItems).filter(Boolean).length;
 
@@ -708,7 +727,7 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" key={`${plan.id}-${meals.length}`}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
           <ArrowLeft className="h-4 w-4" />
@@ -807,11 +826,15 @@ const MealPlanView = ({ plan, onBack, onEdit, onSelectMeal, onGenerateShoppingLi
             {dayNames.map((dayName, dayIndex) => {
               const dayNumber = dayIndex + 1;
               const dayMeals = mealsByDay[dayNumber] || [];
+              const dayWithDate = getDayWithDate(dayName, dayIndex);
               
               return (
                 <div key={dayNumber} className="space-y-3">
-                  <h3 className="font-semibold text-lg text-gray-800 border-b border-gray-200 pb-2">
-                    {dayName}
+                  <h3 className="font-semibold text-lg text-gray-800 border-b border-gray-200 pb-2 flex items-center gap-2">
+                    {dayWithDate.name}
+                    <span className="text-sm font-normal text-gray-600">
+                      {dayWithDate.monthName} {dayWithDate.dayNumber}
+                    </span>
                   </h3>
                   
                   {dayMeals.length > 0 ? (
