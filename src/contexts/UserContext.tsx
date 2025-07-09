@@ -116,6 +116,8 @@ interface UserContextType {
   updatePantryFromMeal: (ingredients: string[]) => void;
   setActiveShoppingList: (list: any[]) => void;
   setActiveMealPlan: (plan: MealPlan | null) => void;
+  refreshMealPlans: () => void;
+  getMealPlanById: (id: string) => MealPlan | null;
   getBillingHistory: () => Promise<void>;
   getPaymentMethods: () => Promise<void>;
   addPaymentMethod: (method: any) => Promise<void>;
@@ -221,6 +223,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     localStorage.setItem('mealPlans', JSON.stringify(mealPlans));
+    console.log('Meal plans updated in localStorage:', mealPlans);
   }, [mealPlans]);
 
   useEffect(() => {
@@ -323,7 +326,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Pantry/Ingredient methods
   const addPantryItem = (item: Omit<PantryItem, 'id'>) => {
     const newItem: PantryItem = {
       ...item,
@@ -362,7 +364,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  // Shopping methods - updated to sync with meal plans
   const addShoppingItem = (item: Omit<ShoppingItem, 'id'>) => {
     const newItem: ShoppingItem = {
       ...item,
@@ -391,9 +392,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  // Meal plan methods - updated to sync with shopping list
   const addMealPlan = (plan: MealPlan) => {
-    setMealPlans(prev => [...prev, plan]);
+    console.log('Adding meal plan:', plan);
+    setMealPlans(prev => {
+      const updated = [...prev, plan];
+      console.log('Updated meal plans after add:', updated);
+      return updated;
+    });
     if (!activeMealPlan) {
       setActiveMealPlan(plan);
       syncShoppingItemsWithActivePlan(plan);
@@ -401,13 +406,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updateMealPlan = (id: string, updates: Partial<MealPlan>) => {
-    setMealPlans(prev => 
-      prev.map(plan => 
+    console.log('Updating meal plan:', { id, updates });
+    setMealPlans(prev => {
+      const updated = prev.map(plan => 
         plan.id === id ? { ...plan, ...updates } : plan
-      )
-    );
+      );
+      console.log('Updated meal plans after update:', updated);
+      return updated;
+    });
     
-    // Update active meal plan if it's the one being updated
     if (activeMealPlan?.id === id) {
       const updatedPlan = { ...activeMealPlan, ...updates };
       setActiveMealPlan(updatedPlan);
@@ -426,13 +433,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const deleteMealFromPlan = (planId: string, mealId: string) => {
-    setMealPlans(prev => 
-      prev.map(plan => 
+    console.log('Deleting meal from plan:', { planId, mealId });
+    setMealPlans(prev => {
+      const updated = prev.map(plan => 
         plan.id === planId 
           ? { ...plan, meals: plan.meals.filter(meal => meal.id !== mealId) }
           : plan
-      )
-    );
+      );
+      console.log('Updated meal plans after meal deletion:', updated);
+      return updated;
+    });
   };
 
   const updateMealPlanShoppingList = (planId: string, shoppingList: any[]) => {
@@ -444,7 +454,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       )
     );
     
-    // If this is the active plan, sync with shopping items
     if (activeMealPlan?.id === planId) {
       const planShoppingItems = shoppingList.map((item: any) => ({
         id: item.id,
@@ -461,26 +470,42 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Updated setActiveMealPlan to sync shopping items
+  const refreshMealPlans = () => {
+    const savedMealPlans = localStorage.getItem('mealPlans');
+    if (savedMealPlans) {
+      const plans = JSON.parse(savedMealPlans);
+      console.log('Refreshing meal plans from localStorage:', plans);
+      setMealPlans(plans);
+      
+      if (activeMealPlan) {
+        const updatedActivePlan = plans.find((plan: MealPlan) => plan.id === activeMealPlan.id);
+        if (updatedActivePlan) {
+          setActiveMealPlan(updatedActivePlan);
+        }
+      }
+    }
+  };
+
+  const getMealPlanById = (id: string): MealPlan | null => {
+    return mealPlans.find(plan => plan.id === id) || null;
+  };
+
   const setActiveMealPlanUpdated = (plan: MealPlan | null) => {
     setActiveMealPlan(plan);
     syncShoppingItemsWithActivePlan(plan);
   };
 
-  // Meal completion methods
   const toggleMealCompletion = (mealId: string, date: string) => {
     setCompletedMeals(prev => {
       const dateKey = date;
       const currentMeals = prev[dateKey] || [];
       
       if (currentMeals.includes(mealId)) {
-        // Remove meal from completed list
         return {
           ...prev,
           [dateKey]: currentMeals.filter(id => id !== mealId)
         };
       } else {
-        // Add meal to completed list
         return {
           ...prev,
           [dateKey]: [...currentMeals, mealId]
@@ -496,8 +521,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updatePantryFromMeal = (ingredients: string[]) => {
-    // This is a simplified implementation
-    // In a real app, you'd want more sophisticated ingredient matching
     ingredients.forEach(ingredient => {
       const matchingItem = pantryItems.find(item => 
         ingredient.toLowerCase().includes(item.name.toLowerCase())
@@ -511,9 +534,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  // Billing methods
   const getBillingHistory = async () => {
-    // Mock implementation
     const mockHistory: BillingHistory[] = [
       {
         id: '1',
@@ -528,7 +549,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const getPaymentMethods = async () => {
-    // Mock implementation
     const mockMethods: PaymentMethod[] = [
       {
         id: '1',
@@ -543,7 +563,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const addPaymentMethod = async (method: any) => {
-    // Mock implementation
     const newMethod: PaymentMethod = {
       id: Date.now().toString(),
       brand: 'visa',
@@ -634,6 +653,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     updatePantryFromMeal,
     setActiveShoppingList,
     setActiveMealPlan: setActiveMealPlanUpdated,
+    refreshMealPlans,
+    getMealPlanById,
     getBillingHistory,
     getPaymentMethods,
     addPaymentMethod,
