@@ -1,8 +1,187 @@
 
-import BillingManagement from "./BillingManagement";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Check, Crown, Star } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import PaymentForm from "./PaymentForm";
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  interval: string;
+  features: string[];
+  popular?: boolean;
+}
+
+const plans: SubscriptionPlan[] = [
+  {
+    id: "basic",
+    name: "Basic",
+    price: 4.99,
+    interval: "month",
+    features: [
+      "5 Meal Plans per month",
+      "Basic Recipe Collection",
+      "Shopping List Generator",
+      "Email Support"
+    ]
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 9.99,
+    interval: "month",
+    popular: true,
+    features: [
+      "Unlimited Meal Plans",
+      "AI Meal Recommendations",
+      "Advanced Recipe Collection",
+      "Grocery Store Integration",
+      "Nutritional Analysis",
+      "Priority Support"
+    ]
+  },
+  {
+    id: "family",
+    name: "Family",
+    price: 19.99,
+    interval: "month",
+    features: [
+      "Everything in Premium",
+      "Up to 6 Family Members",
+      "Bulk Shopping Lists",
+      "Family Meal Planning",
+      "Custom Dietary Plans",
+      "Phone Support"
+    ]
+  }
+];
 
 const SubscriptionManager = () => {
-  return <BillingManagement />;
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const { toast } = useToast();
+
+  const handleSelectPlan = (plan: SubscriptionPlan) => {
+    setSelectedPlan(plan);
+    setShowPaymentForm(true);
+  };
+
+  const handlePaymentSuccess = (paymentData: any) => {
+    toast({
+      title: "Subscription Activated!",
+      description: `Welcome to ${selectedPlan?.name}! Your subscription is now active.`,
+    });
+    setShowPaymentForm(false);
+    setSelectedPlan(null);
+  };
+
+  const handlePaymentBack = () => {
+    setShowPaymentForm(false);
+    setSelectedPlan(null);
+  };
+
+  if (showPaymentForm && selectedPlan) {
+    return (
+      <PaymentForm
+        onSuccess={handlePaymentSuccess}
+        onBack={handlePaymentBack}
+        userInfo={{
+          email: "user@example.com", // This would come from user context
+          phone: "+1234567890"
+        }}
+        selectedPlan={selectedPlan}
+      />
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto space-y-8">
+      <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold text-gray-800">Choose Your Plan</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Select the perfect plan for your meal planning needs. Upgrade or downgrade anytime.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        {plans.map((plan) => (
+          <Card 
+            key={plan.id}
+            className={`relative ${
+              plan.popular 
+                ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white' 
+                : 'border-gray-200'
+            }`}
+          >
+            {plan.popular && (
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                  <Star className="h-3 w-3" />
+                  <span>Most Popular</span>
+                </div>
+              </div>
+            )}
+            
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <Crown className={`h-8 w-8 ${plan.popular ? 'text-green-500' : 'text-gray-400'}`} />
+              </div>
+              <CardTitle className="text-xl">{plan.name}</CardTitle>
+              <CardDescription>
+                <div className="text-3xl font-bold text-gray-800 mt-2">
+                  ${plan.price}
+                  <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>
+                </div>
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              <ul className="space-y-3">
+                {plan.features.map((feature, index) => (
+                  <li key={index} className="flex items-start space-x-3">
+                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                onClick={() => handleSelectPlan(plan)}
+                className={`w-full ${
+                  plan.popular
+                    ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600'
+                    : 'bg-gray-800 hover:bg-gray-700'
+                }`}
+              >
+                Get {plan.name}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="text-center space-y-4 pt-8 border-t">
+        <h3 className="text-lg font-semibold text-gray-800">All plans include:</h3>
+        <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Check className="h-4 w-4 text-green-500" />
+            <span>30-day money-back guarantee</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Check className="h-4 w-4 text-green-500" />
+            <span>Cancel anytime</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Check className="h-4 w-4 text-green-500" />
+            <span>Secure payment processing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default SubscriptionManager;

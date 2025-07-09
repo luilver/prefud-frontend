@@ -6,17 +6,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { User, Settings, Target, Crown, Bell, Shield } from "lucide-react";
+import { User, Target, Crown, Bell } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
+import PaymentForm from "./PaymentForm";
 
 interface UserFormData {
   name: string;
   email: string;
   phone: string;
+  phonePrefix: string;
   age: number;
   weight: number;
-  height: number;
+  heightFeet: number;
+  heightInches: number;
   activity_level: string;
   dietary_preferences: string[];
   allergies: string[];
@@ -27,17 +32,21 @@ interface UserFormData {
 
 const UserProfile = () => {
   const { user, updateUserProfile } = useUser();
+  const { toast } = useToast();
   const [isSubscribed] = useState(user?.subscription?.isSubscribed || false);
   const [subscriptionPlan] = useState(user?.subscription?.plan === 'premium' ? 'Premium' : 'Free');
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
   
   const form = useForm<UserFormData>({
     defaultValues: {
       name: user?.name || "John Doe",
       email: user?.email || "john.doe@example.com",
-      phone: user?.phone || "+1234567890",
+      phone: user?.phone?.replace(/^\+1/, "") || "2345678901",
+      phonePrefix: "+1",
       age: 32,
       weight: 175,
-      height: 70,
+      heightFeet: 5,
+      heightInches: 10,
       activity_level: "moderate",
       dietary_preferences: ["Balanced", "High Protein"],
       allergies: ["Nuts"],
@@ -53,22 +62,30 @@ const UserProfile = () => {
     if (user) {
       form.setValue('name', user.name);
       form.setValue('email', user.email);
-      form.setValue('phone', user.phone);
+      const phoneNumber = user.phone?.replace(/^\+1/, "") || "";
+      form.setValue('phone', phoneNumber);
     }
   }, [user, form]);
 
   const onSubmit = (data: UserFormData) => {
+    const fullPhone = `${data.phonePrefix}${data.phone}`;
     updateUserProfile({
       name: data.name,
       email: data.email,
-      phone: data.phone,
+      phone: fullPhone,
+    });
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been successfully updated.",
     });
   };
 
   const calculateBMI = () => {
     const weight = form.watch('weight');
-    const height = form.watch('height');
-    const heightInMeters = (height * 2.54) / 100;
+    const heightFeet = form.watch('heightFeet');
+    const heightInches = form.watch('heightInches');
+    const totalInches = (heightFeet * 12) + heightInches;
+    const heightInMeters = (totalInches * 2.54) / 100;
     const weightInKg = weight * 0.453592;
     return (weightInKg / (heightInMeters * heightInMeters)).toFixed(1);
   };
@@ -89,8 +106,43 @@ const UserProfile = () => {
     form.setValue('dietary_preferences', newPrefs);
   };
 
+  const handleManageSubscription = () => {
+    if (isSubscribed) {
+      // For existing subscribers, show billing management
+      toast({
+        title: "Subscription Management",
+        description: "Redirecting to billing portal...",
+      });
+    } else {
+      // For non-subscribers, show payment form
+      setShowPaymentForm(true);
+    }
+  };
+
+  const handlePaymentSuccess = (paymentData: any) => {
+    toast({
+      title: "Subscription Activated!",
+      description: "Welcome to Premium! Your subscription is now active.",
+    });
+    setShowPaymentForm(false);
+    // Here you would typically update the user's subscription status
+  };
+
   const bmi = parseFloat(calculateBMI());
   const bmiInfo = getBMICategory(bmi);
+
+  if (showPaymentForm) {
+    return (
+      <PaymentForm
+        onSuccess={handlePaymentSuccess}
+        onBack={() => setShowPaymentForm(false)}
+        userInfo={{
+          email: form.watch('email'),
+          phone: `${form.watch('phonePrefix')}${form.watch('phone')}`
+        }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -99,12 +151,6 @@ const UserProfile = () => {
         <div>
           <h2 className="text-2xl font-bold text-gray-800">User Profile</h2>
           <p className="text-gray-600">Manage your account and preferences</p>
-        </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50">
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
-          </Button>
         </div>
       </div>
 
@@ -151,19 +197,43 @@ const UserProfile = () => {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="border-green-200 focus:border-green-400" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <div className="flex space-x-2">
+                      <FormField
+                        control={form.control}
+                        name="phonePrefix"
+                        render={({ field }) => (
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="w-20 border-green-200 focus:border-green-400">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="+1">+1</SelectItem>
+                                <SelectItem value="+44">+44</SelectItem>
+                                <SelectItem value="+33">+33</SelectItem>
+                                <SelectItem value="+49">+49</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              className="flex-1 border-green-200 focus:border-green-400"
+                              placeholder="Enter phone number"
+                            />
+                          </FormControl>
+                        )}
+                      />
+                    </div>
+                  </FormItem>
                   <FormField
                     control={form.control}
                     name="age"
@@ -187,7 +257,7 @@ const UserProfile = () => {
                 {/* Physical Stats */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Physical Stats & Health Goals</h3>
-                  <div className="grid md:grid-cols-3 gap-4">
+                  <div className="grid md:grid-cols-4 gap-4">
                     <FormField
                       control={form.control}
                       name="weight"
@@ -208,15 +278,37 @@ const UserProfile = () => {
                     />
                     <FormField
                       control={form.control}
-                      name="height"
+                      name="heightFeet"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Height (feet)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="1" 
+                              max="8"
+                              {...field} 
+                              onChange={e => field.onChange(parseInt(e.target.value))}
+                              className="border-green-200 focus:border-green-400" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="heightInches"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Height (inches)</FormLabel>
                           <FormControl>
                             <Input 
                               type="number" 
+                              min="0" 
+                              max="11"
                               {...field} 
-                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              onChange={e => field.onChange(parseInt(e.target.value))}
                               className="border-green-200 focus:border-green-400" 
                             />
                           </FormControl>
@@ -402,9 +494,14 @@ const UserProfile = () => {
                   </div>
                 </div>
 
-                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-                  Manage Subscription
-                </Button>
+                <div className="space-y-2">
+                  <Button 
+                    onClick={handleManageSubscription}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    {isSubscribed ? 'Manage Subscription' : 'Get Premium'}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
