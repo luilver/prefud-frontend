@@ -37,6 +37,21 @@ const UserProfile = () => {
   const [subscriptionPlan] = useState(user?.subscription?.plan === 'premium' ? 'Premium' : 'Free');
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   
+  // Default premium plan for subscription management
+  const premiumPlan = {
+    id: "premium",
+    name: "Premium Plan",
+    price: 9.99,
+    interval: "month",
+    features: [
+      "AI Meal Recommendations",
+      "Grocery Store Integration", 
+      "Unlimited Meal Plans",
+      "Recipe Videos"
+    ],
+    popular: true
+  };
+
   const form = useForm<UserFormData>({
     defaultValues: {
       name: user?.name || "John Doe",
@@ -140,6 +155,7 @@ const UserProfile = () => {
           email: form.watch('email'),
           phone: `${form.watch('phonePrefix')}${form.watch('phone')}`
         }}
+        selectedPlan={premiumPlan}
       />
     );
   }

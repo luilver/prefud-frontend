@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +36,20 @@ const SignupSteps = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const { signup } = useUser();
+
+  // Default premium plan for signup process
+  const premiumPlan = {
+    id: "premium",
+    name: "Premium Plan", 
+    price: 9.99,
+    interval: "month",
+    features: [
+      "5 AI meal plans per month",
+      "Advanced nutrition tracking",
+      "Walmart & Smith's integration"
+    ],
+    popular: true
+  };
 
   const handleBasicInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -318,6 +331,7 @@ const SignupSteps = () => {
           onSuccess={handlePaymentSuccess}
           onBack={() => setCurrentStep(4)}
           userInfo={{ email: signupData.email, phone: signupData.phone }}
+          selectedPlan={premiumPlan}
         />
       )}
     </div>
