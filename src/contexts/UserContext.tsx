@@ -79,6 +79,13 @@ interface PaymentMethod {
   isDefault: boolean;
 }
 
+interface SubscriptionInfo {
+  subscribed: boolean;
+  subscription_tier: string | null;
+  subscription_end: string | null;
+  stripe_customer_id: string | null;
+}
+
 interface UserContextType {
   user: User | null;
   pantryItems: PantryItem[];
@@ -90,6 +97,7 @@ interface UserContextType {
   ingredients: PantryItem[];
   billingHistory: BillingHistory[];
   paymentMethods: PaymentMethod[];
+  subscriptionInfo: SubscriptionInfo | null;
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   login: (email: string, password: string) => Promise<void>;
@@ -125,6 +133,8 @@ interface UserContextType {
   setDefaultPaymentMethod: (id: string) => Promise<void>;
   acceptSubscription: (plan: string) => Promise<void>;
   cancelSubscription: () => Promise<void>;
+  checkSubscription: () => Promise<void>;
+  createCheckoutWithPaymentMethod: (plan: any, paymentMethodId?: string) => Promise<string>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -147,6 +157,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [activeMealPlan, setActiveMealPlan] = useState<MealPlan | null>(null);
   const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
 
   // Computed properties
   const ingredients = pantryItems;
@@ -159,6 +170,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const savedShoppingItems = localStorage.getItem('shoppingItems');
     const savedMealPlans = localStorage.getItem('mealPlans');
     const savedCompletedMeals = localStorage.getItem('completedMeals');
+    const savedSubscriptionInfo = localStorage.getItem('subscriptionInfo');
 
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -187,6 +199,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
     if (savedCompletedMeals) {
       setCompletedMeals(JSON.parse(savedCompletedMeals));
+    }
+    if (savedSubscriptionInfo) {
+      setSubscriptionInfo(JSON.parse(savedSubscriptionInfo));
     }
   }, []);
 
@@ -229,6 +244,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     localStorage.setItem('completedMeals', JSON.stringify(completedMeals));
   }, [completedMeals]);
+
+  useEffect(() => {
+    if (subscriptionInfo) {
+      localStorage.setItem('subscriptionInfo', JSON.stringify(subscriptionInfo));
+    }
+  }, [subscriptionInfo]);
 
   // Sync shopping items back to active meal plan when shopping items change
   useEffect(() => {
@@ -285,11 +306,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
     setUser(mockUser);
+    // Check subscription after login
+    await checkSubscription();
   };
 
   const logout = () => {
     setUser(null);
+    setSubscriptionInfo(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('subscriptionInfo');
     window.dispatchEvent(new CustomEvent('user-logout'));
   };
 
@@ -318,6 +343,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
     setUser(newUser);
+    await checkSubscription();
   };
 
   const updateUserProfile = (updates: Partial<User>) => {
@@ -534,6 +560,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  // Updated billing and subscription methods
   const getBillingHistory = async () => {
     const mockHistory: BillingHistory[] = [
       {
@@ -557,6 +584,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         expiryMonth: 12,
         expiryYear: 2025,
         isDefault: true
+      },
+      {
+        id: '2',
+        brand: 'mastercard',
+        last4: '8888',
+        expiryMonth: 10,
+        expiryYear: 2026,
+        isDefault: false
       }
     ];
     setPaymentMethods(mockMethods);
@@ -589,7 +624,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const acceptSubscription = async (plan: string) => {
     if (user) {
-      setUser({
+      const updatedUser = {
         ...user,
         subscription: {
           ...user.subscription,
@@ -600,7 +635,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             usedPlans: user.subscription.planLimits.usedPlans
           }
         }
-      });
+      };
+      setUser(updatedUser);
+      
+      // Update subscription info
+      const newSubscriptionInfo: SubscriptionInfo = {
+        subscribed: true,
+        subscription_tier: plan === 'premium' ? 'Premium' : 'Basic',
+        subscription_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        stripe_customer_id: 'cus_mock_customer_id'
+      };
+      setSubscriptionInfo(newSubscriptionInfo);
     }
   };
 
@@ -616,6 +661,37 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const checkSubscription = async () => {
+    // Mock subscription check - in real app this would call Supabase edge function
+    try {
+      const mockSubscriptionInfo: SubscriptionInfo = {
+        subscribed: user?.subscription?.isSubscribed || false,
+        subscription_tier: user?.subscription?.plan === 'premium' ? 'Premium' : null,
+        subscription_end: user?.subscription?.isSubscribed ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
+        stripe_customer_id: user?.subscription?.isSubscribed ? 'cus_mock_customer_id' : null
+      };
+      setSubscriptionInfo(mockSubscriptionInfo);
+    } catch (error) {
+      console.error('Failed to check subscription:', error);
+    }
+  };
+
+  const createCheckoutWithPaymentMethod = async (plan: any, paymentMethodId?: string): Promise<string> => {
+    // Mock checkout creation - in real app this would call Supabase edge function
+    try {
+      console.log('Creating checkout for plan:', plan, 'with payment method:', paymentMethodId);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Return mock checkout URL
+      return 'https://checkout.stripe.com/mock-session-url';
+    } catch (error) {
+      console.error('Failed to create checkout:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     pantryItems,
@@ -627,6 +703,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     ingredients,
     billingHistory,
     paymentMethods,
+    subscriptionInfo,
     isAuthenticated,
     setUser,
     login,
@@ -662,6 +739,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setDefaultPaymentMethod,
     acceptSubscription,
     cancelSubscription,
+    checkSubscription,
+    createCheckoutWithPaymentMethod,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

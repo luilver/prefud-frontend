@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { User, Target, Crown, Bell } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
-import PaymentForm from "./PaymentForm";
+import SubscriptionPurchase from "./SubscriptionPurchase";
 
 interface UserFormData {
   name: string;
@@ -31,26 +30,9 @@ interface UserFormData {
 }
 
 const UserProfile = () => {
-  const { user, updateUserProfile } = useUser();
+  const { user, updateUserProfile, subscriptionInfo, checkSubscription } = useUser();
   const { toast } = useToast();
-  const [isSubscribed] = useState(user?.subscription?.isSubscribed || false);
-  const [subscriptionPlan] = useState(user?.subscription?.plan === 'premium' ? 'Premium' : 'Free');
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
-  
-  // Default premium plan for subscription management
-  const premiumPlan = {
-    id: "premium",
-    name: "Premium Plan",
-    price: 9.99,
-    interval: "month",
-    features: [
-      "AI Meal Recommendations",
-      "Grocery Store Integration", 
-      "Unlimited Meal Plans",
-      "Recipe Videos"
-    ],
-    popular: true
-  };
+  const [showSubscriptionPurchase, setShowSubscriptionPurchase] = useState(false);
 
   const form = useForm<UserFormData>({
     defaultValues: {
@@ -79,8 +61,10 @@ const UserProfile = () => {
       form.setValue('email', user.email);
       const phoneNumber = user.phone?.replace(/^\+1/, "") || "";
       form.setValue('phone', phoneNumber);
+      // Check subscription status on load
+      checkSubscription();
     }
-  }, [user, form]);
+  }, [user, form, checkSubscription]);
 
   const onSubmit = (data: UserFormData) => {
     const fullPhone = `${data.phonePrefix}${data.phone}`;
@@ -122,40 +106,25 @@ const UserProfile = () => {
   };
 
   const handleManageSubscription = () => {
-    if (isSubscribed) {
+    if (subscriptionInfo?.subscribed) {
       // For existing subscribers, show billing management
       toast({
         title: "Subscription Management",
         description: "Redirecting to billing portal...",
       });
     } else {
-      // For non-subscribers, show payment form
-      setShowPaymentForm(true);
+      // For non-subscribers, show subscription purchase
+      setShowSubscriptionPurchase(true);
     }
-  };
-
-  const handlePaymentSuccess = (paymentData: any) => {
-    toast({
-      title: "Subscription Activated!",
-      description: "Welcome to Premium! Your subscription is now active.",
-    });
-    setShowPaymentForm(false);
-    // Here you would typically update the user's subscription status
   };
 
   const bmi = parseFloat(calculateBMI());
   const bmiInfo = getBMICategory(bmi);
 
-  if (showPaymentForm) {
+  if (showSubscriptionPurchase) {
     return (
-      <PaymentForm
-        onSuccess={handlePaymentSuccess}
-        onBack={() => setShowPaymentForm(false)}
-        userInfo={{
-          email: form.watch('email'),
-          phone: `${form.watch('phonePrefix')}${form.watch('phone')}`
-        }}
-        selectedPlan={premiumPlan}
+      <SubscriptionPurchase
+        onBack={() => setShowSubscriptionPurchase(false)}
       />
     );
   }
@@ -213,7 +182,7 @@ const UserProfile = () => {
                       </FormItem>
                     )}
                   />
-                  <FormItem>
+                  <FormItem className="md:col-span-2">
                     <FormLabel>Phone Number</FormLabel>
                     <div className="flex space-x-2">
                       <FormField
@@ -222,14 +191,14 @@ const UserProfile = () => {
                         render={({ field }) => (
                           <FormControl>
                             <Select value={field.value} onValueChange={field.onChange}>
-                              <SelectTrigger className="w-20 border-green-200 focus:border-green-400">
+                              <SelectTrigger className="w-24 border-green-200 focus:border-green-400">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="+1">+1</SelectItem>
-                                <SelectItem value="+44">+44</SelectItem>
-                                <SelectItem value="+33">+33</SelectItem>
-                                <SelectItem value="+49">+49</SelectItem>
+                                <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                                <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                                <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                                <SelectItem value="+49">🇩🇪 +49</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -477,47 +446,52 @@ const UserProfile = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-purple-800">{subscriptionPlan} Plan</p>
-                    <p className="text-sm text-purple-600">
-                      {isSubscribed ? 'Active' : 'Inactive'}
+                    <p className="font-semibold text-purple-800">
+                      {subscriptionInfo?.subscription_tier || 'Free'} Plan
                     </p>
+                    <p className="text-sm text-purple-600">
+                      {subscriptionInfo?.subscribed ? 'Active' : 'Inactive'}
+                    </p>
+                    {subscriptionInfo?.subscription_end && (
+                      <p className="text-xs text-purple-500">
+                        {subscriptionInfo.subscribed ? 'Renews' : 'Expires'}: {new Date(subscriptionInfo.subscription_end).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
                   <div className={`px-3 py-1 rounded-full text-sm ${
-                    isSubscribed 
+                    subscriptionInfo?.subscribed 
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-red-100 text-red-700'
                   }`}>
-                    {isSubscribed ? 'Active' : 'Expired'}
+                    {subscriptionInfo?.subscribed ? 'Active' : 'Free'}
                   </div>
                 </div>
                 
                 <div className="space-y-2 text-sm text-purple-700">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className={`w-2 h-2 rounded-full ${subscriptionInfo?.subscribed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                     <span>AI Meal Recommendations</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className={`w-2 h-2 rounded-full ${subscriptionInfo?.subscribed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                     <span>Grocery Store Integration</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className={`w-2 h-2 rounded-full ${subscriptionInfo?.subscribed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                     <span>Unlimited Meal Plans</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className={`w-2 h-2 rounded-full ${subscriptionInfo?.subscribed ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                     <span>Recipe Videos</span>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Button 
-                    onClick={handleManageSubscription}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                  >
-                    {isSubscribed ? 'Manage Subscription' : 'Get Premium'}
-                  </Button>
-                </div>
+                <Button 
+                  onClick={handleManageSubscription}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                >
+                  {subscriptionInfo?.subscribed ? 'Manage Subscription' : 'Get Premium'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -552,7 +526,6 @@ const UserProfile = () => {
             </CardContent>
           </Card>
 
-          {/* Notifications */}
           <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-orange-700">
