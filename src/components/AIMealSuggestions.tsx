@@ -25,7 +25,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
   const [conflictResolution, setConflictResolution] = useState<'snack' | 'substitute'>('snack');
   const [mealToSubstitute, setMealToSubstitute] = useState<string>("");
   const { toast } = useToast();
-  const { mealPlans, updateMealPlan } = useUser();
+  const { mealPlans, updateMealPlan, updatePantryFromIngredients } = useUser();
 
   const getDaysUntilExpiry = (expiryDate: Date) => {
     const today = new Date();
@@ -69,7 +69,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
 
       console.log('Generating AI suggestions with ingredients:', expiringSoon);
       
-      // Mock AI suggestions
+      // Mock AI suggestions with proper ingredient quantities
       const mockSuggestions = [
         {
           id: Date.now().toString(),
@@ -81,10 +81,10 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
           type: "dinner",
           usesExpiringIngredients: expiringSoon.slice(0, 3),
           ingredients: [
-            "2 lbs Chicken Breast",
-            "1 cup Mixed Vegetables",
-            "2 tbsp Soy Sauce",
-            "1 tbsp Oil"
+            { name: "Chicken Breast", quantity: 2, unit: "lbs" },
+            { name: "Mixed Vegetables", quantity: 1, unit: "cup" },
+            { name: "Soy Sauce", quantity: 2, unit: "tbsp" },
+            { name: "Oil", quantity: 1, unit: "tbsp" }
           ],
           steps: [
             "Cut chicken into bite-sized pieces",
@@ -104,10 +104,10 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
           type: "breakfast",
           usesExpiringIngredients: expiringSoon.slice(1, 2),
           ingredients: [
-            "6 pieces Bananas",
-            "1 container Greek Yogurt",
-            "1 cup Milk",
-            "1 tbsp Honey"
+            { name: "Bananas", quantity: 6, unit: "pieces" },
+            { name: "Greek Yogurt", quantity: 1, unit: "container" },
+            { name: "Milk", quantity: 1, unit: "cup" },
+            { name: "Honey", quantity: 1, unit: "tbsp" }
           ],
           steps: [
             "Add all ingredients to blender",
@@ -125,10 +125,10 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
           type: "lunch",
           usesExpiringIngredients: expiringSoon.slice(0, 2),
           ingredients: [
-            "8 oz Pasta",
-            "2 cups Mixed Vegetables",
-            "2 tbsp Olive Oil",
-            "1 clove Garlic"
+            { name: "Pasta", quantity: 8, unit: "oz" },
+            { name: "Mixed Vegetables", quantity: 2, unit: "cups" },
+            { name: "Olive Oil", quantity: 2, unit: "tbsp" },
+            { name: "Garlic", quantity: 1, unit: "clove" }
           ],
           steps: [
             "Cook pasta according to package directions",
@@ -208,12 +208,20 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     console.log('Adding meal to plan:', { meal, planId, date, mealType });
     
     try {
+      const dateString = date.toISOString().split('T')[0];
       const newMeal = {
         ...meal,
         id: `meal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        date: date.toISOString().split('T')[0],
+        date: dateString,
         planId: planId,
-        mealType: mealType
+        mealType: mealType,
+        // Enhanced description with full date
+        description: `${meal.description} - Planned for ${date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          month: 'long', 
+          day: 'numeric',
+          year: 'numeric'
+        })}`
       };
 
       // Find the current plan and update it
@@ -227,12 +235,26 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
       // Update the meal plan in context
       updateMealPlan(planId, { meals: updatedMeals });
       
+      // Update pantry by removing used ingredients
+      if (meal.ingredients && Array.isArray(meal.ingredients)) {
+        const ingredientNames = meal.ingredients.map((ing: any) => 
+          typeof ing === 'string' ? ing : ing.name
+        );
+        updatePantryFromIngredients(ingredientNames);
+      }
+      
       // Also call the original callback
       onAddMeal(newMeal, date);
       
+      const formattedDate = date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      
       toast({
-        title: `${mealType === 'snack' ? 'Snack' : 'Meal'} added!`,
-        description: `${meal.name} has been added as a ${mealType} to your meal plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
+        title: `${mealType === 'snack' ? 'Snack' : 'Meal'} added successfully!`,
+        description: `${meal.name} has been added to your meal plan for ${formattedDate}. Pantry ingredients have been updated.`,
       });
       
       setShowDaySelector(null);
@@ -252,12 +274,20 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     console.log('Substituting meal:', { newMeal, planId, date, mealIdToReplace });
     
     try {
+      const dateString = date.toISOString().split('T')[0];
       const substituteMeal = {
         ...newMeal,
         id: mealIdToReplace,
-        date: date.toISOString().split('T')[0],
+        date: dateString,
         planId: planId,
-        mealType: 'meal'
+        mealType: 'meal',
+        // Enhanced description with full date
+        description: `${newMeal.description} - Planned for ${date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          month: 'long', 
+          day: 'numeric',
+          year: 'numeric'
+        })}`
       };
 
       // Find the current plan and update it
@@ -273,12 +303,26 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
       // Update the meal plan in context
       updateMealPlan(planId, { meals: updatedMeals });
       
+      // Update pantry by removing used ingredients
+      if (newMeal.ingredients && Array.isArray(newMeal.ingredients)) {
+        const ingredientNames = newMeal.ingredients.map((ing: any) => 
+          typeof ing === 'string' ? ing : ing.name
+        );
+        updatePantryFromIngredients(ingredientNames);
+      }
+      
       // Also call the original callback
       onAddMeal(substituteMeal, date);
       
+      const formattedDate = date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      
       toast({
-        title: "Meal substituted!",
-        description: `${newMeal.name} has replaced the selected meal in your plan for ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}.`,
+        title: "Meal substituted successfully!",
+        description: `${newMeal.name} has replaced the selected meal for ${formattedDate}. Pantry ingredients have been updated.`,
       });
       
       setShowDaySelector(null);
@@ -295,10 +339,18 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
   };
 
   const handleQuickAdd = (meal: any) => {
+    // Update pantry by removing used ingredients
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      const ingredientNames = meal.ingredients.map((ing: any) => 
+        typeof ing === 'string' ? ing : ing.name
+      );
+      updatePantryFromIngredients(ingredientNames);
+    }
+    
     onAddMeal(meal);
     toast({
       title: "Meal added!",
-      description: `${meal.name} has been added to your meal plan.`,
+      description: `${meal.name} has been added to your meal plan. Pantry ingredients have been updated.`,
     });
   };
 
