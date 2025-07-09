@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Calendar, Clock, Users, Utensils, Trash2, Edit, ShoppingCart, CheckCircle, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import RecipeView from "./RecipeView";
 
 interface MealPlanViewProps {
   plan: any;
@@ -19,7 +20,8 @@ interface MealPlanViewProps {
 const MealPlanView = ({ plan: initialPlan, onBack, onEdit }: MealPlanViewProps) => {
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [currentPlan, setCurrentPlan] = useState(initialPlan);
-  const { deleteMealFromPlan, toggleMealCompletion, isMealCompleted, getMealPlanById, refreshMealPlans } = useUser();
+  const [viewingRecipe, setViewingRecipe] = useState<any>(null);
+  const { deleteMealFromPlan, toggleMealCompletion, isMealCompleted, getMealPlanById } = useUser();
   const { toast } = useToast();
 
   // Refresh plan data when component mounts or when meal plans change
@@ -34,7 +36,6 @@ const MealPlanView = ({ plan: initialPlan, onBack, onEdit }: MealPlanViewProps) 
   // Listen for meal plan updates
   useEffect(() => {
     const handleStorageChange = () => {
-      refreshMealPlans();
       const updatedPlan = getMealPlanById(initialPlan.id);
       if (updatedPlan) {
         console.log('Plan updated from storage:', updatedPlan);
@@ -44,7 +45,7 @@ const MealPlanView = ({ plan: initialPlan, onBack, onEdit }: MealPlanViewProps) 
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [initialPlan.id, getMealPlanById, refreshMealPlans]);
+  }, [initialPlan.id, getMealPlanById]);
 
   const plan = currentPlan;
 
@@ -98,12 +99,20 @@ const MealPlanView = ({ plan: initialPlan, onBack, onEdit }: MealPlanViewProps) 
     });
   };
 
+  const handleViewRecipe = (meal: any) => {
+    setViewingRecipe(meal);
+  };
+
   const totalMeals = plan.meals?.length || 0;
   const completedMeals = plan.meals?.filter((meal: any) => 
     isMealCompleted(meal.id, meal.date)
   ).length || 0;
 
   const days = getDaysInPlan();
+
+  if (viewingRecipe) {
+    return <RecipeView meal={viewingRecipe} onBack={() => setViewingRecipe(null)} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -179,10 +188,10 @@ const MealPlanView = ({ plan: initialPlan, onBack, onEdit }: MealPlanViewProps) 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <div>
                     <CardTitle className="text-lg text-purple-700">
-                      {day.dayName}
+                      {day.dayName}, {day.month} {day.dayNumber}
                     </CardTitle>
                     <CardDescription className="text-purple-600">
-                      {day.month} {day.dayNumber} • {dayMeals.length} meal{dayMeals.length !== 1 ? 's' : ''} planned
+                      {dayMeals.length} meal{dayMeals.length !== 1 ? 's' : ''} planned
                     </CardDescription>
                   </div>
                   <Badge variant="outline" className="border-purple-200 text-purple-700">
@@ -236,6 +245,14 @@ const MealPlanView = ({ plan: initialPlan, onBack, onEdit }: MealPlanViewProps) 
                             >
                               <CheckCircle className="h-3 w-3 mr-1" />
                               {isMealCompleted(meal.id, meal.date) ? 'Done' : 'Mark Done'}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleViewRecipe(meal)}
+                              className="text-xs"
+                            >
+                              Recipe
                             </Button>
                             <Button
                               size="sm"
@@ -347,11 +364,11 @@ const MealPlanView = ({ plan: initialPlan, onBack, onEdit }: MealPlanViewProps) 
                 )}
 
                 {/* Instructions */}
-                {selectedMeal.steps && selectedMeal.steps.length > 0 && (
+                {selectedMeal.instructions && selectedMeal.instructions.length > 0 && (
                   <div>
                     <h4 className="font-medium mb-2">Instructions</h4>
                     <ol className="space-y-2">
-                      {selectedMeal.steps.map((step: string, index: number) => (
+                      {selectedMeal.instructions.map((step: string, index: number) => (
                         <li key={index} className="text-sm text-gray-600">
                           <span className="font-medium text-purple-600">{index + 1}.</span> {step}
                         </li>
