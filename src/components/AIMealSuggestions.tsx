@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,7 +49,8 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
         label: currentDate.toLocaleDateString('en-US', { 
           weekday: 'long', 
           month: 'short', 
-          day: 'numeric' 
+          day: 'numeric',
+          year: 'numeric'
         }),
         date: new Date(currentDate)
       });
@@ -57,6 +59,13 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     
     return days;
   };
+
+  // Reset day when meal plan changes
+  useEffect(() => {
+    if (selectedMealPlan) {
+      setSelectedDay("");
+    }
+  }, [selectedMealPlan]);
 
   const generateSuggestions = async () => {
     setIsGenerating(true);
@@ -215,7 +224,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
         date: dateString,
         planId: planId,
         mealType: mealType,
-        // Enhanced description with full date
+        completed: false,
         description: `${meal.description} - Planned for ${date.toLocaleDateString('en-US', { 
           weekday: 'long', 
           month: 'long', 
@@ -281,7 +290,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
         date: dateString,
         planId: planId,
         mealType: 'meal',
-        // Enhanced description with full date
+        completed: false,
         description: `${newMeal.description} - Planned for ${date.toLocaleDateString('en-US', { 
           weekday: 'long', 
           month: 'long', 
@@ -416,10 +425,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                           <div className="space-y-4">
                             <div>
                               <Label htmlFor="meal-plan-select" className="text-sm">Select Meal Plan</Label>
-                              <Select value={selectedMealPlan} onValueChange={(value) => {
-                                setSelectedMealPlan(value);
-                                setSelectedDay(""); // Reset day when plan changes
-                              }}>
+                              <Select value={selectedMealPlan} onValueChange={setSelectedMealPlan}>
                                 <SelectTrigger className="mt-1">
                                   <SelectValue placeholder="Choose a meal plan..." />
                                 </SelectTrigger>

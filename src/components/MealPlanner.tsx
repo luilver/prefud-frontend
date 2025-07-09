@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Calendar, Users, ChefHat, Clock, Sparkles, RefreshCw } from "lucide-react";
+import { Plus, Calendar, Users, ChefHat, Clock, Sparkles } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
@@ -11,25 +11,13 @@ const MealPlanner = () => {
   const [showCreator, setShowCreator] = useState(false);
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const { user, mealPlans, addMealPlan, refreshMealPlans, getMealPlanById } = useUser();
-
-  // Refresh meal plans when component mounts or when returning from other views
-  useEffect(() => {
-    refreshMealPlans();
-  }, []);
-
-  // Refresh meal plans when returning from creator or meal plan view
-  useEffect(() => {
-    if (!showCreator && !selectedMealPlan) {
-      refreshMealPlans();
-    }
-  }, [showCreator, selectedMealPlan]);
+  const { user, mealPlans, addMealPlan, getMealPlanById } = useUser();
 
   const handlePlanCreated = (newPlan: any) => {
     console.log('New plan created:', newPlan);
     addMealPlan(newPlan);
     setShowCreator(false);
-    setSelectedMealPlan(newPlan); // Automatically show the newly created plan
+    setSelectedMealPlan(newPlan);
   };
 
   const handleEditPlan = () => {
@@ -41,10 +29,6 @@ const MealPlanner = () => {
     setShowCreator(false);
     setSelectedMealPlan(null);
     setIsEditing(false);
-    // Refresh meal plans when returning to the main view
-    setTimeout(() => {
-      refreshMealPlans();
-    }, 100);
   };
 
   const handlePlanSelect = (plan: any) => {
@@ -54,9 +38,15 @@ const MealPlanner = () => {
     setSelectedMealPlan(updatedPlan);
   };
 
-  const handleRefresh = () => {
-    refreshMealPlans();
-  };
+  // Update selected meal plan when context changes
+  useEffect(() => {
+    if (selectedMealPlan) {
+      const updatedPlan = getMealPlanById(selectedMealPlan.id);
+      if (updatedPlan) {
+        setSelectedMealPlan(updatedPlan);
+      }
+    }
+  }, [mealPlans, selectedMealPlan?.id, getMealPlanById]);
 
   if (selectedMealPlan && !showCreator) {
     return (
@@ -85,24 +75,13 @@ const MealPlanner = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Meal Planner</h1>
           <p className="text-gray-600 mt-1">Create and manage your weekly meal plans</p>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button 
-            onClick={handleRefresh}
-            variant="outline"
-            size="sm"
-            className="flex-1 sm:flex-none"
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          <Button 
-            onClick={() => setShowCreator(true)}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white flex-1 sm:flex-none"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create AI Meal Plan
-          </Button>
-        </div>
+        <Button 
+          onClick={() => setShowCreator(true)}
+          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Create AI Meal Plan
+        </Button>
       </div>
 
       {/* Meal Plans Grid */}
