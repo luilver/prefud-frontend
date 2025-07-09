@@ -7,6 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreditCard, Lock, ArrowLeft } from "lucide-react";
 
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  interval: string;
+  features: string[];
+  popular?: boolean;
+}
+
 interface PaymentFormProps {
   onSuccess: (paymentData: any) => void;
   onBack: () => void;
@@ -14,9 +23,10 @@ interface PaymentFormProps {
     email: string;
     phone: string;
   };
+  selectedPlan: SubscriptionPlan;
 }
 
-const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
+const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormProps) => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
@@ -67,9 +77,11 @@ const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
         cvv,
         cardName,
         billingCycle,
-        amount: billingCycle === 'monthly' ? 9.99 : 99.99,
+        amount: billingCycle === 'monthly' ? selectedPlan.price : selectedPlan.price * 12,
         email: userInfo.email,
         phone: userInfo.phone,
+        planId: selectedPlan.id,
+        planName: selectedPlan.name,
       };
 
       console.log('Processing payment:', paymentData);
@@ -85,8 +97,8 @@ const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
     }
   };
 
-  const monthlyPrice = 9.99;
-  const yearlyPrice = 99.99;
+  const monthlyPrice = selectedPlan.price;
+  const yearlyPrice = selectedPlan.price * 12 * 0.83; // 17% discount for yearly
   const yearlyDiscount = ((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12) * 100).toFixed(0);
 
   return (
@@ -98,7 +110,7 @@ const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
         </Button>
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Complete Your Subscription</h2>
-          <p className="text-gray-600">Secure payment processing</p>
+          <p className="text-gray-600">Secure payment processing for {selectedPlan.name}</p>
         </div>
       </div>
 
@@ -106,7 +118,7 @@ const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
       <Card className="bg-white/90 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Choose Your Billing Cycle</CardTitle>
-          <CardDescription>Select how you'd like to be billed</CardDescription>
+          <CardDescription>Select how you'd like to be billed for {selectedPlan.name}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
@@ -140,7 +152,7 @@ const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
                   <p className="text-sm text-gray-600">Save {yearlyDiscount}% annually</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-2xl font-bold">${yearlyPrice}</span>
+                  <span className="text-2xl font-bold">${yearlyPrice.toFixed(2)}</span>
                   <p className="text-sm text-gray-600">/year</p>
                 </div>
               </div>
@@ -215,9 +227,9 @@ const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
             <div className="p-4 bg-gray-50 rounded-lg border">
               <h4 className="font-semibold mb-2">Order Summary</h4>
               <div className="flex justify-between items-center">
-                <span>MealCraft Premium ({billingCycle})</span>
+                <span>{selectedPlan.name} ({billingCycle})</span>
                 <span className="font-bold">
-                  ${billingCycle === 'monthly' ? monthlyPrice : yearlyPrice}
+                  ${billingCycle === 'monthly' ? monthlyPrice : yearlyPrice.toFixed(2)}
                 </span>
               </div>
               {billingCycle === 'yearly' && (
@@ -237,7 +249,7 @@ const PaymentForm = ({ onSuccess, onBack, userInfo }: PaymentFormProps) => {
               className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
               disabled={isProcessing}
             >
-              {isProcessing ? 'Processing Payment...' : `Subscribe for $${billingCycle === 'monthly' ? monthlyPrice : yearlyPrice}`}
+              {isProcessing ? 'Processing Payment...' : `Subscribe for $${billingCycle === 'monthly' ? monthlyPrice : yearlyPrice.toFixed(2)}`}
             </Button>
           </form>
         </CardContent>
