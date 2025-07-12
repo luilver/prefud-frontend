@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
@@ -674,7 +673,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       // Update subscription info
       const newSubscriptionInfo: SubscriptionInfo = {
         subscribed: plan !== 'free',
-        subscription_tier: plan === 'family' ? 'Family' : plan === 'professional' ? 'Professional' : null,
+        subscription_tier: plan === 'family' ? 'Family' : 
+                          plan === 'professional' ? 'Professional' : null,
         subscription_end: plan !== 'free' ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
         stripe_customer_id: plan !== 'free' ? 'cus_mock_customer_id' : null
       };
