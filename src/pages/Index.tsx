@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Utensils, Menu, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
@@ -7,21 +7,21 @@ import Dashboard from "@/components/Dashboard";
 import { useEffect, useState } from "react";
 
 const Index = () => {
-  const { isAuthenticated, user, checkSubscription, login } = useUser();
+  const { isAuthenticated, user, checkSubscription } = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkSubscription();
   }, [isAuthenticated, checkSubscription]);
 
-  // Quick login function for demo purposes
-  const handleQuickLogin = async () => {
-    try {
-      await login("demo@example.com", "password");
-    } catch (error) {
-      console.error("Quick login failed:", error);
+  // Redirect mobile users to login if not authenticated
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile && !isAuthenticated) {
+      navigate('/signin');
     }
-  };
+  }, [isAuthenticated, navigate]);
 
   // If user is authenticated, show the full dashboard
   if (isAuthenticated) {
@@ -122,20 +122,12 @@ const Index = () => {
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
           Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Pantry.
         </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <div className="flex justify-center">
           <Link to="/signup">
-            <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+            <Button size="lg" className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
               Start Free Trial
             </Button>
           </Link>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="w-full sm:w-auto border-green-500 text-green-600 hover:bg-green-50"
-            onClick={handleQuickLogin}
-          >
-            Quick Demo Login
-          </Button>
         </div>
       </div>
 

@@ -26,6 +26,7 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import SubscriptionPurchase from "./SubscriptionPurchase";
+import PasswordUpdate from "./PasswordUpdate";
 
 interface UserFormData {
   name: string;
@@ -568,7 +569,7 @@ const UserProfile = () => {
               </CardContent>
             </Card>
 
-            {/* Right sidebar with subscription and health stats */}
+            {/* Right sidebar with subscription, health stats, and password update */}
             <div className="space-y-6">
               <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
                 <CardHeader>
@@ -599,6 +600,9 @@ const UserProfile = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Password Update Card */}
+              <PasswordUpdate />
 
               <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
                 <CardHeader>
