@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Crown, Check, X, User, Mail, CreditCard } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import UserProfileForm from "./UserProfileForm";
 import OTPVerification from "./OTPVerification";
@@ -13,11 +15,13 @@ import WelcomeModal from "./WelcomeModal";
 interface SignupData {
   email: string;
   password: string;
+  phonePrefix: string;
   phone: string;
   wantsSubscription: boolean;
   profile?: {
     weight: number;
-    height: number;
+    heightFeet: number;
+    heightInches: number;
     birthday: string;
     healthGoals: string[];
     dietTypes: string[];
@@ -30,11 +34,13 @@ const SignupSteps = () => {
   const [signupData, setSignupData] = useState<SignupData>({
     email: "",
     password: "",
+    phonePrefix: "+1",
     phone: "",
     wantsSubscription: false,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
 
   // Default premium plan for signup process
@@ -198,27 +204,61 @@ const SignupSteps = () => {
               
               <div>
                 <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={signupData.phone}
-                  onChange={(e) => setSignupData(prev => ({ ...prev, phone: e.target.value }))}
-                  required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                  placeholder="+1 (555) 123-4567"
-                />
+                <div className="flex space-x-2 mt-1">
+                  <Select value={signupData.phonePrefix} onValueChange={(value) => setSignupData(prev => ({ ...prev, phonePrefix: value }))}>
+                    <SelectTrigger className="w-24 border-green-200 focus:border-green-400 h-10 sm:h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="+1">+1</SelectItem>
+                      <SelectItem value="+44">+44</SelectItem>
+                      <SelectItem value="+49">+49</SelectItem>
+                      <SelectItem value="+33">+33</SelectItem>
+                      <SelectItem value="+34">+34</SelectItem>
+                      <SelectItem value="+39">+39</SelectItem>
+                      <SelectItem value="+52">+52</SelectItem>
+                      <SelectItem value="+55">+55</SelectItem>
+                      <SelectItem value="+86">+86</SelectItem>
+                      <SelectItem value="+91">+91</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={signupData.phone}
+                    onChange={(e) => setSignupData(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))}
+                    required
+                    className="flex-1 border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base"
+                    placeholder="555 123 4567"
+                  />
+                </div>
               </div>
               
               <div>
                 <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={signupData.password}
-                  onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                />
+                <div className="relative mt-1">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={signupData.password}
+                    onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
+                    required
+                    className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
               </div>
 
               <Button 
