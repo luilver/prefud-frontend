@@ -8,6 +8,7 @@ import { Utensils, Star, Users, Shield, Zap, Heart, Menu, X, Eye, EyeOff } from 
 import { useUser } from "@/contexts/UserContext";
 import Dashboard from "@/components/Dashboard";
 import { useNavigate } from "react-router-dom";
+import PasswordRecovery from "@/components/PasswordRecovery";
 
 const Index = () => {
   const userContext = useUser();
@@ -17,6 +18,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showPasswordRecovery, setShowPasswordRecovery] = useState(false);
 
   // Add safety check for context
   if (!userContext) {
@@ -33,6 +35,7 @@ const Index = () => {
       setEmail("");
       setPassword("");
       setShowPassword(false);
+      setShowPasswordRecovery(false);
     };
 
     window.addEventListener('user-logout', handleLogout);
@@ -63,6 +66,14 @@ const Index = () => {
     return <Dashboard />;
   }
 
+  if (showPasswordRecovery) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100 flex items-center justify-center p-4">
+        <PasswordRecovery onBack={() => setShowPasswordRecovery(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
       {/* Header */}
@@ -79,8 +90,12 @@ const Index = () => {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" className="text-green-700 hover:text-green-800">
-              Features
+            <Button 
+              variant="ghost" 
+              className="text-green-700 hover:text-green-800"
+              onClick={() => navigate('/why-pantry')}
+            >
+              Why Pantry
             </Button>
             <Button variant="ghost" className="text-green-700 hover:text-green-800">
               Pricing
@@ -115,9 +130,12 @@ const Index = () => {
               <Button 
                 variant="ghost" 
                 className="w-full justify-start text-green-700 hover:text-green-800"
-                onClick={closeMobileMenu}
+                onClick={() => {
+                  navigate('/why-pantry');
+                  closeMobileMenu();
+                }}
               >
-                Features
+                Why Pantry
               </Button>
               <Button 
                 variant="ghost" 
@@ -217,6 +235,16 @@ const Index = () => {
                         )}
                       </Button>
                     </div>
+                  </div>
+                  <div className="text-right">
+                    <Button 
+                      type="button"
+                      variant="link" 
+                      className="text-green-600 hover:text-green-700 p-0 text-xs"
+                      onClick={() => setShowPasswordRecovery(true)}
+                    >
+                      Forgot password?
+                    </Button>
                   </div>
                   <Button 
                     type="submit" 
@@ -372,6 +400,16 @@ const Index = () => {
                         )}
                       </Button>
                     </div>
+                  </div>
+                  <div className="text-right">
+                    <Button 
+                      type="button"
+                      variant="link" 
+                      className="text-green-600 hover:text-green-700 p-0"
+                      onClick={() => setShowPasswordRecovery(true)}
+                    >
+                      Forgot password?
+                    </Button>
                   </div>
                   <Button 
                     type="submit" 

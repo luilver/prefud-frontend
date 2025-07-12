@@ -8,12 +8,14 @@ import { Utensils, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import PasswordRecovery from "@/components/PasswordRecovery";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordRecovery, setShowPasswordRecovery] = useState(false);
   const { login } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -37,6 +39,14 @@ const SignIn = () => {
       setIsLoading(false);
     }
   };
+
+  if (showPasswordRecovery) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100 flex items-center justify-center p-4">
+        <PasswordRecovery onBack={() => setShowPasswordRecovery(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
@@ -114,6 +124,7 @@ const SignIn = () => {
                     type="button"
                     variant="link" 
                     className="text-green-600 hover:text-green-700 p-0"
+                    onClick={() => setShowPasswordRecovery(true)}
                   >
                     Forgot password?
                   </Button>
