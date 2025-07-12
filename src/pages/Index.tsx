@@ -1,10 +1,8 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Utensils } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import Highlights from "@/components/Highlights";
-import MealPlanCalendar from "@/components/MealPlanCalendar";
 import ShoppingList from "@/components/ShoppingList";
 import { useEffect } from "react";
 
@@ -145,8 +143,6 @@ const Index = () => {
         </h2>
 
         <Highlights />
-
-        <MealPlanCalendar />
 
         <ShoppingList />
       </div>
