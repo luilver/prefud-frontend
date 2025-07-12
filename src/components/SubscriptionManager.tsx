@@ -17,51 +17,44 @@ interface SubscriptionPlan {
 
 const plans: SubscriptionPlan[] = [
   {
-    id: "free",
-    name: "Free",
-    price: 0,
+    id: "basic",
+    name: "Basic",
+    price: 4.99,
     interval: "month",
     features: [
-      "1 Meal Plan per month",
-      "3 Meal creations with pantry ingredients",
+      "5 Meal Plans per month",
       "Basic Recipe Collection",
       "Shopping List Generator",
       "Email Support"
     ]
   },
   {
-    id: "family",
-    name: "Family",
-    price: 40.00,
+    id: "premium",
+    name: "Premium",
+    price: 9.99,
     interval: "month",
     popular: true,
     features: [
-      "5 Meal Plans per month",
-      "10 Meal creations with pantry ingredients",
+      "Unlimited Meal Plans",
       "AI Meal Recommendations",
-      "Advanced Recipe Collection", 
-      "3 Free grocery deliveries",
-      "Family Meal Planning",
+      "Advanced Recipe Collection",
+      "Grocery Store Integration",
       "Nutritional Analysis",
       "Priority Support"
     ]
   },
   {
-    id: "professional",
-    name: "Professional",
-    price: 120.00,
+    id: "family",
+    name: "Family",
+    price: 19.99,
     interval: "month",
     features: [
-      "12 Meal Plans per month",
-      "Unlimited meal creations",
-      "10 Free grocery deliveries",
-      "3 Free home deliveries",
-      "Advanced AI Meal Planning",
-      "Custom Dietary Plans",
+      "Everything in Premium",
+      "Up to 6 Family Members",
       "Bulk Shopping Lists",
-      "Business Features",
-      "Phone Support",
-      "Priority Processing"
+      "Family Meal Planning",
+      "Custom Dietary Plans",
+      "Phone Support"
     ]
   }
 ];
