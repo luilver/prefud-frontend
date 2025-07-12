@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,36 +14,58 @@ interface SubscriptionPlan {
   price: number;
   interval: string;
   features: string[];
+  limits: {
+    plansPerMonth: number;
+    mealCreations: number;
+    deliveryCommissions: number;
+    homeDeliveries?: number;
+  };
   popular?: boolean;
 }
 
 const plans: SubscriptionPlan[] = [
   {
-    id: "basic",
-    name: "Basic",
-    price: 4.99,
-    interval: "month",
-    features: [
-      "5 Meal Plans per month",
-      "Basic Recipe Collection",
-      "Shopping List Generator",
-      "Email Support"
-    ]
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 9.99,
+    id: "family",
+    name: "Family",
+    price: 40,
     interval: "month",
     popular: true,
     features: [
-      "Unlimited Meal Plans",
+      "5 Meal Plans per month",
+      "10 Meal Creations with pantry ingredients",
       "AI Meal Recommendations",
       "Advanced Recipe Collection",
-      "Grocery Store Integration",
+      "3 Free Delivery Commissions",
       "Nutritional Analysis",
       "Priority Support"
-    ]
+    ],
+    limits: {
+      plansPerMonth: 5,
+      mealCreations: 10,
+      deliveryCommissions: 3
+    }
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    price: 120,
+    interval: "month",
+    features: [
+      "12 Meal Plans per month",
+      "Unlimited Meal Creations",
+      "10 Free Delivery Commissions",
+      "3 Free Home Deliveries",
+      "Advanced AI Recommendations",
+      "Custom Dietary Plans",
+      "Professional Analytics",
+      "Phone Support"
+    ],
+    limits: {
+      plansPerMonth: 12,
+      mealCreations: -1, // unlimited
+      deliveryCommissions: 10,
+      homeDeliveries: 3
+    }
   }
 ];
 
@@ -55,7 +76,7 @@ interface SubscriptionPurchaseProps {
 const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
   const { paymentMethods, getPaymentMethods, createCheckoutWithPaymentMethod, acceptSubscription } = useUser();
   const { toast } = useToast();
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(plans[1]); // Default to premium
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(plans[0]); // Default to family
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

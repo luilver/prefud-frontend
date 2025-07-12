@@ -14,13 +14,19 @@ interface User {
     budgetRange: 'low' | 'medium' | 'high';
   };
   subscription: {
-    plan: 'free' | 'premium';
+    plan: 'free' | 'family' | 'professional';
     isSubscribed: boolean;
     nextBilling?: string;
     cancelAtPeriodEnd?: boolean;
     planLimits: {
       plansPerMonth: number;
       usedPlans: number;
+      mealCreations: number;
+      usedMealCreations: number;
+      deliveryCommissions: number;
+      usedDeliveryCommissions: number;
+      homeDeliveries?: number;
+      usedHomeDeliveries?: number;
     };
   };
 }
@@ -301,7 +307,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         isSubscribed: false,
         planLimits: {
           plansPerMonth: 1,
-          usedPlans: 0
+          usedPlans: 0,
+          mealCreations: 3,
+          usedMealCreations: 0,
+          deliveryCommissions: 0,
+          usedDeliveryCommissions: 0
         }
       }
     };
@@ -624,25 +634,57 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const acceptSubscription = async (plan: string) => {
     if (user) {
+      let planLimits;
+      switch (plan) {
+        case 'family':
+          planLimits = {
+            plansPerMonth: 5,
+            usedPlans: user.subscription.planLimits.usedPlans,
+            mealCreations: 10,
+            usedMealCreations: user.subscription.planLimits.usedMealCreations || 0,
+            deliveryCommissions: 3,
+            usedDeliveryCommissions: user.subscription.planLimits.usedDeliveryCommissions || 0
+          };
+          break;
+        case 'professional':
+          planLimits = {
+            plansPerMonth: 12,
+            usedPlans: user.subscription.planLimits.usedPlans,
+            mealCreations: -1, // unlimited
+            usedMealCreations: user.subscription.planLimits.usedMealCreations || 0,
+            deliveryCommissions: 10,
+            usedDeliveryCommissions: user.subscription.planLimits.usedDeliveryCommissions || 0,
+            homeDeliveries: 3,
+            usedHomeDeliveries: user.subscription.planLimits.usedHomeDeliveries || 0
+          };
+          break;
+        default: // free
+          planLimits = {
+            plansPerMonth: 1,
+            usedPlans: user.subscription.planLimits.usedPlans,
+            mealCreations: 3,
+            usedMealCreations: user.subscription.planLimits.usedMealCreations || 0,
+            deliveryCommissions: 0,
+            usedDeliveryCommissions: 0
+          };
+      }
+
       const updatedUser = {
         ...user,
         subscription: {
           ...user.subscription,
-          plan: plan as 'free' | 'premium',
-          isSubscribed: true,
-          planLimits: {
-            plansPerMonth: plan === 'premium' ? 5 : 1,
-            usedPlans: user.subscription.planLimits.usedPlans
-          }
+          plan: plan as 'free' | 'family' | 'professional',
+          isSubscribed: plan !== 'free',
+          planLimits
         }
       };
       setUser(updatedUser);
       
       // Update subscription info
       const newSubscriptionInfo: SubscriptionInfo = {
-        subscribed: true,
-        subscription_tier: plan === 'premium' ? 'Premium' : 'Basic',
-        subscription_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        subscribed: plan !== 'free',
+        subscription_tier: plan === 'family' ? 'Family' : plan === 'professional' ? 'Professional' : null,
+        subscription_end: plan !== 'free' ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
         stripe_customer_id: 'cus_mock_customer_id'
       };
       setSubscriptionInfo(newSubscriptionInfo);
@@ -666,7 +708,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const mockSubscriptionInfo: SubscriptionInfo = {
         subscribed: user?.subscription?.isSubscribed || false,
-        subscription_tier: user?.subscription?.plan === 'premium' ? 'Premium' : null,
+        subscription_tier: user?.subscription?.plan === 'family' ? 'Family' : user?.subscription?.plan === 'professional' ? 'Professional' : null,
         subscription_end: user?.subscription?.isSubscribed ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
         stripe_customer_id: user?.subscription?.isSubscribed ? 'cus_mock_customer_id' : null
       };

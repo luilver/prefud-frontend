@@ -12,50 +12,76 @@ interface SubscriptionPlan {
   price: number;
   interval: string;
   features: string[];
+  limits: {
+    plansPerMonth: number;
+    mealCreations: number;
+    deliveryCommissions: number;
+    homeDeliveries?: number;
+  };
   popular?: boolean;
 }
 
 const plans: SubscriptionPlan[] = [
   {
-    id: "basic",
-    name: "Basic",
-    price: 4.99,
+    id: "free",
+    name: "Free",
+    price: 0,
     interval: "month",
     features: [
-      "5 Meal Plans per month",
+      "1 Meal Plan per month",
+      "3 Meal Creations with pantry ingredients",
       "Basic Recipe Collection",
       "Shopping List Generator",
       "Email Support"
-    ]
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 9.99,
-    interval: "month",
-    popular: true,
-    features: [
-      "Unlimited Meal Plans",
-      "AI Meal Recommendations",
-      "Advanced Recipe Collection",
-      "Grocery Store Integration",
-      "Nutritional Analysis",
-      "Priority Support"
-    ]
+    ],
+    limits: {
+      plansPerMonth: 1,
+      mealCreations: 3,
+      deliveryCommissions: 0
+    }
   },
   {
     id: "family",
     name: "Family",
-    price: 19.99,
+    price: 40,
+    interval: "month",
+    popular: true,
+    features: [
+      "5 Meal Plans per month",
+      "10 Meal Creations with pantry ingredients",
+      "AI Meal Recommendations",
+      "Advanced Recipe Collection",
+      "3 Free Delivery Commissions",
+      "Nutritional Analysis",
+      "Priority Support"
+    ],
+    limits: {
+      plansPerMonth: 5,
+      mealCreations: 10,
+      deliveryCommissions: 3
+    }
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    price: 120,
     interval: "month",
     features: [
-      "Everything in Premium",
-      "Up to 6 Family Members",
-      "Bulk Shopping Lists",
-      "Family Meal Planning",
+      "12 Meal Plans per month",
+      "Unlimited Meal Creations",
+      "10 Free Delivery Commissions",
+      "3 Free Home Deliveries",
+      "Advanced AI Recommendations",
       "Custom Dietary Plans",
+      "Professional Analytics",
       "Phone Support"
-    ]
+    ],
+    limits: {
+      plansPerMonth: 12,
+      mealCreations: -1, // unlimited
+      deliveryCommissions: 10,
+      homeDeliveries: 3
+    }
   }
 ];
 
