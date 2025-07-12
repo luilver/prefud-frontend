@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
@@ -698,7 +699,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const mockSubscriptionInfo: SubscriptionInfo = {
         subscribed: user?.subscription?.isSubscribed || false,
-        subscription_tier: user?.subscription?.plan === 'premium' ? 'Premium' : null,
+        subscription_tier: user?.subscription?.plan === 'family' ? 'Family' : 
+                          user?.subscription?.plan === 'professional' ? 'Professional' : null,
         subscription_end: user?.subscription?.isSubscribed ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
         stripe_customer_id: user?.subscription?.isSubscribed ? 'cus_mock_customer_id' : null
       };
