@@ -1,8 +1,7 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Utensils } from "lucide-react";
-import Features from "@/components/Features";
-import Footer from "@/components/Footer";
 import { useUser } from "@/contexts/UserContext";
 import Highlights from "@/components/Highlights";
 import MealPlanCalendar from "@/components/MealPlanCalendar";
@@ -71,11 +70,45 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Features Section */}
-        <Features />
+        {/* Simple Features Section */}
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Why PantryPal?</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Save time, money, and reduce food waste with intelligent meal planning
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Utensils className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Smart Planning</h3>
+              <p className="text-gray-600">AI-powered meal suggestions based on your pantry</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Utensils className="h-8 w-8 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Reduce Waste</h3>
+              <p className="text-gray-600">Use ingredients before they expire</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Utensils className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Save Money</h3>
+              <p className="text-gray-600">Shop smarter with automated lists</p>
+            </div>
+          </div>
+        </div>
 
-        {/* Footer */}
-        <Footer />
+        {/* Simple Footer */}
+        <footer className="bg-gray-800 text-white py-8">
+          <div className="container mx-auto px-4 text-center">
+            <p>&copy; 2024 PantryPal. All rights reserved.</p>
+          </div>
+        </footer>
       </div>
     );
   }
@@ -118,8 +151,12 @@ const Index = () => {
         <ShoppingList />
       </div>
 
-      {/* Footer */}
-      <Footer />
+      {/* Simple Footer */}
+      <footer className="bg-gray-800 text-white py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p>&copy; 2024 PantryPal. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 };

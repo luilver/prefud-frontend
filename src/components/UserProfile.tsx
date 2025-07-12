@@ -648,7 +648,7 @@ const UserProfile = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold text-purple-800">
-                      {user?.subscription?.plan === 'premium' ? 'Premium' : subscriptionInfo?.subscription_tier || 'Free'} Plan
+                      {user?.subscription?.plan === 'family' ? 'Family' : user?.subscription?.plan === 'professional' ? 'Professional' : subscriptionInfo?.subscription_tier || 'Free'} Plan
                     </p>
                     <p className="text-sm text-purple-600">
                       {user?.subscription?.isSubscribed || subscriptionInfo?.subscribed ? 'Active' : 'Inactive'}

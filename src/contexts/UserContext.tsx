@@ -348,7 +348,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         isSubscribed: false,
         planLimits: {
           plansPerMonth: 1,
-          usedPlans: 0
+          usedPlans: 0,
+          mealCreations: 3,
+          usedMealCreations: 0,
+          deliveryCommissions: 0,
+          usedDeliveryCommissions: 0
         }
       }
     };
