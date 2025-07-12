@@ -14,13 +14,16 @@ interface User {
     budgetRange: 'low' | 'medium' | 'high';
   };
   subscription: {
-    plan: 'free' | 'premium';
+    plan: 'free' | 'family' | 'professional';
     isSubscribed: boolean;
     nextBilling?: string;
     cancelAtPeriodEnd?: boolean;
     planLimits: {
       plansPerMonth: number;
       usedPlans: number;
+      maxMealCreations: number;
+      freeDeliveries: number;
+      homeDeliveries?: number;
     };
   };
 }
@@ -301,7 +304,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         isSubscribed: false,
         planLimits: {
           plansPerMonth: 1,
-          usedPlans: 0
+          usedPlans: 0,
+          maxMealCreations: 3,
+          freeDeliveries: 0
         }
       }
     };
@@ -338,7 +343,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         isSubscribed: false,
         planLimits: {
           plansPerMonth: 1,
-          usedPlans: 0
+          usedPlans: 0,
+          maxMealCreations: 3,
+          freeDeliveries: 0
         }
       }
     };
@@ -624,26 +631,51 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const acceptSubscription = async (plan: string) => {
     if (user) {
+      let planLimits;
+      switch (plan) {
+        case 'family':
+          planLimits = {
+            plansPerMonth: 5,
+            usedPlans: user.subscription.planLimits.usedPlans,
+            maxMealCreations: 10,
+            freeDeliveries: 3
+          };
+          break;
+        case 'professional':
+          planLimits = {
+            plansPerMonth: 12,
+            usedPlans: user.subscription.planLimits.usedPlans,
+            maxMealCreations: 999,
+            freeDeliveries: 10,
+            homeDeliveries: 3
+          };
+          break;
+        default:
+          planLimits = {
+            plansPerMonth: 1,
+            usedPlans: user.subscription.planLimits.usedPlans,
+            maxMealCreations: 3,
+            freeDeliveries: 0
+          };
+      }
+
       const updatedUser = {
         ...user,
         subscription: {
           ...user.subscription,
-          plan: plan as 'free' | 'premium',
-          isSubscribed: true,
-          planLimits: {
-            plansPerMonth: plan === 'premium' ? 5 : 1,
-            usedPlans: user.subscription.planLimits.usedPlans
-          }
+          plan: plan as 'free' | 'family' | 'professional',
+          isSubscribed: plan !== 'free',
+          planLimits
         }
       };
       setUser(updatedUser);
       
       // Update subscription info
       const newSubscriptionInfo: SubscriptionInfo = {
-        subscribed: true,
-        subscription_tier: plan === 'premium' ? 'Premium' : 'Basic',
-        subscription_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        stripe_customer_id: 'cus_mock_customer_id'
+        subscribed: plan !== 'free',
+        subscription_tier: plan === 'family' ? 'Family' : plan === 'professional' ? 'Professional' : null,
+        subscription_end: plan !== 'free' ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
+        stripe_customer_id: plan !== 'free' ? 'cus_mock_customer_id' : null
       };
       setSubscriptionInfo(newSubscriptionInfo);
     }
