@@ -7,11 +7,20 @@ import Dashboard from "@/components/Dashboard";
 import { useEffect } from "react";
 
 const Index = () => {
-  const { isAuthenticated, user, checkSubscription } = useUser();
+  const { isAuthenticated, user, checkSubscription, login } = useUser();
 
   useEffect(() => {
     checkSubscription();
   }, [isAuthenticated, checkSubscription]);
+
+  // Quick login function for demo purposes
+  const handleQuickLogin = async () => {
+    try {
+      await login("demo@example.com", "password");
+    } catch (error) {
+      console.error("Quick login failed:", error);
+    }
+  };
 
   // If user is authenticated, show the full dashboard
   if (isAuthenticated) {
@@ -65,11 +74,14 @@ const Index = () => {
               Start Free Trial
             </Button>
           </Link>
-          <Link to="/pricing">
-            <Button size="lg" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-              View Pricing
-            </Button>
-          </Link>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="border-green-500 text-green-600 hover:bg-green-50"
+            onClick={handleQuickLogin}
+          >
+            Quick Demo Login
+          </Button>
         </div>
       </div>
 

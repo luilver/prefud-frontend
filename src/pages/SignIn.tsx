@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +28,7 @@ const SignIn = () => {
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
+      navigate('/'); // Navigate to dashboard after successful login
     } catch (error) {
       toast({
         title: "Sign in failed",
