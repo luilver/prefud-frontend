@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,10 @@ interface UserProfileFormProps {
 
 const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
   const [formData, setFormData] = useState({
+    name: "",
+    lastName: "",
+    phonePrefix: "+1",
+    phone: "",
     weight: "",
     heightFeet: "",
     heightInches: "",
@@ -64,6 +69,10 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
     e.preventDefault();
     
     const profileData = {
+      name: formData.name,
+      lastName: formData.lastName,
+      phonePrefix: formData.phonePrefix,
+      phone: formData.phone,
       weight: parseInt(formData.weight),
       heightFeet: parseInt(formData.heightFeet),
       heightInches: parseInt(formData.heightInches),
@@ -86,6 +95,69 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
       </CardHeader>
       <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          {/* Name and Last Name */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="name" className="text-sm sm:text-base">First Name *</Label>
+              <Input
+                id="name"
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                required
+                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                placeholder="John"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="lastName" className="text-sm sm:text-base">Last Name *</Label>
+              <Input
+                id="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                required
+                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                placeholder="Doe"
+              />
+            </div>
+          </div>
+
+          {/* Phone Number */}
+          <div>
+            <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number *</Label>
+            <div className="flex space-x-2 mt-1">
+              <Select value={formData.phonePrefix} onValueChange={(value) => setFormData(prev => ({ ...prev, phonePrefix: value }))}>
+                <SelectTrigger className="w-24 border-green-200 focus:border-green-400 h-10 sm:h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="+1">+1</SelectItem>
+                  <SelectItem value="+44">+44</SelectItem>
+                  <SelectItem value="+49">+49</SelectItem>
+                  <SelectItem value="+33">+33</SelectItem>
+                  <SelectItem value="+34">+34</SelectItem>
+                  <SelectItem value="+39">+39</SelectItem>
+                  <SelectItem value="+52">+52</SelectItem>
+                  <SelectItem value="+55">+55</SelectItem>
+                  <SelectItem value="+86">+86</SelectItem>
+                  <SelectItem value="+91">+91</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))}
+                required
+                className="flex-1 border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base"
+                placeholder="555 123 4567"
+              />
+            </div>
+          </div>
+
+          {/* Weight and Height */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="weight" className="text-sm sm:text-base">Weight (lbs)</Label>

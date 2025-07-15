@@ -15,10 +15,13 @@ import WelcomeModal from "./WelcomeModal";
 interface SignupData {
   email: string;
   password: string;
-  phonePrefix: string;
-  phone: string;
   wantsSubscription: boolean;
+  selectedPlan?: string;
   profile?: {
+    name: string;
+    lastName: string;
+    phonePrefix: string;
+    phone: string;
     weight: number;
     heightFeet: number;
     heightInches: number;
@@ -34,8 +37,6 @@ const SignupSteps = () => {
   const [signupData, setSignupData] = useState<SignupData>({
     email: "",
     password: "",
-    phonePrefix: "+1",
-    phone: "",
     wantsSubscription: false,
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -43,19 +44,49 @@ const SignupSteps = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
 
-  // Default premium plan for signup process
-  const premiumPlan = {
-    id: "premium",
-    name: "Premium Plan", 
-    price: 9.99,
-    interval: "month",
-    features: [
-      "5 AI meal plans per month",
-      "Advanced nutrition tracking",
-      "Walmart & Smith's integration"
-    ],
-    popular: true
-  };
+  // Updated subscription plans to match your app's offerings
+  const subscriptionPlans = [
+    {
+      id: "free",
+      name: "Free Plan",
+      price: 0,
+      interval: "month",
+      features: [
+        "1 AI meal plan per month",
+        "Basic calorie tracking",
+        "Basic recipe suggestions"
+      ],
+      popular: false
+    },
+    {
+      id: "family",
+      name: "Family Plan", 
+      price: 14.99,
+      interval: "month",
+      features: [
+        "Unlimited AI meal plans",
+        "Family meal planning (up to 6 people)",
+        "Advanced nutrition tracking",
+        "Grocery store integration",
+        "Recipe sharing & collaboration"
+      ],
+      popular: true
+    },
+    {
+      id: "professional",
+      name: "Professional Plan",
+      price: 29.99,
+      interval: "month",
+      features: [
+        "Everything in Family Plan",
+        "Business meal planning tools",
+        "Advanced analytics & reporting",
+        "API access",
+        "Priority support"
+      ],
+      popular: false
+    }
+  ];
 
   const handleBasicInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,13 +114,19 @@ const SignupSteps = () => {
     setCurrentStep(4);
   };
 
-  const handleSubscriptionChoice = (wantsSubscription: boolean) => {
-    console.log('Mock: Subscription choice:', wantsSubscription);
-    setSignupData(prev => ({ ...prev, wantsSubscription }));
-    if (wantsSubscription) {
-      setCurrentStep(5);
-    } else {
+  const handleSubscriptionChoice = (planId: string) => {
+    console.log('Mock: Subscription choice:', planId);
+    const selectedPlan = subscriptionPlans.find(plan => plan.id === planId);
+    setSignupData(prev => ({ 
+      ...prev, 
+      wantsSubscription: planId !== 'free',
+      selectedPlan: planId
+    }));
+    
+    if (planId === 'free') {
       completeSignup();
+    } else {
+      setCurrentStep(5);
     }
   };
 
@@ -102,11 +139,10 @@ const SignupSteps = () => {
     try {
       console.log('Mock: Completing signup with data:', signupData);
       
-      // Update the signup call to match the new function signature
       const userData = {
-        name: signupData.email.split('@')[0], // Use email prefix as name
+        name: signupData.profile?.name || signupData.email.split('@')[0],
         email: signupData.email,
-        phone: signupData.phone,
+        phone: signupData.profile?.phone || '',
         preferences: signupData.profile ? {
           dietaryRestrictions: [],
           allergies: signupData.profile.allergies || [],
@@ -121,7 +157,6 @@ const SignupSteps = () => {
       
       console.log('Mock: Signup completed, showing welcome modal');
       
-      // Force a small delay to ensure the signup process is complete
       setTimeout(() => {
         setShowWelcome(true);
       }, 100);
@@ -143,7 +178,6 @@ const SignupSteps = () => {
     { step: 5, title: "Payment", icon: CreditCard },
   ];
 
-  // Show welcome modal if it should be shown
   if (showWelcome) {
     return <WelcomeModal onClose={handleWelcomeClose} />;
   }
@@ -181,12 +215,12 @@ const SignupSteps = () => {
         </div>
       </div>
 
-      {/* Step 1: Basic Info */}
+      {/* Step 1: Basic Info - Removed phone fields */}
       {currentStep === 1 && (
         <Card className="max-w-full sm:max-w-md mx-auto bg-white/90 backdrop-blur-sm">
           <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
             <CardTitle className="text-lg sm:text-xl">Create Your Account</CardTitle>
-            <CardDescription className="text-sm sm:text-base">Enter your basic information to get started</CardDescription>
+            <CardDescription className="text-sm sm:text-base">Enter your email and password to get started</CardDescription>
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleBasicInfoSubmit} className="space-y-3 sm:space-y-4">
@@ -200,38 +234,6 @@ const SignupSteps = () => {
                   required
                   className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                 />
-              </div>
-              
-              <div>
-                <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number</Label>
-                <div className="flex space-x-2 mt-1">
-                  <Select value={signupData.phonePrefix} onValueChange={(value) => setSignupData(prev => ({ ...prev, phonePrefix: value }))}>
-                    <SelectTrigger className="w-24 border-green-200 focus:border-green-400 h-10 sm:h-12">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="+1">+1</SelectItem>
-                      <SelectItem value="+44">+44</SelectItem>
-                      <SelectItem value="+49">+49</SelectItem>
-                      <SelectItem value="+33">+33</SelectItem>
-                      <SelectItem value="+34">+34</SelectItem>
-                      <SelectItem value="+39">+39</SelectItem>
-                      <SelectItem value="+52">+52</SelectItem>
-                      <SelectItem value="+55">+55</SelectItem>
-                      <SelectItem value="+86">+86</SelectItem>
-                      <SelectItem value="+91">+91</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={signupData.phone}
-                    onChange={(e) => setSignupData(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))}
-                    required
-                    className="flex-1 border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base"
-                    placeholder="555 123 4567"
-                  />
-                </div>
               </div>
               
               <div>
@@ -282,7 +284,7 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 3: User Profile */}
+      {/* Step 3: User Profile - Now includes phone fields and name fields */}
       {currentStep === 3 && (
         <UserProfileForm 
           onComplete={handleProfileComplete}
@@ -290,7 +292,7 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 4: Subscription Choice */}
+      {/* Step 4: Subscription Choice - Updated with new plans */}
       {currentStep === 4 && (
         <div className="space-y-4 sm:space-y-6">
           <div className="text-center mb-6 sm:mb-8 px-4 sm:px-0">
@@ -298,69 +300,62 @@ const SignupSteps = () => {
             <p className="text-gray-600 text-sm sm:text-base">Select the plan that works best for you</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
-            <Card className="border-2 border-gray-200 hover:border-green-500 cursor-pointer transition-all"
-                  onClick={() => handleSubscriptionChoice(false)}>
-              <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-                <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
-                  <span>Free Plan</span>
-                  <span className="text-xl sm:text-2xl font-bold text-green-600">$0</span>
-                </CardTitle>
-                <CardDescription className="text-sm sm:text-base">Perfect for trying out Pantry</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <ul className="space-y-2 sm:space-y-3">
-                  <li className="flex items-center space-x-2">
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                    <span className="text-sm sm:text-base">1 AI meal plan per month</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                    <span className="text-sm sm:text-base">Basic calorie tracking</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <X className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
-                    <span className="text-sm sm:text-base">No grocery store integration</span>
-                  </li>
-                </ul>
-                <Button className="w-full mt-3 sm:mt-4 h-10 sm:h-12 text-sm sm:text-base" variant="outline">
-                  Choose Free Plan
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-orange-500 ring-2 ring-orange-200 cursor-pointer"
-                  onClick={() => handleSubscriptionChoice(true)}>
-              <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-                <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
-                  <div className="flex items-center space-x-2">
-                    <Crown className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
-                    <span>Premium Plan</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
+            {subscriptionPlans.map((plan) => (
+              <Card key={plan.id} className={`border-2 cursor-pointer transition-all relative ${
+                plan.popular 
+                  ? 'border-orange-500 ring-2 ring-orange-200' 
+                  : 'border-gray-200 hover:border-green-500'
+              }`}
+                    onClick={() => handleSubscriptionChoice(plan.id)}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-orange-500 text-white px-3 py-1 text-xs font-semibold rounded-full">
+                      MOST POPULAR
+                    </span>
                   </div>
-                  <span className="text-xl sm:text-2xl font-bold text-orange-600">$9.99</span>
-                </CardTitle>
-                <CardDescription className="text-sm sm:text-base">Everything you need for meal planning success</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                <ul className="space-y-2 sm:space-y-3">
-                  <li className="flex items-center space-x-2">
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                    <span className="text-sm sm:text-base">5 AI meal plans per month</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                    <span className="text-sm sm:text-base">Advanced nutrition tracking</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                    <span className="text-sm sm:text-base">Walmart & Smith's integration</span>
-                  </li>
-                </ul>
-                <Button className="w-full mt-3 sm:mt-4 h-10 sm:h-12 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-                  Choose Premium Plan
-                </Button>
-              </CardContent>
-            </Card>
+                )}
+                <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+                  <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
+                    <div className="flex items-center space-x-2">
+                      {plan.popular && <Crown className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />}
+                      <span>{plan.name}</span>
+                    </div>
+                    <span className={`text-xl sm:text-2xl font-bold ${
+                      plan.id === 'free' ? 'text-green-600' : 
+                      plan.id === 'family' ? 'text-orange-600' : 'text-purple-600'
+                    }`}>
+                      ${plan.price === 0 ? '0' : plan.price}
+                      {plan.price > 0 && <span className="text-sm font-normal">/mo</span>}
+                    </span>
+                  </CardTitle>
+                  <CardDescription className="text-sm sm:text-base">
+                    {plan.id === 'free' && 'Perfect for trying out Pantry'}
+                    {plan.id === 'family' && 'Everything you need for family meal planning'}
+                    {plan.id === 'professional' && 'Advanced tools for professional use'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                  <ul className="space-y-2 sm:space-y-3">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center space-x-2">
+                        <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                        <span className="text-sm sm:text-base">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 text-sm sm:text-base ${
+                    plan.id === 'free' 
+                      ? 'variant-outline' 
+                      : plan.id === 'family'
+                      ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                      : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600'
+                  }`} variant={plan.id === 'free' ? 'outline' : 'default'}>
+                    Choose {plan.name}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       )}
@@ -370,8 +365,8 @@ const SignupSteps = () => {
         <PaymentForm
           onSuccess={handlePaymentSuccess}
           onBack={() => setCurrentStep(4)}
-          userInfo={{ email: signupData.email, phone: signupData.phone }}
-          selectedPlan={premiumPlan}
+          userInfo={{ email: signupData.email, phone: signupData.profile?.phone || '' }}
+          selectedPlan={subscriptionPlans.find(plan => plan.id === signupData.selectedPlan) || subscriptionPlans[1]}
         />
       )}
     </div>
