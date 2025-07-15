@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
-import SubscriptionPurchase from "./SubscriptionPurchase";
 import PasswordUpdate from "./PasswordUpdate";
 
 interface UserFormData {
@@ -61,7 +60,6 @@ const UserProfile = () => {
     cancelSubscription
   } = useUser();
   const { toast } = useToast();
-  const [showSubscriptionPurchase, setShowSubscriptionPurchase] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoading, setIsLoading] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
@@ -147,15 +145,6 @@ const UserProfile = () => {
       : [...currentPrefs, diet];
     setDietaryPrefs(newPrefs);
     form.setValue('dietary_preferences', newPrefs);
-  };
-
-  const handleManageSubscription = () => {
-    if (subscriptionInfo?.subscribed) {
-      setActiveTab("billing");
-    } else {
-      // For non-subscribers, show subscription purchase
-      setShowSubscriptionPurchase(true);
-    }
   };
 
   const handleAddPaymentMethod = async (e: React.FormEvent) => {
@@ -249,14 +238,6 @@ const UserProfile = () => {
 
   const bmi = parseFloat(calculateBMI());
   const bmiInfo = getBMICategory(bmi);
-
-  if (showSubscriptionPurchase) {
-    return (
-      <SubscriptionPurchase
-        onBack={() => setShowSubscriptionPurchase(false)}
-      />
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -569,7 +550,7 @@ const UserProfile = () => {
               </CardContent>
             </Card>
 
-            {/* Right sidebar with subscription, health stats, and password update */}
+            {/* Right sidebar with health stats, password update, and notifications */}
             <div className="space-y-6">
               <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
                 <CardHeader>
@@ -692,13 +673,6 @@ const UserProfile = () => {
                     <span>Recipe Videos</span>
                   </div>
                 </div>
-
-                <Button 
-                  onClick={handleManageSubscription}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                >
-                  {user?.subscription?.isSubscribed || subscriptionInfo?.subscribed ? 'Manage Subscription' : 'Get Premium'}
-                </Button>
               </div>
             </CardContent>
           </Card>
