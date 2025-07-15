@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff } from "lucide-react";
+import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import UserProfileForm from "./UserProfileForm";
 import OTPVerification from "./OTPVerification";
@@ -44,45 +43,57 @@ const SignupSteps = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
 
-  // Updated subscription plans to match your app's offerings
+  // Updated subscription plans to match pricing page
   const subscriptionPlans = [
     {
       id: "free",
-      name: "Free Plan",
+      name: "Free",
       price: 0,
       interval: "month",
+      description: "Perfect for getting started with meal planning",
       features: [
-        "1 AI meal plan per month",
-        "Basic calorie tracking",
-        "Basic recipe suggestions"
+        "1 Meal Plan per month",
+        "Basic Recipe Collection",
+        "Shopping List Generator",
+        "Pantry Management",
+        "Email Support"
       ],
       popular: false
     },
     {
       id: "family",
-      name: "Family Plan", 
-      price: 14.99,
+      name: "Family", 
+      price: 40,
       interval: "month",
+      description: "Ideal for families looking to optimize meal planning",
       features: [
-        "Unlimited AI meal plans",
-        "Family meal planning (up to 6 people)",
-        "Advanced nutrition tracking",
-        "Grocery store integration",
-        "Recipe sharing & collaboration"
+        "5 Meal Plans per month",
+        "10 Meal Creations with pantry ingredients",
+        "AI Meal Recommendations",
+        "Advanced Recipe Collection",
+        "3 Free Delivery Commissions",
+        "Nutritional Analysis",
+        "Priority Support"
       ],
       popular: true
     },
     {
       id: "professional",
-      name: "Professional Plan",
-      price: 29.99,
+      name: "Professional",
+      price: 120,
       interval: "month",
+      description: "For meal planning professionals and large households",
       features: [
-        "Everything in Family Plan",
-        "Business meal planning tools",
-        "Advanced analytics & reporting",
-        "API access",
-        "Priority support"
+        "12 Meal Plans per month",
+        "Unlimited Meal Creations",
+        "10 Free Delivery Commissions",
+        "3 Free Home Deliveries",
+        "Advanced AI Recommendations",
+        "Custom Dietary Plans",
+        "Bulk Shopping Lists",
+        "Professional Analytics",
+        "Phone Support",
+        "Priority Processing"
       ],
       popular: false
     }
@@ -292,7 +303,7 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 4: Subscription Choice - Updated with new plans */}
+      {/* Step 4: Subscription Choice - Updated layout and pricing */}
       {currentStep === 4 && (
         <div className="space-y-4 sm:space-y-6">
           <div className="text-center mb-6 sm:mb-8 px-4 sm:px-0">
@@ -302,55 +313,60 @@ const SignupSteps = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
             {subscriptionPlans.map((plan) => (
-              <Card key={plan.id} className={`border-2 cursor-pointer transition-all relative ${
-                plan.popular 
-                  ? 'border-orange-500 ring-2 ring-orange-200' 
-                  : 'border-gray-200 hover:border-green-500'
-              }`}
-                    onClick={() => handleSubscriptionChoice(plan.id)}>
+              <Card 
+                key={plan.id} 
+                className={`relative border-2 cursor-pointer transition-all h-full ${
+                  plan.popular 
+                    ? 'border-green-500 ring-2 ring-green-200 shadow-lg' 
+                    : 'border-gray-200 hover:border-green-500 hover:shadow-md'
+                }`}
+                onClick={() => handleSubscriptionChoice(plan.id)}
+              >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-orange-500 text-white px-3 py-1 text-xs font-semibold rounded-full">
-                      MOST POPULAR
-                    </span>
+                    <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                      <Star className="h-3 w-3" />
+                      <span>Most Popular</span>
+                    </div>
                   </div>
                 )}
-                <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-                  <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
-                    <div className="flex items-center space-x-2">
-                      {plan.popular && <Crown className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />}
-                      <span>{plan.name}</span>
-                    </div>
-                    <span className={`text-xl sm:text-2xl font-bold ${
-                      plan.id === 'free' ? 'text-green-600' : 
-                      plan.id === 'family' ? 'text-orange-600' : 'text-purple-600'
-                    }`}>
-                      ${plan.price === 0 ? '0' : plan.price}
-                      {plan.price > 0 && <span className="text-sm font-normal">/mo</span>}
-                    </span>
-                  </CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
-                    {plan.id === 'free' && 'Perfect for trying out Pantry'}
-                    {plan.id === 'family' && 'Everything you need for family meal planning'}
-                    {plan.id === 'professional' && 'Advanced tools for professional use'}
+                
+                <CardHeader className="text-center pb-4 px-4 sm:px-6 py-4 sm:py-6">
+                  <div className="flex justify-center mb-4">
+                    <Crown className={`h-8 w-8 ${plan.popular ? 'text-green-500' : 'text-gray-400'}`} />
+                  </div>
+                  <CardTitle className="text-xl sm:text-2xl mb-2">{plan.name}</CardTitle>
+                  <CardDescription className="text-sm mb-4 min-h-[3rem] flex items-center justify-center">
+                    {plan.description}
                   </CardDescription>
+                  <div className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
+                    {plan.price === 0 ? 'Free' : `$${plan.price}`}
+                    {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
+                  </div>
                 </CardHeader>
-                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-                  <ul className="space-y-2 sm:space-y-3">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center space-x-2">
-                        <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-                        <span className="text-sm sm:text-base">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className={`w-full mt-3 sm:mt-4 h-10 sm:h-12 text-sm sm:text-base ${
-                    plan.id === 'free' 
-                      ? 'variant-outline' 
-                      : plan.id === 'family'
-                      ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                      : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600'
-                  }`} variant={plan.id === 'free' ? 'outline' : 'default'}>
+
+                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col justify-between flex-1">
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-800 mb-3">Features</h4>
+                    <ul className="space-y-2">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start space-x-3">
+                          <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-gray-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <Button 
+                    className={`w-full h-12 text-sm sm:text-base font-medium ${
+                      plan.id === 'free' 
+                        ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                        : plan.id === 'family'
+                        ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-white'
+                        : 'bg-gray-800 hover:bg-gray-700 text-white'
+                    }`}
+                  >
                     Choose {plan.name}
                   </Button>
                 </CardContent>
