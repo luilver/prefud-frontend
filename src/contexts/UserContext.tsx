@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 
 interface User {
@@ -99,6 +98,8 @@ interface UserContextType {
   updateUserProfile: (updates: Partial<User>) => void;
   logout: () => void;
   signup: (userData: any) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  isAuthenticated: boolean;
   
   // Ingredients
   ingredients: Ingredient[];
@@ -194,6 +195,32 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     subscription_tier: 'Family',
     subscription_end: '2024-12-31'
   });
+
+  // Authentication computed property
+  const isAuthenticated = user !== null;
+
+  // Authentication methods
+  const login = async (email: string, password: string) => {
+    // Mock login implementation
+    console.log('Logging in user:', email);
+    const mockUser: User = {
+      id: '1',
+      name: 'John Doe',
+      email: email,
+      phone: '+1234567890',
+      subscription: {
+        isSubscribed: true,
+        plan: 'family',
+        planLimits: {
+          usedPlans: 2,
+          plansPerMonth: 5,
+          mealCreations: 8,
+          deliveryCommissions: 1
+        }
+      }
+    };
+    setUser(mockUser);
+  };
 
   const updateUserProfile = (updates: Partial<User>) => {
     if (user) {
@@ -367,6 +394,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     updateUserProfile,
     logout,
     signup,
+    login,
+    isAuthenticated,
     ingredients,
     addIngredient,
     updateIngredient,
