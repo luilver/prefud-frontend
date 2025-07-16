@@ -61,6 +61,7 @@ interface ShoppingItem {
 interface UserContextType {
   user: User | null;
   isSignedIn: boolean;
+  isAuthenticated: boolean;
   mealPlans: any[];
   healthyDrinks: any[];
   ingredients: Ingredient[];
@@ -69,6 +70,7 @@ interface UserContextType {
   paymentMethods: PaymentMethod[];
   subscriptionInfo: any;
   signin: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   signup: (userData: any) => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
@@ -94,7 +96,7 @@ interface UserContextType {
   setDefaultPaymentMethod: (id: string) => Promise<void>;
   acceptSubscription: (plan: string) => Promise<void>;
   cancelSubscription: () => Promise<void>;
-  createCheckoutWithPaymentMethod: (planId: string, paymentMethodId: string) => Promise<void>;
+  createCheckoutWithPaymentMethod: (planId: string, paymentMethodId: string) => Promise<string>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -126,6 +128,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
     setUser(mockUser);
   };
+
+  const login = signin; // Alias for signin
 
   const signup = async (userData: any) => {
     const newUser = {
@@ -333,15 +337,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     } : null);
   };
 
-  const createCheckoutWithPaymentMethod = async (planId: string, paymentMethodId: string) => {
+  const createCheckoutWithPaymentMethod = async (planId: string, paymentMethodId: string): Promise<string> => {
     // Mock checkout implementation
     console.log('Creating checkout with payment method:', { planId, paymentMethodId });
+    return 'https://checkout.stripe.com/mock-session';
   };
 
   return (
     <UserContext.Provider value={{
       user,
       isSignedIn: !!user,
+      isAuthenticated: !!user,
       mealPlans,
       healthyDrinks,
       ingredients,
@@ -350,6 +356,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       paymentMethods,
       subscriptionInfo,
       signin,
+      login,
       signup,
       logout,
       updateUser,
