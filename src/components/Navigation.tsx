@@ -1,13 +1,6 @@
+
 import { Button } from "@/components/ui/button";
-import {
-  ChefHat,
-  BarChart3,
-  Utensils,
-  ShoppingCart,
-  TrendingUp,
-  User,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Calendar, TrendingUp, ShoppingCart, Package, User, Sparkles, Leaf } from "lucide-react";
 
 interface NavigationProps {
   activeTab: string;
@@ -16,75 +9,42 @@ interface NavigationProps {
 
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const navItems = [
-    { id: "planner", label: "Meal Plans", icon: ChefHat, shortLabel: "Plans" },
-
-    {
-      id: "ingredients",
-      label: "Pantry",
-      icon: Utensils,
-      shortLabel: "Pantry",
-    },
-    {
-      id: "shopping",
-      label: "Shopping",
-      icon: ShoppingCart,
-      shortLabel: "Shop",
-    },
-    { id: "calories", label: "Calories", icon: TrendingUp, shortLabel: "Cals" },
-    { id: "profile", label: "Profile", icon: User, shortLabel: "Profile" },
-    {
-      id: "highlights",
-      label: "Highlights",
-      icon: BarChart3,
-      shortLabel: "Stats",
-    },
+    { id: "planner", label: "Planner", icon: Calendar },
+    { id: "highlights", label: "Highlights", icon: Sparkles },
+    { id: "environment", label: "Environment", icon: Leaf },
+    { id: "ingredients", label: "Pantry", icon: Package },
+    { id: "shopping", label: "Shopping", icon: ShoppingCart },
+    { id: "calories", label: "Calories", icon: TrendingUp },
+    { id: "profile", label: "Profile", icon: User },
   ];
 
   return (
-    <nav className="bg-white/90 backdrop-blur-sm border-b border-green-200 sticky top-16 z-40">
-      {/* Desktop Navigation */}
-      <div className="hidden sm:flex container mx-auto px-4 py-2">
-        <div className="flex space-x-1 w-full">
-          {navItems.map((item) => (
-            <Button
-              key={item.id}
-              variant={activeTab === item.id ? "default" : "ghost"}
-              onClick={() => onTabChange(item.id)}
-              className={cn(
-                "flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-all",
-                activeTab === item.id
-                  ? "bg-gradient-to-r from-green-500 to-orange-500 text-white shadow-md"
-                  : "text-gray-600 hover:text-green-700 hover:bg-green-50"
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              <span>{item.label}</span>
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      <div className="sm:hidden px-2 py-2">
-        <div className="flex overflow-x-auto scrollbar-hide space-x-1 pb-1">
-          {navItems.map((item) => (
-            <Button
-              key={item.id}
-              variant={activeTab === item.id ? "default" : "ghost"}
-              onClick={() => onTabChange(item.id)}
-              className={cn(
-                "flex flex-col items-center space-y-1 min-w-[4rem] px-3 py-2 text-xs font-medium transition-all flex-shrink-0",
-                activeTab === item.id
-                  ? "bg-gradient-to-r from-green-500 to-orange-500 text-white shadow-md"
-                  : "text-gray-600 hover:text-green-700 hover:bg-green-50"
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              <span className="text-[10px] leading-tight">
-                {item.shortLabel}
-              </span>
-            </Button>
-          ))}
+    <nav className="bg-white/70 backdrop-blur-sm border-b border-green-200">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 sm:py-3">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            
+            return (
+              <Button
+                key={item.id}
+                variant={isActive ? "default" : "ghost"}
+                onClick={() => onTabChange(item.id)}
+                className={`
+                  flex items-center space-x-1 sm:space-x-2 whitespace-nowrap min-w-fit
+                  text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2
+                  ${isActive 
+                    ? "bg-green-600 text-white shadow-md" 
+                    : "text-green-700 hover:bg-green-100"
+                  }
+                `}
+              >
+                <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </Button>
+            );
+          })}
         </div>
       </div>
     </nav>

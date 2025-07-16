@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +12,7 @@ import ShoppingList from "./ShoppingList";
 import UserProfile from "./UserProfile";
 import SubscriptionManager from "./SubscriptionManager";
 import Highlights from "./Highlights";
+import Environment from "./Environment";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("planner");
@@ -76,6 +76,10 @@ const Dashboard = () => {
 
           <TabsContent value="highlights" className="mt-4 sm:mt-6">
             <Highlights />
+          </TabsContent>
+
+          <TabsContent value="environment" className="mt-4 sm:mt-6">
+            <Environment />
           </TabsContent>
 
           <TabsContent value="ingredients" className="mt-4 sm:mt-6">

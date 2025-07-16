@@ -2,7 +2,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, TrendingUp, ShoppingCart, Utensils } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import CarbonSavingsTracker from "./CarbonSavingsTracker";
 
 const Highlights = () => {
   const { user } = useUser();
@@ -69,9 +68,6 @@ const Highlights = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Carbon Savings Section */}
-      <CarbonSavingsTracker />
     </div>
   );
 };
