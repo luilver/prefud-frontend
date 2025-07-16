@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +14,7 @@ const MealPlanner = () => {
   const [showSpecialMealCreator, setShowSpecialMealCreator] = useState(false);
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const { user, mealPlans, addMealPlan, getMealPlanById } = useUser();
+  const { user, mealPlans, drinks, specialMeals, addMealPlan, addDrink, addSpecialMeal, getMealPlanById } = useUser();
 
   const handlePlanCreated = (newPlan: any) => {
     console.log('New plan created:', newPlan);
@@ -46,14 +45,14 @@ const MealPlanner = () => {
 
   const handleDrinkCreated = (drink: any) => {
     console.log('Drink created:', drink);
+    addDrink(drink);
     setShowDrinkCreator(false);
-    // You can add logic to save the drink to user context if needed
   };
 
   const handleSpecialMealCreated = (meal: any) => {
     console.log('Special meal created:', meal);
+    addSpecialMeal(meal);
     setShowSpecialMealCreator(false);
-    // You can add logic to save the meal to user context if needed
   };
 
   // Update selected meal plan when context changes
@@ -109,7 +108,7 @@ const MealPlanner = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Meal Planner</h1>
-          <p className="text-gray-600 mt-1">Create and manage your weekly meal plans</p>
+          <p className="text-gray-600 mt-1">Create and manage your weekly meal plans, drinks, and special meals</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Button 
@@ -136,45 +135,138 @@ const MealPlanner = () => {
         </div>
       </div>
 
-      {/* Meal Plans Grid */}
-      {mealPlans.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mealPlans.map((plan) => (
-            <Card 
-              key={plan.id} 
-              className="hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => handlePlanSelect(plan)}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ChefHat className="h-5 w-5 text-purple-500" />
-                  {plan.name}
-                </CardTitle>
-                <CardDescription>
-                  {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>{plan.duration || 'Custom duration'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>For {plan.preferences?.people || 'N/A'} people</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{plan.preferences?.mealsPerDay || '3'} meals per day</span>
-                  </div>
-                  <div className="mt-3 text-xs text-gray-500">
-                    {plan.meals?.length || 0} total meals planned
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      {/* Content based on what exists */}
+      {(mealPlans.length > 0 || drinks.length > 0 || specialMeals.length > 0) ? (
+        <div className="space-y-8">
+          {/* Meal Plans Grid */}
+          {mealPlans.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <ChefHat className="h-5 w-5 text-purple-500" />
+                Meal Plans
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {mealPlans.map((plan) => (
+                  <Card 
+                    key={plan.id} 
+                    className="hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => handlePlanSelect(plan)}
+                  >
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <ChefHat className="h-5 w-5 text-purple-500" />
+                        {plan.name}
+                      </CardTitle>
+                      <CardDescription>
+                        {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <span>{plan.duration || 'Custom duration'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          <span>For {plan.preferences?.people || 'N/A'} people</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          <span>{plan.preferences?.mealsPerDay || '3'} meals per day</span>
+                        </div>
+                        <div className="mt-3 text-xs text-gray-500">
+                          {plan.meals?.length || 0} total meals planned
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Drinks Grid */}
+          {drinks.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Coffee className="h-5 w-5 text-blue-500" />
+                Healthy Drinks
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {drinks.map((drink) => (
+                  <Card key={drink.id} className="hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-blue-700">
+                        <Coffee className="h-5 w-5" />
+                        {drink.name}
+                      </CardTitle>
+                      <CardDescription>
+                        {drink.goal} • {drink.calories} cal • {drink.prepTime} min • {drink.servings} serving(s)
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="font-medium text-gray-700">Ingredients:</span>
+                          <p className="text-gray-600">{drink.ingredients.slice(0, 3).join(', ')}{drink.ingredients.length > 3 ? '...' : ''}</p>
+                        </div>
+                        {drink.benefits && (
+                          <div>
+                            <span className="font-medium text-gray-700">Benefits:</span>
+                            <p className="text-gray-600">{drink.benefits.slice(0, 2).join(', ')}</p>
+                          </div>
+                        )}
+                        <div className="text-xs text-gray-500 mt-2">
+                          Created: {new Date(drink.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Special Meals Grid */}
+          {specialMeals.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Utensils className="h-5 w-5 text-green-500" />
+                Special Meals
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {specialMeals.map((meal) => (
+                  <Card key={meal.id} className="hover:shadow-lg transition-shadow bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-green-700">
+                        <Utensils className="h-5 w-5" />
+                        {meal.name}
+                      </CardTitle>
+                      <CardDescription>
+                        {meal.occasion} • {meal.type} • {meal.calories} cal • {meal.prepTime} min • Serves {meal.servings}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="font-medium text-gray-700">Ingredients:</span>
+                          <p className="text-gray-600">{meal.ingredients.slice(0, 3).join(', ')}{meal.ingredients.length > 3 ? '...' : ''}</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-700">Difficulty:</span>
+                          <span className="text-gray-600 ml-1 capitalize">{meal.difficulty}</span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                          Created: {new Date(meal.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <Card className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">

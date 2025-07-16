@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -212,19 +211,48 @@ const DrinkCreator = ({ onDrinkCreated, onBack }: DrinkCreatorProps) => {
   };
 
   const handleOrderIngredients = () => {
+    if (!generatedDrink || !generatedDrink.availability.needed.length) {
+      toast({
+        title: "No Ingredients Needed",
+        description: "You already have all the required ingredients!",
+      });
+      return;
+    }
+
+    // Create shopping list for online ordering
+    const shoppingList = generatedDrink.availability.needed.join(', ');
     toast({
       title: "Order Ingredients",
-      description: "Redirecting to grocery delivery service...",
+      description: `Redirecting to grocery delivery service with: ${shoppingList}`,
     });
-    // Here you would integrate with grocery delivery APIs
+    // Here you would integrate with grocery delivery APIs like Instacart, Amazon Fresh, etc.
   };
 
   const handleShopInStore = () => {
+    if (!generatedDrink || !generatedDrink.availability.needed.length) {
+      toast({
+        title: "No Shopping List Needed",
+        description: "You already have all the required ingredients!",
+      });
+      return;
+    }
+
+    // Generate downloadable shopping list
+    const shoppingListText = `Shopping List for ${generatedDrink.name}\n\nIngredients to buy:\n${generatedDrink.availability.needed.map((item: string) => `• ${item}`).join('\n')}\n\nYou already have:\n${generatedDrink.availability.available.map((item: string) => `• ${item}`).join('\n')}`;
+    
+    // Create and download text file
+    const blob = new Blob([shoppingListText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${generatedDrink.name.replace(/\s+/g, '_')}_shopping_list.txt`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
     toast({
       title: "Shopping List Created",
-      description: "Your shopping list has been prepared for in-store shopping.",
+      description: "Your shopping list has been downloaded for in-store shopping.",
     });
-    // Here you would create a shopping list
   };
 
   if (generatedDrink) {
@@ -337,6 +365,7 @@ const DrinkCreator = ({ onDrinkCreated, onBack }: DrinkCreatorProps) => {
               <Button 
                 onClick={handleOrderIngredients}
                 className="bg-blue-500 hover:bg-blue-600 text-white flex-1"
+                disabled={!generatedDrink.availability.needed.length}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Order Ingredients Online
@@ -345,6 +374,7 @@ const DrinkCreator = ({ onDrinkCreated, onBack }: DrinkCreatorProps) => {
                 onClick={handleShopInStore}
                 variant="outline" 
                 className="border-blue-300 text-blue-700 hover:bg-blue-50 flex-1"
+                disabled={!generatedDrink.availability.needed.length}
               >
                 Create Shopping List
               </Button>

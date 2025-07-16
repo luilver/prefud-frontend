@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -226,16 +225,47 @@ const SpecialMealCreator = ({ onMealCreated, onBack }: SpecialMealCreatorProps) 
   };
 
   const handleOrderIngredients = () => {
+    if (!generatedMeal || !generatedMeal.availability.needed.length) {
+      toast({
+        title: "No Ingredients Needed",
+        description: "You already have all the required ingredients!",
+      });
+      return;
+    }
+
+    // Create shopping list for online ordering
+    const shoppingList = generatedMeal.availability.needed.join(', ');
     toast({
       title: "Order Ingredients",
-      description: "Redirecting to grocery delivery service...",
+      description: `Redirecting to grocery delivery service with: ${shoppingList}`,
     });
+    // Here you would integrate with grocery delivery APIs
   };
 
   const handleShopInStore = () => {
+    if (!generatedMeal || !generatedMeal.availability.needed.length) {
+      toast({
+        title: "No Shopping List Needed",
+        description: "You already have all the required ingredients!",
+      });
+      return;
+    }
+
+    // Generate downloadable shopping list
+    const shoppingListText = `Shopping List for ${generatedMeal.name}\n\nIngredients to buy:\n${generatedMeal.availability.needed.map((item: string) => `• ${item}`).join('\n')}\n\nYou already have:\n${generatedMeal.availability.available.map((item: string) => `• ${item}`).join('\n')}\n\nServes: ${generatedMeal.servings} people\nOccasion: ${generatedMeal.occasion}`;
+    
+    // Create and download text file
+    const blob = new Blob([shoppingListText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${generatedMeal.name.replace(/\s+/g, '_')}_shopping_list.txt`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
     toast({
       title: "Shopping List Created",
-      description: "Your shopping list has been prepared for in-store shopping.",
+      description: "Your shopping list has been downloaded for in-store shopping.",
     });
   };
 
@@ -338,6 +368,7 @@ const SpecialMealCreator = ({ onMealCreated, onBack }: SpecialMealCreatorProps) 
               <Button 
                 onClick={handleOrderIngredients}
                 className="bg-green-500 hover:bg-green-600 text-white flex-1"
+                disabled={!generatedMeal.availability.needed.length}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Order Ingredients Online
@@ -346,6 +377,7 @@ const SpecialMealCreator = ({ onMealCreated, onBack }: SpecialMealCreatorProps) 
                 onClick={handleShopInStore}
                 variant="outline" 
                 className="border-green-300 text-green-700 hover:bg-green-50 flex-1"
+                disabled={!generatedMeal.availability.needed.length}
               >
                 Create Shopping List
               </Button>
