@@ -2,13 +2,17 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Calendar, Users, ChefHat, Clock, Sparkles } from "lucide-react";
+import { Plus, Calendar, Users, ChefHat, Clock, Sparkles, Coffee, Utensils } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
+import DrinkCreator from "./DrinkCreator";
+import SpecialMealCreator from "./SpecialMealCreator";
 
 const MealPlanner = () => {
   const [showCreator, setShowCreator] = useState(false);
+  const [showDrinkCreator, setShowDrinkCreator] = useState(false);
+  const [showSpecialMealCreator, setShowSpecialMealCreator] = useState(false);
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const { user, mealPlans, addMealPlan, getMealPlanById } = useUser();
@@ -27,6 +31,8 @@ const MealPlanner = () => {
 
   const handleBackToPlanner = () => {
     setShowCreator(false);
+    setShowDrinkCreator(false);
+    setShowSpecialMealCreator(false);
     setSelectedMealPlan(null);
     setIsEditing(false);
   };
@@ -36,6 +42,18 @@ const MealPlanner = () => {
     const updatedPlan = getMealPlanById(plan.id) || plan;
     console.log('Selecting plan:', updatedPlan);
     setSelectedMealPlan(updatedPlan);
+  };
+
+  const handleDrinkCreated = (drink: any) => {
+    console.log('Drink created:', drink);
+    setShowDrinkCreator(false);
+    // You can add logic to save the drink to user context if needed
+  };
+
+  const handleSpecialMealCreated = (meal: any) => {
+    console.log('Special meal created:', meal);
+    setShowSpecialMealCreator(false);
+    // You can add logic to save the meal to user context if needed
   };
 
   // Update selected meal plan when context changes
@@ -48,7 +66,7 @@ const MealPlanner = () => {
     }
   }, [mealPlans, selectedMealPlan?.id, getMealPlanById]);
 
-  if (selectedMealPlan && !showCreator) {
+  if (selectedMealPlan && !showCreator && !showDrinkCreator && !showSpecialMealCreator) {
     return (
       <MealPlanView 
         plan={selectedMealPlan} 
@@ -67,6 +85,24 @@ const MealPlanner = () => {
     );
   }
 
+  if (showDrinkCreator) {
+    return (
+      <DrinkCreator
+        onDrinkCreated={handleDrinkCreated}
+        onBack={handleBackToPlanner}
+      />
+    );
+  }
+
+  if (showSpecialMealCreator) {
+    return (
+      <SpecialMealCreator
+        onMealCreated={handleSpecialMealCreated}
+        onBack={handleBackToPlanner}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -75,13 +111,29 @@ const MealPlanner = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Meal Planner</h1>
           <p className="text-gray-600 mt-1">Create and manage your weekly meal plans</p>
         </div>
-        <Button 
-          onClick={() => setShowCreator(true)}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create AI Meal Plan
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <Button 
+            onClick={() => setShowCreator(true)}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create AI Meal Plan
+          </Button>
+          <Button 
+            onClick={() => setShowDrinkCreator(true)}
+            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+          >
+            <Coffee className="h-4 w-4 mr-2" />
+            Create Healthy Drink
+          </Button>
+          <Button 
+            onClick={() => setShowSpecialMealCreator(true)}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+          >
+            <Utensils className="h-4 w-4 mr-2" />
+            Create Special Meal
+          </Button>
+        </div>
       </div>
 
       {/* Meal Plans Grid */}
@@ -135,19 +187,40 @@ const MealPlanner = () => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
                   Welcome to AI Meal Planning, {user?.name?.split(' ')[0] || 'Chef'}!
                 </h3>
-                <p className="text-gray-600 max-w-md mx-auto">
+                <p className="text-gray-600 max-w-md mx-auto mb-4">
                   Create your first personalized meal plan with our AI assistant. 
                   Get customized recipes based on your preferences, dietary needs, and cooking skills.
                 </p>
+                <p className="text-sm text-gray-500 max-w-md mx-auto">
+                  You can also create healthy drinks for specific goals or one-time special meals!
+                </p>
               </div>
-              <Button 
-                onClick={() => setShowCreator(true)}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white mt-4"
-                size="lg"
-              >
-                <Sparkles className="h-5 w-5 mr-2" />
-                Create Your First AI Meal Plan
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button 
+                  onClick={() => setShowCreator(true)}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                  size="lg"
+                >
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  Create Your First AI Meal Plan
+                </Button>
+                <Button 
+                  onClick={() => setShowDrinkCreator(true)}
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+                  size="lg"
+                >
+                  <Coffee className="h-5 w-5 mr-2" />
+                  Create Healthy Drink
+                </Button>
+                <Button 
+                  onClick={() => setShowSpecialMealCreator(true)}
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                  size="lg"
+                >
+                  <Utensils className="h-5 w-5 mr-2" />
+                  Create Special Meal
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
