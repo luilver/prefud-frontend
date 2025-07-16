@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Calendar, TrendingUp, ShoppingCart, Package, User, Sparkles, Leaf } from "lucide-react";
+import { Calendar, TrendingUp, ShoppingCart, Package, User, Sparkles, Leaf, Coffee } from "lucide-react";
 
 interface NavigationProps {
   activeTab: string;
@@ -10,6 +10,7 @@ interface NavigationProps {
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const navItems = [
     { id: "planner", label: "Planner", icon: Calendar },
+    { id: "drinks", label: "Drinks", icon: Coffee },
     { id: "highlights", label: "Highlights", icon: Sparkles },
     { id: "environment", label: "Environment", icon: Leaf },
     { id: "ingredients", label: "Pantry", icon: Package },
