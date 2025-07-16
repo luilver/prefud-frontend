@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,6 @@ import { Utensils, ChefHat, Sparkles, Plus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import Navigation from "./Navigation";
 import MealPlanner from "./MealPlanner";
-import HealthyDrinks from "./HealthyDrinks";
 import CalorieTracker from "./CalorieTracker";
 import IngredientTracker from "./IngredientTracker";
 import ShoppingList from "./ShoppingList";
@@ -65,16 +63,15 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-6 lg:py-8">
+        {/* Welcome Section - Only show on planner tab */}
+        
+
         {/* Tab Content */}
         <Tabs value={activeTab} className="w-full">
           <TabsContent value="planner" className="mt-4 sm:mt-6">
             <div id="meal-planner-section">
               <MealPlanner />
             </div>
-          </TabsContent>
-
-          <TabsContent value="drinks" className="mt-4 sm:mt-6">
-            <HealthyDrinks />
           </TabsContent>
 
           <TabsContent value="highlights" className="mt-4 sm:mt-6">

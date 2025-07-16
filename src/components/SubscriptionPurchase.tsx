@@ -106,9 +106,9 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
     setIsLoading(true);
     try {
       if (selectedPaymentMethod) {
-        // Use existing payment method - pass the plan ID as string
-        const checkoutUrl = await createCheckoutWithPaymentMethod(selectedPlan.id, selectedPaymentMethod);
-        window.open(checkoutUrl, '_blank'); // Pass the URL string, not void
+        // Use existing payment method
+        const checkoutUrl = await createCheckoutWithPaymentMethod(selectedPlan, selectedPaymentMethod);
+        window.open(checkoutUrl, '_blank');
         
         // Simulate successful subscription
         await acceptSubscription(selectedPlan.id);
