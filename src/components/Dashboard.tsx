@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,7 @@ import SubscriptionManager from "./SubscriptionManager";
 import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
+import AIDrinkCreator from "./AIDrinkCreator";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("planner");
@@ -74,6 +76,10 @@ const Dashboard = () => {
 
           <TabsContent value="ai-meals" className="mt-4 sm:mt-6">
             <AIMealCreator />
+          </TabsContent>
+
+          <TabsContent value="ai-drinks" className="mt-4 sm:mt-6">
+            <AIDrinkCreator />
           </TabsContent>
 
           <TabsContent value="highlights" className="mt-4 sm:mt-6">
