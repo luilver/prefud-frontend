@@ -42,15 +42,15 @@ const MealPlanner = () => {
     setIsEditing(false); // Ensure editing mode is off
   };
 
-  // Update selected meal plan when context changes
+  // Update selected meal plan when context changes - but only if we're currently viewing a plan
   useEffect(() => {
-    if (selectedMealPlan) {
+    if (selectedMealPlan && !showCreator) {
       const updatedPlan = getMealPlanById(selectedMealPlan.id);
       if (updatedPlan) {
         setSelectedMealPlan(updatedPlan);
       }
     }
-  }, [mealPlans, selectedMealPlan?.id, getMealPlanById]);
+  }, [mealPlans, selectedMealPlan?.id, getMealPlanById, showCreator]);
 
   // Show meal plan view when a plan is selected and not in creator mode
   if (selectedMealPlan && !showCreator) {
