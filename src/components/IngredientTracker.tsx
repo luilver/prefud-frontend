@@ -15,6 +15,7 @@ const IngredientTracker = () => {
   const { 
     ingredients, 
     deleteIngredient, 
+    updatePantryFromIngredients,
     addIngredient 
   } = useUser();
 
@@ -28,19 +29,20 @@ const IngredientTracker = () => {
   };
 
   const handleAddMealFromAI = (meal: any) => {
+    // When a meal is added from AI suggestions, update pantry
     if (meal.ingredients) {
+      // This would typically happen when the meal is actually prepared
       console.log('Adding AI suggested meal to plan:', meal);
     }
   };
 
-  const getDaysUntilExpiry = (expiryDate: Date | string) => {
+  const getDaysUntilExpiry = (expiryDate: Date) => {
     const today = new Date();
-    const expiry = typeof expiryDate === 'string' ? new Date(expiryDate) : expiryDate;
-    const diffTime = expiry.getTime() - today.getTime();
+    const diffTime = expiryDate.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const getExpiryStatus = (expiryDate: Date | string) => {
+  const getExpiryStatus = (expiryDate: Date) => {
     const days = getDaysUntilExpiry(expiryDate);
     if (days < 0) return { status: "expired", color: "text-red-600", bgColor: "bg-red-50", borderColor: "border-red-200" };
     if (days <= 2) return { status: "urgent", color: "text-orange-600", bgColor: "bg-orange-50", borderColor: "border-orange-200" };
@@ -48,12 +50,11 @@ const IngredientTracker = () => {
     return { status: "fresh", color: "text-green-600", bgColor: "bg-green-50", borderColor: "border-green-200" };
   };
 
-  const formatExpiryDate = (date: Date | string) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('en-US', { 
+  const formatExpiryDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
       month: 'short', 
       day: 'numeric',
-      year: dateObj.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+      year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
     });
   };
 
