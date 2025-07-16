@@ -5,11 +5,6 @@ interface User {
   name: string;
   email: string;
   phone?: string;
-  preferences?: {
-    dietaryRestrictions: string[];
-    allergies: string[];
-    cuisinePreferences: string[];
-  };
   subscription?: {
     isSubscribed: boolean;
     plan: string;
@@ -22,6 +17,11 @@ interface User {
       deliveryCommissions: number;
       homeDeliveries?: number;
     };
+  };
+  preferences?: {
+    dietaryRestrictions: string[];
+    allergies: string[];
+    cuisinePreferences: string[];
   };
 }
 
@@ -155,22 +155,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>({
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    phone: '+1234567890',
-    subscription: {
-      isSubscribed: true,
-      plan: 'family',
-      planLimits: {
-        usedPlans: 2,
-        plansPerMonth: 5,
-        mealCreations: 8,
-        deliveryCommissions: 1
-      }
-    }
-  });
+  const [user, setUser] = useState<User | null>(null);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [drinks, setDrinks] = useState<any[]>([]);
@@ -201,7 +186,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Authentication methods
   const login = async (email: string, password: string) => {
-    // Mock login implementation
     console.log('Logging in user:', email);
     const mockUser: User = {
       id: '1',
@@ -233,7 +217,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signup = async (userData: any) => {
-    // Mock signup implementation
     console.log('Signing up user:', userData);
   };
 
@@ -258,7 +241,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updatePantryFromIngredients = (newIngredients: any[]) => {
-    // Mock implementation for updating pantry
     console.log('Updating pantry from ingredients:', newIngredients);
   };
 
@@ -337,7 +319,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setEcoPoints(prev => prev + points);
   };
 
-  // Mock billing and payment methods
   const getBillingHistory = async () => {
     console.log('Getting billing history');
   };
@@ -388,7 +369,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('Cancelling subscription');
   };
 
-  const value = {
+  const value: UserContextType = {
     user,
     setUser,
     updateUserProfile,
