@@ -13,6 +13,7 @@ import UserProfile from "./UserProfile";
 import SubscriptionManager from "./SubscriptionManager";
 import Highlights from "./Highlights";
 import Environment from "./Environment";
+import AIMealCreator from "./AIMealCreator";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("planner");
@@ -63,15 +64,16 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-6 lg:py-8">
-        {/* Welcome Section - Only show on planner tab */}
-        
-
         {/* Tab Content */}
         <Tabs value={activeTab} className="w-full">
           <TabsContent value="planner" className="mt-4 sm:mt-6">
             <div id="meal-planner-section">
               <MealPlanner />
             </div>
+          </TabsContent>
+
+          <TabsContent value="ai-meals" className="mt-4 sm:mt-6">
+            <AIMealCreator />
           </TabsContent>
 
           <TabsContent value="highlights" className="mt-4 sm:mt-6">

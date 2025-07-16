@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Calendar, TrendingUp, ShoppingCart, Package, User, Sparkles, Leaf } from "lucide-react";
+import { Calendar, TrendingUp, ShoppingCart, Package, User, Sparkles, Leaf, Wand2 } from "lucide-react";
 
 interface NavigationProps {
   activeTab: string;
@@ -10,6 +10,7 @@ interface NavigationProps {
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const navItems = [
     { id: "planner", label: "Planner", icon: Calendar },
+    { id: "ai-meals", label: "AI Meals", icon: Wand2 },
     { id: "highlights", label: "Highlights", icon: Sparkles },
     { id: "environment", label: "Environment", icon: Leaf },
     { id: "ingredients", label: "Pantry", icon: Package },
@@ -35,8 +36,12 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                   flex items-center space-x-1 sm:space-x-2 whitespace-nowrap min-w-fit
                   text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2
                   ${isActive 
-                    ? "bg-green-600 text-white shadow-md" 
-                    : "text-green-700 hover:bg-green-100"
+                    ? item.id === "ai-meals" 
+                      ? "bg-purple-600 text-white shadow-md" 
+                      : "bg-green-600 text-white shadow-md"
+                    : item.id === "ai-meals"
+                      ? "text-purple-700 hover:bg-purple-100"
+                      : "text-green-700 hover:bg-green-100"
                   }
                 `}
               >
