@@ -10,27 +10,29 @@ import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface MealPlanCreatorStepperProps {
+  initialData?: any;
   onPlanCreated: (plan: any) => void;
   onBack: () => void;
+  isEditing?: boolean;
 }
 
-const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorStepperProps) => {
+const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing = false }: MealPlanCreatorStepperProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [planName, setPlanName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [numberOfWeeks, setNumberOfWeeks] = useState(1);
-  const [numberOfPersons, setNumberOfPersons] = useState(1);
-  const [mealsPerDay, setMealsPerDay] = useState(3);
-  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
-  const [cuisinePreferences, setCuisinePreferences] = useState<string[]>([]);
-  const [allergiesIntolerances, setAllergiesIntolerances] = useState<string[]>([]);
-  const [additionalAllergies, setAdditionalAllergies] = useState("");
-  const [maxCookTime, setMaxCookTime] = useState(30);
-  const [cookingSkillLevel, setCookingSkillLevel] = useState("");
-  const [budgetRange, setBudgetRange] = useState("");
-  const [dislikes, setDislikes] = useState<string[]>([]);
+  const [planName, setPlanName] = useState(initialData?.name || "");
+  const [startDate, setStartDate] = useState(initialData?.startDate || "");
+  const [numberOfWeeks, setNumberOfWeeks] = useState(initialData?.numberOfWeeks || 1);
+  const [numberOfPersons, setNumberOfPersons] = useState(initialData?.numberOfPersons || 1);
+  const [mealsPerDay, setMealsPerDay] = useState(initialData?.mealsPerDay || 3);
+  const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>(initialData?.dietaryRestrictions || []);
+  const [cuisinePreferences, setCuisinePreferences] = useState<string[]>(initialData?.cuisinePreferences || []);
+  const [allergiesIntolerances, setAllergiesIntolerances] = useState<string[]>(initialData?.allergiesIntolerances || []);
+  const [additionalAllergies, setAdditionalAllergies] = useState(initialData?.additionalAllergies || "");
+  const [maxCookTime, setMaxCookTime] = useState(initialData?.maxCookTime || 30);
+  const [cookingSkillLevel, setCookingSkillLevel] = useState(initialData?.cookingSkillLevel || "");
+  const [budgetRange, setBudgetRange] = useState(initialData?.budgetRange || "");
+  const [dislikes, setDislikes] = useState<string[]>(initialData?.dislikes || []);
   const [newDislike, setNewDislike] = useState("");
-  const [healthGoals, setHealthGoals] = useState<string[]>([]);
+  const [healthGoals, setHealthGoals] = useState<string[]>(initialData?.healthGoals || []);
   const [isGenerating, setIsGenerating] = useState(false);
   
   const { ingredients } = useUser();
@@ -267,7 +269,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
       }
 
       const mockMealPlan = {
-        id: Date.now().toString(),
+        id: isEditing ? initialData?.id : Date.now().toString(),
         name: planName,
         startDate,
         endDate,
@@ -289,7 +291,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
       onPlanCreated(mockMealPlan);
       
       toast({
-        title: "Meal Plan Generated!",
+        title: isEditing ? "Meal Plan Updated!" : "Meal Plan Generated!",
         description: `Your personalized meal plan "${planName}" is ready for ${numberOfWeeks} week${numberOfWeeks > 1 ? 's' : ''} and ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}.`,
       });
 
@@ -661,7 +663,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-sm sm:text-lg py-4 sm:py-6"
               >
                 <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                {isGenerating ? "Generating Your Plan..." : "Generate AI Meal Plan"}
+                {isGenerating ? "Generating Your Plan..." : (isEditing ? "Update AI Meal Plan" : "Generate AI Meal Plan")}
               </Button>
               
               {isGenerating && (
@@ -731,7 +733,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack }: MealPlanCreatorSteppe
             <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
             Back
           </Button>
-          <h2 className="text-lg sm:text-2xl font-bold text-gray-800">AI Meal Plan</h2>
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-800">{isEditing ? "Edit Meal Plan" : "AI Meal Plan"}</h2>
           <div></div>
         </div>
 
