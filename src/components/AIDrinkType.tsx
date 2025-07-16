@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -6,6 +5,9 @@ interface AIDrinkTypeProps {
   data: any;
   onUpdate: (key: string, value: any) => void;
   onNext: () => void;
+  onPrevious?: () => void;
+  isFirstStep?: boolean;
+  isLastStep?: boolean;
 }
 
 const AIDrinkType = ({ data, onUpdate, onNext }: AIDrinkTypeProps) => {

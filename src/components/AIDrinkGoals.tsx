@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,6 +6,9 @@ interface AIDrinkGoalsProps {
   data: any;
   onUpdate: (key: string, value: any) => void;
   onNext: () => void;
+  onPrevious?: () => void;
+  isFirstStep?: boolean;
+  isLastStep?: boolean;
 }
 
 const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
