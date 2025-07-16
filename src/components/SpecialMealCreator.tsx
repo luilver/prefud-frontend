@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -188,6 +189,9 @@ const SpecialMealCreator = ({ onMealCreated, onBack }: SpecialMealCreatorProps) 
 
       const selectedMeal = sampleMeals[occasion as keyof typeof sampleMeals] || sampleMeals["romantic dinner"];
       
+      // Check ingredient availability first
+      const availability = checkIngredientAvailability(selectedMeal.ingredients);
+      
       const mealData = {
         id: Date.now().toString(),
         ...selectedMeal,
@@ -199,12 +203,9 @@ const SpecialMealCreator = ({ onMealCreated, onBack }: SpecialMealCreatorProps) 
         budgetRange,
         dislikes,
         specialRequests,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        availability
       };
-
-      // Check ingredient availability
-      const availability = checkIngredientAvailability(mealData.ingredients);
-      mealData.availability = availability;
 
       setGeneratedMeal(mealData);
 

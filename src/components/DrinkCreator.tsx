@@ -178,6 +178,9 @@ const DrinkCreator = ({ onDrinkCreated, onBack }: DrinkCreatorProps) => {
 
       const mockDrink = sampleDrinks[drinkGoal as keyof typeof sampleDrinks] || sampleDrinks["energy-boost"];
       
+      // Check ingredient availability first
+      const availability = checkIngredientAvailability(mockDrink.ingredients);
+      
       const drinkData = {
         id: Date.now().toString(),
         ...mockDrink,
@@ -186,12 +189,9 @@ const DrinkCreator = ({ onDrinkCreated, onBack }: DrinkCreatorProps) => {
         dietaryRestrictions,
         allergiesIntolerances,
         flavorPreferences,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        availability
       };
-
-      // Check ingredient availability
-      const availability = checkIngredientAvailability(drinkData.ingredients);
-      drinkData.availability = availability;
 
       setGeneratedDrink(drinkData);
 
