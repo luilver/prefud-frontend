@@ -18,6 +18,7 @@ const MealPlanner = () => {
     addMealPlan(newPlan);
     setShowCreator(false);
     setSelectedMealPlan(newPlan);
+    setIsEditing(false);
   };
 
   const handleEditPlan = () => {
@@ -26,6 +27,7 @@ const MealPlanner = () => {
   };
 
   const handleBackToPlanner = () => {
+    console.log('Navigating back to meal planner');
     setShowCreator(false);
     setSelectedMealPlan(null);
     setIsEditing(false);
@@ -36,6 +38,8 @@ const MealPlanner = () => {
     const updatedPlan = getMealPlanById(plan.id) || plan;
     console.log('Selecting plan:', updatedPlan);
     setSelectedMealPlan(updatedPlan);
+    setShowCreator(false); // Ensure creator is not shown when selecting a plan
+    setIsEditing(false); // Ensure editing mode is off
   };
 
   // Update selected meal plan when context changes
@@ -48,6 +52,7 @@ const MealPlanner = () => {
     }
   }, [mealPlans, selectedMealPlan?.id, getMealPlanById]);
 
+  // Show meal plan view when a plan is selected and not in creator mode
   if (selectedMealPlan && !showCreator) {
     return (
       <MealPlanView 
@@ -58,15 +63,19 @@ const MealPlanner = () => {
     );
   }
 
+  // Show creator when in creator mode
   if (showCreator) {
     return (
       <MealPlanCreatorStepper
+        initialData={isEditing ? selectedMealPlan : undefined}
         onPlanCreated={handlePlanCreated}
         onBack={handleBackToPlanner}
+        isEditing={isEditing}
       />
     );
   }
 
+  // Default view: show meal planner dashboard
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -76,7 +85,11 @@ const MealPlanner = () => {
           <p className="text-gray-600 mt-1">Create and manage your weekly meal plans</p>
         </div>
         <Button 
-          onClick={() => setShowCreator(true)}
+          onClick={() => {
+            setShowCreator(true);
+            setSelectedMealPlan(null);
+            setIsEditing(false);
+          }}
           className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -141,7 +154,11 @@ const MealPlanner = () => {
                 </p>
               </div>
               <Button 
-                onClick={() => setShowCreator(true)}
+                onClick={() => {
+                  setShowCreator(true);
+                  setSelectedMealPlan(null);
+                  setIsEditing(false);
+                }}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white mt-4"
                 size="lg"
               >
