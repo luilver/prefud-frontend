@@ -1,10 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { List, ListItem, ListIcon, OrderedList, UnorderedList } from "@/components/ui/list"
 import { CheckCircle, Circle, Utensils, ChevronsLeft, Plus, ShoppingCart, Edit, Trash2, Check, Store } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
@@ -35,16 +35,17 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 interface MealPlanViewProps {
-  planId: string;
+  plan: any;
   onBack: () => void;
+  onEdit: () => void;
 }
 
-const MealPlanView = ({ planId, onBack }: MealPlanViewProps) => {
-  const { getMealPlanById, updateMealPlan, addIngredient, addShoppingItem, ingredients, shoppingItems } = useUser();
+const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
+  const { updateMealPlan, addIngredient, addShoppingItem, ingredients, shoppingItems } = useUser();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [mealPlan, setMealPlan] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [mealPlan, setMealPlan] = useState<any>(plan);
+  const [isLoading, setIsLoading] = useState(false);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notes, setNotes] = useState("");
   const [showIngredientDialog, setShowIngredientDialog] = useState(false);
@@ -64,13 +65,11 @@ const MealPlanView = ({ planId, onBack }: MealPlanViewProps) => {
   const [datePickerType, setDatePickerType] = useState<'expiry' | 'purchase'>('expiry');
 
   useEffect(() => {
-    const plan = getMealPlanById(planId);
     if (plan) {
       setMealPlan(plan);
       setNotes(plan.notes || "");
     }
-    setIsLoading(false);
-  }, [planId, getMealPlanById]);
+  }, [plan]);
 
   const handleEditNotes = () => {
     setIsEditingNotes(true);
@@ -93,7 +92,7 @@ const MealPlanView = ({ planId, onBack }: MealPlanViewProps) => {
   const handleAddToPantry = async (ingredient: any) => {
     try {
       addIngredient({
-        id: Date.now().toString(), // Add the missing id property
+        id: Date.now().toString(),
         name: ingredient.name,
         quantity: ingredient.quantity,
         unit: ingredient.unit,
@@ -182,10 +181,6 @@ const MealPlanView = ({ planId, onBack }: MealPlanViewProps) => {
     }
   };
 
-  if (isLoading) {
-    return <div className="text-center p-4">Loading meal plan...</div>;
-  }
-
   if (!mealPlan) {
     return <div className="text-center p-4">Meal plan not found.</div>;
   }
@@ -242,11 +237,11 @@ const MealPlanView = ({ planId, onBack }: MealPlanViewProps) => {
             <div>
               <h3 className="text-lg font-semibold mb-2">Instructions</h3>
               <ScrollArea className="h-[200px] rounded-md border">
-                <OrderedList className="list-decimal pl-6">
+                <ol className="list-decimal pl-6 space-y-2">
                   {mealPlan.instructions && mealPlan.instructions.map((instruction: string, index: number) => (
-                    <ListItem key={index}>{instruction}</ListItem>
+                    <li key={index} className="text-sm">{instruction}</li>
                   ))}
-                </OrderedList>
+                </ol>
               </ScrollArea>
             </div>
           </div>
