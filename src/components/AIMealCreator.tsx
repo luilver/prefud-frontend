@@ -2,14 +2,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2 } from "lucide-react";
+import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2, Eye } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import AIMealCreatorStepper from "./AIMealCreatorStepper";
+import AIMealView from "./AIMealView";
 
 const AIMealCreator = () => {
   const [showCreator, setShowCreator] = useState(false);
-  const [createdMeals, setCreatedMeals] = useState<any[]>([]);
-  const { user } = useUser();
+  const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const { aiMeals, addAIMeal } = useUser();
 
   const handleStartCreation = () => {
     setShowCreator(true);
@@ -17,11 +18,20 @@ const AIMealCreator = () => {
 
   const handleBackToList = () => {
     setShowCreator(false);
+    setSelectedMeal(null);
   };
 
   const handleMealCreated = (meal: any) => {
-    setCreatedMeals(prev => [...prev, meal]);
+    const newMeal = {
+      ...meal,
+      id: Date.now().toString()
+    };
+    addAIMeal(newMeal);
     setShowCreator(false);
+  };
+
+  const handleViewMeal = (meal: any) => {
+    setSelectedMeal(meal);
   };
 
   if (showCreator) {
@@ -29,6 +39,15 @@ const AIMealCreator = () => {
       <AIMealCreatorStepper 
         onBack={handleBackToList}
         onMealCreated={handleMealCreated}
+      />
+    );
+  }
+
+  if (selectedMeal) {
+    return (
+      <AIMealView 
+        meal={selectedMeal}
+        onBack={handleBackToList}
       />
     );
   }
@@ -63,11 +82,11 @@ const AIMealCreator = () => {
       </div>
 
       {/* Created Meals List */}
-      {createdMeals.length > 0 && (
+      {aiMeals.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-center">Your AI Created Meals</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {createdMeals.map((meal, index) => (
+            {aiMeals.map((meal, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center space-x-2">
@@ -90,7 +109,13 @@ const AIMealCreator = () => {
                       </span>
                     ))}
                   </div>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleViewMeal(meal)}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
                     View Recipe
                   </Button>
                 </CardContent>
@@ -101,7 +126,7 @@ const AIMealCreator = () => {
       )}
 
       {/* Empty State */}
-      {createdMeals.length === 0 && (
+      {aiMeals.length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
             <div className="space-y-4">

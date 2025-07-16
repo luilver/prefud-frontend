@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +8,10 @@ import { toast } from "sonner";
 interface AIDrinkGenerationProps {
   data: any;
   onUpdate: (key: string, value: any) => void;
+  onDrinkCreated?: (drink: any) => void;
 }
 
-const AIDrinkGeneration = ({ data }: AIDrinkGenerationProps) => {
+const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => {
   const [isGenerating, setIsGenerating] = useState(true);
   const [generatedDrink, setGeneratedDrink] = useState<any>(null);
 
@@ -35,6 +35,7 @@ const AIDrinkGeneration = ({ data }: AIDrinkGenerationProps) => {
 
       const mockDrink = {
         name: `Healthy ${drinkTypes[data.type as keyof typeof drinkTypes] || 'Drink'}`,
+        type: data.type,
         description: "A nutritious and delicious drink crafted specifically for your health goals and ingredient preferences.",
         prepTime: "5-10 minutes",
         servings: 1,
@@ -77,7 +78,12 @@ const AIDrinkGeneration = ({ data }: AIDrinkGenerationProps) => {
   };
 
   const saveDrink = () => {
-    toast.success("Drink recipe saved to your collection!");
+    if (generatedDrink && onDrinkCreated) {
+      onDrinkCreated(generatedDrink);
+      toast.success("Drink recipe saved successfully!");
+    } else {
+      toast.success("Drink recipe saved to your collection!");
+    }
   };
 
   if (isGenerating) {

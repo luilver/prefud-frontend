@@ -92,6 +92,34 @@ interface SubscriptionInfo {
   stripe_customer_id: string | null;
 }
 
+interface AIMeal {
+  id: string;
+  name: string;
+  type: string;
+  cuisine: string;
+  cookingTime: number;
+  difficulty: string;
+  description: string;
+  tags: string[];
+  ingredients: string[];
+  instructions: string[];
+  calories: number;
+  prepTime: string;
+}
+
+interface AIDrink {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  prepTime: string;
+  calories: number;
+  ingredients: { name: string; amount: string }[];
+  instructions: string[];
+  nutritionHighlights: string[];
+  tips: string[];
+}
+
 interface UserContextType {
   user: User | null;
   pantryItems: PantryItem[];
@@ -141,6 +169,12 @@ interface UserContextType {
   cancelSubscription: () => Promise<void>;
   checkSubscription: () => Promise<void>;
   createCheckoutWithPaymentMethod: (plan: any, paymentMethodId?: string) => Promise<string>;
+  aiMeals: AIMeal[];
+  aiDrinks: AIDrink[];
+  addAIMeal: (meal: AIMeal) => void;
+  addAIDrink: (drink: AIDrink) => void;
+  deleteAIMeal: (id: string) => void;
+  deleteAIDrink: (id: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -164,6 +198,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
+  const [aiMeals, setAIMeals] = useState<AIMeal[]>([]);
+  const [aiDrinks, setAIDrinks] = useState<AIDrink[]>([]);
 
   // Computed properties
   const ingredients = pantryItems;
@@ -177,6 +213,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const savedMealPlans = localStorage.getItem('mealPlans');
     const savedCompletedMeals = localStorage.getItem('completedMeals');
     const savedSubscriptionInfo = localStorage.getItem('subscriptionInfo');
+    const savedAIMeals = localStorage.getItem('aiMeals');
+    const savedAIDrinks = localStorage.getItem('aiDrinks');
 
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -208,6 +246,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
     if (savedSubscriptionInfo) {
       setSubscriptionInfo(JSON.parse(savedSubscriptionInfo));
+    }
+    if (savedAIMeals) {
+      setAIMeals(JSON.parse(savedAIMeals));
+    }
+    if (savedAIDrinks) {
+      setAIDrinks(JSON.parse(savedAIDrinks));
     }
   }, []);
 
@@ -256,6 +300,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem('subscriptionInfo', JSON.stringify(subscriptionInfo));
     }
   }, [subscriptionInfo]);
+
+  useEffect(() => {
+    localStorage.setItem('aiMeals', JSON.stringify(aiMeals));
+  }, [aiMeals]);
+
+  useEffect(() => {
+    localStorage.setItem('aiDrinks', JSON.stringify(aiDrinks));
+  }, [aiDrinks]);
 
   // Sync shopping items back to active meal plan when shopping items change
   useEffect(() => {
@@ -738,6 +790,22 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const addAIMeal = (meal: AIMeal) => {
+    setAIMeals(prev => [...prev, meal]);
+  };
+
+  const addAIDrink = (drink: AIDrink) => {
+    setAIDrinks(prev => [...prev, drink]);
+  };
+
+  const deleteAIMeal = (id: string) => {
+    setAIMeals(prev => prev.filter(meal => meal.id !== id));
+  };
+
+  const deleteAIDrink = (id: string) => {
+    setAIDrinks(prev => prev.filter(drink => drink.id !== id));
+  };
+
   const value = {
     user,
     pantryItems,
@@ -787,6 +855,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     cancelSubscription,
     checkSubscription,
     createCheckoutWithPaymentMethod,
+    aiMeals,
+    aiDrinks,
+    addAIMeal,
+    addAIDrink,
+    deleteAIMeal,
+    deleteAIDrink,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
