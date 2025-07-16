@@ -42,8 +42,8 @@ const MealPlanner = () => {
     const updatedPlan = getMealPlanById(plan.id) || plan;
     console.log('Selecting plan:', updatedPlan);
     setSelectedMealPlan(updatedPlan);
-    setShowCreator(false); // Ensure creator is not shown when selecting a plan
-    setIsEditing(false); // Ensure editing mode is off
+    setShowCreator(false);
+    setIsEditing(false);
     isNavigatingBack.current = false;
   };
 
@@ -126,15 +126,15 @@ const MealPlanner = () => {
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{plan.duration || 'Custom duration'}</span>
+                    <span>{plan.numberOfWeeks || 'Custom duration'} week{(plan.numberOfWeeks || 1) > 1 ? 's' : ''}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    <span>For {plan.preferences?.people || 'N/A'} people</span>
+                    <span>For {plan.numberOfPersons || 'N/A'} people</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <span>{plan.preferences?.mealsPerDay || '3'} meals per day</span>
+                    <span>{plan.mealsPerDay || '3'} meals per day</span>
                   </div>
                   <div className="mt-3 text-xs text-gray-500">
                     {plan.meals?.length || 0} total meals planned
