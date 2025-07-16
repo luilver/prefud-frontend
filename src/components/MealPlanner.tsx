@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Calendar, Users, ChefHat, Clock, Sparkles } from "lucide-react";
@@ -11,6 +11,7 @@ const MealPlanner = () => {
   const [showCreator, setShowCreator] = useState(false);
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const isNavigatingBack = useRef(false);
   const { user, mealPlans, addMealPlan, getMealPlanById } = useUser();
 
   const handlePlanCreated = (newPlan: any) => {
@@ -19,15 +20,18 @@ const MealPlanner = () => {
     setShowCreator(false);
     setSelectedMealPlan(newPlan);
     setIsEditing(false);
+    isNavigatingBack.current = false;
   };
 
   const handleEditPlan = () => {
     setIsEditing(true);
     setShowCreator(true);
+    isNavigatingBack.current = false;
   };
 
   const handleBackToPlanner = () => {
     console.log('Navigating back to meal planner - resetting all states');
+    isNavigatingBack.current = true;
     setShowCreator(false);
     setSelectedMealPlan(null);
     setIsEditing(false);
@@ -40,11 +44,12 @@ const MealPlanner = () => {
     setSelectedMealPlan(updatedPlan);
     setShowCreator(false); // Ensure creator is not shown when selecting a plan
     setIsEditing(false); // Ensure editing mode is off
+    isNavigatingBack.current = false;
   };
 
-  // Update selected meal plan when context changes - but only if we're currently viewing a plan
+  // Update selected meal plan when context changes - but only if we're viewing a plan and not navigating back
   useEffect(() => {
-    if (selectedMealPlan && !showCreator) {
+    if (selectedMealPlan && !showCreator && !isNavigatingBack.current) {
       const updatedPlan = getMealPlanById(selectedMealPlan.id);
       if (updatedPlan) {
         setSelectedMealPlan(updatedPlan);
@@ -90,6 +95,7 @@ const MealPlanner = () => {
             setShowCreator(true);
             setSelectedMealPlan(null);
             setIsEditing(false);
+            isNavigatingBack.current = false;
           }}
           className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
         >
@@ -160,6 +166,7 @@ const MealPlanner = () => {
                   setShowCreator(true);
                   setSelectedMealPlan(null);
                   setIsEditing(false);
+                  isNavigatingBack.current = false;
                 }}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white mt-4"
                 size="lg"
