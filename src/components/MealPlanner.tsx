@@ -27,7 +27,7 @@ const MealPlanner = () => {
   };
 
   const handleBackToPlanner = () => {
-    console.log('Navigating back to meal planner');
+    console.log('Navigating back to meal planner - resetting all states');
     setShowCreator(false);
     setSelectedMealPlan(null);
     setIsEditing(false);
@@ -86,6 +86,7 @@ const MealPlanner = () => {
         </div>
         <Button 
           onClick={() => {
+            console.log('Creating new meal plan');
             setShowCreator(true);
             setSelectedMealPlan(null);
             setIsEditing(false);
@@ -155,6 +156,7 @@ const MealPlanner = () => {
               </div>
               <Button 
                 onClick={() => {
+                  console.log('Creating first meal plan');
                   setShowCreator(true);
                   setSelectedMealPlan(null);
                   setIsEditing(false);
