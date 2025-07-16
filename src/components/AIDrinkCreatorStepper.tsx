@@ -10,9 +10,10 @@ import AIDrinkGeneration from "./AIDrinkGeneration";
 
 interface AIDrinkCreatorStepperProps {
   onBack: () => void;
+  onDrinkCreated: (drink: any) => void;
 }
 
-const AIDrinkCreatorStepper = ({ onBack }: AIDrinkCreatorStepperProps) => {
+const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepperProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [drinkData, setDrinkData] = useState({
     type: '',
@@ -78,6 +79,7 @@ const AIDrinkCreatorStepper = ({ onBack }: AIDrinkCreatorStepperProps) => {
             onUpdate={updateDrinkData}
             onNext={handleNext}
             onPrevious={handlePrevious}
+            onDrinkCreated={onDrinkCreated}
             isFirstStep={currentStep === 1}
             isLastStep={currentStep === steps.length}
           />
