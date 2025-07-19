@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,14 +32,14 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
     setIsVideoPlaying(false);
   };
 
-  const nutrition = {
+  const nutrition = useMemo(() => ({
     calories: meal.calories,
     protein: Math.floor(meal.calories * 0.2 / 4),
     carbs: Math.floor(meal.calories * 0.5 / 4),
     fat: Math.floor(meal.calories * 0.3 / 9),
     fiber: Math.floor(Math.random() * 8) + 3,
     sodium: Math.floor(Math.random() * 800) + 200
-  };
+  }), [meal.calories]);
 
   const getIngredientsWithQuantities = (ingredients: string[]) => {
     return ingredients.map(ingredient => {
@@ -76,9 +76,9 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
     });
   };
 
-  const enhancedIngredients = getIngredientsWithQuantities(meal.ingredients);
+  const enhancedIngredients = useMemo(() => getIngredientsWithQuantities(meal.ingredients), [meal.ingredients]);
 
-  const getEnhancedInstructions = (instructions: string[]) => {
+  const enhancedInstructions = useMemo(() => {
     const cookingTips = [
       "🔥 Heat your pan to medium-high heat",
       "⏱️ Don't rush this step - patience makes perfect!",
@@ -90,14 +90,12 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
       "🏆 Final stretch - you've got this!"
     ];
     
-    return instructions.map((instruction, index) => ({
+    return meal.instructions.map((instruction: string, index: number) => ({
       text: instruction,
       tip: cookingTips[index % cookingTips.length],
-      estimatedTime: Math.floor(Math.random() * 5) + 2
+      estimatedTime: 2 + (index % 5) // Fixed time based on step index instead of random
     }));
-  };
-
-  const enhancedInstructions = getEnhancedInstructions(meal.instructions);
+  }, [meal.instructions]);
 
   return (
     <>

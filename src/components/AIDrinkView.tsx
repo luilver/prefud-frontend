@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,10 +41,10 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
     onBack();
   };
 
-  const getEnhancedInstructions = (instructions: string[]) => {
+  const enhancedInstructions = useMemo(() => {
     const drinkTips = [
       "🥤 Use fresh ingredients for best taste",
-      "⏱️ Blend slowly at first, then increase speed",
+      "⏱️ Blend slowly at first, then increase speed", 
       "🧊 Add ice for a refreshing chill",
       "🌟 Taste and adjust sweetness as needed",
       "💡 Serve immediately for optimal freshness",
@@ -54,14 +53,12 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
       "🏆 Enjoy your healthy creation!"
     ];
     
-    return instructions.map((instruction, index) => ({
+    return drink.instructions.map((instruction: string, index: number) => ({
       text: instruction,
       tip: drinkTips[index % drinkTips.length],
-      estimatedTime: Math.floor(Math.random() * 3) + 1
+      estimatedTime: 1 + (index % 3) // Fixed time based on step index instead of random
     }));
-  };
-
-  const enhancedInstructions = getEnhancedInstructions(drink.instructions);
+  }, [drink.instructions]);
 
   return (
     <>
@@ -223,7 +220,6 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   </CardContent>
                 </Card>
 
-                {/* Health Benefits */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
@@ -243,7 +239,6 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   </CardContent>
                 </Card>
 
-                {/* Tips */}
                 {drink.tips && drink.tips.length > 0 && (
                   <Card>
                     <CardHeader>
