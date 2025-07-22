@@ -1,15 +1,14 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Leaf, Truck, ChefHat, TreePine, Calendar, TrendingUp } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 const CarbonSavingsTracker = () => {
   const [timePeriod, setTimePeriod] = useState("week");
   const { ingredients } = useUser();
-  const { t } = useLanguage();
 
   // Mock calculations - in real app these would come from actual data
   const calculateSavings = () => {
@@ -43,9 +42,9 @@ const CarbonSavingsTracker = () => {
 
   const getPeriodText = () => {
     switch(timePeriod) {
-      case "month": return t('carbon.period.month');
-      case "year": return t('carbon.period.year');
-      default: return t('carbon.period.week');
+      case "month": return "this month";
+      case "year": return "this year";
+      default: return "this week";
     }
   };
 
@@ -55,18 +54,18 @@ const CarbonSavingsTracker = () => {
         <div>
           <h3 className="text-xl font-semibold text-gray-800 flex items-center space-x-2">
             <Leaf className="h-5 w-5 text-green-600" />
-            <span>{t('carbon.title')}</span>
+            <span>Carbon Impact</span>
           </h3>
-          <p className="text-gray-600 text-sm">{t('carbon.subtitle')}</p>
+          <p className="text-gray-600 text-sm">Your environmental impact from smart meal planning</p>
         </div>
         <Select value={timePeriod} onValueChange={setTimePeriod}>
           <SelectTrigger className="w-32">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="week">{t('carbon.time.week')}</SelectItem>
-            <SelectItem value="month">{t('carbon.time.month')}</SelectItem>
-            <SelectItem value="year">{t('carbon.time.year')}</SelectItem>
+            <SelectItem value="week">This Week</SelectItem>
+            <SelectItem value="month">This Month</SelectItem>
+            <SelectItem value="year">This Year</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -77,9 +76,9 @@ const CarbonSavingsTracker = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-green-600 font-medium">{t('carbon.foodWaste.title')}</p>
+                <p className="text-sm text-green-600 font-medium">Food Waste Prevented</p>
                 <p className="text-2xl font-bold text-green-700">{savings.foodWaste} kg</p>
-                <p className="text-xs text-green-600">{t('carbon.foodWaste.saved')} {getPeriodText()}</p>
+                <p className="text-xs text-green-600">CO₂ saved {getPeriodText()}</p>
               </div>
               <div className="p-2 bg-green-100 rounded-full">
                 <Leaf className="h-6 w-6 text-green-600" />
@@ -93,9 +92,9 @@ const CarbonSavingsTracker = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-600 font-medium">{t('carbon.mealPrep.title')}</p>
+                <p className="text-sm text-blue-600 font-medium">Home Cooking</p>
                 <p className="text-2xl font-bold text-blue-700">{savings.mealPrep} kg</p>
-                <p className="text-xs text-blue-600">{t('carbon.mealPrep.saved')}</p>
+                <p className="text-xs text-blue-600">CO₂ saved vs takeout</p>
               </div>
               <div className="p-2 bg-blue-100 rounded-full">
                 <ChefHat className="h-6 w-6 text-blue-600" />
@@ -109,9 +108,9 @@ const CarbonSavingsTracker = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-orange-600 font-medium">{t('carbon.delivery.title')}</p>
+                <p className="text-sm text-orange-600 font-medium">Delivery Estimate</p>
                 <p className="text-2xl font-bold text-orange-700">{savings.deliveryEmission} kg</p>
-                <p className="text-xs text-orange-600">{t('carbon.delivery.description')}</p>
+                <p className="text-xs text-orange-600">CO₂ per grocery delivery</p>
               </div>
               <div className="p-2 bg-orange-100 rounded-full">
                 <Truck className="h-6 w-6 text-orange-600" />
@@ -126,35 +125,35 @@ const CarbonSavingsTracker = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <TrendingUp className="h-5 w-5" />
-            <span>{t('carbon.impact.title')}</span>
+            <span>Total Environmental Impact</span>
           </CardTitle>
           <CardDescription className="text-green-100">
-            {t('carbon.impact.subtitle')} {getPeriodText()}
+            Your positive impact {getPeriodText()}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <p className="text-3xl font-bold mb-2">{savings.total} kg CO₂</p>
-              <p className="text-green-100">{t('carbon.impact.total')}</p>
+              <p className="text-green-100">Total carbon emissions saved</p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold mb-3">{t('carbon.equivalents.title')}</h4>
+              <h4 className="font-semibold mb-3">That's equivalent to:</h4>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div className="text-center bg-white/10 rounded-lg p-2">
                   <TreePine className="h-4 w-4 mx-auto mb-1" />
                   <p className="font-medium">{equivalents.trees}</p>
-                  <p className="text-xs opacity-90">{t('carbon.equivalents.trees')}</p>
+                  <p className="text-xs opacity-90">trees planted</p>
                 </div>
                 <div className="text-center bg-white/10 rounded-lg p-2">
                   <Calendar className="h-4 w-4 mx-auto mb-1" />
                   <p className="font-medium">{equivalents.carMiles}</p>
-                  <p className="text-xs opacity-90">{t('carbon.equivalents.carMiles')}</p>
+                  <p className="text-xs opacity-90">car miles</p>
                 </div>
                 <div className="text-center bg-white/10 rounded-lg p-2">
                   <Leaf className="h-4 w-4 mx-auto mb-1" />
                   <p className="font-medium">{equivalents.lightBulbs}</p>
-                  <p className="text-xs opacity-90">{t('carbon.equivalents.lightBulbs')}</p>
+                  <p className="text-xs opacity-90">LED bulbs/year</p>
                 </div>
               </div>
             </div>
@@ -165,14 +164,14 @@ const CarbonSavingsTracker = () => {
       {/* Tips */}
       <Card className="bg-white/70 backdrop-blur-sm border-gray-200">
         <CardHeader>
-          <CardTitle className="text-lg">💡 {t('carbon.tips.title')}</CardTitle>
+          <CardTitle className="text-lg">💡 Reduce Your Carbon Footprint</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm text-gray-600">
-            <p>• {t('carbon.tips.tip1')}</p>
-            <p>• {t('carbon.tips.tip2')}</p>
-            <p>• {t('carbon.tips.tip3')}</p>
-            <p>• {t('carbon.tips.tip4')}</p>
+            <p>• Plan meals to use ingredients before expiry dates</p>
+            <p>• Cook at home instead of ordering takeout</p>
+            <p>• Batch grocery deliveries to reduce transport emissions</p>
+            <p>• Use seasonal and local ingredients when possible</p>
           </div>
         </CardContent>
       </Card>
