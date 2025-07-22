@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import UserProfileForm from "./UserProfileForm";
 import OTPVerification from "./OTPVerification";
 import PaymentForm from "./PaymentForm";
@@ -42,6 +43,7 @@ const SignupSteps = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
+  const { t } = useLanguage();
 
   // Updated subscription plans to match pricing page
   const subscriptionPlans = [
@@ -226,17 +228,17 @@ const SignupSteps = () => {
         </div>
       </div>
 
-      {/* Step 1: Basic Info - Removed phone fields */}
+      {/* Step 1: Basic Info - Now with translations */}
       {currentStep === 1 && (
         <Card className="max-w-full sm:max-w-md mx-auto bg-white/90 backdrop-blur-sm">
           <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-            <CardTitle className="text-lg sm:text-xl">Create Your Account</CardTitle>
-            <CardDescription className="text-sm sm:text-base">Enter your email and password to get started</CardDescription>
+            <CardTitle className="text-lg sm:text-xl">{t('signup.account.title')}</CardTitle>
+            <CardDescription className="text-sm sm:text-base">{t('signup.account.description')}</CardDescription>
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleBasicInfoSubmit} className="space-y-3 sm:space-y-4">
               <div>
-                <Label htmlFor="email" className="text-sm sm:text-base">Email Address</Label>
+                <Label htmlFor="email" className="text-sm sm:text-base">{t('signup.account.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -248,7 +250,7 @@ const SignupSteps = () => {
               </div>
               
               <div>
-                <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
+                <Label htmlFor="password" className="text-sm sm:text-base">{t('signup.account.password')}</Label>
                 <div className="relative mt-1">
                   <Input
                     id="password"
@@ -279,7 +281,7 @@ const SignupSteps = () => {
                 className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
                 disabled={isLoading}
               >
-                {isLoading ? 'Sending Verification...' : 'Continue'}
+                {isLoading ? t('signup.account.sending') : t('signup.account.continue')}
               </Button>
             </form>
           </CardContent>

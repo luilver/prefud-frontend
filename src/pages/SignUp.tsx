@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Utensils, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import SignupSteps from "@/components/SignupSteps";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
@@ -21,11 +24,14 @@ const SignUp = () => {
               Pantry
             </h1>
           </div>
-          <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base px-2 sm:px-3">
-            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Back to Home</span>
-            <span className="sm:hidden">Back</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <LanguageSelector variant="button" />
+            <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base px-2 sm:px-3">
+              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{t('common.back')} to {t('nav.home')}</span>
+              <span className="sm:hidden">{t('common.back')}</span>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -34,9 +40,9 @@ const SignUp = () => {
         <div className="container mx-auto max-w-full sm:max-w-2xl">
           <Card className="bg-white/90 backdrop-blur-sm border-green-200 shadow-lg sm:shadow-2xl mb-4 sm:mb-6">
             <CardHeader className="text-center px-4 sm:px-6 py-4 sm:py-6">
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl text-green-700 mb-1 sm:mb-2">Join Pantry</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl text-green-700 mb-1 sm:mb-2">{t('signup.title')}</CardTitle>
               <CardDescription className="text-sm sm:text-base md:text-lg">
-                Create your account and start your smart kitchen journey
+                {t('signup.subtitle')}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -47,13 +53,13 @@ const SignUp = () => {
           
           <div className="mt-4 sm:mt-6 text-center px-4 sm:px-0">
             <p className="text-gray-600 text-sm sm:text-base">
-              Already have an account?{' '}
+              {t('signup.already-account')}{' '}
               <Button
                 variant="link"
                 onClick={() => navigate('/signin')}
                 className="text-green-600 hover:text-green-700 p-0 font-semibold text-sm sm:text-base"
               >
-                Sign in here
+                {t('signup.signin-here')}
               </Button>
             </p>
           </div>

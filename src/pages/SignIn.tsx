@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +8,9 @@ import { Utensils, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import PasswordRecovery from "@/components/PasswordRecovery";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +21,7 @@ const SignIn = () => {
   const { login } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,10 +65,13 @@ const SignIn = () => {
               Pantry
             </h1>
           </div>
-          <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Home</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <LanguageSelector variant="button" />
+            <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-2">
+              <ArrowLeft className="h-4 w-4" />
+              <span>{t('common.back')} to {t('nav.home')}</span>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -73,15 +80,15 @@ const SignIn = () => {
         <div className="container mx-auto max-w-md">
           <Card className="bg-white/90 backdrop-blur-sm border-green-200 shadow-2xl">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl md:text-3xl text-green-700 mb-2">Welcome Back</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl text-green-700 mb-2">{t('signin.title')}</CardTitle>
               <CardDescription className="text-base md:text-lg">
-                Sign in to your Pantry account
+                {t('signin.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <Label htmlFor="email" className="text-base">Email Address</Label>
+                  <Label htmlFor="email" className="text-base">{t('signin.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -89,11 +96,11 @@ const SignIn = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="border-green-200 focus:border-green-400 h-12 text-base mt-1"
-                    placeholder="Enter your email"
+                    placeholder={t('signin.email.placeholder')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password" className="text-base">Password</Label>
+                  <Label htmlFor="password" className="text-base">{t('signin.password')}</Label>
                   <div className="relative mt-1">
                     <Input
                       id="password"
@@ -102,7 +109,7 @@ const SignIn = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       className="border-green-200 focus:border-green-400 h-12 text-base pr-12"
-                      placeholder="Enter your password"
+                      placeholder={t('signin.password.placeholder')}
                     />
                     <Button
                       type="button"
@@ -126,7 +133,7 @@ const SignIn = () => {
                     className="text-green-600 hover:text-green-700 p-0"
                     onClick={() => setShowPasswordRecovery(true)}
                   >
-                    Forgot password?
+                    {t('signin.forgot-password')}
                   </Button>
                 </div>
                 <Button 
@@ -134,19 +141,19 @@ const SignIn = () => {
                   className="w-full h-12 text-base bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
+                  {isLoading ? t('signin.signing-in') : t('signin.button')}
                 </Button>
               </form>
               
               <div className="mt-6 text-center">
                 <p className="text-gray-600">
-                  Don't have an account?{' '}
+                  {t('signin.no-account')}{' '}
                   <Button
                     variant="link"
                     onClick={() => navigate('/signup')}
                     className="text-green-600 hover:text-green-700 p-0 font-semibold"
                   >
-                    Create one here
+                    {t('signin.create-here')}
                   </Button>
                 </p>
               </div>
