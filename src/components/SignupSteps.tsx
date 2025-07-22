@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,14 +45,14 @@ const SignupSteps = () => {
   const { signup } = useUser();
   const { t } = useLanguage();
 
-  // Updated subscription plans to match pricing page with translations
+  // Updated subscription plans to match pricing page
   const subscriptionPlans = [
     {
       id: "free",
-      name: t('subscription.free.name'),
+      name: "Free",
       price: 0,
       interval: "month",
-      description: t('subscription.free.description'),
+      description: "Perfect for getting started with meal planning",
       features: [
         "1 Meal Plan per month",
         "Basic Recipe Collection",
@@ -65,10 +64,10 @@ const SignupSteps = () => {
     },
     {
       id: "family",
-      name: t('subscription.family.name'), 
+      name: "Family", 
       price: 40,
       interval: "month",
-      description: t('subscription.family.description'),
+      description: "Ideal for families looking to optimize meal planning",
       features: [
         "5 Meal Plans per month",
         "10 Meal Creations with pantry ingredients",
@@ -82,10 +81,10 @@ const SignupSteps = () => {
     },
     {
       id: "professional",
-      name: t('subscription.professional.name'),
+      name: "Professional",
       price: 120,
       interval: "month",
-      description: t('subscription.professional.description'),
+      description: "For meal planning professionals and large households",
       features: [
         "12 Meal Plans per month",
         "Unlimited Meal Creations",
@@ -185,11 +184,11 @@ const SignupSteps = () => {
   };
 
   const stepItems = [
-    { step: 1, title: t('signup.steps.basic'), icon: User },
-    { step: 2, title: t('signup.steps.verify'), icon: Mail },
-    { step: 3, title: t('signup.steps.profile'), icon: User },
-    { step: 4, title: t('signup.steps.subscription'), icon: Crown },
-    { step: 5, title: t('signup.steps.payment'), icon: CreditCard },
+    { step: 1, title: "Basic Info", icon: User },
+    { step: 2, title: "Verify Email", icon: Mail },
+    { step: 3, title: "Profile", icon: User },
+    { step: 4, title: "Subscription", icon: Crown },
+    { step: 5, title: "Payment", icon: CreditCard },
   ];
 
   if (showWelcome) {
@@ -310,8 +309,8 @@ const SignupSteps = () => {
       {currentStep === 4 && (
         <div className="space-y-4 sm:space-y-6">
           <div className="text-center mb-6 sm:mb-8 px-4 sm:px-0">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{t('subscription.title')}</h2>
-            <p className="text-gray-600 text-sm sm:text-base">{t('subscription.description')}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Choose Your Plan</h2>
+            <p className="text-gray-600 text-sm sm:text-base">Select the plan that works best for you</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
@@ -329,7 +328,7 @@ const SignupSteps = () => {
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
                       <Star className="h-3 w-3" />
-                      <span>{t('subscription.popular')}</span>
+                      <span>Most Popular</span>
                     </div>
                   </div>
                 )}
@@ -343,14 +342,14 @@ const SignupSteps = () => {
                     {plan.description}
                   </CardDescription>
                   <div className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
-                    {plan.price === 0 ? t('subscription.free.name') : `$${plan.price}`}
+                    {plan.price === 0 ? 'Free' : `$${plan.price}`}
                     {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
                   </div>
                 </CardHeader>
 
                 <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col justify-between flex-1">
                   <div className="mb-6">
-                    <h4 className="font-semibold text-gray-800 mb-3">{t('subscription.features')}</h4>
+                    <h4 className="font-semibold text-gray-800 mb-3">Features</h4>
                     <ul className="space-y-2">
                       {plan.features.map((feature, index) => (
                         <li key={index} className="flex items-start space-x-3">
@@ -370,7 +369,7 @@ const SignupSteps = () => {
                         : 'bg-gray-800 hover:bg-gray-700 text-white'
                     }`}
                   >
-                    {t('subscription.choose')} {plan.name}
+                    Choose {plan.name}
                   </Button>
                 </CardContent>
               </Card>

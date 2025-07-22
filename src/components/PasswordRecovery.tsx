@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Mail, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PasswordRecoveryProps {
   onBack: () => void;
@@ -24,7 +24,6 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { t } = useLanguage();
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,20 +156,20 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
         <CardHeader>
           <CardTitle className="text-center text-green-700 flex items-center justify-center">
             <Mail className="h-5 w-5 mr-2" />
-            {t('recovery.title')}
+            Recover Password
           </CardTitle>
           <CardDescription className="text-center">
-            {t('recovery.email.description')}
+            Enter your email address and we'll send you a verification code
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="recovery-email">{t('recovery.email.label')}</Label>
+              <Label htmlFor="recovery-email">Email Address</Label>
               <Input
                 id="recovery-email"
                 type="email"
-                placeholder={t('recovery.email.placeholder')}
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -182,7 +181,7 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
               className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
               disabled={isLoading}
             >
-              {isLoading ? t('recovery.email.sending') : t('recovery.email.send')}
+              {isLoading ? 'Sending...' : 'Send Verification Code'}
             </Button>
             <Button 
               type="button" 
@@ -191,7 +190,7 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
               className="w-full text-green-700"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('common.back')} to {t('signin.title')}
+              Back to Login
             </Button>
           </form>
         </CardContent>
@@ -204,15 +203,15 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     return (
       <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm border-green-200 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-center text-green-700">{t('recovery.otp.title')}</CardTitle>
+          <CardTitle className="text-center text-green-700">Verify Email</CardTitle>
           <CardDescription className="text-center">
-            {t('recovery.otp.description')} {email}
+            We've sent a 6-digit code to {email}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-4">
-              {t('otp.instruction')}
+              Enter the verification code sent to your email
             </p>
             
             <div className="flex justify-center mb-6">
@@ -237,12 +236,12 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
               disabled={otp.length !== 6 || isLoading}
               className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 mb-4"
             >
-              {isLoading ? t('otp.verifying') : t('recovery.otp.verify')}
+              {isLoading ? 'Verifying...' : 'Verify Code'}
             </Button>
 
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-2">
-                {t('otp.resend.text')}
+                Didn't receive the code?
               </p>
               <Button 
                 variant="ghost" 
@@ -250,7 +249,7 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
                 disabled={isLoading}
                 className="text-green-600 hover:text-green-700"
               >
-                {t('otp.resend.button')}
+                Resend Code
               </Button>
             </div>
 
@@ -260,7 +259,7 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
               className="w-full text-green-700 mt-4"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('recovery.otp.back')}
+              Back to Email
             </Button>
           </div>
         </CardContent>
@@ -273,20 +272,20 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     return (
       <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm border-green-200 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-center text-green-700">{t('recovery.password.title')}</CardTitle>
+          <CardTitle className="text-center text-green-700">Set New Password</CardTitle>
           <CardDescription className="text-center">
-            {t('recovery.password.description')}
+            Create a new password for your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handlePasswordReset} className="space-y-4">
             <div>
-              <Label htmlFor="new-password">{t('recovery.password.new')}</Label>
+              <Label htmlFor="new-password">New Password</Label>
               <div className="relative">
                 <Input
                   id="new-password"
                   type={showNewPassword ? "text" : "password"}
-                  placeholder={t('recovery.password.new.placeholder')}
+                  placeholder="Enter new password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -309,12 +308,12 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
               </div>
             </div>
             <div>
-              <Label htmlFor="confirm-password">{t('recovery.password.confirm')}</Label>
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
               <div className="relative">
                 <Input
                   id="confirm-password"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder={t('recovery.password.confirm.placeholder')}
+                  placeholder="Confirm new password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -341,7 +340,7 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
               className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
               disabled={isLoading}
             >
-              {isLoading ? t('recovery.password.updating') : t('recovery.password.update')}
+              {isLoading ? 'Updating...' : 'Update Password'}
             </Button>
             <Button 
               type="button" 
@@ -350,7 +349,7 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
               className="w-full text-green-700"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('recovery.password.back')}
+              Back to Verification
             </Button>
           </form>
         </CardContent>
@@ -365,14 +364,14 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
         <div className="mx-auto mb-4 p-3 bg-green-100 rounded-full w-fit">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
-        <CardTitle className="text-green-700">{t('recovery.success.title')}</CardTitle>
+        <CardTitle className="text-green-700">Password Updated!</CardTitle>
         <CardDescription>
-          {t('recovery.success.description')}
+          Your password has been successfully changed. You can now sign in with your new password.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Button onClick={onBack} className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-          {t('recovery.success.signin')}
+          Sign In Now
         </Button>
       </CardContent>
     </Card>
