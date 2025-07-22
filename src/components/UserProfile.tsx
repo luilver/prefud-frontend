@@ -64,7 +64,7 @@ const UserProfile = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <User className="h-5 w-5 text-green-600" />
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle>{t('profile.title') || 'Profile Information'}</CardTitle>
             </div>
             {!isEditing ? (
               <Button
@@ -74,7 +74,7 @@ const UserProfile = () => {
                 className="border-green-500 text-green-600 hover:bg-green-50"
               >
                 <Edit2 className="h-4 w-4 mr-2" />
-                Edit
+                {t('profile.edit') || 'Edit'}
               </Button>
             ) : (
               <div className="flex space-x-2">
@@ -99,16 +99,16 @@ const UserProfile = () => {
             )}
           </div>
           <CardDescription>
-            Manage your personal information and preferences
+            {t('profile.description') || 'Manage your personal information and preferences'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Personal Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Personal Information</h3>
+            <h3 className="text-lg font-medium">{t('profile.personalInfo') || 'Personal Information'}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t('profile.fullName') || 'Full Name'}</Label>
                 {isEditing ? (
                   <Input
                     id="name"
@@ -125,7 +125,7 @@ const UserProfile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">{t('profile.email') || 'Email Address'}</Label>
                 {isEditing ? (
                   <Input
                     id="email"
@@ -148,7 +148,7 @@ const UserProfile = () => {
                   <CountrySelect
                     value={editData.country}
                     onValueChange={(value) => setEditData(prev => ({ ...prev, country: value }))}
-                    placeholder="Select country"
+                    placeholder={t('profile.selectCountry') || 'Select country'}
                     className="border-green-200 focus:border-green-400"
                   />
                 ) : (
@@ -160,7 +160,7 @@ const UserProfile = () => {
                         <span>{countryDisplay.name}</span>
                       </>
                     ) : (
-                      <span className="text-gray-500">Not specified</span>
+                      <span className="text-gray-500">{t('profile.notSpecified') || 'Not specified'}</span>
                     )}
                   </div>
                 )}
@@ -194,7 +194,7 @@ const UserProfile = () => {
                     {countryDisplay && (
                       <span className="text-lg">{countryDisplay.flag}</span>
                     )}
-                    <span>{user.phone || 'Not specified'}</span>
+                    <span>{user.phone || (t('profile.notSpecified') || 'Not specified')}</span>
                   </div>
                 )}
               </div>
@@ -205,14 +205,14 @@ const UserProfile = () => {
 
           {/* Language Preference */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Language Preference</h3>
+            <h3 className="text-lg font-medium">{t('profile.languagePreference') || 'Language Preference'}</h3>
             <div className="space-y-2">
               <Label>{t('profile.language')}</Label>
               <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
                 <Languages className="h-4 w-4 text-gray-500" />
                 <span className="text-lg">{languageDisplay.flag}</span>
                 <span>{languageDisplay.name}</span>
-                <span className="text-sm text-gray-500 ml-auto">(Cannot be changed)</span>
+                <span className="text-sm text-gray-500 ml-auto">{t('profile.cannotChange') || '(Cannot be changed)'}</span>
               </div>
             </div>
           </div>
@@ -221,13 +221,13 @@ const UserProfile = () => {
 
           {/* Subscription Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Subscription</h3>
+            <h3 className="text-lg font-medium">{t('profile.subscription') || 'Subscription'}</h3>
             <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
               <Globe className="h-4 w-4 text-gray-500" />
-              <span className="capitalize">{user.subscription.plan} Plan</span>
+              <span className="capitalize">{user.subscription.plan} {t('profile.plan') || 'Plan'}</span>
               {user.subscription.isSubscribed && (
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full ml-auto">
-                  Active
+                  {t('profile.active') || 'Active'}
                 </span>
               )}
             </div>
