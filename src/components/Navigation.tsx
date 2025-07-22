@@ -1,61 +1,63 @@
 
+import { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
-import { Utensils } from "lucide-react";
-import LanguageSelector from "./LanguageSelector";
+import { 
+  Calendar, 
+  Sparkles, 
+  Utensils, 
+  Package2, 
+  ShoppingCart, 
+  Target, 
+  User, 
+  Lightbulb,
+  Leaf
+} from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const Navigation = () => {
-  const location = useLocation();
+interface NavigationProps {
+  activeTab: string;
+  onTabChange: Dispatch<SetStateAction<string>>;
+}
+
+const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const { t } = useLanguage();
-  
-  const isActive = (path: string) => location.pathname === path;
+
+  const navItems = [
+    { id: "planner", icon: Calendar, label: t("nav.mealPlanner") },
+    { id: "ai-meals", icon: Sparkles, label: t("nav.aiMeals") },
+    { id: "ai-drinks", icon: Utensils, label: t("nav.aiDrinks") },
+    { id: "highlights", icon: Lightbulb, label: t("nav.highlights") },
+    { id: "environment", icon: Leaf, label: t("nav.environment") },
+    { id: "ingredients", icon: Package2, label: t("nav.ingredients") },
+    { id: "shopping", icon: ShoppingCart, label: t("nav.shopping") },
+    { id: "calories", icon: Target, label: t("nav.calories") },
+    { id: "profile", icon: User, label: t("nav.profile") },
+  ];
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <Utensils className="h-8 w-8 text-green-600" />
-            <span className="text-xl font-bold text-gray-900">Pantry</span>
-          </Link>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
-              className={`text-sm font-medium transition-colors hover:text-green-600 ${
-                isActive('/') ? 'text-green-600' : 'text-gray-700'
-              }`}
-            >
-              {t('nav.home')}
-            </Link>
-            <Link 
-              to="/pricing" 
-              className={`text-sm font-medium transition-colors hover:text-green-600 ${
-                isActive('/pricing') ? 'text-green-600' : 'text-gray-700'
-              }`}
-            >
-              {t('nav.pricing')}
-            </Link>
-            <Link 
-              to="/why-pantry" 
-              className={`text-sm font-medium transition-colors hover:text-green-600 ${
-                isActive('/why-pantry') ? 'text-green-600' : 'text-gray-700'
-              }`}
-            >
-              {t('nav.why')}
-            </Link>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <LanguageSelector variant="button" />
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/signin">{t('signin.title')}</Link>
-            </Button>
-            <Button asChild size="sm" className="bg-green-600 hover:bg-green-700">
-              <Link to="/signup">{t('signup.title')}</Link>
-            </Button>
-          </div>
+    <nav className="bg-white/60 backdrop-blur-sm border-b border-green-100">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto py-2 sm:py-3 scrollbar-hide">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Button
+                key={item.id}
+                variant={activeTab === item.id ? "default" : "ghost"}
+                onClick={() => onTabChange(item.id)}
+                className={`
+                  flex-shrink-0 flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 text-xs sm:text-sm lg:text-base font-medium rounded-lg transition-all duration-200
+                  ${activeTab === item.id 
+                    ? "bg-gradient-to-r from-green-500 to-orange-500 text-white shadow-lg transform scale-105" 
+                    : "text-green-700 hover:bg-green-50 hover:text-green-800"
+                  }
+                `}
+              >
+                <Icon className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
+                <span className="hidden sm:block whitespace-nowrap">{item.label}</span>
+              </Button>
+            );
+          })}
         </div>
       </div>
     </nav>
