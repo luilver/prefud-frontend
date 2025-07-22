@@ -76,9 +76,22 @@ const translations = {
     'signin.create-here': 'Create one here',
     
     // Profile
-    'profile.language': 'Language',
+    'profile.title': 'Profile Information',
+    'profile.description': 'Manage your personal information and preferences',
+    'profile.edit': 'Edit',
+    'profile.personalInfo': 'Personal Information',
+    'profile.fullName': 'Full Name',
+    'profile.email': 'Email Address',
     'profile.phone': 'Phone Number',
     'profile.country': 'Country',
+    'profile.selectCountry': 'Select country',
+    'profile.notSpecified': 'Not specified',
+    'profile.languagePreference': 'Language Preference',
+    'profile.language': 'Language',
+    'profile.cannotChange': '(Cannot be changed)',
+    'profile.subscription': 'Subscription',
+    'profile.plan': 'Plan',
+    'profile.active': 'Active',
     
     // Pricing
     'pricing.title': 'Choose Your Meal Planning Plan',
@@ -245,9 +258,22 @@ const translations = {
     'signin.create-here': 'Crea una aquí',
     
     // Profile
-    'profile.language': 'Idioma',
+    'profile.title': 'Información del Perfil',
+    'profile.description': 'Gestiona tu información personal y preferencias',
+    'profile.edit': 'Editar',
+    'profile.personalInfo': 'Información Personal',
+    'profile.fullName': 'Nombre Completo',
+    'profile.email': 'Dirección de Email',
     'profile.phone': 'Número de Teléfono',
     'profile.country': 'País',
+    'profile.selectCountry': 'Seleccionar país',
+    'profile.notSpecified': 'No especificado',
+    'profile.languagePreference': 'Preferencia de Idioma',
+    'profile.language': 'Idioma',
+    'profile.cannotChange': '(No se puede cambiar)',
+    'profile.subscription': 'Suscripción',
+    'profile.plan': 'Plan',
+    'profile.active': 'Activo',
     
     // Pricing
     'pricing.title': 'Elige Tu Plan de Planificación de Comidas',
@@ -414,9 +440,22 @@ const translations = {
     'signin.create-here': 'Crie uma aqui',
     
     // Profile
-    'profile.language': 'Idioma',
+    'profile.title': 'Informações do Perfil',
+    'profile.description': 'Gerencie suas informações pessoais e preferências',
+    'profile.edit': 'Editar',
+    'profile.personalInfo': 'Informações Pessoais',
+    'profile.fullName': 'Nome Completo',
+    'profile.email': 'Endereço de Email',
     'profile.phone': 'Número de Telefone',
     'profile.country': 'País',
+    'profile.selectCountry': 'Selecionar país',
+    'profile.notSpecified': 'Não especificado',
+    'profile.languagePreference': 'Preferência de Idioma',
+    'profile.language': 'Idioma',
+    'profile.cannotChange': '(Não pode ser alterado)',
+    'profile.subscription': 'Assinatura',
+    'profile.plan': 'Plano',
+    'profile.active': 'Ativo',
     
     // Pricing
     'pricing.title': 'Escolha Seu Plano de Planejamento de Refeições',
