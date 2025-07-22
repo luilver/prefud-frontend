@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 
 export type Language = 'en' | 'es' | 'pt';
@@ -13,7 +12,7 @@ const translations = {
   en: {
     // Language names
     'language.english': 'English',
-    'language.spanish': 'Spanish',
+    'language.spanish': 'Spanish', 
     'language.portuguese': 'Portuguese',
     
     // Common
@@ -92,6 +91,28 @@ const translations = {
     'profile.subscription': 'Subscription',
     'profile.plan': 'Plan',
     'profile.active': 'Active',
+
+    // Password
+    'password.security.title': 'Password Security',
+    'password.security.description': 'Keep your account secure by updating your password regularly.',
+    'password.changePassword': 'Change Password',
+    'password.dialog.description': 'Enter your current password and choose a new one to update your account security.',
+    'password.currentPassword': 'Current Password',
+    'password.currentPassword.placeholder': 'Enter current password',
+    'password.newPassword': 'New Password',
+    'password.newPassword.placeholder': 'Enter new password',
+    'password.confirmPassword': 'Confirm New Password',
+    'password.confirmPassword.placeholder': 'Confirm new password',
+    'password.updatePassword': 'Update Password',
+    'password.updating': 'Updating...',
+    'password.mismatch.title': 'Password Mismatch',
+    'password.mismatch.description': 'New password and confirmation password do not match.',
+    'password.tooShort.title': 'Password Too Short',
+    'password.tooShort.description': 'Password must be at least 6 characters long.',
+    'password.updated.title': 'Password Updated',
+    'password.updated.description': 'Your password has been successfully updated.',
+    'password.updateFailed.title': 'Update Failed',
+    'password.updateFailed.description': 'Failed to update password. Please try again.',
     
     // Pricing
     'pricing.title': 'Choose Your Meal Planning Plan',
@@ -274,6 +295,28 @@ const translations = {
     'profile.subscription': 'Suscripción',
     'profile.plan': 'Plan',
     'profile.active': 'Activo',
+
+    // Password
+    'password.security.title': 'Seguridad de Contraseña',
+    'password.security.description': 'Mantén tu cuenta segura actualizando tu contraseña regularmente.',
+    'password.changePassword': 'Cambiar Contraseña',
+    'password.dialog.description': 'Ingresa tu contraseña actual y elige una nueva para actualizar la seguridad de tu cuenta.',
+    'password.currentPassword': 'Contraseña Actual',
+    'password.currentPassword.placeholder': 'Ingresa contraseña actual',
+    'password.newPassword': 'Nueva Contraseña',
+    'password.newPassword.placeholder': 'Ingresa nueva contraseña',
+    'password.confirmPassword': 'Confirmar Nueva Contraseña',
+    'password.confirmPassword.placeholder': 'Confirma nueva contraseña',
+    'password.updatePassword': 'Actualizar Contraseña',
+    'password.updating': 'Actualizando...',
+    'password.mismatch.title': 'Contraseñas No Coinciden',
+    'password.mismatch.description': 'La nueva contraseña y la confirmación no coinciden.',
+    'password.tooShort.title': 'Contraseña Muy Corta',
+    'password.tooShort.description': 'La contraseña debe tener al menos 6 caracteres.',
+    'password.updated.title': 'Contraseña Actualizada',
+    'password.updated.description': 'Tu contraseña ha sido actualizada exitosamente.',
+    'password.updateFailed.title': 'Actualización Fallida',
+    'password.updateFailed.description': 'Falló la actualización de contraseña. Por favor intenta de nuevo.',
     
     // Pricing
     'pricing.title': 'Elige Tu Plan de Planificación de Comidas',
@@ -364,7 +407,7 @@ const translations = {
     'why-pantry.carbon-footprint.equivalent': 'Equivalente a sacar un auto de la carretera por 5,800 millas o plantar 105 árboles',
     'why-pantry.features.title': 'Cómo Pantry Hace Todo Esto Posible',
     'why-pantry.features.shopping-lists.title': 'Listas de Compras Inteligentes',
-    'why-pantry.features.shopping-lists.description': 'Generadas automáticamente basadas en tus planes de comidas, inventario de despensa y distribución de tiendas. Nunca olvides un ingrediente o compres duplicados de nuevo.',
+    'why-pantry.features.shopping-lists.description': 'Generadas automáticamente basadas en tus planes de comidas, inventario de despensa y distribución de tiendas. Nunca olvides un ingrediente o compres duplicatas de nuevo.',
     'why-pantry.features.meal-planning.title': 'Planificación de Comidas con IA',
     'why-pantry.features.meal-planning.description': 'Sugerencias de comidas personalizadas basadas en tus preferencias, restricciones dietéticas y lo que ya tienes en tu despensa.',
     'why-pantry.features.analytics.title': 'Análisis de Desperdicio',
@@ -456,6 +499,28 @@ const translations = {
     'profile.subscription': 'Assinatura',
     'profile.plan': 'Plano',
     'profile.active': 'Ativo',
+
+    // Password
+    'password.security.title': 'Segurança da Senha',
+    'password.security.description': 'Mantenha sua conta segura atualizando sua senha regularmente.',
+    'password.changePassword': 'Alterar Senha',
+    'password.dialog.description': 'Digite sua senha atual e escolha uma nova para atualizar a segurança da sua conta.',
+    'password.currentPassword': 'Senha Atual',
+    'password.currentPassword.placeholder': 'Digite a senha atual',
+    'password.newPassword': 'Nova Senha',
+    'password.newPassword.placeholder': 'Digite a nova senha',
+    'password.confirmPassword': 'Confirmar Nova Senha',
+    'password.confirmPassword.placeholder': 'Confirme a nova senha',
+    'password.updatePassword': 'Atualizar Senha',
+    'password.updating': 'Atualizando...',
+    'password.mismatch.title': 'Senhas Não Coincidem',
+    'password.mismatch.description': 'A nova senha e a confirmação não coincidem.',
+    'password.tooShort.title': 'Senha Muito Curta',
+    'password.tooShort.description': 'A senha deve ter pelo menos 6 caracteres.',
+    'password.updated.title': 'Senha Atualizada',
+    'password.updated.description': 'Sua senha foi atualizada com sucesso.',
+    'password.updateFailed.title': 'Atualização Falhada',
+    'password.updateFailed.description': 'Falha ao atualizar senha. Tente novamente.',
     
     // Pricing
     'pricing.title': 'Escolha Seu Plano de Planejamento de Refeições',
@@ -509,7 +574,7 @@ const translations = {
     'why-pantry.title.main': 'Por que o Pantry está',
     'why-pantry.title.sub': 'Mudando o Mundo',
     'why-pantry.hero.description': 'Todos os dias, milhões de toneladas de alimentos são desperdiçados enquanto as pessoas lutam com o planejamento de refeições e compras de supermercado. O Pantry está revolucionando como pensamos sobre comida, sustentabilidade e vida inteligente.',
-    'why-pantry.stats.food-waste': 'Desperdício de Alimentos Reduzido',
+    'why-pantry.stats.food-waste': 'Desperdício de Alimentos Reducido',
     'why-pantry.stats.yearly-savings': 'Economia Anual Média',
     'why-pantry.stats.time-saved': 'Tempo Economizado Semanalmente',
     'why-pantry.stats.co2-reduced': 'CO₂ Reduzido/Ano',
