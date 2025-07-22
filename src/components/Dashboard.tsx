@@ -16,6 +16,7 @@ import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
 import AIDrinkCreator from "./AIDrinkCreator";
+import LanguageSelector from "./LanguageSelector";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("planner");
@@ -48,6 +49,7 @@ const Dashboard = () => {
             </h1>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-3">
+            <LanguageSelector variant="button" className="mr-2" />
             <span className="text-sm sm:text-base text-green-700 font-medium hidden sm:block">
              Welcome {user?.name || 'User'} !
             </span>
