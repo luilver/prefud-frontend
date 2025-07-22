@@ -1,158 +1,184 @@
 
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Brain, ShoppingCart, Utensils, TrendingDown, Clock, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Utensils, Menu, X } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import Navigation from "@/components/Navigation";
+import Dashboard from "@/components/Dashboard";
+import LanguageSelector from "@/components/LanguageSelector";
+import { useEffect, useState } from "react";
 
 const Index = () => {
+  const { isAuthenticated, user, checkSubscription } = useUser();
   const { t } = useLanguage();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const features = [
-    {
-      icon: Brain,
-      title: t('home.features.ai.title'),
-      description: t('home.features.ai.description')
-    },
-    {
-      icon: Utensils,
-      title: t('home.features.tracking.title'),
-      description: t('home.features.tracking.description')
-    },
-    {
-      icon: TrendingDown,
-      title: t('home.features.waste.title'),
-      description: t('home.features.waste.description')
-    },
-    {
-      icon: Clock,
-      title: t('home.features.planning.title'),
-      description: t('home.features.planning.description')
-    },
-    {
-      icon: ShoppingCart,
-      title: t('home.features.shopping.title'),
-      description: t('home.features.shopping.description')
-    },
-    {
-      icon: Heart,
-      title: t('home.features.nutrition.title'),
-      description: t('home.features.nutrition.description')
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkSubscription();
     }
-  ];
+  }, [isAuthenticated, checkSubscription]);
 
-  const testimonials = [
-    {
-      text: t('home.testimonials.sarah.text'),
-      author: t('home.testimonials.sarah.author'),
-      role: t('home.testimonials.sarah.role')
-    },
-    {
-      text: t('home.testimonials.mike.text'),
-      author: t('home.testimonials.mike.author'),
-      role: t('home.testimonials.mike.role')
-    },
-    {
-      text: t('home.testimonials.emily.text'),
-      author: t('home.testimonials.emily.author'),
-      role: t('home.testimonials.emily.role')
+  // Redirect mobile users to login if not authenticated
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile && !isAuthenticated) {
+      navigate('/signin');
     }
-  ];
+  }, [isAuthenticated, navigate]);
 
+  // If user is authenticated, show the full dashboard
+  if (isAuthenticated) {
+    return <Dashboard />;
+  }
+
+  // If not authenticated, show the landing page
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-50 to-blue-50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              {t('home.hero.title')}
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              {t('home.hero.subtitle')}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-green-600 hover:bg-green-700">
-                <Link to="/signup">{t('home.hero.cta')}</Link>
-              </Button>
-              <Button variant="outline" size="lg">
-                {t('home.hero.demo')}
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-orange-50">
+      {/* Navigation */}
+      <nav className="bg-white/80 backdrop-blur-sm border-b border-green-200 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo - matching dashboard design */}
+            <div className="flex items-center space-x-2">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+                <Utensils className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
+              </div>
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent">
+                Pantry
+              </h1>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link to="/why-pantry" className="text-gray-600 hover:text-green-600 transition-colors">
+                {t('home.nav.why-pantry')}
+              </Link>
+              <Link to="/pricing" className="text-gray-600 hover:text-green-600 transition-colors">
+                {t('nav.pricing')}
+              </Link>
+              <LanguageSelector variant="button" className="mr-2" />
+              <Link to="/signin">
+                <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
+                  {t('nav.signin')}
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+                  {t('home.nav.get-started')}
+                </Button>
+              </Link>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="text-gray-600"
+              >
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              {t('home.features.title')}
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="border-green-100 hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-green-600" />
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {/* Mobile Navigation Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden mt-4 pb-4 border-t border-green-200 pt-4">
+              <div className="flex flex-col space-y-3">
+                <Link 
+                  to="/why-pantry" 
+                  className="text-gray-600 hover:text-green-600 transition-colors px-2 py-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {t('home.nav.why-pantry')}
+                </Link>
+                <Link 
+                  to="/pricing" 
+                  className="text-gray-600 hover:text-green-600 transition-colors px-2 py-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {t('nav.pricing')}
+                </Link>
+                <div className="px-2 py-1">
+                  <LanguageSelector className="w-full" />
+                </div>
+                <div className="flex flex-col space-y-2 pt-2">
+                  <Link to="/signin" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-green-500 text-green-600 hover:bg-green-50">
+                      {t('nav.signin')}
+                    </Button>
+                  </Link>
+                  <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+                      {t('home.nav.get-started')}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </section>
+      </nav>
 
-      {/* Testimonials Section */}
-      <section className="bg-gray-50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              {t('home.testimonials.title')}
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-white">
-                <CardContent className="p-6">
-                  <p className="text-gray-600 mb-4 italic">"{testimonial.text}"</p>
-                  <div>
-                    <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-5xl font-bold text-gray-800 mb-6">
+          {t('home.title')}
+        </h1>
+        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          {t('home.subtitle')}
+        </p>
+        <div className="flex justify-center">
+          <Link to="/signup">
+            <Button size="lg" className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+              {t('home.cta.primary')}
+            </Button>
+          </Link>
         </div>
-      </section>
+      </div>
 
-      {/* CTA Section */}
-      <section className="bg-green-600 py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            {t('home.cta.title')}
-          </h2>
-          <p className="text-xl text-green-100 mb-8">
-            {t('home.cta.subtitle')}
+      {/* Simple Features Section */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">{t('home.features.title')}</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            {t('home.features.subtitle')}
           </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link to="/signup">{t('home.cta.button')}</Link>
-          </Button>
         </div>
-      </section>
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Utensils className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">{t('home.features.smart-planning.title')}</h3>
+            <p className="text-gray-600">{t('home.features.smart-planning.description')}</p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Utensils className="h-8 w-8 text-orange-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">{t('home.features.reduce-waste.title')}</h3>
+            <p className="text-gray-600">{t('home.features.reduce-waste.description')}</p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Utensils className="h-8 w-8 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">{t('home.features.save-money.title')}</h3>
+            <p className="text-gray-600">{t('home.features.save-money.description')}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Simple Footer */}
+      <footer className="bg-gray-800 text-white py-8">
+        <div className="container mx-auto px-4 text-center">
+          <p>{t('home.footer.copyright')}</p>
+        </div>
+      </footer>
     </div>
   );
 };

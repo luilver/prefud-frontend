@@ -1,61 +1,62 @@
 
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
-import { Utensils } from "lucide-react";
-import LanguageSelector from "./LanguageSelector";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { Calendar, TrendingUp, ShoppingCart, Package, User, Sparkles, Leaf, CookingPot, CupSoda } from "lucide-react";
 
-const Navigation = () => {
-  const location = useLocation();
-  const { t } = useLanguage();
-  
-  const isActive = (path: string) => location.pathname === path;
+interface NavigationProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}
+
+const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
+  const navItems = [
+    { id: "planner", label: "Planner", icon: Calendar },
+    { id: "ai-meals", label: "Meals", icon: CookingPot },
+    { id: "ai-drinks", label: "Drinks", icon: CupSoda },
+    { id: "ingredients", label: "Pantry", icon: Package },
+    { id: "shopping", label: "Shopping", icon: ShoppingCart },
+   
+    { id: "environment", label: "Environment", icon: Leaf },
+    
+    { id: "calories", label: "Calories", icon: TrendingUp },
+     { id: "highlights", label: "Highlights", icon: Sparkles },
+    { id: "profile", label: "Profile", icon: User },
+  ];
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <Utensils className="h-8 w-8 text-green-600" />
-            <span className="text-xl font-bold text-gray-900">Pantry</span>
-          </Link>
-          
-          <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
-              className={`text-sm font-medium transition-colors hover:text-green-600 ${
-                isActive('/') ? 'text-green-600' : 'text-gray-700'
-              }`}
-            >
-              {t('nav.home')}
-            </Link>
-            <Link 
-              to="/pricing" 
-              className={`text-sm font-medium transition-colors hover:text-green-600 ${
-                isActive('/pricing') ? 'text-green-600' : 'text-gray-700'
-              }`}
-            >
-              {t('nav.pricing')}
-            </Link>
-            <Link 
-              to="/why-pantry" 
-              className={`text-sm font-medium transition-colors hover:text-green-600 ${
-                isActive('/why-pantry') ? 'text-green-600' : 'text-gray-700'
-              }`}
-            >
-              {t('nav.why')}
-            </Link>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <LanguageSelector variant="button" />
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/signin">{t('signin.title')}</Link>
-            </Button>
-            <Button asChild size="sm" className="bg-green-600 hover:bg-green-700">
-              <Link to="/signup">{t('signup.title')}</Link>
-            </Button>
-          </div>
+    <nav className="bg-white/70 backdrop-blur-sm border-b border-green-200">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 sm:py-3">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            
+            return (
+              <Button
+                key={item.id}
+                variant={isActive ? "default" : "ghost"}
+                onClick={() => onTabChange(item.id)}
+                className={`
+                  flex items-center space-x-1 sm:space-x-2 whitespace-nowrap min-w-fit
+                  text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2
+                  ${isActive 
+                    ? item.id === "ai-meals" 
+                      ? "bg-purple-600 text-white shadow-md" 
+                      : item.id === "ai-drinks"
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "bg-green-600 text-white shadow-md"
+                    : item.id === "ai-meals"
+                      ? "text-purple-700 hover:bg-purple-100"
+                      : item.id === "ai-drinks"
+                        ? "text-blue-700 hover:bg-blue-100"
+                        : "text-green-700 hover:bg-green-100"
+                  }
+                `}
+              >
+                <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </Button>
+            );
+          })}
         </div>
       </div>
     </nav>
