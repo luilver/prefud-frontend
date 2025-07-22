@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { User, ArrowLeft, Languages } from "lucide-react";
 import CountrySelect, { countries } from "./CountrySelect";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
@@ -175,7 +175,7 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
             <p className="text-sm text-gray-600">{t('signup.language.description')}</p>
             <Select
               value={formData.selectedLanguage}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, selectedLanguage: value }))}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, selectedLanguage: value as Language }))}
             >
               <SelectTrigger className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base">
                 <SelectValue placeholder={t('signup.language.select')} />
