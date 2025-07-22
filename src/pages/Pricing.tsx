@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,10 +11,10 @@ import LanguageSelector from "@/components/LanguageSelector";
 
 interface PricingPlan {
   id: string;
-  name: string;
+  nameKey: string;
   price: number;
   interval: string;
-  description: string;
+  descriptionKey: string;
   features: string[];
   limits: {
     plansPerMonth: number;
@@ -29,96 +30,96 @@ interface PricingPlan {
   };
 }
 
-const plans: PricingPlan[] = [
-  {
-    id: "free",
-    name: "Free",
-    price: 0,
-    interval: "month",
-    description: "Perfect for getting started with meal planning",
-    features: [
-      "1 Meal Plan per month",
-      "Basic Recipe Collection",
-      "Shopping List Generator",
-      "Pantry Management",
-      "Email Support"
-    ],
-    limits: {
-      plansPerMonth: 1,
-      mealCreations: 3,
-      deliveryCommissions: 0
-    },
-    savings: {
-      environment: "Save 2kg CO2 monthly",
-      money: "Save $50 on food waste",
-      time: "Save 2 hours weekly"
-    }
-  },
-  {
-    id: "family",
-    name: "Family",
-    price: 40,
-    interval: "month",
-    description: "Ideal for families looking to optimize meal planning",
-    popular: true,
-    features: [
-      "5 Meal Plans per month",
-      "10 Meal Creations with pantry ingredients",
-      "AI Meal Recommendations",
-      "Advanced Recipe Collection",
-      "3 Free Delivery Commissions",
-      "Nutritional Analysis",
-      "Priority Support"
-    ],
-    limits: {
-      plansPerMonth: 5,
-      mealCreations: 10,
-      deliveryCommissions: 3
-    },
-    savings: {
-      environment: "Save 15kg CO2 monthly",
-      money: "Save $200 on groceries",
-      time: "Save 8 hours weekly"
-    }
-  },
-  {
-    id: "professional",
-    name: "Professional",
-    price: 120,
-    interval: "month",
-    description: "For meal planning professionals and large households",
-    features: [
-      "12 Meal Plans per month",
-      "Unlimited Meal Creations",
-      "10 Free Delivery Commissions",
-      "3 Free Home Deliveries",
-      "Advanced AI Recommendations",
-      "Custom Dietary Plans",
-      "Bulk Shopping Lists",
-      "Professional Analytics",
-      "Phone Support",
-      "Priority Processing"
-    ],
-    limits: {
-      plansPerMonth: 12,
-      mealCreations: -1, // unlimited
-      deliveryCommissions: 10,
-      homeDeliveries: 3
-    },
-    savings: {
-      environment: "Save 40kg CO2 monthly",
-      money: "Save $500 on groceries",
-      time: "Save 15 hours weekly"
-    }
-  }
-];
-
 const Pricing = () => {
   const navigate = useNavigate();
   const { user, acceptSubscription } = useUser();
   const { t } = useLanguage();
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+
+  const plans: PricingPlan[] = [
+    {
+      id: "free",
+      nameKey: "pricing.plans.free.name",
+      price: 0,
+      interval: "month",
+      descriptionKey: "pricing.plans.free.description",
+      features: [
+        `1 ${t('pricing.features.meal-plans')}`,
+        t('pricing.features.basic-recipes'),
+        t('pricing.features.shopping-list'),
+        t('pricing.features.pantry-management'),
+        t('pricing.features.email-support')
+      ],
+      limits: {
+        plansPerMonth: 1,
+        mealCreations: 3,
+        deliveryCommissions: 0
+      },
+      savings: {
+        environment: "Save 2kg CO2 monthly",
+        money: "Save $50 on food waste",
+        time: "Save 2 hours weekly"
+      }
+    },
+    {
+      id: "family",
+      nameKey: "pricing.plans.family.name",
+      price: 40,
+      interval: "month",
+      descriptionKey: "pricing.plans.family.description",
+      popular: true,
+      features: [
+        `5 ${t('pricing.features.meal-plans')}`,
+        `10 ${t('pricing.features.meal-creations')}`,
+        t('pricing.features.ai-recommendations'),
+        t('pricing.features.advanced-recipes'),
+        `3 ${t('pricing.features.delivery-commissions')}`,
+        t('pricing.features.nutritional-analysis'),
+        t('pricing.features.priority-support')
+      ],
+      limits: {
+        plansPerMonth: 5,
+        mealCreations: 10,
+        deliveryCommissions: 3
+      },
+      savings: {
+        environment: "Save 15kg CO2 monthly",
+        money: "Save $200 on groceries",
+        time: "Save 8 hours weekly"
+      }
+    },
+    {
+      id: "professional",
+      nameKey: "pricing.plans.professional.name",
+      price: 120,
+      interval: "month",
+      descriptionKey: "pricing.plans.professional.description",
+      features: [
+        `12 ${t('pricing.features.meal-plans')}`,
+        t('pricing.features.unlimited-creations'),
+        `10 ${t('pricing.features.delivery-commissions')}`,
+        `3 ${t('pricing.features.home-deliveries')}`,
+        t('pricing.features.advanced-ai'),
+        t('pricing.features.custom-dietary'),
+        t('pricing.features.bulk-shopping'),
+        t('pricing.features.professional-analytics'),
+        t('pricing.features.phone-support'),
+        t('pricing.features.priority-processing')
+      ],
+      limits: {
+        plansPerMonth: 12,
+        mealCreations: -1, // unlimited
+        deliveryCommissions: 10,
+        homeDeliveries: 3
+      },
+      savings: {
+        environment: "Save 40kg CO2 monthly",
+        money: "Save $500 on groceries",
+        time: "Save 15 hours weekly"
+      }
+    }
+  ];
 
   const handleSelectPlan = async (plan: PricingPlan) => {
     if (!user) {
@@ -143,7 +144,7 @@ const Pricing = () => {
       await acceptSubscription(plan.id);
       toast({
         title: "Plan Selected!",
-        description: `Welcome to ${plan.name}! Your subscription is now active.`,
+        description: `Welcome to ${t(plan.nameKey)}! Your subscription is now active.`,
       });
       navigate('/');
     } catch (error) {
@@ -216,7 +217,7 @@ const Pricing = () => {
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
                     <Star className="h-3 w-3" />
-                    <span>Most Popular</span>
+                    <span>{t('pricing.most-popular')}</span>
                   </div>
                 </div>
               )}
@@ -225,10 +226,10 @@ const Pricing = () => {
                 <div className="flex justify-center mb-4">
                   <Crown className={`h-8 w-8 ${plan.popular ? 'text-green-500' : 'text-gray-400'}`} />
                 </div>
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <CardDescription className="text-sm mb-4">{plan.description}</CardDescription>
+                <CardTitle className="text-2xl">{t(plan.nameKey)}</CardTitle>
+                <CardDescription className="text-sm mb-4">{t(plan.descriptionKey)}</CardDescription>
                 <div className="text-4xl font-bold text-gray-800">
-                  {plan.price === 0 ? 'Free' : `$${plan.price}`}
+                  {plan.price === 0 ? t('pricing.plans.free.name') : `$${plan.price}`}
                   {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
                 </div>
               </CardHeader>
@@ -236,7 +237,7 @@ const Pricing = () => {
               <CardContent className="space-y-6">
                 {/* Features */}
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Features</h4>
+                  <h4 className="font-semibold text-gray-800 mb-3">{t('pricing.features-title')}</h4>
                   <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-start space-x-3">
@@ -249,7 +250,7 @@ const Pricing = () => {
 
                 {/* Savings */}
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">Your Impact</h4>
+                  <h4 className="font-semibold text-gray-800 mb-3">{t('pricing.impact-title')}</h4>
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2 text-sm">
                       <Leaf className="h-4 w-4 text-green-500" />
@@ -276,7 +277,7 @@ const Pricing = () => {
                       : 'bg-gray-800 hover:bg-gray-700'
                   }`}
                 >
-                  {plan.price === 0 ? 'Current Plan' : `Choose ${plan.name}`}
+                  {plan.price === 0 ? t('pricing.current-plan') : `${t('pricing.choose-plan')} ${t(plan.nameKey)}`}
                 </Button>
               </CardContent>
             </Card>
@@ -292,30 +293,30 @@ const Pricing = () => {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-gray-800 mb-2">
-                  How does meal planning help the environment?
+                  {t('pricing.faq.environment.question')}
                 </h3>
                 <p className="text-gray-600">
-                  Smart meal planning reduces food waste by up to 40%, which directly decreases methane emissions from landfills and reduces the carbon footprint of food production.
+                  {t('pricing.faq.environment.answer')}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-gray-800 mb-2">
-                  Can I change plans anytime?
+                  {t('pricing.faq.change-plans.question')}
                 </h3>
                 <p className="text-gray-600">
-                  Yes! You can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
+                  {t('pricing.faq.change-plans.answer')}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-gray-800 mb-2">
-                  What happens if I exceed my plan limits?
+                  {t('pricing.faq.limits.question')}
                 </h3>
                 <p className="text-gray-600">
-                  We'll notify you when you're approaching your limits and offer options to upgrade your plan or wait for the next billing cycle.
+                  {t('pricing.faq.limits.answer')}
                 </p>
               </CardContent>
             </Card>
