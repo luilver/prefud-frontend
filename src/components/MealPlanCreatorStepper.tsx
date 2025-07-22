@@ -20,7 +20,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
   const [currentStep, setCurrentStep] = useState(0);
   const [planName, setPlanName] = useState(initialData?.name || "");
   const [startDate, setStartDate] = useState(initialData?.startDate || "");
-  const [numberOfDays, setNumberOfDays] = useState(initialData?.numberOfDays || 1);
+  const [numberOfWeeks, setNumberOfWeeks] = useState(initialData?.numberOfWeeks || 1);
   const [numberOfPersons, setNumberOfPersons] = useState(initialData?.numberOfPersons || 1);
   const [mealsPerDay, setMealsPerDay] = useState(initialData?.mealsPerDay || 3);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>(initialData?.dietaryRestrictions || []);
@@ -70,15 +70,15 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
   const cookingSkillLevels = ["beginner", "intermediate", "advanced", "expert"];
   const budgetRanges = ["low", "medium", "high"];
 
-  const calculateEndDate = (start: string, days: number) => {
+  const calculateEndDate = (start: string, weeks: number) => {
     if (!start) return "";
     const startDateObj = new Date(start);
     const endDateObj = new Date(startDateObj);
-    endDateObj.setDate(startDateObj.getDate() + days - 1);
+    endDateObj.setDate(startDateObj.getDate() + (weeks * 7) - 1);
     return endDateObj.toISOString().split('T')[0];
   };
 
-  const endDate = calculateEndDate(startDate, numberOfDays);
+  const endDate = calculateEndDate(startDate, numberOfWeeks);
 
   const addDislike = () => {
     if (newDislike.trim() && !dislikes.includes(newDislike.trim().toLowerCase())) {
@@ -126,7 +126,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
   const canGoNext = () => {
     switch (currentStep) {
       case 0:
-        return planName && startDate && numberOfDays >= 1 && numberOfPersons >= 1 && mealsPerDay >= 1;
+        return planName && startDate && numberOfWeeks >= 1 && numberOfPersons >= 1 && mealsPerDay >= 1;
       case 1:
         return true; // Dietary preferences are optional
       case 2:
@@ -151,7 +151,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
   };
 
   const generateMealPlan = async () => {
-    if (!planName || !startDate || numberOfDays < 1 || numberOfPersons < 1 || mealsPerDay < 1 || !cookingSkillLevel || !budgetRange) {
+    if (!planName || !startDate || numberOfWeeks < 1 || numberOfPersons < 1 || mealsPerDay < 1 || !cookingSkillLevel || !budgetRange) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields with valid values.",
@@ -167,7 +167,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
         planName,
         startDate,
         endDate,
-        numberOfDays,
+        numberOfWeeks,
         numberOfPersons,
         mealsPerDay,
         dietaryRestrictions,
@@ -250,18 +250,21 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
         }
       ];
 
-      for (let day = 1; day <= numberOfDays; day++) {
-        for (let mealIndex = 0; mealIndex < mealsPerDay; mealIndex++) {
-          const mealType = mealTypes[mealIndex] || 'snack';
-          const baseMeal = sampleMeals[Math.floor(Math.random() * sampleMeals.length)];
-          
-          allMeals.push({
-            id: `${day}-${mealIndex}`,
-            ...baseMeal,
-            type: mealType,
-            day,
-            date: new Date(new Date(startDate).getTime() + (day - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-          });
+      for (let week = 1; week <= numberOfWeeks; week++) {
+        for (let day = 1; day <= 7; day++) {
+          for (let mealIndex = 0; mealIndex < mealsPerDay; mealIndex++) {
+            const mealType = mealTypes[mealIndex] || 'snack';
+            const baseMeal = sampleMeals[Math.floor(Math.random() * sampleMeals.length)];
+            
+            allMeals.push({
+              id: `${week}-${day}-${mealIndex}`,
+              ...baseMeal,
+              type: mealType,
+              week,
+              day,
+              date: new Date(new Date(startDate).getTime() + ((week - 1) * 7 + (day - 1)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+            });
+          }
         }
       }
 
@@ -270,7 +273,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
         name: planName,
         startDate,
         endDate,
-        numberOfDays,
+        numberOfWeeks,
         numberOfPersons,
         mealsPerDay,
         dietaryRestrictions,
@@ -289,7 +292,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
       
       toast({
         title: isEditing ? "Meal Plan Updated!" : "Meal Plan Generated!",
-        description: `Your personalized meal plan "${planName}" is ready for ${numberOfDays} day${numberOfDays > 1 ? 's' : ''} and ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}.`,
+        description: `Your personalized meal plan "${planName}" is ready for ${numberOfWeeks} week${numberOfWeeks > 1 ? 's' : ''} and ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}.`,
       });
 
     } catch (error) {
@@ -337,20 +340,14 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="numberOfDays">Number of Days *</Label>
+                  <Label htmlFor="numberOfWeeks">Number of Weeks *</Label>
                   <Input
-                    id="numberOfDays"
+                    id="numberOfWeeks"
                     type="number"
                     min="1"
-                    max="10"
-                    value={numberOfDays}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (!isNaN(value) && value >= 1 && value <= 10) {
-                        setNumberOfDays(value);
-                      }
-                    }}
-                    onFocus={(e) => e.target.select()}
+                    max="12"
+                    value={numberOfWeeks}
+                    onChange={(e) => setNumberOfWeeks(parseInt(e.target.value) || 1)}
                     className="border-purple-200 focus:border-purple-400"
                   />
                 </div>
@@ -362,13 +359,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
                     min="1"
                     max="10"
                     value={numberOfPersons}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (!isNaN(value) && value >= 1 && value <= 10) {
-                        setNumberOfPersons(value);
-                      }
-                    }}
-                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => setNumberOfPersons(parseInt(e.target.value) || 1)}
                     className="border-purple-200 focus:border-purple-400"
                   />
                 </div>
@@ -380,13 +371,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
                     min="1"
                     max="6"
                     value={mealsPerDay}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (!isNaN(value) && value >= 1 && value <= 6) {
-                        setMealsPerDay(value);
-                      }
-                    }}
-                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => setMealsPerDay(parseInt(e.target.value) || 3)}
                     className="border-purple-200 focus:border-purple-400"
                   />
                 </div>
@@ -398,7 +383,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
                     <strong>Plan Duration:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
                   </p>
                   <p className="text-xs text-purple-600 mt-1">
-                    {numberOfDays} day{numberOfDays > 1 ? 's' : ''} • {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} meal{mealsPerDay > 1 ? 's' : ''} per day
+                    {numberOfWeeks} week{numberOfWeeks > 1 ? 's' : ''} • {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} meal{mealsPerDay > 1 ? 's' : ''} per day
                   </p>
                 </div>
               )}
@@ -661,7 +646,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
                 <h4 className="font-semibold text-gray-800 text-sm sm:text-base">Plan Summary:</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
                   <p>• <strong>Name:</strong> {planName}</p>
-                  <p>• <strong>Duration:</strong> {numberOfDays} day{numberOfDays > 1 ? 's' : ''}</p>
+                  <p>• <strong>Duration:</strong> {numberOfWeeks} week{numberOfWeeks > 1 ? 's' : ''}</p>
                   <p>• <strong>People:</strong> {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''}</p>
                   <p>• <strong>Meals per day:</strong> {mealsPerDay}</p>
                   <p>• <strong>Skill level:</strong> {cookingSkillLevel}</p>
