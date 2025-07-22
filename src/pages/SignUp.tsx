@@ -3,12 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Utensils, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
 import SignupSteps from "@/components/SignupSteps";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
@@ -36,11 +34,9 @@ const SignUp = () => {
         <div className="container mx-auto max-w-full sm:max-w-2xl">
           <Card className="bg-white/90 backdrop-blur-sm border-green-200 shadow-lg sm:shadow-2xl mb-4 sm:mb-6">
             <CardHeader className="text-center px-4 sm:px-6 py-4 sm:py-6">
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl text-green-700 mb-1 sm:mb-2">
-                {t('signup.title')}
-              </CardTitle>
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl text-green-700 mb-1 sm:mb-2">Join Pantry</CardTitle>
               <CardDescription className="text-sm sm:text-base md:text-lg">
-                {t('signup.subtitle')}
+                Create your account and start your smart kitchen journey
               </CardDescription>
             </CardHeader>
           </Card>
@@ -51,13 +47,13 @@ const SignUp = () => {
           
           <div className="mt-4 sm:mt-6 text-center px-4 sm:px-0">
             <p className="text-gray-600 text-sm sm:text-base">
-              {t('signup.alreadyHaveAccount')}{' '}
+              Already have an account?{' '}
               <Button
                 variant="link"
                 onClick={() => navigate('/signin')}
                 className="text-green-600 hover:text-green-700 p-0 font-semibold text-sm sm:text-base"
               >
-                {t('signup.signInHere')}
+                Sign in here
               </Button>
             </p>
           </div>

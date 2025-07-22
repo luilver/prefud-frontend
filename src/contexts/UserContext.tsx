@@ -5,8 +5,6 @@ interface User {
   name: string;
   email: string;
   phone?: string;
-  countryCode?: string;
-  preferredLanguage?: string;
   preferences: {
     dietaryRestrictions: string[];
     allergies: string[];
@@ -348,8 +346,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       name: 'John Doe',
       email: email,
       phone: '+1234567890',
-      countryCode: 'US',
-      preferredLanguage: 'en',
       preferences: {
         dietaryRestrictions: [],
         allergies: [],
@@ -391,8 +387,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       name: userData.name,
       email: userData.email,
       phone: userData.phone,
-      countryCode: userData.countryCode,
-      preferredLanguage: userData.preferredLanguage || 'en',
       preferences: userData.preferences || {
         dietaryRestrictions: [],
         allergies: [],

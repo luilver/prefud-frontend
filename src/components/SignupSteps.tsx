@@ -1,344 +1,390 @@
-
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { useLanguage, languages } from "@/contexts/LanguageContext";
-import CountrySelect, { countries } from "./CountrySelect";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle, User, Mail, Phone, Globe, Lock } from "lucide-react";
+import UserProfileForm from "./UserProfileForm";
+import OTPVerification from "./OTPVerification";
+import PaymentForm from "./PaymentForm";
+import WelcomeModal from "./WelcomeModal";
 
-const signupSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  countryCode: z.string().min(1, "Please select a country"),
-  preferredLanguage: z.string().min(1, "Please select a language"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type SignupFormData = z.infer<typeof signupSchema>;
+interface SignupData {
+  email: string;
+  password: string;
+  wantsSubscription: boolean;
+  selectedPlan?: string;
+  profile?: {
+    name: string;
+    lastName: string;
+    phonePrefix: string;
+    phone: string;
+    weight: number;
+    heightFeet: number;
+    heightInches: number;
+    birthday: string;
+    healthGoals: string[];
+    dietTypes: string[];
+    allergies: string[];
+  };
+}
 
 const SignupSteps = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const { signup } = useUser();
-  const { t, setLanguage } = useLanguage();
-  const navigate = useNavigate();
-
-  const form = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      countryCode: "",
-      preferredLanguage: "en",
-      password: "",
-      confirmPassword: "",
-    },
+  const [signupData, setSignupData] = useState<SignupData>({
+    email: "",
+    password: "",
+    wantsSubscription: false,
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const { signup } = useUser();
 
-  const steps = [
+  // Updated subscription plans to match pricing page
+  const subscriptionPlans = [
     {
-      id: 1,
-      title: t('signup.language'),
-      icon: Globe,
-      fields: ['preferredLanguage']
+      id: "free",
+      name: "Free",
+      price: 0,
+      interval: "month",
+      description: "Perfect for getting started with meal planning",
+      features: [
+        "1 Meal Plan per month",
+        "Basic Recipe Collection",
+        "Shopping List Generator",
+        "Pantry Management",
+        "Email Support"
+      ],
+      popular: false
     },
     {
-      id: 2,
-      title: t('signup.personalInfo'),
-      icon: User,
-      fields: ['name', 'email']
+      id: "family",
+      name: "Family", 
+      price: 40,
+      interval: "month",
+      description: "Ideal for families looking to optimize meal planning",
+      features: [
+        "5 Meal Plans per month",
+        "10 Meal Creations with pantry ingredients",
+        "AI Meal Recommendations",
+        "Advanced Recipe Collection",
+        "3 Free Delivery Commissions",
+        "Nutritional Analysis",
+        "Priority Support"
+      ],
+      popular: true
     },
     {
-      id: 3,
-      title: t('signup.phone'),
-      icon: Phone,
-      fields: ['countryCode', 'phone']
-    },
-    {
-      id: 4,
-      title: t('signup.password'),
-      icon: Lock,
-      fields: ['password', 'confirmPassword']
+      id: "professional",
+      name: "Professional",
+      price: 120,
+      interval: "month",
+      description: "For meal planning professionals and large households",
+      features: [
+        "12 Meal Plans per month",
+        "Unlimited Meal Creations",
+        "10 Free Delivery Commissions",
+        "3 Free Home Deliveries",
+        "Advanced AI Recommendations",
+        "Custom Dietary Plans",
+        "Bulk Shopping Lists",
+        "Professional Analytics",
+        "Phone Support",
+        "Priority Processing"
+      ],
+      popular: false
     }
   ];
 
-  const handleNext = async () => {
-    const currentFields = steps[currentStep - 1].fields;
-    const isValid = await form.trigger(currentFields as any);
-    
-    if (isValid) {
-      if (currentStep < steps.length) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        await handleSubmit();
-      }
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleSubmit = async () => {
-    const isValid = await form.trigger();
-    if (!isValid) return;
-
+  const handleBasicInfoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
+    
     try {
-      const formData = form.getValues();
-      
-      // Update language context when user selects language
-      const selectedLanguage = languages.find(lang => lang.code === formData.preferredLanguage);
-      if (selectedLanguage) {
-        setLanguage(selectedLanguage);
-      }
-
-      await signup(formData);
-      navigate('/');
+      console.log('Mock: Sending OTP to:', signupData.email);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setCurrentStep(2);
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('Failed to send OTP:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <FormField
-            control={form.control}
-            name="preferredLanguage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('signup.selectLanguage')}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('signup.selectLanguage')} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {languages.map((language) => (
-                      <SelectItem key={language.code} value={language.code}>
-                        {language.nativeName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
+  const handleOTPVerified = () => {
+    console.log('Mock: OTP verified successfully');
+    setCurrentStep(3);
+  };
 
-      case 2:
-        return (
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('signup.name')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t('signup.name')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('signup.email')}</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder={t('signup.email')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        );
+  const handleProfileComplete = (profileData: any) => {
+    console.log('Mock: Profile data saved:', profileData);
+    setSignupData(prev => ({ ...prev, profile: profileData }));
+    setCurrentStep(4);
+  };
 
-      case 3:
-        return (
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="countryCode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('signup.selectCountry')}</FormLabel>
-                  <FormControl>
-                    <CountrySelect
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      placeholder={t('signup.selectCountry')}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('signup.phone')}</FormLabel>
-                  <div className="flex space-x-2">
-                    <div className="w-20 flex items-center justify-center bg-gray-50 border rounded px-3 text-sm">
-                      {form.watch('countryCode') ? 
-                        countries.find(c => c.code === form.watch('countryCode'))?.prefix : 
-                        '+1'
-                      }
-                    </div>
-                    <FormControl>
-                      <Input placeholder="1234567890" {...field} />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('signup.password')}</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder={t('signup.password')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('signup.confirmPassword')}</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder={t('signup.confirmPassword')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        );
-
-      default:
-        return null;
+  const handleSubscriptionChoice = (planId: string) => {
+    console.log('Mock: Subscription choice:', planId);
+    const selectedPlan = subscriptionPlans.find(plan => plan.id === planId);
+    setSignupData(prev => ({ 
+      ...prev, 
+      wantsSubscription: planId !== 'free',
+      selectedPlan: planId
+    }));
+    
+    if (planId === 'free') {
+      completeSignup();
+    } else {
+      setCurrentStep(5);
     }
   };
 
+  const handlePaymentSuccess = async (paymentData: any) => {
+    console.log('Mock: Payment processed:', paymentData);
+    completeSignup();
+  };
+
+  const completeSignup = async () => {
+    try {
+      console.log('Mock: Completing signup with data:', signupData);
+      
+      const userData = {
+        name: signupData.profile?.name || signupData.email.split('@')[0],
+        email: signupData.email,
+        phone: signupData.profile?.phone || '',
+        preferences: signupData.profile ? {
+          dietaryRestrictions: [],
+          allergies: signupData.profile.allergies || [],
+          cuisinePreferences: [],
+          cookingSkillLevel: 'beginner' as const,
+          mealPrepTime: 30,
+          budgetRange: 'medium' as const
+        } : undefined
+      };
+      
+      await signup(userData);
+      
+      console.log('Mock: Signup completed, showing welcome modal');
+      
+      setTimeout(() => {
+        setShowWelcome(true);
+      }, 100);
+    } catch (error) {
+      console.error('Mock: Signup failed:', error);
+    }
+  };
+
+  const handleWelcomeClose = () => {
+    console.log('Mock: Welcome modal closed, user should now see dashboard');
+    setShowWelcome(false);
+  };
+
+  const stepItems = [
+    { step: 1, title: "Basic Info", icon: User },
+    { step: 2, title: "Verify Email", icon: Mail },
+    { step: 3, title: "Profile", icon: User },
+    { step: 4, title: "Subscription", icon: Crown },
+    { step: 5, title: "Payment", icon: CreditCard },
+  ];
+
+  if (showWelcome) {
+    return <WelcomeModal onClose={handleWelcomeClose} />;
+  }
+
   return (
-    <div className="max-w-md mx-auto">
-      {/* Progress Steps */}
-      <div className="flex justify-between mb-8">
-        {steps.map((step, index) => {
-          const StepIcon = step.icon;
-          const isCompleted = currentStep > step.id;
-          const isCurrent = currentStep === step.id;
-          
-          return (
-            <div key={step.id} className="flex flex-col items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
-                  isCompleted
-                    ? 'bg-green-500 text-white'
-                    : isCurrent
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-500'
-                }`}
-              >
-                {isCompleted ? (
-                  <CheckCircle className="h-5 w-5" />
+    <div className="max-w-full sm:max-w-4xl mx-auto space-y-4 sm:space-y-6">
+      {/* Progress Steps - Mobile Responsive */}
+      <div className="flex justify-center mb-6 sm:mb-8 overflow-x-auto">
+        <div className="flex items-center space-x-2 sm:space-x-4 px-4 sm:px-0 min-w-max">
+          {stepItems.map(({ step, title, icon: Icon }) => (
+            <div key={step} className="flex items-center">
+              <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${
+                currentStep >= step 
+                  ? 'bg-green-500 border-green-500 text-white' 
+                  : 'border-gray-300 text-gray-400'
+              }`}>
+                {currentStep > step ? (
+                  <Check className="h-3 w-3 sm:h-5 sm:w-5" />
                 ) : (
-                  <StepIcon className="h-5 w-5" />
+                  <Icon className="h-3 w-3 sm:h-5 sm:w-5" />
                 )}
               </div>
-              <span className={`text-xs text-center ${isCurrent ? 'text-green-600 font-medium' : 'text-gray-500'}`}>
-                {step.title}
+              <span className={`ml-1 sm:ml-2 text-xs sm:text-sm font-medium ${
+                currentStep >= step ? 'text-green-600' : 'text-gray-400'
+              }`}>
+                {title}
               </span>
+              {step < stepItems.length && (
+                <div className={`w-4 sm:w-8 h-0.5 ml-2 sm:ml-4 ${
+                  currentStep > step ? 'bg-green-500' : 'bg-gray-300'
+                }`} />
+              )}
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl text-green-700">
-            {steps[currentStep - 1].title}
-          </CardTitle>
-          <CardDescription>
-            Step {currentStep} of {steps.length}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <div className="space-y-6">
-              {renderStepContent()}
+      {/* Step 1: Basic Info - Removed phone fields */}
+      {currentStep === 1 && (
+        <Card className="max-w-full sm:max-w-md mx-auto bg-white/90 backdrop-blur-sm">
+          <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+            <CardTitle className="text-lg sm:text-xl">Create Your Account</CardTitle>
+            <CardDescription className="text-sm sm:text-base">Enter your email and password to get started</CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <form onSubmit={handleBasicInfoSubmit} className="space-y-3 sm:space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-sm sm:text-base">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={signupData.email}
+                  onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
               
-              <div className="flex justify-between space-x-4">
-                {currentStep > 1 && (
+              <div>
+                <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
+                <div className="relative mt-1">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={signupData.password}
+                    onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
+                    required
+                    className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base pr-10"
+                  />
                   <Button
                     type="button"
-                    variant="outline"
-                    onClick={handleBack}
-                    className="flex-1"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
                   >
-                    Back
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
                   </Button>
-                )}
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={isLoading}
-                  className={`bg-green-600 hover:bg-green-700 ${currentStep === 1 ? 'w-full' : 'flex-1'}`}
-                >
-                  {isLoading ? (
-                    "Creating..."
-                  ) : currentStep === steps.length ? (
-                    t('signup.createAccount')
-                  ) : (
-                    "Next"
-                  )}
-                </Button>
+                </div>
               </div>
-            </div>
-          </Form>
-        </CardContent>
-      </Card>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Sending Verification...' : 'Continue'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Step 2: OTP Verification */}
+      {currentStep === 2 && (
+        <OTPVerification 
+          email={signupData.email}
+          onVerified={handleOTPVerified}
+          onBack={() => setCurrentStep(1)}
+        />
+      )}
+
+      {/* Step 3: User Profile - Now includes phone fields and name fields */}
+      {currentStep === 3 && (
+        <UserProfileForm 
+          onComplete={handleProfileComplete}
+          onBack={() => setCurrentStep(2)}
+        />
+      )}
+
+      {/* Step 4: Subscription Choice - Updated layout and pricing */}
+      {currentStep === 4 && (
+        <div className="space-y-4 sm:space-y-6">
+          <div className="text-center mb-6 sm:mb-8 px-4 sm:px-0">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Choose Your Plan</h2>
+            <p className="text-gray-600 text-sm sm:text-base">Select the plan that works best for you</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
+            {subscriptionPlans.map((plan) => (
+              <Card 
+                key={plan.id} 
+                className={`relative border-2 cursor-pointer transition-all h-full ${
+                  plan.popular 
+                    ? 'border-green-500 ring-2 ring-green-200 shadow-lg' 
+                    : 'border-gray-200 hover:border-green-500 hover:shadow-md'
+                }`}
+                onClick={() => handleSubscriptionChoice(plan.id)}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                      <Star className="h-3 w-3" />
+                      <span>Most Popular</span>
+                    </div>
+                  </div>
+                )}
+                
+                <CardHeader className="text-center pb-4 px-4 sm:px-6 py-4 sm:py-6">
+                  <div className="flex justify-center mb-4">
+                    <Crown className={`h-8 w-8 ${plan.popular ? 'text-green-500' : 'text-gray-400'}`} />
+                  </div>
+                  <CardTitle className="text-xl sm:text-2xl mb-2">{plan.name}</CardTitle>
+                  <CardDescription className="text-sm mb-4 min-h-[3rem] flex items-center justify-center">
+                    {plan.description}
+                  </CardDescription>
+                  <div className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
+                    {plan.price === 0 ? 'Free' : `$${plan.price}`}
+                    {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
+                  </div>
+                </CardHeader>
+
+                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col justify-between flex-1">
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-800 mb-3">Features</h4>
+                    <ul className="space-y-2">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start space-x-3">
+                          <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-gray-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <Button 
+                    className={`w-full h-12 text-sm sm:text-base font-medium ${
+                      plan.id === 'free' 
+                        ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                        : plan.id === 'family'
+                        ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-white'
+                        : 'bg-gray-800 hover:bg-gray-700 text-white'
+                    }`}
+                  >
+                    Choose {plan.name}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Step 5: Payment */}
+      {currentStep === 5 && (
+        <PaymentForm
+          onSuccess={handlePaymentSuccess}
+          onBack={() => setCurrentStep(4)}
+          userInfo={{ email: signupData.email, phone: signupData.profile?.phone || '' }}
+          selectedPlan={subscriptionPlans.find(plan => plan.id === signupData.selectedPlan) || subscriptionPlans[1]}
+        />
+      )}
     </div>
   );
 };
