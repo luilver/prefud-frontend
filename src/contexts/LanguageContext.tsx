@@ -31,14 +31,21 @@ const translations = {
     'nav.language': 'Language',
     
     // Home page
-    'home.title': 'Smart Kitchen Management',
-    'home.subtitle': 'Transform your cooking experience with AI-powered meal planning, smart pantry management, and personalized nutrition tracking.',
-    'home.cta.primary': 'Get Started Free',
+    'home.title': 'Smart Meal Planning Made Simple',
+    'home.subtitle': 'Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Pantry.',
+    'home.cta.primary': 'Start Free Trial',
     'home.cta.secondary': 'Learn More',
-    'home.features.meal-planning': 'AI Meal Planning',
-    'home.features.pantry-management': 'Smart Pantry',
-    'home.features.nutrition-tracking': 'Nutrition Tracking',
-    'home.hero.badge': 'New AI Features',
+    'home.features.title': 'Why Pantry?',
+    'home.features.subtitle': 'Save time, money, and reduce food waste with intelligent meal planning',
+    'home.features.smart-planning.title': 'Smart Planning',
+    'home.features.smart-planning.description': 'AI-powered meal suggestions based on your pantry',
+    'home.features.reduce-waste.title': 'Reduce Waste',
+    'home.features.reduce-waste.description': 'Use ingredients before they expire',
+    'home.features.save-money.title': 'Save Money',
+    'home.features.save-money.description': 'Shop smarter with automated lists',
+    'home.footer.copyright': '© 2024 Pantry. All rights reserved.',
+    'home.nav.why-pantry': 'Why Pantry?',
+    'home.nav.get-started': 'Get Started',
     
     // Signup
     'signup.title': 'Join Pantry',
@@ -72,6 +79,18 @@ const translations = {
     'profile.language': 'Language',
     'profile.phone': 'Phone Number',
     'profile.country': 'Country',
+    
+    // Pricing
+    'pricing.title': 'Choose Your Meal Planning Plan',
+    'pricing.subtitle': 'Transform your kitchen into an eco-friendly, money-saving, time-efficient meal planning hub',
+    'pricing.back-to-dashboard': 'Back to Dashboard',
+    'pricing.environmental-impact': 'Environmental Impact',
+    'pricing.environmental-description': 'Reduce food waste and carbon footprint with smart meal planning',
+    'pricing.money-savings': 'Money Savings',
+    'pricing.money-description': 'Save hundreds monthly by reducing food waste and smart shopping',
+    'pricing.time-efficiency': 'Time Efficiency',
+    'pricing.time-description': 'Streamline grocery shopping and meal prep with automated planning',
+    'pricing.faq.title': 'Frequently Asked Questions',
   },
   es: {
     // Language names
@@ -94,14 +113,21 @@ const translations = {
     'nav.language': 'Idioma',
     
     // Home page
-    'home.title': 'Gestión Inteligente de Cocina',
-    'home.subtitle': 'Transforma tu experiencia culinaria con planificación de comidas con IA, gestión inteligente de despensa y seguimiento nutricional personalizado.',
-    'home.cta.primary': 'Comenzar Gratis',
+    'home.title': 'Planificación Inteligente de Comidas Simplificada',
+    'home.subtitle': 'Transforma tu cocina con planificación de comidas impulsada por IA, reduce el desperdicio de alimentos, ahorra dinero y come más saludable con Pantry.',
+    'home.cta.primary': 'Comenzar Prueba Gratuita',
     'home.cta.secondary': 'Saber Más',
-    'home.features.meal-planning': 'Planificación con IA',
-    'home.features.pantry-management': 'Despensa Inteligente',
-    'home.features.nutrition-tracking': 'Seguimiento Nutricional',
-    'home.hero.badge': 'Nuevas Funciones IA',
+    'home.features.title': '¿Por qué Pantry?',
+    'home.features.subtitle': 'Ahorra tiempo, dinero y reduce el desperdicio de alimentos con planificación inteligente de comidas',
+    'home.features.smart-planning.title': 'Planificación Inteligente',
+    'home.features.smart-planning.description': 'Sugerencias de comidas impulsadas por IA basadas en tu despensa',
+    'home.features.reduce-waste.title': 'Reducir Desperdicio',
+    'home.features.reduce-waste.description': 'Usa ingredientes antes de que expiren',
+    'home.features.save-money.title': 'Ahorrar Dinero',
+    'home.features.save-money.description': 'Compra más inteligentemente con listas automatizadas',
+    'home.footer.copyright': '© 2024 Pantry. Todos los derechos reservados.',
+    'home.nav.why-pantry': '¿Por qué Pantry?',
+    'home.nav.get-started': 'Comenzar',
     
     // Signup
     'signup.title': 'Únete a Pantry',
@@ -135,6 +161,18 @@ const translations = {
     'profile.language': 'Idioma',
     'profile.phone': 'Número de Teléfono',
     'profile.country': 'País',
+    
+    // Pricing
+    'pricing.title': 'Elige Tu Plan de Planificación de Comidas',
+    'pricing.subtitle': 'Transforma tu cocina en un centro de planificación de comidas ecológico, que ahorra dinero y tiempo',
+    'pricing.back-to-dashboard': 'Volver al Panel',
+    'pricing.environmental-impact': 'Impacto Ambiental',
+    'pricing.environmental-description': 'Reduce el desperdicio de alimentos y la huella de carbono con planificación inteligente de comidas',
+    'pricing.money-savings': 'Ahorros de Dinero',
+    'pricing.money-description': 'Ahorra cientos mensualmente reduciendo el desperdicio de alimentos y comprando inteligentemente',
+    'pricing.time-efficiency': 'Eficiencia de Tiempo',
+    'pricing.time-description': 'Agiliza las compras y la preparación de comidas con planificación automatizada',
+    'pricing.faq.title': 'Preguntas Frecuentes',
   },
   pt: {
     // Language names
@@ -157,14 +195,21 @@ const translations = {
     'nav.language': 'Idioma',
     
     // Home page
-    'home.title': 'Gestão Inteligente da Cozinha',
-    'home.subtitle': 'Transforme sua experiência culinária com planejamento de refeições com IA, gestão inteligente da despensa e rastreamento nutricional personalizado.',
-    'home.cta.primary': 'Começar Grátis',
+    'home.title': 'Planejamento Inteligente de Refeições Simplificado',
+    'home.subtitle': 'Transforme sua cozinha com planejamento de refeições com IA, reduza o desperdício de alimentos, economize dinheiro e coma mais saudável com o Pantry.',
+    'home.cta.primary': 'Começar Teste Gratuito',
     'home.cta.secondary': 'Saiba Mais',
-    'home.features.meal-planning': 'Planejamento com IA',
-    'home.features.pantry-management': 'Despensa Inteligente',
-    'home.features.nutrition-tracking': 'Rastreamento Nutricional',
-    'home.hero.badge': 'Novos Recursos IA',
+    'home.features.title': 'Por que Pantry?',
+    'home.features.subtitle': 'Economize tempo, dinheiro e reduza o desperdício de alimentos com planejamento inteligente de refeições',
+    'home.features.smart-planning.title': 'Planejamento Inteligente',
+    'home.features.smart-planning.description': 'Sugestões de refeições com IA baseadas na sua despensa',
+    'home.features.reduce-waste.title': 'Reduzir Desperdício',
+    'home.features.reduce-waste.description': 'Use ingredientes antes que expirem',
+    'home.features.save-money.title': 'Economizar Dinheiro',
+    'home.features.save-money.description': 'Compre mais inteligentemente com listas automatizadas',
+    'home.footer.copyright': '© 2024 Pantry. Todos os direitos reservados.',
+    'home.nav.why-pantry': 'Por que Pantry?',
+    'home.nav.get-started': 'Começar',
     
     // Signup
     'signup.title': 'Junte-se ao Pantry',
@@ -198,6 +243,18 @@ const translations = {
     'profile.language': 'Idioma',
     'profile.phone': 'Número de Telefone',
     'profile.country': 'País',
+    
+    // Pricing
+    'pricing.title': 'Escolha Seu Plano de Planejamento de Refeições',
+    'pricing.subtitle': 'Transforme sua cozinha em um centro de planejamento de refeições ecológico, econômico e eficiente',
+    'pricing.back-to-dashboard': 'Voltar ao Painel',
+    'pricing.environmental-impact': 'Impacto Ambiental',
+    'pricing.environmental-description': 'Reduza o desperdício de alimentos e a pegada de carbono com planejamento inteligente de refeições',
+    'pricing.money-savings': 'Economia de Dinheiro',
+    'pricing.money-description': 'Economize centenas mensalmente reduzindo o desperdício de alimentos e comprando inteligentemente',
+    'pricing.time-efficiency': 'Eficiência de Tempo',
+    'pricing.time-description': 'Agilize as compras e preparo de refeições com planejamento automatizado',
+    'pricing.faq.title': 'Perguntas Frequentes',
   }
 };
 

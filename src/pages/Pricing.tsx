@@ -1,11 +1,12 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Crown, Star, Leaf, Clock, DollarSign, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
+import LanguageSelector from "@/components/LanguageSelector";
 
 interface PricingPlan {
   id: string;
@@ -115,6 +116,7 @@ const plans: PricingPlan[] = [
 const Pricing = () => {
   const navigate = useNavigate();
   const { user, acceptSubscription } = useUser();
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
 
@@ -157,19 +159,20 @@ const Pricing = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-orange-50">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="flex items-center mb-8">
-          <Button variant="ghost" onClick={() => navigate('/')} className="mr-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+        <div className="flex items-center justify-between mb-8">
+          <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-2">
+            <ArrowLeft className="h-4 w-4" />
+            <span>{t('pricing.back-to-dashboard')}</span>
           </Button>
+          <LanguageSelector variant="button" />
         </div>
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Choose Your Meal Planning Plan
+            {t('pricing.title')}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Transform your kitchen into an eco-friendly, money-saving, time-efficient meal planning hub
+            {t('pricing.subtitle')}
           </p>
         </div>
 
@@ -178,22 +181,22 @@ const Pricing = () => {
           <Card className="text-center bg-green-100 border-green-300">
             <CardContent className="p-6">
               <Leaf className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-green-800 mb-2">Environmental Impact</h3>
-              <p className="text-green-700">Reduce food waste and carbon footprint with smart meal planning</p>
+              <h3 className="text-lg font-semibold text-green-800 mb-2">{t('pricing.environmental-impact')}</h3>
+              <p className="text-green-700">{t('pricing.environmental-description')}</p>
             </CardContent>
           </Card>
           <Card className="text-center bg-blue-100 border-blue-300">
             <CardContent className="p-6">
               <DollarSign className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-blue-800 mb-2">Money Savings</h3>
-              <p className="text-blue-700">Save hundreds monthly by reducing food waste and smart shopping</p>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">{t('pricing.money-savings')}</h3>
+              <p className="text-blue-700">{t('pricing.money-description')}</p>
             </CardContent>
           </Card>
           <Card className="text-center bg-orange-100 border-orange-300">
             <CardContent className="p-6">
               <Clock className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-orange-800 mb-2">Time Efficiency</h3>
-              <p className="text-orange-700">Streamline grocery shopping and meal prep with automated planning</p>
+              <h3 className="text-lg font-semibold text-orange-800 mb-2">{t('pricing.time-efficiency')}</h3>
+              <p className="text-orange-700">{t('pricing.time-description')}</p>
             </CardContent>
           </Card>
         </div>
@@ -283,7 +286,7 @@ const Pricing = () => {
         {/* FAQ Section */}
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Frequently Asked Questions
+            {t('pricing.faq.title')}
           </h2>
           <div className="space-y-4">
             <Card>

@@ -3,11 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Utensils, Menu, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Dashboard from "@/components/Dashboard";
+import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -50,19 +53,20 @@ const Index = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
               <Link to="/why-pantry" className="text-gray-600 hover:text-green-600 transition-colors">
-                Why Pantry?
+                {t('home.nav.why-pantry')}
               </Link>
               <Link to="/pricing" className="text-gray-600 hover:text-green-600 transition-colors">
-                Pricing
+                {t('nav.pricing')}
               </Link>
+              <LanguageSelector variant="button" className="mr-2" />
               <Link to="/signin">
                 <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-                  Sign In
+                  {t('nav.signin')}
                 </Button>
               </Link>
               <Link to="/signup">
                 <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-                  Get Started
+                  {t('home.nav.get-started')}
                 </Button>
               </Link>
             </div>
@@ -89,24 +93,27 @@ const Index = () => {
                   className="text-gray-600 hover:text-green-600 transition-colors px-2 py-1"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Why Pantry?
+                  {t('home.nav.why-pantry')}
                 </Link>
                 <Link 
                   to="/pricing" 
                   className="text-gray-600 hover:text-green-600 transition-colors px-2 py-1"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Pricing
+                  {t('nav.pricing')}
                 </Link>
+                <div className="px-2 py-1">
+                  <LanguageSelector className="w-full" />
+                </div>
                 <div className="flex flex-col space-y-2 pt-2">
                   <Link to="/signin" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full border-green-500 text-green-600 hover:bg-green-50">
-                      Sign In
+                      {t('nav.signin')}
                     </Button>
                   </Link>
                   <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-                      Get Started
+                      {t('home.nav.get-started')}
                     </Button>
                   </Link>
                 </div>
@@ -119,15 +126,15 @@ const Index = () => {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-5xl font-bold text-gray-800 mb-6">
-          Smart Meal Planning Made Simple
+          {t('home.title')}
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Pantry.
+          {t('home.subtitle')}
         </p>
         <div className="flex justify-center">
           <Link to="/signup">
             <Button size="lg" className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-              Start Free Trial
+              {t('home.cta.primary')}
             </Button>
           </Link>
         </div>
@@ -136,9 +143,9 @@ const Index = () => {
       {/* Simple Features Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Why Pantry?</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">{t('home.features.title')}</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Save time, money, and reduce food waste with intelligent meal planning
+            {t('home.features.subtitle')}
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
@@ -146,22 +153,22 @@ const Index = () => {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Utensils className="h-8 w-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Smart Planning</h3>
-            <p className="text-gray-600">AI-powered meal suggestions based on your pantry</p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.features.smart-planning.title')}</h3>
+            <p className="text-gray-600">{t('home.features.smart-planning.description')}</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Utensils className="h-8 w-8 text-orange-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Reduce Waste</h3>
-            <p className="text-gray-600">Use ingredients before they expire</p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.features.reduce-waste.title')}</h3>
+            <p className="text-gray-600">{t('home.features.reduce-waste.description')}</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Utensils className="h-8 w-8 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Save Money</h3>
-            <p className="text-gray-600">Shop smarter with automated lists</p>
+            <h3 className="text-xl font-semibold mb-2">{t('home.features.save-money.title')}</h3>
+            <p className="text-gray-600">{t('home.features.save-money.description')}</p>
           </div>
         </div>
       </div>
@@ -169,7 +176,7 @@ const Index = () => {
       {/* Simple Footer */}
       <footer className="bg-gray-800 text-white py-8">
         <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2024 Pantry. All rights reserved.</p>
+          <p>{t('home.footer.copyright')}</p>
         </div>
       </footer>
     </div>

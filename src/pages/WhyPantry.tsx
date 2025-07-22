@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Utensils, ArrowLeft, Leaf, Clock, DollarSign, Users, TrendingDown, Recycle, ShoppingCart, Calendar, BarChart3, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const WhyPantry = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
@@ -20,10 +23,13 @@ const WhyPantry = () => {
               Pantry
             </h1>
           </div>
-          <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Home</span>
-          </Button>
+          <div className="flex items-center space-x-4">
+            <LanguageSelector variant="button" />
+            <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-2">
+              <ArrowLeft className="h-4 w-4" />
+              <span>{t('common.back')} to Home</span>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -321,7 +327,7 @@ const WhyPantry = () => {
               className="bg-white text-green-600 hover:bg-gray-100 font-semibold px-8 py-3"
               onClick={() => navigate('/signup')}
             >
-              Get Started Free
+              {t('home.nav.get-started')} Free
             </Button>
             <Button 
               size="lg"
@@ -329,7 +335,7 @@ const WhyPantry = () => {
               className="border-white text-white hover:bg-white hover:text-green-600 font-semibold px-8 py-3"
               onClick={() => navigate('/')}
             >
-              Learn More
+              {t('home.cta.secondary')}
             </Button>
           </div>
         </div>
