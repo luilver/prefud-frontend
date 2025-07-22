@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, Mail, RefreshCw } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface OTPVerificationProps {
   email: string;
@@ -15,6 +15,7 @@ const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) =>
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const { t } = useLanguage();
 
   const handleVerify = async () => {
     if (otp.length !== 6) return;
@@ -61,10 +62,10 @@ const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) =>
           <div>
             <CardTitle className="flex items-center space-x-2">
               <Mail className="h-5 w-5" />
-              <span>Verify Your Email</span>
+              <span>{t('otp.title')}</span>
             </CardTitle>
             <CardDescription>
-              We've sent a 6-digit code to {email}
+              {t('otp.description')} {email}
             </CardDescription>
           </div>
         </div>
@@ -72,7 +73,7 @@ const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) =>
       <CardContent className="space-y-6">
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-4">
-            Enter the verification code sent to your email
+            {t('otp.instruction')}
           </p>
           
           <div className="flex justify-center mb-6">
@@ -97,12 +98,12 @@ const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) =>
             disabled={otp.length !== 6 || isLoading}
             className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 mb-4"
           >
-            {isLoading ? 'Verifying...' : 'Verify Email'}
+            {isLoading ? t('otp.verifying') : t('otp.verify')}
           </Button>
 
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-2">
-              Didn't receive the code?
+              {t('otp.resend.text')}
             </p>
             <Button 
               variant="ghost" 
@@ -113,10 +114,10 @@ const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) =>
               {isResending ? (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Sending...
+                  {t('otp.resend.sending')}
                 </>
               ) : (
-                'Resend Code'
+                t('otp.resend.button')
               )}
             </Button>
           </div>
