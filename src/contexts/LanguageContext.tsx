@@ -29,6 +29,14 @@ const translations = {
     'nav.signup': 'Sign Up',
     'nav.language': 'Language',
     
+    // Dashboard Highlights
+    'highlights.title': 'Dashboard Highlights',
+    'highlights.subtitle': 'Overview of your meal planning progress and statistics',
+    'highlights.plans-used': 'Plans Used',
+    'highlights.todays-calories': "Today's Calories",
+    'highlights.shopping-items': 'Shopping Items',
+    'highlights.pantry-items': 'Pantry Items',
+    
     // Home page
     'home.title': 'Smart Meal Planning Made Simple',
     'home.subtitle': 'Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Pantry.',
@@ -233,6 +241,14 @@ const translations = {
     'nav.signup': 'Registrarse',
     'nav.language': 'Idioma',
     
+    // Dashboard Highlights
+    'highlights.title': 'Destacados del Panel',
+    'highlights.subtitle': 'Resumen de tu progreso de planificación de comidas y estadísticas',
+    'highlights.plans-used': 'Planes Usados',
+    'highlights.todays-calories': 'Calorías de Hoy',
+    'highlights.shopping-items': 'Artículos de Compras',
+    'highlights.pantry-items': 'Artículos de Despensa',
+    
     // Home page
     'home.title': 'Planificación Inteligente de Comidas Simplificada',
     'home.subtitle': 'Transforma tu cocina con planificación de comidas impulsada por IA, reduce el desperdicio de alimentos, ahorra dinero y come más saludable con Pantry.',
@@ -398,9 +414,9 @@ const translations = {
     'why-pantry.save-money.breakdown.bulk-buying': 'Alertas de compras al por mayor',
     'why-pantry.save-money.breakdown.coupons': 'Integración de cupones',
     'why-pantry.carbon-footprint.title': 'Reducir la Huella de Carbono',
-    'why-pantry.carbon-footprint.description': 'El desperdicio de alimentos es responsable del 8% de las emisiones globales de gases de efecto invernadero. Al usar Pantry, no solo estás ahorrando dinero - estás ayudando a salvar el planeta. Cada comida planificada eficientemente y cada ingrediente salvado de la basura hace un impacto ambiental real.',
+    'why-pantry.carbon-footprint.description': 'El desperdicio de alimentos es responsable del 8% de las emisiones globales de gases de efecto invernadero. Al usar Pantry, no solo estás ahorrando dinero - estás ayudando a salvar el planeta. Cada comida planificada eficientemente y cada ingrediente salvado del basura hace un impacto ambiental real.',
     'why-pantry.carbon-footprint.feature1': 'Reducir metano del desperdicio de alimentos',
-    'why-pantry.carbon-footprint.feature2': 'Reducir emisiones de transporte',
+    'why-pantry.carbon-footprint.feature2': 'Disminuir emisiones de transporte',
     'why-pantry.carbon-footprint.feature3': 'Apoyar sistemas alimentarios sostenibles',
     'why-pantry.carbon-footprint.stat': 'Toneladas CO₂',
     'why-pantry.carbon-footprint.stat-desc': 'Reducidas por hogar anualmente',
@@ -436,6 +452,14 @@ const translations = {
     'nav.signin': 'Entrar',
     'nav.signup': 'Cadastrar',
     'nav.language': 'Idioma',
+    
+    // Dashboard Highlights
+    'highlights.title': 'Destaques do Painel',
+    'highlights.subtitle': 'Visão geral do seu progresso de planejamento de refeições e estatísticas',
+    'highlights.plans-used': 'Planos Usados',
+    'highlights.todays-calories': 'Calorias de Hoje',
+    'highlights.shopping-items': 'Itens de Compras',
+    'highlights.pantry-items': 'Itens da Despensa',
     
     // Home page
     'home.title': 'Planejamento Inteligente de Refeições Simplificado',
