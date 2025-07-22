@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Brain, ShoppingCart, Utensils, TrendingDown, Clock, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import Navigation from "@/components/Navigation";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -62,6 +63,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <Navigation />
+      
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-green-50 to-blue-50 py-20">
         <div className="container mx-auto px-4">

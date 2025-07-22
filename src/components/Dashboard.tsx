@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Utensils, ChefHat, Sparkles, Plus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import Navigation from "./Navigation";
+import DashboardNavigation from "./DashboardNavigation";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
 import IngredientTracker from "./IngredientTracker";
@@ -62,7 +61,7 @@ const Dashboard = () => {
       </header>
 
       {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <DashboardNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content */}
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-6 lg:py-8">
