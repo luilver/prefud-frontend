@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Droplets, Eye } from "lucide-react";
+import { ArrowLeft, Droplets, Eye, Wine } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import AIDrinkCreatorStepper from "./AIDrinkCreatorStepper";
 import AIDrinkView from "./AIDrinkView";
@@ -54,15 +54,12 @@ const AIDrinkCreator = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-green-800 mb-2">AI Healthy Drinks</h1>
-        <p className="text-green-600">Create personalized healthy drinks with AI assistance</p>
-      </div>
+     
 
       <Card className="border-green-200">
         <CardHeader className="text-center">
           <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mb-4">
-            <Droplets className="h-8 w-8 text-white" />
+            <Wine className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl text-green-800">Create Your Perfect Healthy Drink</CardTitle>
           <CardDescription className="text-green-600">

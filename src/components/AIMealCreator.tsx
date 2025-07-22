@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2, Eye } from "lucide-react";
+import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2, Eye, Salad } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import AIMealCreatorStepper from "./AIMealCreatorStepper";
 import AIMealView from "./AIMealView";
@@ -58,10 +58,10 @@ const AIMealCreator = () => {
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center space-x-2">
           <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-            <Sparkles className="h-8 w-8 text-white" />
+            <Salad className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            AI Meal Creator
+            Create a Meal
           </h1>
         </div>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -131,10 +131,10 @@ const AIMealCreator = () => {
           <CardContent>
             <div className="space-y-4">
               <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-                <Sparkles className="h-8 w-8 text-purple-600" />
+                <Salad className="h-8 w-8 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">No AI meals created yet</h3>
+                <h3 className="text-lg font-semibold mb-2">No Meals created yet</h3>
                 <p className="text-gray-600 mb-4">
                   Start creating your first AI-powered meal based on your preferences and ingredients.
                 </p>
