@@ -9,6 +9,7 @@ import { User, Mail, Phone, Globe, MapPin, Edit2, Save, X, Languages } from "luc
 import { useUser } from "@/contexts/UserContext";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
+import PasswordUpdate from "./PasswordUpdate";
 
 const UserProfile = () => {
   const { user, updateUserProfile } = useUser();
@@ -234,6 +235,9 @@ const UserProfile = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Password Update Section */}
+      <PasswordUpdate />
     </div>
   );
 };
