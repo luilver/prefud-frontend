@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Calendar, TrendingUp, ShoppingCart, Package, User, Sparkles, Leaf, CookingPot, CupSoda } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NavigationProps {
   activeTab: string;
@@ -8,18 +9,18 @@ interface NavigationProps {
 }
 
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
+  const { t } = useLanguage();
+
   const navItems = [
-    { id: "planner", label: "Planner", icon: Calendar },
-    { id: "ai-meals", label: "Meals", icon: CookingPot },
-    { id: "ai-drinks", label: "Drinks", icon: CupSoda },
-    { id: "ingredients", label: "Pantry", icon: Package },
-    { id: "shopping", label: "Shopping", icon: ShoppingCart },
-   
-    { id: "environment", label: "Environment", icon: Leaf },
-    
-    { id: "calories", label: "Calories", icon: TrendingUp },
-     { id: "highlights", label: "Highlights", icon: Sparkles },
-    { id: "profile", label: "Profile", icon: User },
+    { id: "planner", label: t('dashboard.nav.planner'), icon: Calendar },
+    { id: "ai-meals", label: t('dashboard.nav.meals'), icon: CookingPot },
+    { id: "ai-drinks", label: t('dashboard.nav.drinks'), icon: CupSoda },
+    { id: "ingredients", label: t('dashboard.nav.pantry'), icon: Package },
+    { id: "shopping", label: t('dashboard.nav.shopping'), icon: ShoppingCart },
+    { id: "environment", label: t('dashboard.nav.environment'), icon: Leaf },
+    { id: "calories", label: t('dashboard.nav.calories'), icon: TrendingUp },
+    { id: "highlights", label: t('dashboard.nav.highlights'), icon: Sparkles },
+    { id: "profile", label: t('dashboard.nav.profile'), icon: User },
   ];
 
   return (

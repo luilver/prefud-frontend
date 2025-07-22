@@ -29,6 +29,21 @@ const translations = {
     'nav.signup': 'Sign Up',
     'nav.language': 'Language',
     
+    // Dashboard Navigation Tabs
+    'dashboard.nav.planner': 'Planner',
+    'dashboard.nav.meals': 'Meals',
+    'dashboard.nav.drinks': 'Drinks',
+    'dashboard.nav.pantry': 'Pantry',
+    'dashboard.nav.shopping': 'Shopping',
+    'dashboard.nav.environment': 'Environment',
+    'dashboard.nav.calories': 'Calories',
+    'dashboard.nav.highlights': 'Highlights',
+    'dashboard.nav.profile': 'Profile',
+    
+    // Dashboard Header
+    'dashboard.header.welcome': 'Welcome',
+    'dashboard.header.logout': 'Logout',
+    
     // Dashboard Highlights
     'highlights.title': 'Dashboard Highlights',
     'highlights.subtitle': 'Overview of your meal planning progress and statistics',
@@ -240,6 +255,21 @@ const translations = {
     'nav.signin': 'Iniciar Sesión',
     'nav.signup': 'Registrarse',
     'nav.language': 'Idioma',
+    
+    // Dashboard Navigation Tabs
+    'dashboard.nav.planner': 'Planificador',
+    'dashboard.nav.meals': 'Comidas',
+    'dashboard.nav.drinks': 'Bebidas',
+    'dashboard.nav.pantry': 'Despensa',
+    'dashboard.nav.shopping': 'Compras',
+    'dashboard.nav.environment': 'Ambiente',
+    'dashboard.nav.calories': 'Calorías',
+    'dashboard.nav.highlights': 'Destacados',
+    'dashboard.nav.profile': 'Perfil',
+    
+    // Dashboard Header
+    'dashboard.header.welcome': 'Bienvenido',
+    'dashboard.header.logout': 'Cerrar Sesión',
     
     // Dashboard Highlights
     'highlights.title': 'Destacados del Panel',
@@ -453,6 +483,21 @@ const translations = {
     'nav.signup': 'Cadastrar',
     'nav.language': 'Idioma',
     
+    // Dashboard Navigation Tabs
+    'dashboard.nav.planner': 'Planejador',
+    'dashboard.nav.meals': 'Refeições',
+    'dashboard.nav.drinks': 'Bebidas',
+    'dashboard.nav.pantry': 'Despensa',
+    'dashboard.nav.shopping': 'Compras',
+    'dashboard.nav.environment': 'Ambiente',
+    'dashboard.nav.calories': 'Calorias',
+    'dashboard.nav.highlights': 'Destaques',
+    'dashboard.nav.profile': 'Perfil',
+    
+    // Dashboard Header
+    'dashboard.header.welcome': 'Bem-vindo',
+    'dashboard.header.logout': 'Sair',
+    
     // Dashboard Highlights
     'highlights.title': 'Destaques do Painel',
     'highlights.subtitle': 'Visão geral do seu progresso de planejamento de refeições e estatísticas',
@@ -598,7 +643,7 @@ const translations = {
     'why-pantry.title.main': 'Por que o Pantry está',
     'why-pantry.title.sub': 'Mudando o Mundo',
     'why-pantry.hero.description': 'Todos os dias, milhões de toneladas de alimentos são desperdiçados enquanto as pessoas lutam com o planejamento de refeições e compras de supermercado. O Pantry está revolucionando como pensamos sobre comida, sustentabilidade e vida inteligente.',
-    'why-pantry.stats.food-waste': 'Desperdício de Alimentos Reducido',
+    'why-pantry.stats.food-waste': 'Desperdício de Alimentos Reduzido',
     'why-pantry.stats.yearly-savings': 'Economia Anual Média',
     'why-pantry.stats.time-saved': 'Tempo Economizado Semanalmente',
     'why-pantry.stats.co2-reduced': 'CO₂ Reduzido/Ano',

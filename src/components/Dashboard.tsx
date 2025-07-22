@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Utensils, ChefHat, Sparkles, Plus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Navigation from "./Navigation";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
@@ -21,6 +22,7 @@ import LanguageSelector from "./LanguageSelector";
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("planner");
   const { user, logout } = useUser();
+  const { t } = useLanguage();
 
   const handleStartPlanning = () => {
     setActiveTab("planner");
@@ -51,13 +53,13 @@ const Dashboard = () => {
           <div className="flex items-center space-x-2 sm:space-x-3">
             <LanguageSelector variant="button" className="mr-2" />
             <span className="text-sm sm:text-base text-green-700 font-medium hidden sm:block">
-             Welcome {user?.name || 'User'} !
+              {t('dashboard.header.welcome')} {user?.name || 'User'} !
             </span>
             <span className="text-xs text-green-700 font-medium sm:hidden">
-             {user?.name?.split(' ')[0] || 'User'}
+              {user?.name?.split(' ')[0] || 'User'}
             </span>
             <Button variant="ghost" onClick={logout} className="text-green-700 text-xs sm:text-sm lg:text-base px-2 sm:px-3 lg:px-4 py-1 sm:py-2">
-              Logout
+              {t('dashboard.header.logout')}
             </Button>
           </div>
         </div>
