@@ -12,7 +12,9 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkSubscription();
+    if (isAuthenticated) {
+      checkSubscription();
+    }
   }, [isAuthenticated, checkSubscription]);
 
   // Redirect mobile users to login if not authenticated

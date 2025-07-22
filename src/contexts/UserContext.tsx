@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface User {
   id: string;
@@ -759,7 +759,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const checkSubscription = async () => {
+  const checkSubscription = useCallback(async () => {
     // Mock subscription check - in real app this would call Supabase edge function
     try {
       const mockSubscriptionInfo: SubscriptionInfo = {
@@ -772,7 +772,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Failed to check subscription:', error);
     }
-  };
+  }, [user?.subscription?.isSubscribed, user?.subscription?.plan]);
 
   const createCheckoutWithPaymentMethod = async (plan: any, paymentMethodId?: string): Promise<string> => {
     // Mock checkout creation - in real app this would call Supabase edge function
