@@ -17,14 +17,24 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   const [currentStep, setCurrentStep] = useState(1);
   const [drinkData, setDrinkData] = useState({
     type: '',
-    goals: [] as string[],
+    drinkType: '',
+    healthGoals: [] as string[],
+    dietaryRestrictions: [] as string[],
+    cuisinePreferences: [] as string[],
+    allergiesIntolerance: [] as string[],
+    dislikes: '',
+    maxCookingTime: 30,
+    cookingSkillLevel: '',
+    budgetRange: '',
+    drink_name: '',
+    numberPeople: 1,
     ingredients: [] as string[],
     preferences: {} as any
   });
 
   const steps = [
     { number: 1, title: "Drink Type", component: AIDrinkType },
-    { number: 2, title: "Health Goals", component: AIDrinkGoals },
+    { number: 2, title: "Preferences & Goals", component: AIDrinkGoals },
     { number: 3, title: "Ingredients", component: AIDrinkIngredients },
     { number: 4, title: "AI Generation", component: AIDrinkGeneration },
   ];
@@ -44,7 +54,9 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   const updateDrinkData = (key: string, value: any) => {
     setDrinkData(prev => ({
       ...prev,
-      [key]: value
+      [key]: value,
+      // Map type to drinkType for consistency
+      ...(key === 'type' ? { drinkType: value } : {})
     }));
   };
 
