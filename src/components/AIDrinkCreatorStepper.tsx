@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import AIDrinkType from "./AIDrinkType";
 import AIDrinkGoals from "./AIDrinkGoals";
-import AIDrinkIngredients from "./AIDrinkIngredients";
 import AIDrinkGeneration from "./AIDrinkGeneration";
 
 interface AIDrinkCreatorStepperProps {
@@ -28,15 +27,13 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     budgetRange: '',
     drink_name: '',
     numberPeople: 1,
-    ingredients: [] as string[],
     preferences: {} as any
   });
 
   const steps = [
     { number: 1, title: "Drink Type", component: AIDrinkType },
     { number: 2, title: "Preferences & Goals", component: AIDrinkGoals },
-    { number: 3, title: "Ingredients", component: AIDrinkIngredients },
-    { number: 4, title: "AI Generation", component: AIDrinkGeneration },
+    { number: 3, title: "AI Generation", component: AIDrinkGeneration },
   ];
 
   const handleNext = () => {
