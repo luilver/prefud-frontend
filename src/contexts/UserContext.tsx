@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
 
 interface User {
   id: string;
@@ -190,6 +191,7 @@ export const useUser = () => {
 };
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user: authUser, login: authLogin, logout: authLogout, isAuthenticated: authIsAuthenticated } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
@@ -205,7 +207,43 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Computed properties
   const ingredients = pantryItems;
-  const isAuthenticated = user !== null;
+  const isAuthenticated = authIsAuthenticated || user !== null;
+
+  // Sync with AuthContext user
+  useEffect(() => {
+    if (authUser && !user) {
+      // Create user profile from auth user
+      const userProfile: User = {
+        id: authUser.userId,
+        name: authUser.email.split('@')[0], // Use email prefix as name
+        email: authUser.email,
+        language: 'en',
+        preferences: {
+          dietaryRestrictions: [],
+          allergies: [],
+          cuisinePreferences: [],
+          cookingSkillLevel: 'beginner',
+          mealPrepTime: 30,
+          budgetRange: 'medium'
+        },
+        subscription: {
+          plan: 'free',
+          isSubscribed: false,
+          planLimits: {
+            plansPerMonth: 1,
+            usedPlans: 0,
+            mealCreations: 3,
+            usedMealCreations: 0,
+            deliveryCommissions: 0,
+            usedDeliveryCommissions: 0
+          }
+        }
+      };
+      setUser(userProfile);
+    } else if (!authUser && user) {
+      setUser(null);
+    }
+  }, [authUser, user]);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -340,43 +378,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [shoppingItems]);
 
-  // Authentication methods
+  // Authentication methods - now using AuthContext
   const login = async (email: string, password: string) => {
-    // Mock login implementation
-    const mockUser: User = {
-      id: '1',
-      name: 'John Doe',
-      email: email,
-      phone: '+1234567890',
-      country: 'US',
-      language: 'en',
-      preferences: {
-        dietaryRestrictions: [],
-        allergies: [],
-        cuisinePreferences: ['Italian', 'Mexican'],
-        cookingSkillLevel: 'intermediate',
-        mealPrepTime: 30,
-        budgetRange: 'medium'
-      },
-      subscription: {
-        plan: 'free',
-        isSubscribed: false,
-        planLimits: {
-          plansPerMonth: 1,
-          usedPlans: 0,
-          mealCreations: 3,
-          usedMealCreations: 0,
-          deliveryCommissions: 0,
-          usedDeliveryCommissions: 0
-        }
-      }
-    };
-    setUser(mockUser);
-    // Check subscription after login
+    await authLogin(email, password);
+    // User profile will be created in the useEffect above
     await checkSubscription();
   };
 
   const logout = () => {
+    authLogout();
     setUser(null);
     setSubscriptionInfo(null);
     localStorage.removeItem('user');
