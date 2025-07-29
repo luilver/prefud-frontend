@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '@/services/authService';
 
 interface AuthUser {
   email: string;
@@ -9,6 +10,30 @@ interface AuthUser {
   expirationToken: string;
   token: string;
   userId: string;
+  profile?: {
+    _id: string;
+    name: string;
+    lastName: string;
+    weight: number;
+    height: number;
+    birthday: string;
+    healthGoals: {
+      dailyCaloriesGoal: number;
+      mealsPerDay: number;
+      personCount: number;
+      _id: string;
+    };
+    dietTypes: string[];
+    alergies: string[];
+    phone: string;
+    userId: string;
+    ruku_client_id: string;
+    suscription_id: string;
+    addressId: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
 }
 
 interface AuthContextType {
@@ -41,15 +66,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedUser && savedToken) {
       const parsedUser = JSON.parse(savedUser);
       // Check if token is expired
-      const expirationTime = new Date(parsedUser.expirationToken).getTime();
-      const currentTime = new Date().getTime();
-      
-      if (currentTime < expirationTime) {
-        setUser(parsedUser);
-      } else {
+      if (authService.isTokenExpired(parsedUser.expirationToken)) {
         // Token expired, clear storage
         localStorage.removeItem('authUser');
         localStorage.removeItem('authToken');
+      } else {
+        setUser(parsedUser);
       }
     }
   }, []);
@@ -57,25 +79,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Mock API call - replace with actual endpoint later
-      const mockResponse = {
-        email: email,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationToken: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
-        token: "mock-jwt-token-" + Date.now(),
-        userId: "mock-user-id-" + Math.random().toString(36).substr(2, 9)
+      const response = await authService.login(email, password);
+      
+      const userData: AuthUser = {
+        email: response.email,
+        isActive: response.isActive,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt,
+        expirationToken: response.expirationToken,
+        token: response.token,
+        userId: response.userId,
+        profile: response.profile
       };
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       // Store user data and token
-      localStorage.setItem('authUser', JSON.stringify(mockResponse));
-      localStorage.setItem('authToken', mockResponse.token);
+      localStorage.setItem('authUser', JSON.stringify(userData));
+      localStorage.setItem('authToken', response.token);
       
-      setUser(mockResponse);
+      setUser(userData);
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

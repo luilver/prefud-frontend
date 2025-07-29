@@ -22,10 +22,39 @@ interface ApiErrorResponse {
   path_url: string;
 }
 
+interface UserProfile {
+  _id: string;
+  name: string;
+  lastName: string;
+  weight: number;
+  height: number;
+  birthday: string;
+  healthGoals: {
+    dailyCaloriesGoal: number;
+    mealsPerDay: number;
+    personCount: number;
+    _id: string;
+  };
+  dietTypes: string[];
+  alergies: string[];
+  phone: string;
+  userId: string;
+  ruku_client_id: string;
+  suscription_id: string;
+  addressId: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface CompleteLoginResponse extends LoginResponse {
+  profile: UserProfile;
+}
+
 class AuthService {
   private baseURL = 'https://pantry-auth-1.onrender.com';
 
-  async login(email: string, password: string): Promise<LoginResponse> {
+  async login(email: string, password: string): Promise<CompleteLoginResponse> {
     try {
       const response = await fetch(`${this.baseURL}/security/login`, {
         method: 'POST',
@@ -40,10 +69,39 @@ class AuthService {
         throw new Error(errorData.message.message);
       }
 
-      const data = await response.json();
-      return data;
+      const loginData: LoginResponse = await response.json();
+      
+      // Fetch user profile after successful login
+      const profile = await this.getProfile(loginData.userId);
+      
+      return {
+        ...loginData,
+        profile
+      };
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
+    }
+  }
+
+  async getProfile(userId: string): Promise<UserProfile> {
+    try {
+      const response = await fetch(`${this.baseURL}/user-profile/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        throw new Error(errorData.message.message);
+      }
+
+      const profileData: UserProfile = await response.json();
+      return profileData;
+    } catch (error) {
+      console.error('Get profile error:', error);
       throw error;
     }
   }
