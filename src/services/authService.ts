@@ -13,34 +13,43 @@ interface ApiResponse {
   message: string;
 }
 
+interface ApiErrorResponse {
+  message: {
+    message: string;
+    error: string;
+    statusCode: number;
+  };
+  path_url: string;
+}
+
 class AuthService {
   private baseURL = 'https://pantry-auth-1.onrender.com';
 
   async login(email: string, password: string): Promise<LoginResponse> {
-    // Mock implementation - will be replaced with actual API call
-    const mockResponse: LoginResponse = {
-      email: email,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      expirationToken: new Date(Date.now() + 3600000).toISOString(),
-      token: "mock-jwt-token-" + Date.now(),
-      userId: "mock-user-id-" + Math.random().toString(36).substr(2, 9)
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/security/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        throw new Error(errorData.message.message);
+      }
 
-    // Mock validation
-    if (!email || !password) {
-      throw new Error('Email and password are required');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
-
-    return mockResponse;
   }
 
   async requestPasswordReset(email: string): Promise<ApiResponse> {
-    // Mock implementation
+    // Mock implementation - will be replaced with actual API call
     console.log('Password reset requested for:', email);
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -50,7 +59,7 @@ class AuthService {
   }
 
   async verifyOTP(email: string, otp: string): Promise<ApiResponse> {
-    // Mock implementation
+    // Mock implementation - will be replaced with actual API call
     console.log('Verifying OTP:', otp, 'for email:', email);
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -64,7 +73,7 @@ class AuthService {
   }
 
   async resetPassword(email: string, otp: string, newPassword: string): Promise<ApiResponse> {
-    // Mock implementation
+    // Mock implementation - will be replaced with actual API call
     console.log('Resetting password for:', email);
     await new Promise(resolve => setTimeout(resolve, 1000));
     
