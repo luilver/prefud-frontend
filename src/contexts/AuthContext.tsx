@@ -56,24 +56,41 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start with loading true for initial check
 
-  // Load user from localStorage on mount
+  // Load user from localStorage on mount to persist session
   useEffect(() => {
-    const savedUser = localStorage.getItem('authUser');
-    const savedToken = localStorage.getItem('authToken');
-    
-    if (savedUser && savedToken) {
-      const parsedUser = JSON.parse(savedUser);
-      // Check if token is expired
-      if (authService.isTokenExpired(parsedUser.expirationToken)) {
-        // Token expired, clear storage
+    const restoreSession = () => {
+      try {
+        const savedUser = localStorage.getItem('authUser');
+        const savedToken = localStorage.getItem('authToken');
+        
+        if (savedUser && savedToken) {
+          const parsedUser = JSON.parse(savedUser);
+          
+          // Check if token is expired
+          if (authService.isTokenExpired(parsedUser.expirationToken)) {
+            // Token expired, clear storage
+            localStorage.removeItem('authUser');
+            localStorage.removeItem('authToken');
+            console.log('Session expired, cleared storage');
+          } else {
+            // Valid session, restore user
+            setUser(parsedUser);
+            console.log('Session restored successfully');
+          }
+        }
+      } catch (error) {
+        console.error('Error restoring session:', error);
+        // Clear potentially corrupted data
         localStorage.removeItem('authUser');
         localStorage.removeItem('authToken');
-      } else {
-        setUser(parsedUser);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    restoreSession();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -92,11 +109,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         profile: response.profile
       };
 
-      // Store user data and token
+      // Store user data and token for session persistence
       localStorage.setItem('authUser', JSON.stringify(userData));
       localStorage.setItem('authToken', response.token);
       
       setUser(userData);
+      console.log('Login successful, session saved');
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -106,9 +124,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
+    console.log('Logging out and clearing all session data');
+    
+    // Clear user state
     setUser(null);
+    
+    // Clean all authentication-related data from localStorage for security
     localStorage.removeItem('authUser');
     localStorage.removeItem('authToken');
+    
+    // Optional: Clear any other session-related data if needed in the future
+    // This ensures complete cleanup without affecting other app data
+    const keysToRemove = ['authUser', 'authToken'];
+    keysToRemove.forEach(key => {
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    console.log('Session cleanup completed');
   };
 
   const value = {

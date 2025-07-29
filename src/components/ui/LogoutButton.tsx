@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,16 +15,18 @@ export const LogoutButton = () => {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await logout();
+      // Perform logout which cleans localStorage
+      logout();
       
       toast({
         title: "Logged out",
-        description: "You have been successfully logged out",
+        description: "You have been successfully logged out and session data cleared",
       });
 
-      // Redirect to home page
-      navigate('/');
+      // Redirect to home page after successful logout
+      navigate('/', { replace: true });
     } catch (error: any) {
+      console.error('Logout error:', error);
       toast({
         title: "Error",
         description: error.message || 'Failed to logout',
