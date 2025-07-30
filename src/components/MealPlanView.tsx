@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, Users, ChefHat, Clock, Trash2, CheckCircle, Circle, Edit, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Calendar, Users, ChefHat, Clock, Trash2, CheckCircle, Circle, Edit, ShoppingCart, Plus, ExternalLink, Package } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
 import RecipeView from "./RecipeView";
 
 interface MealPlanViewProps {
@@ -15,9 +16,11 @@ interface MealPlanViewProps {
 }
 
 const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
-  const { deleteMealFromPlan, toggleMealCompletion, isMealCompleted } = useUser();
+  const { deleteMealFromPlan, toggleMealCompletion, isMealCompleted, addPantryItem } = useUser();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const [purchasedItems, setPurchasedItems] = useState<Set<string>>(new Set());
 
   const handleDeleteMeal = (mealId: string) => {
     if (window.confirm('Are you sure you want to delete this meal?')) {
@@ -35,6 +38,48 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
   const handleBackFromMeal = () => {
     setSelectedMeal(null);
+  };
+
+  const handleAddToPantry = (item: any) => {
+    addPantryItem({
+      name: item.name,
+      quantity: parseFloat(item.quantity) || 1,
+      unit: item.unit || 'piece',
+      category: item.category || 'other',
+      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      purchaseDate: new Date(),
+      notes: `Added from ${plan.name} shopping list`
+    });
+    
+    toast({
+      title: "Added to Pantry",
+      description: `${item.name} has been added to your pantry`,
+    });
+  };
+
+  const handleBuyOnline = (item: any) => {
+    // Mock online shopping - in real app this would integrate with grocery delivery services
+    const searchQuery = encodeURIComponent(`${item.name} ${item.quantity} ${item.unit}`);
+    const mockShoppingUrl = `https://www.instacart.com/store/search?q=${searchQuery}`;
+    
+    window.open(mockShoppingUrl, '_blank');
+    
+    toast({
+      title: "Opening Online Store",
+      description: `Searching for ${item.name} in online grocery store`,
+    });
+  };
+
+  const handleMarkAsPurchased = (itemId: string) => {
+    setPurchasedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
   };
 
   // If a meal is selected, show the RecipeView
@@ -310,9 +355,41 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           })}
         </TabsContent>
 
-        <TabsContent value="shopping" className="space-y-4">
+        <TabsContent value="shopping" className="space-y-6">
           {plan.shoppingList && plan.shoppingList.length > 0 ? (
-            <div className="grid gap-4">
+            <div className="space-y-6">
+              {/* Shopping Summary */}
+              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-blue-800">
+                    <ShoppingCart className="h-5 w-5" />
+                    Shopping Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-700">{plan.shoppingList.length}</div>
+                      <div className="text-sm text-gray-600">Total Items</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-700">{purchasedItems.size}</div>
+                      <div className="text-sm text-gray-600">Purchased</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-700">{plan.shoppingList.length - purchasedItems.size}</div>
+                      <div className="text-sm text-gray-600">Remaining</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-700">
+                        ${plan.shoppingList.reduce((total: number, item: any) => total + (item.estimatedPrice || 0), 0).toFixed(2)}
+                      </div>
+                      <div className="text-sm text-gray-600">Est. Total</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Group shopping items by category */}
               {Object.entries(
                 plan.shoppingList.reduce((acc: any, item: any) => {
@@ -322,29 +399,88 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                   return acc;
                 }, {})
               ).map(([category, items]: [string, any]) => (
-                <Card key={category}>
-                  <CardHeader>
-                    <CardTitle className="text-lg capitalize">{category}</CardTitle>
+                <Card key={category} className="overflow-hidden">
+                  <CardHeader className="bg-gray-50 pb-4">
+                    <CardTitle className="text-lg capitalize flex items-center gap-2">
+                      <Package className="h-5 w-5 text-gray-600" />
+                      {category}
+                      <Badge variant="secondary" className="ml-auto">
+                        {items.length} items
+                      </Badge>
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {items.map((item: any, index: number) => (
-                        <div key={`${item.id}-${index}`} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-medium">{item.name}</p>
-                              <p className="text-sm text-gray-600">
-                                {item.quantity} {item.unit}
-                              </p>
+                  <CardContent className="p-0">
+                    <div className="divide-y">
+                      {items.map((item: any, index: number) => {
+                        const isPurchased = purchasedItems.has(item.id);
+                        return (
+                          <div 
+                            key={`${item.id}-${index}`} 
+                            className={`p-4 hover:bg-gray-50 transition-colors ${
+                              isPurchased ? 'bg-green-50 opacity-75' : ''
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 flex-1">
+                                <button
+                                  onClick={() => handleMarkAsPurchased(item.id)}
+                                  className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                    isPurchased 
+                                      ? 'bg-green-500 border-green-500 text-white' 
+                                      : 'border-gray-300 hover:border-green-400'
+                                  }`}
+                                >
+                                  {isPurchased && <CheckCircle className="h-3 w-3" />}
+                                </button>
+                                
+                                <div className={`flex-1 ${isPurchased ? 'line-through text-gray-500' : ''}`}>
+                                  <p className="font-medium text-gray-900">{item.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {item.quantity} {item.unit}
+                                  </p>
+                                  {item.notes && (
+                                    <p className="text-xs text-gray-500 mt-1">{item.notes}</p>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-3">
+                                {item.estimatedPrice && (
+                                  <div className="text-right">
+                                    <div className="text-lg font-semibold text-green-600">
+                                      ${item.estimatedPrice}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleAddToPantry(item)}
+                                    className="text-xs"
+                                    disabled={isPurchased}
+                                  >
+                                    <Plus className="h-3 w-3 mr-1" />
+                                    Add to Pantry
+                                  </Button>
+                                  
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    onClick={() => handleBuyOnline(item)}
+                                    className="text-xs bg-blue-600 hover:bg-blue-700"
+                                    disabled={isPurchased}
+                                  >
+                                    <ExternalLink className="h-3 w-3 mr-1" />
+                                    Buy Online
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          {item.estimatedPrice && (
-                            <div className="text-sm text-green-600 font-medium">
-                              ${item.estimatedPrice}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
