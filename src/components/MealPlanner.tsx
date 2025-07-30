@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -106,68 +107,76 @@ const MealPlanner = () => {
       {/* Meal Plans Grid */}
       {mealPlans.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mealPlans.map((plan) => (
-            <Card 
-              key={plan.id} 
-              className="hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => handlePlanSelect(plan)}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ChefHat className="h-5 w-5 text-purple-500" />
-                  {plan.name}
-                </CardTitle>
-                <CardDescription>
-                  {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>{plan.numberOfDays || Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24)) || plan.duration} day{(plan.numberOfDays > 1 || Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24)) > 1) ? 's' : ''}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>For {plan.preferences?.numberOfPersons || plan.preferences?.people || plan.numberOfPersons || 'N/A'} people</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{plan.preferences?.mealsPerDay || plan.mealsPerDay || '3'} meals per day</span>
-                  </div>
-                  
-                  {/* Additional plan details from API */}
-                  {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
-                    <div className="text-xs text-purple-600">
-                      Cuisine: {plan.preferences.cuisinePreferences.join(', ')}
+          {mealPlans.map((plan) => {
+            // Calculate days from duration string or use preferences
+            const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
+                             (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
+            const peopleCount = plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A';
+            const mealsCount = plan.preferences?.mealsPerDay || '3';
+            
+            return (
+              <Card 
+                key={plan.id} 
+                className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => handlePlanSelect(plan)}
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ChefHat className="h-5 w-5 text-purple-500" />
+                    {plan.name}
+                  </CardTitle>
+                  <CardDescription>
+                    {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>{daysCount} day{daysCount > 1 ? 's' : ''}</span>
                     </div>
-                  )}
-                  
-                  {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
-                    <div className="text-xs text-green-600">
-                      Diet: {plan.preferences.dietaryRestrictions.join(', ')}
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span>For {peopleCount} people</span>
                     </div>
-                  )}
-                  
-                  {plan.preferences?.cookingSkillLevel && (
-                    <div className="text-xs text-blue-600">
-                      Skill Level: {plan.preferences.cookingSkillLevel}
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>{mealsCount} meals per day</span>
                     </div>
-                  )}
-                  
-                  <div className="mt-3 text-xs text-gray-500">
-                    {plan.meals?.length || 0} total meals planned
+                    
+                    {/* Additional plan details from API */}
+                    {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
+                      <div className="text-xs text-purple-600">
+                        Cuisine: {plan.preferences.cuisinePreferences.join(', ')}
+                      </div>
+                    )}
+                    
+                    {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
+                      <div className="text-xs text-green-600">
+                        Diet: {plan.preferences.dietaryRestrictions.join(', ')}
+                      </div>
+                    )}
+                    
+                    {plan.preferences?.cookingSkillLevel && (
+                      <div className="text-xs text-blue-600">
+                        Skill Level: {plan.preferences.cookingSkillLevel}
+                      </div>
+                    )}
+                    
+                    <div className="mt-3 text-xs text-gray-500">
+                      {plan.meals?.length || 0} total meals planned
+                    </div>
+                    
+                    {plan.shoppingList && plan.shoppingList.length > 0 && (
+                      <div className="text-xs text-orange-600">
+                        {plan.shoppingList.length} ingredients needed
+                      </div>
+                    )}
                   </div>
-                  
-                  {plan.shoppingList && plan.shoppingList.length > 0 && (
-                    <div className="text-xs text-orange-600">
-                      {plan.shoppingList.length} ingredients needed
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <Card className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
