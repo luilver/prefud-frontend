@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Calendar, Users, ChefHat, Clock, Trash2, CheckCircle, Circle, Edit, ShoppingCart } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import RecipeView from "./RecipeView";
 
 interface MealPlanViewProps {
   plan: any;
@@ -16,6 +17,7 @@ interface MealPlanViewProps {
 const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const { deleteMealFromPlan, toggleMealCompletion, isMealCompleted } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedMeal, setSelectedMeal] = useState<any>(null);
 
   const handleDeleteMeal = (mealId: string) => {
     if (window.confirm('Are you sure you want to delete this meal?')) {
@@ -26,6 +28,24 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const handleToggleCompletion = (mealId: string, date: string) => {
     toggleMealCompletion(mealId, date);
   };
+
+  const handleMealClick = (meal: any) => {
+    setSelectedMeal(meal);
+  };
+
+  const handleBackFromMeal = () => {
+    setSelectedMeal(null);
+  };
+
+  // If a meal is selected, show the RecipeView
+  if (selectedMeal) {
+    return (
+      <RecipeView 
+        meal={selectedMeal} 
+        onBack={handleBackFromMeal}
+      />
+    );
+  }
 
   // Calculate plan statistics
   const totalDays = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
@@ -183,9 +203,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                         return (
                           <Card 
                             key={`${meal.id}-${mealIndex}`} 
-                            className={`relative hover:shadow-md transition-shadow ${
-                              isCompleted ? 'bg-green-50 border-green-200' : ''
+                            className={`relative hover:shadow-md transition-all cursor-pointer ${
+                              isCompleted ? 'bg-green-50 border-green-200' : 'hover:shadow-lg'
                             }`}
+                            onClick={() => handleMealClick(meal)}
                           >
                             <CardHeader className="pb-3">
                               <div className="flex items-start justify-between">
@@ -208,7 +229,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleDeleteMeal(meal.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteMeal(meal.id);
+                                  }}
                                   className="text-red-500 hover:text-red-700 p-1 h-auto"
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -246,7 +270,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleToggleCompletion(meal.id, day)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleCompletion(meal.id, day);
+                                  }}
                                   className={`text-xs ${
                                     isCompleted 
                                       ? 'text-green-600 hover:text-green-700' 
