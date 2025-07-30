@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,8 +16,9 @@ interface MealPlanCreatorProps {
 
 const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [planName, setPlanName] = useState("");
+  const [planDescription, setPlanDescription] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [numberOfWeeks, setNumberOfWeeks] = useState(1);
+  const [numberOfDays, setNumberOfDays] = useState(7);
   const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [mealsPerDay, setMealsPerDay] = useState(3);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
@@ -33,7 +33,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [healthGoals, setHealthGoals] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   
-  const { ingredients } = useUser();
+  const { user } = useUser();
   const { toast } = useToast();
 
   const availableDiets = [
@@ -59,17 +59,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const cookTimesOptions = [15, 30, 45, 60];
   const cookingSkillLevels = ["beginner", "intermediate", "advanced", "expert"];
   const budgetRanges = ["low", "medium", "high"];
-
-  // Calculate end date based on start date and number of weeks
-  const calculateEndDate = (start: string, weeks: number) => {
-    if (!start) return "";
-    const startDateObj = new Date(start);
-    const endDateObj = new Date(startDateObj);
-    endDateObj.setDate(startDateObj.getDate() + (weeks * 7) - 1);
-    return endDateObj.toISOString().split('T')[0];
-  };
-
-  const endDate = calculateEndDate(startDate, numberOfWeeks);
 
   const addDislike = () => {
     if (newDislike.trim() && !dislikes.includes(newDislike.trim().toLowerCase())) {
@@ -115,7 +104,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   };
 
   const generateMealPlan = async () => {
-    if (!planName || !startDate || numberOfWeeks < 1 || numberOfPersons < 1 || mealsPerDay < 1 || !cookingSkillLevel || !budgetRange) {
+    if (!planName || !startDate || numberOfDays < 1 || numberOfPersons < 1 || mealsPerDay < 1 || !cookingSkillLevel || !budgetRange) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields with valid values.",
@@ -124,154 +113,136 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       return;
     }
 
+    if (!user?.id) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to create a meal plan.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGenerating(true);
 
     try {
-      // Mock AI generation process
-      console.log('Generating meal plan with preferences:', {
-        planName,
-        startDate,
-        endDate,
-        numberOfWeeks,
-        numberOfPersons,
-        mealsPerDay,
-        dietaryRestrictions,
-        cuisinePreferences,
-        allergiesIntolerances,
-        additionalAllergies,
-        maxCookTime,
-        cookingSkillLevel,
-        budgetRange,
-        dislikes,
-        healthGoals,
-        availableIngredients: ingredients
-      });
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Generate meals for each week
-      const allMeals = [];
-      const mealTypes = ['breakfast', 'lunch', 'dinner'];
-      const sampleMeals = [
-        {
-          name: "Mediterranean Quinoa Bowl",
-          type: "lunch",
-          calories: 450,
-          prepTime: 20,
-          servings: numberOfPersons,
-          difficulty: "easy",
-          ingredients: ["quinoa", "chickpeas", "cucumber", "tomatoes", "feta cheese", "olive oil"],
-          instructions: [
-            "Cook quinoa according to package directions",
-            "Drain and rinse chickpeas",
-            "Dice cucumber and tomatoes",
-            "Combine all ingredients and drizzle with olive oil"
-          ]
-        },
-        {
-          name: "Grilled Salmon with Asparagus",
-          type: "dinner",
-          calories: 380,
-          prepTime: 25,
-          servings: numberOfPersons,
-          difficulty: "medium",
-          ingredients: ["salmon fillets", "asparagus", "lemon", "garlic", "olive oil"],
-          instructions: [
-            "Season salmon with salt and pepper",
-            "Grill salmon for 4-5 minutes per side",
-            "Sauté asparagus with garlic",
-            "Serve with lemon wedges"
-          ]
-        },
-        {
-          name: "Overnight Oats with Berries",
-          type: "breakfast",
-          calories: 320,
-          prepTime: 5,
-          servings: numberOfPersons,
-          difficulty: "easy",
-          ingredients: ["rolled oats", "milk", "greek yogurt", "honey", "mixed berries"],
-          instructions: [
-            "Mix oats with milk and yogurt",
-            "Add honey to taste",
-            "Refrigerate overnight",
-            "Top with berries before serving"
-          ]
-        },
-        {
-          name: "Thai Green Curry",
-          type: "dinner",
-          calories: 420,
-          prepTime: 35,
-          servings: numberOfPersons,
-          difficulty: "intermediate",
-          ingredients: ["chicken breast", "green curry paste", "coconut milk", "bell peppers", "basil"],
-          instructions: [
-            "Cut chicken into pieces",
-            "Sauté curry paste in oil",
-            "Add chicken and cook through",
-            "Add coconut milk and vegetables",
-            "Simmer until tender"
-          ]
-        }
-      ];
-
-      for (let week = 1; week <= numberOfWeeks; week++) {
-        for (let day = 1; day <= 7; day++) {
-          for (let mealIndex = 0; mealIndex < mealsPerDay; mealIndex++) {
-            const mealType = mealTypes[mealIndex] || 'snack';
-            const baseMeal = sampleMeals[Math.floor(Math.random() * sampleMeals.length)];
-            
-            allMeals.push({
-              id: `${week}-${day}-${mealIndex}`,
-              ...baseMeal,
-              type: mealType,
-              week,
-              day,
-              date: new Date(new Date(startDate).getTime() + ((week - 1) * 7 + (day - 1)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-            });
-          }
-        }
-      }
-
-      const mockMealPlan = {
-        id: Date.now().toString(),
-        name: planName,
-        startDate,
-        endDate,
-        numberOfWeeks,
-        numberOfPersons,
-        mealsPerDay,
-        dietaryRestrictions,
-        cuisinePreferences,
-        allergiesIntolerances,
-        additionalAllergies,
-        maxCookTime,
-        cookingSkillLevel,
-        budgetRange,
-        dislikes,
-        healthGoals,
-        meals: allMeals
+      // Prepare the API request data
+      const requestData = {
+        duration: numberOfDays,
+        numberPeople: numberOfPersons,
+        mealsPerDay: mealsPerDay,
+        dietaryRestrictions: dietaryRestrictions,
+        cuisinePreferences: cuisinePreferences,
+        allergiesIntolerance: allergiesIntolerances,
+        dislikes: [...dislikes, additionalAllergies].filter(item => item.trim()).join(', '),
+        maxCookingTime: maxCookTime,
+        cookingSkillLevel: cookingSkillLevel,
+        budgetRange: budgetRange,
+        healthGoals: healthGoals,
+        language: "english",
+        user_id: user.id,
+        start_date: new Date(startDate).toISOString(),
+        plan_name: planName,
+        plan_description: planDescription || `Personalized meal plan for ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}`
       };
 
-      onPlanCreated(mockMealPlan);
+      console.log('Creating meal plan with data:', requestData);
+
+      const response = await fetch('https://pantry-ms-brain.onrender.com/meal-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('API Error:', response.status, errorData);
+        throw new Error(`Failed to create meal plan: ${response.status}`);
+      }
+
+      const apiResponse = await response.json();
+      console.log('API Response:', apiResponse);
+
+      // Transform the API response to match our local format
+      const transformedPlan = {
+        id: apiResponse._id || Date.now().toString(),
+        name: apiResponse.plan_name || planName,
+        startDate: startDate,
+        endDate: calculateEndDate(startDate, numberOfDays),
+        numberOfDays: numberOfDays,
+        numberOfPersons: numberOfPersons,
+        mealsPerDay: mealsPerDay,
+        dietaryRestrictions,
+        cuisinePreferences,
+        allergiesIntolerances,
+        additionalAllergies,
+        maxCookTime,
+        cookingSkillLevel,
+        budgetRange,
+        dislikes,
+        healthGoals,
+        meals: transformMealsFromAPI(apiResponse),
+        rawApiResponse: apiResponse
+      };
+
+      onPlanCreated(transformedPlan);
       
       toast({
         title: "Meal Plan Generated!",
-        description: `Your personalized meal plan "${planName}" is ready for ${numberOfWeeks} week${numberOfWeeks > 1 ? 's' : ''} and ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}.`,
+        description: `Your personalized meal plan "${planName}" has been created successfully.`,
       });
 
     } catch (error) {
+      console.error('Error generating meal plan:', error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate meal plan. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
         variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
     }
   };
+
+  const calculateEndDate = (start: string, days: number) => {
+    if (!start) return "";
+    const startDateObj = new Date(start);
+    const endDateObj = new Date(startDateObj);
+    endDateObj.setDate(startDateObj.getDate() + days - 1);
+    return endDateObj.toISOString().split('T')[0];
+  };
+
+  const transformMealsFromAPI = (apiResponse: any) => {
+    const meals: any[] = [];
+    
+    if (apiResponse.plan && apiResponse.plan.mealPlan) {
+      apiResponse.plan.mealPlan.forEach((dayPlan: any) => {
+        dayPlan.meals.forEach((meal: any, mealIndex: number) => {
+          meals.push({
+            id: `${dayPlan.day}-${mealIndex}`,
+            name: meal.name,
+            description: meal.description || '',
+            type: meal.mealType,
+            calories: meal.calories || 0,
+            prepTime: meal.cookingTime || 0,
+            servings: numberOfPersons,
+            difficulty: cookingSkillLevel,
+            ingredients: meal.ingredients ? meal.ingredients.map((ing: any) => ing.name || ing) : [],
+            instructions: meal.steps || [],
+            day: dayPlan.day,
+            date: dayPlan.date,
+            nutritionalInfo: meal.nutritionalInfo,
+            prepTip: meal.prepTip
+          });
+        });
+      });
+    }
+    
+    return meals;
+  };
+
+  
 
   return (
     <div className="space-y-6">
@@ -294,7 +265,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="planName">Plan Name</Label>
+              <Label htmlFor="planName">Plan Name *</Label>
               <Input
                 id="planName"
                 placeholder="e.g., Weekly Healthy Meals"
@@ -305,7 +276,19 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
-              <Label htmlFor="startDate">Start Date</Label>
+              <Label htmlFor="planDescription">Plan Description (Optional)</Label>
+              <Textarea
+                id="planDescription"
+                placeholder="Describe your meal plan goals or preferences..."
+                value={planDescription}
+                onChange={(e) => setPlanDescription(e.target.value)}
+                className="border-purple-200 focus:border-purple-400"
+                rows={2}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="startDate">Start Date *</Label>
               <Input
                 id="startDate"
                 type="date"
@@ -317,19 +300,19 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="numberOfWeeks">Number of Weeks</Label>
+                <Label htmlFor="numberOfDays">Number of Days *</Label>
                 <Input
-                  id="numberOfWeeks"
+                  id="numberOfDays"
                   type="number"
                   min="1"
-                  max="12"
-                  value={numberOfWeeks}
-                  onChange={(e) => setNumberOfWeeks(parseInt(e.target.value) || 1)}
+                  max="30"
+                  value={numberOfDays}
+                  onChange={(e) => setNumberOfDays(parseInt(e.target.value) || 1)}
                   className="border-purple-200 focus:border-purple-400"
                 />
               </div>
               <div>
-                <Label htmlFor="numberOfPersons">Number of Persons</Label>
+                <Label htmlFor="numberOfPersons">Number of Persons *</Label>
                 <Input
                   id="numberOfPersons"
                   type="number"
@@ -341,7 +324,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="mealsPerDay">Meals per Day</Label>
+                <Label htmlFor="mealsPerDay">Meals per Day *</Label>
                 <Input
                   id="mealsPerDay"
                   type="number"
@@ -357,10 +340,10 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             {startDate && (
               <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
                 <p className="text-sm text-purple-700">
-                  <strong>Plan Duration:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
+                  <strong>Plan Duration:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(calculateEndDate(startDate, numberOfDays)).toLocaleDateString()}
                 </p>
                 <p className="text-xs text-purple-600 mt-1">
-                  {numberOfWeeks} week{numberOfWeeks > 1 ? 's' : ''} • {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} meal{mealsPerDay > 1 ? 's' : ''} per day
+                  {numberOfDays} day{numberOfDays > 1 ? 's' : ''} • {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} meal{mealsPerDay > 1 ? 's' : ''} per day
                 </p>
               </div>
             )}

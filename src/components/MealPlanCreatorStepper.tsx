@@ -35,7 +35,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
   const [healthGoals, setHealthGoals] = useState<string[]>(initialData?.healthGoals || []);
   const [isGenerating, setIsGenerating] = useState(false);
   
-  const { ingredients } = useUser();
+  const { user } = useUser();
   const { toast } = useToast();
 
   const steps = [
@@ -160,147 +160,125 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
       return;
     }
 
+    if (!user?.id) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to create a meal plan.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGenerating(true);
 
     try {
-      console.log('Generating meal plan with preferences:', {
-        planName,
-        startDate,
-        endDate,
-        numberOfDays,
-        numberOfPersons,
-        mealsPerDay,
-        dietaryRestrictions,
-        cuisinePreferences,
-        allergiesIntolerances,
-        additionalAllergies,
-        maxCookTime,
-        cookingSkillLevel,
-        budgetRange,
-        dislikes,
-        healthGoals,
-        availableIngredients: ingredients
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      const allMeals = [];
-      const mealTypes = ['breakfast', 'lunch', 'dinner'];
-      const sampleMeals = [
-        {
-          name: "Mediterranean Quinoa Bowl",
-          type: "lunch",
-          calories: 450,
-          prepTime: 20,
-          servings: numberOfPersons,
-          difficulty: "easy",
-          ingredients: ["quinoa", "chickpeas", "cucumber", "tomatoes", "feta cheese", "olive oil"],
-          instructions: [
-            "Cook quinoa according to package directions",
-            "Drain and rinse chickpeas",
-            "Dice cucumber and tomatoes",
-            "Combine all ingredients and drizzle with olive oil"
-          ]
-        },
-        {
-          name: "Grilled Salmon with Asparagus",
-          type: "dinner",
-          calories: 380,
-          prepTime: 25,
-          servings: numberOfPersons,
-          difficulty: "medium",
-          ingredients: ["salmon fillets", "asparagus", "lemon", "garlic", "olive oil"],
-          instructions: [
-            "Season salmon with salt and pepper",
-            "Grill salmon for 4-5 minutes per side",
-            "Sauté asparagus with garlic",
-            "Serve with lemon wedges"
-          ]
-        },
-        {
-          name: "Overnight Oats with Berries",
-          type: "breakfast",
-          calories: 320,
-          prepTime: 5,
-          servings: numberOfPersons,
-          difficulty: "easy",
-          ingredients: ["rolled oats", "milk", "greek yogurt", "honey", "mixed berries"],
-          instructions: [
-            "Mix oats with milk and yogurt",
-            "Add honey to taste",
-            "Refrigerate overnight",
-            "Top with berries before serving"
-          ]
-        },
-        {
-          name: "Thai Green Curry",
-          type: "dinner",
-          calories: 420,
-          prepTime: 35,
-          servings: numberOfPersons,
-          difficulty: "intermediate",
-          ingredients: ["chicken breast", "green curry paste", "coconut milk", "bell peppers", "basil"],
-          instructions: [
-            "Cut chicken into pieces",
-            "Sauté curry paste in oil",
-            "Add chicken and cook through",
-            "Add coconut milk and vegetables",
-            "Simmer until tender"
-          ]
-        }
-      ];
-
-      for (let day = 1; day <= numberOfDays; day++) {
-        for (let mealIndex = 0; mealIndex < mealsPerDay; mealIndex++) {
-          const mealType = mealTypes[mealIndex] || 'snack';
-          const baseMeal = sampleMeals[Math.floor(Math.random() * sampleMeals.length)];
-          
-          allMeals.push({
-            id: `${day}-${mealIndex}`,
-            ...baseMeal,
-            type: mealType,
-            day,
-            date: new Date(new Date(startDate).getTime() + ((day - 1)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-          });
-        }
-      }
-
-      const mockMealPlan = {
-        id: isEditing ? initialData?.id : Date.now().toString(),
-        name: planName,
-        startDate,
-        endDate,
-        numberOfDays,
-        numberOfPersons,
-        mealsPerDay,
-        dietaryRestrictions,
-        cuisinePreferences,
-        allergiesIntolerances,
-        additionalAllergies,
-        maxCookTime,
-        cookingSkillLevel,
-        budgetRange,
-        dislikes,
-        healthGoals,
-        meals: allMeals
+      // Prepare the API request data
+      const requestData = {
+        duration: numberOfDays,
+        numberPeople: numberOfPersons,
+        mealsPerDay: mealsPerDay,
+        dietaryRestrictions: dietaryRestrictions,
+        cuisinePreferences: cuisinePreferences,
+        allergiesIntolerance: allergiesIntolerances,
+        dislikes: [...dislikes, additionalAllergies].filter(item => item.trim()).join(', '),
+        maxCookingTime: maxCookTime,
+        cookingSkillLevel: cookingSkillLevel,
+        budgetRange: budgetRange,
+        healthGoals: healthGoals,
+        language: "english",
+        user_id: user.id,
+        start_date: new Date(startDate).toISOString(),
+        plan_name: planName,
+        plan_description: `Personalized meal plan for ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}`
       };
 
-      onPlanCreated(mockMealPlan);
+      console.log('Creating meal plan with data:', requestData);
+
+      const response = await fetch('https://pantry-ms-brain.onrender.com/meal-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('API Error:', response.status, errorData);
+        throw new Error(`Failed to create meal plan: ${response.status}`);
+      }
+
+      const apiResponse = await response.json();
+      console.log('API Response:', apiResponse);
+
+      // Transform the API response to match our local format
+      const transformedPlan = {
+        id: isEditing ? initialData?.id : (apiResponse._id || Date.now().toString()),
+        name: apiResponse.plan_name || planName,
+        startDate: startDate,
+        endDate: endDate,
+        numberOfDays: numberOfDays,
+        numberOfPersons: numberOfPersons,
+        mealsPerDay: mealsPerDay,
+        dietaryRestrictions,
+        cuisinePreferences,
+        allergiesIntolerances,
+        additionalAllergies,
+        maxCookTime,
+        cookingSkillLevel,
+        budgetRange,
+        dislikes,
+        healthGoals,
+        meals: transformMealsFromAPI(apiResponse),
+        rawApiResponse: apiResponse
+      };
+
+      onPlanCreated(transformedPlan);
       
       toast({
         title: isEditing ? "Meal Plan Updated!" : "Meal Plan Generated!",
-        description: `Your personalized meal plan "${planName}" is ready for ${numberOfDays} day${numberOfDays > 1 ? 's' : ''} and ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}.`,
+        description: `Your personalized meal plan "${planName}" has been ${isEditing ? 'updated' : 'created'} successfully.`,
       });
 
     } catch (error) {
+      console.error('Error generating meal plan:', error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate meal plan. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
         variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const transformMealsFromAPI = (apiResponse: any) => {
+    const meals: any[] = [];
+    
+    if (apiResponse.plan && apiResponse.plan.mealPlan) {
+      apiResponse.plan.mealPlan.forEach((dayPlan: any) => {
+        dayPlan.meals.forEach((meal: any, mealIndex: number) => {
+          meals.push({
+            id: `${dayPlan.day}-${mealIndex}`,
+            name: meal.name,
+            description: meal.description || '',
+            type: meal.mealType,
+            calories: meal.calories || 0,
+            prepTime: meal.cookingTime || 0,
+            servings: numberOfPersons,
+            difficulty: cookingSkillLevel,
+            ingredients: meal.ingredients ? meal.ingredients.map((ing: any) => ing.name || ing) : [],
+            instructions: meal.steps || [],
+            day: dayPlan.day,
+            date: dayPlan.date,
+            nutritionalInfo: meal.nutritionalInfo,
+            prepTip: meal.prepTip
+          });
+        });
+      });
+    }
+    
+    return meals;
   };
 
   const renderStepContent = () => {

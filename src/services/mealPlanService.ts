@@ -97,6 +97,52 @@ export interface LocalMealPlan {
   weeks: any[];
 }
 
+// API functions for creating meal plans
+export interface CreateMealPlanRequest {
+  duration: number;
+  numberPeople: number;
+  mealsPerDay: number;
+  dietaryRestrictions?: string[];
+  cuisinePreferences?: string[];
+  allergiesIntolerance?: string[];
+  dislikes?: string;
+  maxCookingTime: number;
+  cookingSkillLevel: string;
+  budgetRange: string;
+  healthGoals?: string[];
+  language: string;
+  user_id: string;
+  start_date: string;
+  plan_name: string;
+  plan_description?: string;
+}
+
+export const createMealPlan = async (planData: CreateMealPlanRequest): Promise<ApiMealPlan> => {
+  console.log('Service: Creating meal plan', planData);
+  
+  try {
+    const response = await fetch('https://pantry-ms-brain.onrender.com/meal-plan', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(planData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create meal plan: ${response.status}`);
+    }
+
+    const data: ApiMealPlan = await response.json();
+    console.log('Service: Meal plan created successfully', data);
+    
+    return data;
+  } catch (error) {
+    console.error('Service: Error creating meal plan', error);
+    throw error;
+  }
+};
+
 // Mock delay to simulate API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
