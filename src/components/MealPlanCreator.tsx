@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface MealPlanCreatorProps {
@@ -34,6 +35,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   
   const { user } = useUser();
+  const { language } = useLanguage();
   const { toast } = useToast();
 
   const availableDiets = [
@@ -103,6 +105,15 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     );
   };
 
+  const getLanguageName = (languageCode: string) => {
+    const languageMap: { [key: string]: string } = {
+      'en': 'english',
+      'es': 'spanish',
+      'pt': 'portuguese'
+    };
+    return languageMap[languageCode] || 'english';
+  };
+
   const generateMealPlan = async () => {
     if (!planName || !startDate || numberOfDays < 1 || numberOfPersons < 1 || mealsPerDay < 1 || !cookingSkillLevel || !budgetRange) {
       toast({
@@ -138,7 +149,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         cookingSkillLevel: cookingSkillLevel,
         budgetRange: budgetRange,
         healthGoals: healthGoals,
-        language: "english",
+        language: getLanguageName(language),
         user_id: user.id,
         start_date: new Date(startDate).toISOString(),
         plan_name: planName,
@@ -241,8 +252,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     
     return meals;
   };
-
-  
 
   return (
     <div className="space-y-6">
