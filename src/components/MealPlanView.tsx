@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, Users, ChefHat, Clock, Trash2, CheckCircle, Circle
 import { useUser } from "@/contexts/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
+import OrderOnlineModal from "./OrderOnlineModal";
 
 interface MealPlanViewProps {
   plan: any;
@@ -20,6 +21,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
 
   const handleDeleteMeal = (mealId: string) => {
     if (window.confirm('Are you sure you want to delete this meal?')) {
@@ -86,15 +89,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
   const handleOrderOnline = (items?: any[]) => {
     const itemsToOrder = items || plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) || [];
-    
-    // Create a shopping list string for external service
-    const itemsList = itemsToOrder.map(item => 
-      `${item.quantity || 1} ${item.unit || 'piece'} ${item.name}`
-    ).join('\n');
-    
-    // Open external shopping service (example with Instacart)
-    const searchQuery = encodeURIComponent(itemsList);
-    window.open(`https://www.instacart.com/store/search?query=${searchQuery}`, '_blank');
+    setOrderItems(itemsToOrder);
+    setShowOrderModal(true);
   };
 
   // If a meal is selected, show the RecipeView
@@ -245,7 +241,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {/* Days View */}
           {days.map((day) => {
             const dayMeals = mealsByDay[day] || [];
             
@@ -420,7 +415,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                         onClick={() => handleOrderOnline()}
                         className="flex items-center gap-2"
                       >
-                        <ExternalLink className="h-4 w-4" />
+                        <ShoppingCart className="h-4 w-4" />
                         Order Online ({checkedCount})
                       </Button>
                     </div>
@@ -499,7 +494,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 className="h-8 w-8 p-0"
                                 title="Order Online"
                               >
-                                <ExternalLink className="h-4 w-4" />
+                                <ShoppingCart className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
@@ -520,6 +515,14 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Order Online Modal */}
+      <OrderOnlineModal
+        isOpen={showOrderModal}
+        onClose={() => setShowOrderModal(false)}
+        items={orderItems}
+        mealPlanName={plan.name}
+      />
     </div>
   );
 };
