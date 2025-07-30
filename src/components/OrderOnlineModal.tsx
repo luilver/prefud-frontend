@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { CreditCard, MapPin, ShoppingCart, Plus, Check, Clock, Package } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 
@@ -210,36 +211,38 @@ const OrderOnlineModal = ({ isOpen, onClose, items, mealPlanName }: OrderOnlineM
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex-1 overflow-y-auto mt-4">
-            <TabsContent value="items" className="space-y-4">
-              <div className="grid gap-3">
-                {items.map((item) => (
-                  <Card key={item.id}>
-                    <CardContent className="flex items-center justify-between p-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium">{item.name}</h4>
-                          {item.mealName && (
-                            <Badge variant="outline" className="text-xs">
-                              {item.mealName}
-                            </Badge>
-                          )}
+          <div className="flex-1 overflow-hidden mt-4">
+            <TabsContent value="items" className="space-y-4 h-full">
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="grid gap-3">
+                  {items.map((item) => (
+                    <Card key={item.id}>
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-medium">{item.name}</h4>
+                            {item.mealName && (
+                              <Badge variant="outline" className="text-xs">
+                                {item.mealName}
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            {item.quantity} {item.unit}
+                            {item.notes && ` • ${item.notes}`}
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          {item.quantity} {item.unit}
-                          {item.notes && ` • ${item.notes}`}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-green-600">
-                          ${(item.estimatedPrice || 0).toFixed(2)}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              <div className="flex justify-end">
+                        <div className="text-right">
+                          <p className="font-medium text-green-600">
+                            ${(item.estimatedPrice || 0).toFixed(2)}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+              <div className="flex justify-end pt-4">
                 <Button onClick={() => setActiveTab("address")}>
                   Continue to Address
                 </Button>
