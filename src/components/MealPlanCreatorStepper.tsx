@@ -7,6 +7,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
+import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
 
@@ -45,6 +46,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
   const { user, refreshMealPlans } = useUser();
   const { language } = useLanguage();
   const { toast } = useToast();
+  const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
 
   const steps = [
     { id: 1, title: "Plan Details", description: "Basic information about your meal plan" },
@@ -438,13 +440,21 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       return;
     }
 
-    setIsGenerating(true);
+    // Show the cooking loader
+    showLoader("Analyzing your preferences and creating your perfect meal plan...");
 
     // Set up timeout for 3 minutes (180 seconds)
     const timeout = setTimeout(() => {
       console.log('Meal plan generation timed out after 3 minutes');
-      setIsGenerating(false);
-      setShowTimeoutModal(true);
+      hideLoader();
+      toast({
+        title: "Still Cooking!",
+        description: "Your meal plan is being prepared in the background. Please check your meal plans in a few minutes.",
+        duration: 5000,
+      });
+      // Navigate back and refresh
+      onBack();
+      refreshMealPlans();
     }, 180000); // 3 minutes
 
     setTimeoutId(timeout);
@@ -491,11 +501,23 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
         setTimeoutId(null);
       }
       
+      // Hide the loader
+      hideLoader();
+      
       const transformedPlan = transformApiMealPlanToLocal(apiResponse);
 
-      setCreatedPlan(transformedPlan);
-      setIsGenerating(false);
-      setShowSuccessModal(true);
+      // Show success toast
+      toast({
+        title: "Meal Plan Created Successfully!",
+        description: `Your ${planData.numberOfDays}-day meal plan "${planData.planName}" is ready to explore.`,
+        duration: 5000,
+      });
+
+      // Add to context and navigate
+      onPlanCreated(transformedPlan);
+
+      // Refresh meal plans from server
+      await refreshMealPlans();
 
     } catch (error) {
       console.error('Error generating meal plan:', error);
@@ -506,7 +528,9 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
         setTimeoutId(null);
       }
       
-      setIsGenerating(false);
+      // Hide the loader
+      hideLoader();
+      
       toast({
         title: "Generation Failed",
         description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
@@ -547,6 +571,8 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <LoaderComponent />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
