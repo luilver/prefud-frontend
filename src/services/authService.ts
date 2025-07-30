@@ -96,6 +96,7 @@ class AuthService {
 
       if (!response.ok) {
         const errorData: ApiErrorResponse = await response.json();
+        // Throw the specific error message from the API
         throw new Error(errorData.message.message);
       }
 
@@ -114,6 +115,7 @@ class AuthService {
       };
     } catch (error) {
       console.error('Login error:', error);
+      // Re-throw the error so it can be handled by the UI
       throw error;
     }
   }

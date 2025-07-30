@@ -34,9 +34,28 @@ const SignIn = () => {
       });
       navigate('/'); // Navigate to dashboard after successful login
     } catch (error) {
+      // Handle specific error messages from the API
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      
+      let title = "Sign in failed";
+      let description = "Please check your credentials and try again.";
+      
+      // Handle specific error cases
+      if (errorMessage.includes("No user exists with email")) {
+        title = "Account not found";
+        description = "No account found with this email address. Please check your email or create a new account.";
+      } else if (errorMessage.includes("Invalid email or password")) {
+        title = "Invalid credentials";
+        description = "The email or password you entered is incorrect. Please try again.";
+      } else if (errorMessage.includes("email") || errorMessage.includes("password")) {
+        // Generic handling for other email/password related errors
+        title = "Login failed";
+        description = errorMessage;
+      }
+      
       toast({
-        title: "Sign in failed",
-        description: "Please check your credentials and try again.",
+        title,
+        description,
         variant: "destructive",
       });
     } finally {
