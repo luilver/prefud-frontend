@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlanService';
+import { getMealPlansByUser } from "@/services/userMealPlansService";
 
 interface User {
   id: string;
@@ -661,19 +662,19 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const refreshMealPlans = () => {
-    const savedMealPlans = localStorage.getItem('mealPlans');
-    if (savedMealPlans) {
-      const plans = JSON.parse(savedMealPlans);
-      console.log('Refreshing meal plans from localStorage:', plans);
-      setMealPlans(plans);
-      
-      if (activeMealPlan) {
-        const updatedActivePlan = plans.find((plan: MealPlan) => plan.id === activeMealPlan.id);
-        if (updatedActivePlan) {
-          setActiveMealPlan(updatedActivePlan);
-        }
-      }
+  const refreshMealPlans = async () => {
+    if (!user?.id) {
+      console.log('No user ID available for refreshing meal plans');
+      return;
+    }
+
+    try {
+      console.log('Refreshing meal plans for user:', user.id);
+      const freshMealPlans = await getMealPlansByUser(user.id);
+      setMealPlans(freshMealPlans || []);
+      console.log('Meal plans refreshed:', freshMealPlans);
+    } catch (error) {
+      console.error('Error refreshing meal plans:', error);
     }
   };
 

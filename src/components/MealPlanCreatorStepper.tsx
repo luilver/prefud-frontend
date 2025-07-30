@@ -7,6 +7,8 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
+import MealPlanSuccessModal from "./MealPlanSuccessModal";
+import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
 
 interface MealPlanCreatorStepperProps {
   onPlanCreated: (plan: any) => void;
@@ -35,8 +37,12 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
     healthGoals: initialData?.preferences?.healthGoals || [],
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+  const [createdPlan, setCreatedPlan] = useState<any>(null);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   
-  const { user } = useUser();
+  const { user, refreshMealPlans } = useUser();
   const { language } = useLanguage();
   const { toast } = useToast();
 
@@ -434,6 +440,15 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
     setIsGenerating(true);
 
+    // Set up timeout for 3 minutes (180 seconds)
+    const timeout = setTimeout(() => {
+      console.log('Meal plan generation timed out after 3 minutes');
+      setIsGenerating(false);
+      setShowTimeoutModal(true);
+    }, 180000); // 3 minutes
+
+    setTimeoutId(timeout);
+
     try {
       const getLanguageName = (languageCode: string) => {
         const languageMap: { [key: string]: string } = {
@@ -469,24 +484,64 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       console.log('Creating meal plan with data:', requestData);
 
       const apiResponse = await createMealPlan(requestData);
+      
+      // Clear the timeout since we got a response
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+      
       const transformedPlan = transformApiMealPlanToLocal(apiResponse);
 
-      onPlanCreated(transformedPlan);
-      
-      toast({
-        title: "Meal Plan Generated!",
-        description: `Your personalized meal plan "${planData.planName}" has been created successfully.`,
-      });
+      setCreatedPlan(transformedPlan);
+      setIsGenerating(false);
+      setShowSuccessModal(true);
 
     } catch (error) {
       console.error('Error generating meal plan:', error);
+      
+      // Clear the timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+      
+      setIsGenerating(false);
       toast({
         title: "Generation Failed",
         description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsGenerating(false);
+    }
+  };
+
+  const handleSuccessModalClose = async () => {
+    setShowSuccessModal(false);
+    
+    if (createdPlan) {
+      // Add to context and navigate
+      onPlanCreated(createdPlan);
+    }
+
+    // Refresh meal plans from server
+    try {
+      await refreshMealPlans();
+    } catch (error) {
+      console.error('Error refreshing meal plans:', error);
+    }
+  };
+
+  const handleTimeoutModalClose = async () => {
+    setShowTimeoutModal(false);
+    
+    // Navigate back to meal planner
+    onBack();
+
+    // Refresh meal plans from server in case the plan was created in the background
+    try {
+      await refreshMealPlans();
+    } catch (error) {
+      console.error('Error refreshing meal plans:', error);
     }
   };
 
@@ -541,6 +596,22 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
           </Button>
         </div>
       )}
+
+      <MealPlanSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        mealPlan={createdPlan ? {
+          name: createdPlan.name,
+          numberOfDays: planData.numberOfDays,
+          numberOfPersons: planData.numberOfPersons,
+          mealsPerDay: planData.mealsPerDay
+        } : undefined}
+      />
+
+      <MealPlanTimeoutModal
+        isOpen={showTimeoutModal}
+        onClose={handleTimeoutModalClose}
+      />
     </div>
   );
 };

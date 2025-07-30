@@ -10,6 +10,9 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
+import MealPlanSuccessModal from "./MealPlanSuccessModal";
+import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
+import { getMealPlansByUser } from "@/services/userMealPlansService";
 
 interface MealPlanCreatorProps {
   onPlanCreated: (plan: any) => void;
@@ -34,8 +37,12 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [newDislike, setNewDislike] = useState("");
   const [healthGoals, setHealthGoals] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+  const [createdPlan, setCreatedPlan] = useState<any>(null);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   
-  const { user } = useUser();
+  const { user, refreshMealPlans } = useUser();
   const { language } = useLanguage();
   const { toast } = useToast();
 
@@ -154,6 +161,15 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
 
     setIsGenerating(true);
 
+    // Set up timeout for 3 minutes (180 seconds)
+    const timeout = setTimeout(() => {
+      console.log('Meal plan generation timed out after 3 minutes');
+      setIsGenerating(false);
+      setShowTimeoutModal(true);
+    }, 180000); // 3 minutes
+
+    setTimeoutId(timeout);
+
     try {
       // Prepare the API request data with correct language mapping
       const requestData = {
@@ -181,26 +197,35 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       const apiResponse = await createMealPlan(requestData);
       console.log('API Response received:', apiResponse);
 
+      // Clear the timeout since we got a response
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+
       // Transform the API response to match our local format
       const transformedPlan = transformApiMealPlanToLocal(apiResponse);
       console.log('Transformed plan:', transformedPlan);
 
-      onPlanCreated(transformedPlan);
-      
-      toast({
-        title: "Meal Plan Generated!",
-        description: `Your personalized meal plan "${planName}" has been created successfully.`,
-      });
+      setCreatedPlan(transformedPlan);
+      setIsGenerating(false);
+      setShowSuccessModal(true);
 
     } catch (error) {
       console.error('Error generating meal plan:', error);
+      
+      // Clear the timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
+      
+      setIsGenerating(false);
       toast({
         title: "Generation Failed",
         description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -210,6 +235,36 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     const endDateObj = new Date(startDateObj);
     endDateObj.setDate(startDateObj.getDate() + days - 1);
     return endDateObj.toISOString().split('T')[0];
+  };
+
+  const handleSuccessModalClose = async () => {
+    setShowSuccessModal(false);
+    
+    if (createdPlan) {
+      // Add to context and navigate
+      onPlanCreated(createdPlan);
+    }
+
+    // Refresh meal plans from server
+    try {
+      await refreshMealPlans();
+    } catch (error) {
+      console.error('Error refreshing meal plans:', error);
+    }
+  };
+
+  const handleTimeoutModalClose = async () => {
+    setShowTimeoutModal(false);
+    
+    // Navigate back to meal planner
+    onBack();
+
+    // Refresh meal plans from server in case the plan was created in the background
+    try {
+      await refreshMealPlans();
+    } catch (error) {
+      console.error('Error refreshing meal plans:', error);
+    }
   };
 
   return (
@@ -595,6 +650,22 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
           </CardContent>
         </Card>
       </div>
+
+      <MealPlanSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        mealPlan={createdPlan ? {
+          name: createdPlan.name,
+          numberOfDays: numberOfDays,
+          numberOfPersons: numberOfPersons,
+          mealsPerDay: mealsPerDay
+        } : undefined}
+      />
+
+      <MealPlanTimeoutModal
+        isOpen={showTimeoutModal}
+        onClose={handleTimeoutModalClose}
+      />
     </div>
   );
 };
