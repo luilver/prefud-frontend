@@ -50,6 +50,19 @@ interface MealPlansApiResponse {
   totalMealPlans: number;
 }
 
+// Local MealPlan interface (matching UserContext expectations)
+export interface LocalMealPlan {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  meals: any[];
+  shoppingList?: any[];
+  duration: string;
+  preferences: any;
+  weeks: any[];
+}
+
 // Mock delay to simulate API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -120,15 +133,34 @@ export const getMealPlans = async (userId: string, page: number = 1, limit: numb
   }
 };
 
-export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): MealPlan => {
+export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan => {
+  // Calculate duration from start and end dates
+  const startDate = new Date(apiPlan.startDate);
+  const endDate = new Date(apiPlan.endDate);
+  const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const duration = `${diffDays} days`;
+
+  // Create weeks array based on numberOfWeeks
+  const weeks = Array.from({ length: apiPlan.numberOfWeeks }, (_, index) => ({
+    id: `week-${index + 1}`,
+    weekNumber: index + 1,
+    meals: []
+  }));
+
   return {
     id: apiPlan._id,
     name: apiPlan.name,
     startDate: apiPlan.startDate,
     endDate: apiPlan.endDate,
-    numberOfWeeks: apiPlan.numberOfWeeks,
-    numberOfPersons: apiPlan.numberOfPersons,
-    mealsPerDay: apiPlan.mealsPerDay,
-    meals: apiPlan.meals || []
+    meals: apiPlan.meals || [],
+    shoppingList: [],
+    duration,
+    preferences: {
+      numberOfPersons: apiPlan.numberOfPersons,
+      mealsPerDay: apiPlan.mealsPerDay,
+      numberOfWeeks: apiPlan.numberOfWeeks
+    },
+    weeks
   };
 };
