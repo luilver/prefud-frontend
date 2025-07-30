@@ -198,8 +198,8 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       console.log('API Response received:', apiResponse);
 
       // Clear the timeout since we got a response
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timeout) {
+        clearTimeout(timeout);
         setTimeoutId(null);
       }
 
@@ -215,8 +215,8 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       console.error('Error generating meal plan:', error);
       
       // Clear the timeout
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timeout) {
+        clearTimeout(timeout);
         setTimeoutId(null);
       }
       

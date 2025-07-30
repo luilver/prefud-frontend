@@ -486,8 +486,8 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       const apiResponse = await createMealPlan(requestData);
       
       // Clear the timeout since we got a response
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timeout) {
+        clearTimeout(timeout);
         setTimeoutId(null);
       }
       
@@ -501,8 +501,8 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       console.error('Error generating meal plan:', error);
       
       // Clear the timeout
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timeout) {
+        clearTimeout(timeout);
         setTimeoutId(null);
       }
       
