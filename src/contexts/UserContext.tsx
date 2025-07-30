@@ -218,8 +218,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       // Fetch first page to get all meal plans
       const response = await getMealPlans(userId, 1, 50); // Fetch up to 50 plans
       
-      if (response.mealPlans && response.mealPlans.length > 0) {
-        const transformedPlans = response.mealPlans.map(transformApiMealPlanToLocal);
+      if (response.data && response.data.length > 0) {
+        const transformedPlans = response.data.map(transformApiMealPlanToLocal);
         console.log('Transformed meal plans from API:', transformedPlans);
         
         // Merge with existing local plans (avoid duplicates)

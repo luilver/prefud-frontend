@@ -28,26 +28,60 @@ export interface Meal {
   mealType: 'meal' | 'snack';
 }
 
-// API response interfaces
+// API response interfaces - updated to match new API structure
 interface ApiMealPlan {
   _id: string;
   user_id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  numberOfWeeks: number;
-  numberOfPersons: number;
+  plan_name: string;
+  plan_description?: string;
+  start_date: string;
+  plan: {
+    mealPlan: Array<{
+      day: number;
+      date: string;
+      dayOfWeek: string;
+      meals: Array<{
+        name: string;
+        description?: string;
+        ingredients: Array<{
+          name: string;
+          quantity: number;
+          unit: string;
+        }>;
+        prepTip?: string;
+        cookingTime: number;
+        steps: string[];
+        calories: number;
+        nutritionalInfo?: any;
+        mealType: string;
+      }>;
+    }>;
+    ingredientsList?: Array<{
+      name: string;
+      quantity: number;
+      unit: string;
+    }>;
+  };
+  duration: number;
+  numberPeople: number;
   mealsPerDay: number;
-  meals: any[];
+  dietaryRestrictions?: string[];
+  cuisinePreferences?: string[];
+  allergiesIntolerance?: string[];
+  dislikes?: string;
+  maxCookingTime?: number;
+  cookingSkillLevel?: string;
+  budgetRange?: string;
+  healthGoals?: string[];
   createdAt: string;
   updatedAt: string;
 }
 
 interface MealPlansApiResponse {
-  mealPlans: ApiMealPlan[];
+  data: ApiMealPlan[];
+  total: number;
+  page: number;
   totalPages: number;
-  currentPage: number;
-  totalMealPlans: number;
 }
 
 // Local MealPlan interface (matching UserContext expectations)
@@ -134,32 +168,77 @@ export const getMealPlans = async (userId: string, page: number = 1, limit: numb
 };
 
 export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan => {
-  // Calculate duration from start and end dates
-  const startDate = new Date(apiPlan.startDate);
-  const endDate = new Date(apiPlan.endDate);
-  const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const duration = `${diffDays} days`;
+  // Calculate duration and dates
+  const startDate = new Date(apiPlan.start_date);
+  const endDate = new Date(startDate.getTime() + (apiPlan.duration * 24 * 60 * 60 * 1000));
+  const duration = `${apiPlan.duration} days`;
 
-  // Create weeks array based on numberOfWeeks
-  const weeks = Array.from({ length: apiPlan.numberOfWeeks }, (_, index) => ({
+  // Transform meals from the nested structure
+  const transformedMeals: any[] = [];
+  
+  if (apiPlan.plan && apiPlan.plan.mealPlan) {
+    apiPlan.plan.mealPlan.forEach((dayPlan) => {
+      dayPlan.meals.forEach((meal, mealIndex) => {
+        transformedMeals.push({
+          id: `${dayPlan.day}-${mealIndex}`,
+          name: meal.name,
+          description: meal.description || '',
+          type: meal.mealType,
+          calories: meal.calories || 0,
+          prepTime: meal.cookingTime || 0,
+          servings: apiPlan.numberPeople || 1,
+          difficulty: apiPlan.cookingSkillLevel || 'medium',
+          ingredients: meal.ingredients ? meal.ingredients.map(ing => ing.name) : [],
+          instructions: meal.steps || [],
+          week: Math.ceil(dayPlan.day / 7),
+          day: dayPlan.day,
+          date: dayPlan.date,
+          nutritionalInfo: meal.nutritionalInfo,
+          prepTip: meal.prepTip
+        });
+      });
+    });
+  }
+
+  // Create weeks array based on duration
+  const numberOfWeeks = Math.ceil(apiPlan.duration / 7);
+  const weeks = Array.from({ length: numberOfWeeks }, (_, index) => ({
     id: `week-${index + 1}`,
     weekNumber: index + 1,
-    meals: []
+    meals: transformedMeals.filter(meal => meal.week === index + 1)
   }));
+
+  // Transform shopping list from ingredients list
+  const shoppingList = apiPlan.plan?.ingredientsList?.map((ingredient, index) => ({
+    id: `ingredient-${index}`,
+    name: ingredient.name,
+    quantity: ingredient.quantity,
+    unit: ingredient.unit,
+    category: 'meal-ingredient',
+    priority: 'medium',
+    purchased: false
+  })) || [];
 
   return {
     id: apiPlan._id,
-    name: apiPlan.name,
-    startDate: apiPlan.startDate,
-    endDate: apiPlan.endDate,
-    meals: apiPlan.meals || [],
-    shoppingList: [],
+    name: apiPlan.plan_name,
+    startDate: startDate.toISOString().split('T')[0],
+    endDate: endDate.toISOString().split('T')[0],
+    meals: transformedMeals,
+    shoppingList,
     duration,
     preferences: {
-      numberOfPersons: apiPlan.numberOfPersons,
+      numberOfPersons: apiPlan.numberPeople,
       mealsPerDay: apiPlan.mealsPerDay,
-      numberOfWeeks: apiPlan.numberOfWeeks
+      numberOfWeeks,
+      dietaryRestrictions: apiPlan.dietaryRestrictions || [],
+      cuisinePreferences: apiPlan.cuisinePreferences || [],
+      allergiesIntolerance: apiPlan.allergiesIntolerance || [],
+      dislikes: apiPlan.dislikes || '',
+      maxCookingTime: apiPlan.maxCookingTime || 60,
+      cookingSkillLevel: apiPlan.cookingSkillLevel || 'medium',
+      budgetRange: apiPlan.budgetRange || 'medium',
+      healthGoals: apiPlan.healthGoals || []
     },
     weeks
   };
