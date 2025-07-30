@@ -1,4 +1,3 @@
-
 // Mock service for meal plan operations
 // In a real app, these would be API calls to your backend
 
@@ -105,6 +104,7 @@ export interface LocalMealPlan {
   duration: string;
   preferences: any;
   weeks: any[];
+  totalCarbonFootprint?: number;
 }
 
 // API functions for creating meal plans
