@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlanService';
-import { getMealPlansByUser } from "@/services/userMealPlansService";
 
 interface User {
   id: string;
@@ -165,6 +164,12 @@ interface UserContextType {
   setActiveMealPlan: (plan: MealPlan | null) => void;
   refreshMealPlans: () => void;
   getMealPlanById: (id: string) => MealPlan | null;
+  fetchMealPlansFromAPI: (userId: string, page?: number, limit?: number) => Promise<{
+    data: MealPlan[];
+    totalPages: number;
+    currentPage: number;
+    totalCount: number;
+  }>;
   getBillingHistory: () => Promise<void>;
   getPaymentMethods: () => Promise<void>;
   addPaymentMethod: (method: any) => Promise<void>;
@@ -211,30 +216,34 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const ingredients = pantryItems;
   const isAuthenticated = authIsAuthenticated || user !== null;
 
-  // Function to fetch meal plans from API
-  const fetchMealPlansFromAPI = useCallback(async (userId: string) => {
+  // Function to fetch meal plans from API - now callable from meal planner
+  const fetchMealPlansFromAPI = useCallback(async (userId: string, page: number = 1, limit: number = 10) => {
     try {
-      console.log('Fetching meal plans from API for user:', userId);
+      console.log('Fetching meal plans from API for user:', userId, 'page:', page);
       
-      // Fetch first page to get all meal plans
-      const response = await getMealPlans(userId, 1, 50); // Fetch up to 50 plans
+      const response = await getMealPlans(userId, page, limit);
       
       if (response.data && response.data.length > 0) {
         const transformedPlans = response.data.map(transformApiMealPlanToLocal);
         console.log('Transformed meal plans from API:', transformedPlans);
         
-        // Merge with existing local plans (avoid duplicates)
-        setMealPlans(prevPlans => {
-          const existingIds = prevPlans.map(plan => plan.id);
-          const newPlans = transformedPlans.filter(plan => !existingIds.includes(plan.id));
-          const mergedPlans = [...prevPlans, ...newPlans];
-          console.log('Merged meal plans:', mergedPlans);
-          return mergedPlans;
-        });
+        return {
+          data: transformedPlans,
+          totalPages: response.totalPages || 1,
+          currentPage: response.currentPage || page,
+          totalCount: response.totalCount || transformedPlans.length
+        };
       }
+      
+      return {
+        data: [],
+        totalPages: 1,
+        currentPage: 1,
+        totalCount: 0
+      };
     } catch (error) {
       console.error('Failed to fetch meal plans from API:', error);
-      // Don't throw the error, just log it so the app continues to work
+      throw error;
     }
   }, []);
 
@@ -270,7 +279,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  // Sync with AuthContext user and fetch meal plans
+  // Sync with AuthContext user - removed automatic meal plans fetching
   useEffect(() => {
     if (authUser && !user) {
       // Create user profile from auth user
@@ -302,13 +311,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       };
       setUser(userProfile);
-      
-      // Fetch meal plans after user is set
-      fetchMealPlansFromAPI(authUser.userId);
     } else if (!authUser && user) {
       setUser(null);
     }
-  }, [authUser, user, fetchMealPlansFromAPI]);
+  }, [authUser, user]);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -670,9 +676,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       console.log('Refreshing meal plans for user:', user.id);
-      const freshMealPlans = await getMealPlansByUser(user.id);
-      setMealPlans(freshMealPlans || []);
-      console.log('Meal plans refreshed:', freshMealPlans);
+      // Fetch first page of meal plans
+      const response = await fetchMealPlansFromAPI(user.id, 1, 50);
+      setMealPlans(response.data || []);
+      console.log('Meal plans refreshed:', response.data);
     } catch (error) {
       console.error('Error refreshing meal plans:', error);
     }
@@ -946,6 +953,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setActiveMealPlan: setActiveMealPlanUpdated,
     refreshMealPlans,
     getMealPlanById,
+    fetchMealPlansFromAPI,
     getBillingHistory,
     getPaymentMethods,
     addPaymentMethod,
