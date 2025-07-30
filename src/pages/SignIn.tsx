@@ -34,8 +34,11 @@ const SignIn = () => {
       });
       navigate('/'); // Navigate to dashboard after successful login
     } catch (error) {
+      console.log('Login error caught:', error);
+      
       // Handle specific error messages from the API
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      console.log('Error message:', errorMessage);
       
       let title = "Sign in failed";
       let description = "Please check your credentials and try again.";
@@ -52,6 +55,8 @@ const SignIn = () => {
         title = "Login failed";
         description = errorMessage;
       }
+      
+      console.log('Showing toast with:', { title, description });
       
       toast({
         title,
