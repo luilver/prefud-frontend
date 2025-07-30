@@ -453,10 +453,27 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     authLogout();
     setUser(null);
     setSubscriptionInfo(null);
-    // Clear pantry items when logging out
+    // Clear all user-related state including meal plans
     setPantryItems([]);
+    setMealPlans([]);
+    setShoppingItems([]);
+    setCompletedMeals({});
+    setActiveShoppingList([]);
+    setActiveMealPlan(null);
+    setAIMeals([]);
+    setAIDrinks([]);
+    setBillingHistory([]);
+    setPaymentMethods([]);
+    
+    // Clear localStorage for user data
     localStorage.removeItem('user');
     localStorage.removeItem('subscriptionInfo');
+    localStorage.removeItem('mealPlans');
+    localStorage.removeItem('shoppingItems');
+    localStorage.removeItem('completedMeals');
+    localStorage.removeItem('aiMeals');
+    localStorage.removeItem('aiDrinks');
+    
     window.dispatchEvent(new CustomEvent('user-logout'));
   };
 
