@@ -50,9 +50,15 @@ interface ApiMealPlan {
         }>;
         prepTip?: string;
         cookingTime: number;
+        carbonFootprint?: number;
         steps: string[];
         calories: number;
-        nutritionalInfo?: any;
+        nutritionalInfo?: {
+          protein: number;
+          fat: number;
+          carbohydrates: number;
+          fiber: number;
+        };
         mealType: string;
       }>;
     }>;
@@ -60,7 +66,11 @@ interface ApiMealPlan {
       name: string;
       quantity: number;
       unit: string;
+      classification?: string;
+      carbonFootPrintToWaste?: number;
+      daysToExpire?: number;
     }>;
+    totalCarbonFootprint?: number;
   };
   duration: number;
   numberPeople: number;
@@ -214,6 +224,8 @@ export const getMealPlans = async (userId: string, page: number = 1, limit: numb
 };
 
 export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan => {
+  console.log('Transforming API meal plan:', apiPlan);
+  
   // Calculate duration and dates
   const startDate = new Date(apiPlan.start_date);
   const endDate = new Date(startDate.getTime() + (apiPlan.duration * 24 * 60 * 60 * 1000));
@@ -236,15 +248,21 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
           difficulty: apiPlan.cookingSkillLevel || 'medium',
           ingredients: meal.ingredients ? meal.ingredients.map(ing => ing.name) : [],
           instructions: meal.steps || [],
+          steps: meal.steps || [],
           week: Math.ceil(dayPlan.day / 7),
           day: dayPlan.day,
           date: dayPlan.date,
+          dayOfWeek: dayPlan.dayOfWeek,
           nutritionalInfo: meal.nutritionalInfo,
-          prepTip: meal.prepTip
+          prepTip: meal.prepTip,
+          carbonFootprint: meal.carbonFootprint,
+          detailedIngredients: meal.ingredients || []
         });
       });
     });
   }
+
+  console.log('Transformed meals:', transformedMeals);
 
   // Create weeks array based on duration
   const numberOfWeeks = Math.ceil(apiPlan.duration / 7);
@@ -260,12 +278,17 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
     name: ingredient.name,
     quantity: ingredient.quantity,
     unit: ingredient.unit,
-    category: 'meal-ingredient',
+    category: ingredient.classification || 'other',
     priority: 'medium',
-    purchased: false
+    purchased: false,
+    estimatedPrice: 0,
+    carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
+    daysToExpire: ingredient.daysToExpire
   })) || [];
 
-  return {
+  console.log('Transformed shopping list:', shoppingList);
+
+  const transformedPlan: LocalMealPlan = {
     id: apiPlan._id,
     name: apiPlan.plan_name,
     startDate: startDate.toISOString().split('T')[0],
@@ -286,6 +309,10 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
       budgetRange: apiPlan.budgetRange || 'medium',
       healthGoals: apiPlan.healthGoals || []
     },
-    weeks
+    weeks,
+    totalCarbonFootprint: apiPlan.plan?.totalCarbonFootprint
   };
+
+  console.log('Final transformed plan:', transformedPlan);
+  return transformedPlan;
 };
