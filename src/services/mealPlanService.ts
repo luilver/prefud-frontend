@@ -28,6 +28,28 @@ export interface Meal {
   mealType: 'meal' | 'snack';
 }
 
+// API response interfaces
+interface ApiMealPlan {
+  _id: string;
+  user_id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  numberOfWeeks: number;
+  numberOfPersons: number;
+  mealsPerDay: number;
+  meals: any[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface MealPlansApiResponse {
+  mealPlans: ApiMealPlan[];
+  totalPages: number;
+  currentPage: number;
+  totalMealPlans: number;
+}
+
 // Mock delay to simulate API calls
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -71,4 +93,42 @@ export const updateMealInPlan = async (planId: string, mealId: string, updatedMe
   
   // In a real app, this would make an API call to update the meal in the plan
   console.log('Service: Meal updated successfully');
+};
+
+export const getMealPlans = async (userId: string, page: number = 1, limit: number = 10): Promise<MealPlansApiResponse> => {
+  console.log('Service: Fetching meal plans', { userId, page, limit });
+  
+  try {
+    const response = await fetch(`https://pantry-ms-brain.onrender.com/meal-plan/${userId}?page=${page}&limit=${limit}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch meal plans: ${response.status}`);
+    }
+
+    const data: MealPlansApiResponse = await response.json();
+    console.log('Service: Meal plans fetched successfully', data);
+    
+    return data;
+  } catch (error) {
+    console.error('Service: Error fetching meal plans', error);
+    throw error;
+  }
+};
+
+export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): MealPlan => {
+  return {
+    id: apiPlan._id,
+    name: apiPlan.name,
+    startDate: apiPlan.startDate,
+    endDate: apiPlan.endDate,
+    numberOfWeeks: apiPlan.numberOfWeeks,
+    numberOfPersons: apiPlan.numberOfPersons,
+    mealsPerDay: apiPlan.mealsPerDay,
+    meals: apiPlan.meals || []
+  };
 };

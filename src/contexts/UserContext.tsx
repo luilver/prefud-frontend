@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlanService';
 
 interface User {
   id: string;
@@ -209,6 +210,33 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const ingredients = pantryItems;
   const isAuthenticated = authIsAuthenticated || user !== null;
 
+  // Function to fetch meal plans from API
+  const fetchMealPlansFromAPI = useCallback(async (userId: string) => {
+    try {
+      console.log('Fetching meal plans from API for user:', userId);
+      
+      // Fetch first page to get all meal plans
+      const response = await getMealPlans(userId, 1, 50); // Fetch up to 50 plans
+      
+      if (response.mealPlans && response.mealPlans.length > 0) {
+        const transformedPlans = response.mealPlans.map(transformApiMealPlanToLocal);
+        console.log('Transformed meal plans from API:', transformedPlans);
+        
+        // Merge with existing local plans (avoid duplicates)
+        setMealPlans(prevPlans => {
+          const existingIds = prevPlans.map(plan => plan.id);
+          const newPlans = transformedPlans.filter(plan => !existingIds.includes(plan.id));
+          const mergedPlans = [...prevPlans, ...newPlans];
+          console.log('Merged meal plans:', mergedPlans);
+          return mergedPlans;
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch meal plans from API:', error);
+      // Don't throw the error, just log it so the app continues to work
+    }
+  }, []);
+
   // Listen for pantry sync events from AuthContext
   useEffect(() => {
     const handlePantrySync = (event: CustomEvent) => {
@@ -241,7 +269,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  // Sync with AuthContext user
+  // Sync with AuthContext user and fetch meal plans
   useEffect(() => {
     if (authUser && !user) {
       // Create user profile from auth user
@@ -273,10 +301,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
       };
       setUser(userProfile);
+      
+      // Fetch meal plans after user is set
+      fetchMealPlansFromAPI(authUser.userId);
     } else if (!authUser && user) {
       setUser(null);
     }
-  }, [authUser, user]);
+  }, [authUser, user, fetchMealPlansFromAPI]);
 
   // Load data from localStorage on mount
   useEffect(() => {
