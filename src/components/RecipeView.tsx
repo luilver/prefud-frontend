@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,42 +42,60 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
     sodium: Math.floor(Math.random() * 800) + 200
   }), [meal.calories]);
 
-  const getIngredientsWithQuantities = (ingredients: string[]) => {
-    return ingredients.map(ingredient => {
-      if (/^\d/.test(ingredient)) {
-        return ingredient;
-      }
-      
-      const quantities = {
-        'chicken': '2 lbs',
-        'vegetables': '1 cup',
-        'oil': '2 tbsp',
-        'salt': '1 tsp',
-        'pepper': '1/2 tsp',
-        'garlic': '2 cloves',
-        'onion': '1 medium',
-        'tomato': '2 medium',
-        'rice': '1 cup',
-        'pasta': '8 oz',
-        'cheese': '1/2 cup',
-        'milk': '1 cup',
-        'flour': '2 cups',
-        'sugar': '1/4 cup',
-        'butter': '2 tbsp'
-      };
-      
-      const ingredientLower = ingredient.toLowerCase();
-      for (const [key, quantity] of Object.entries(quantities)) {
-        if (ingredientLower.includes(key)) {
-          return `${quantity} ${ingredient}`;
+  // Use actual ingredient data from the meal, with fallback to simple ingredient names
+  const getIngredientsDisplay = () => {
+    // Check if meal has structured ingredient data (from API)
+    if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
+      return meal.ingredientsData.map((ingredient: any) => {
+        if (ingredient.name && ingredient.quantity && ingredient.unit) {
+          return `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`;
         }
-      }
-      
-      return `1 unit ${ingredient}`;
-    });
+        return ingredient.name || ingredient;
+      });
+    }
+    
+    // Check if ingredients are already formatted strings with quantities
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      return meal.ingredients.map((ingredient: string) => {
+        // If ingredient already has quantity/unit format, return as is
+        if (/^\d/.test(ingredient) || ingredient.includes('cup') || ingredient.includes('tbsp') || ingredient.includes('tsp') || ingredient.includes('lb') || ingredient.includes('oz')) {
+          return ingredient;
+        }
+        
+        // Generic fallback for unformatted ingredients
+        const quantities = {
+          'chicken': '2 lbs',
+          'vegetables': '1 cup',
+          'oil': '2 tbsp',
+          'salt': '1 tsp',
+          'pepper': '1/2 tsp',
+          'garlic': '2 cloves',
+          'onion': '1 medium',
+          'tomato': '2 medium',
+          'rice': '1 cup',
+          'pasta': '8 oz',
+          'cheese': '1/2 cup',
+          'milk': '1 cup',
+          'flour': '2 cups',
+          'sugar': '1/4 cup',
+          'butter': '2 tbsp'
+        };
+        
+        const ingredientLower = ingredient.toLowerCase();
+        for (const [key, quantity] of Object.entries(quantities)) {
+          if (ingredientLower.includes(key)) {
+            return `${quantity} ${ingredient}`;
+          }
+        }
+        
+        return `1 unit ${ingredient}`;
+      });
+    }
+    
+    return [];
   };
 
-  const enhancedIngredients = useMemo(() => getIngredientsWithQuantities(meal.ingredients), [meal.ingredients]);
+  const enhancedIngredients = useMemo(() => getIngredientsDisplay(), [meal]);
 
   const enhancedInstructions = useMemo(() => {
     const cookingTips = [
@@ -90,12 +109,15 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
       "🏆 Final stretch - you've got this!"
     ];
     
-    return meal.instructions.map((instruction: string, index: number) => ({
+    // Use instructions from the meal data
+    const instructions = meal.instructions || meal.steps || [];
+    
+    return instructions.map((instruction: string, index: number) => ({
       text: instruction,
       tip: cookingTips[index % cookingTips.length],
       estimatedTime: 2 + (index % 5) // Fixed time based on step index instead of random
     }));
-  }, [meal.instructions]);
+  }, [meal.instructions, meal.steps]);
 
   return (
     <>
@@ -124,17 +146,17 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                   {meal.name}
                 </CardTitle>
                 <CardDescription className="text-base sm:text-lg break-words">
-                  A delicious {meal.type} perfect for any time of day
+                  {meal.description || `A delicious ${meal.type} perfect for any time of day`}
                 </CardDescription>
                 
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{meal.prepTime} minutes</span>
+                    <span className="font-medium text-sm sm:text-base">{meal.prepTime || meal.cookingTime || 30} minutes</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">2 servings</span>
+                    <span className="font-medium text-sm sm:text-base">{meal.servings || 2} servings</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
