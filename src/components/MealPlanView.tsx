@@ -24,6 +24,43 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderItems, setOrderItems] = useState<any[]>([]);
 
+  // Meal type order for sorting
+  const mealTypeOrder = {
+    breakfast: 1,
+    lunch: 2,
+    dinner: 3,
+    snack: 4
+  };
+
+  // Function to get day name and date
+  const getDayInfo = (dayIndex: number) => {
+    const startDate = new Date(plan.startDate);
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + dayIndex);
+    
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayName = dayNames[currentDate.getDay()];
+    const dateString = currentDate.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
+    
+    return {
+      dayName,
+      dateString,
+      fullDate: currentDate
+    };
+  };
+
+  // Function to sort meals by type order
+  const sortMealsByType = (meals: any[]) => {
+    return meals.sort((a, b) => {
+      const aOrder = mealTypeOrder[a.type?.toLowerCase() as keyof typeof mealTypeOrder] || 5;
+      const bOrder = mealTypeOrder[b.type?.toLowerCase() as keyof typeof mealTypeOrder] || 5;
+      return aOrder - bOrder;
+    });
+  };
+
   const handleDeleteMeal = (mealId: string) => {
     if (window.confirm('Are you sure you want to delete this meal?')) {
       deleteMealFromPlan(plan.id, mealId);
@@ -163,6 +200,11 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       });
     }
     
+    // Sort meals within each day by meal type
+    Object.keys(groupedMeals).forEach(dayKey => {
+      groupedMeals[dayKey] = sortMealsByType(groupedMeals[dayKey]);
+    });
+    
     console.log('Grouped meals by day:', groupedMeals);
     return groupedMeals;
   })();
@@ -241,15 +283,21 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {days.map((day) => {
+          {days.map((day, dayIndex) => {
             const dayMeals = mealsByDay[day] || [];
+            const { dayName, dateString } = getDayInfo(dayIndex);
             
             return (
               <Card key={day}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-blue-500" />
-                    {day}
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg font-semibold">{dayName}</span>
+                      <Badge variant="outline" className="text-sm">
+                        {dateString}
+                      </Badge>
+                    </div>
                   </CardTitle>
                   <CardDescription>
                     {dayMeals.length} meal{dayMeals.length !== 1 ? 's' : ''} planned
@@ -277,7 +325,15 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                     {isCompleted && <CheckCircle className="h-4 w-4 text-green-500" />}
                                   </CardTitle>
                                   <div className="flex flex-wrap gap-1 mt-2">
-                                    <Badge variant="secondary" className="text-xs">
+                                    <Badge 
+                                      variant="secondary" 
+                                      className={`text-xs ${
+                                        meal.type?.toLowerCase() === 'breakfast' ? 'bg-orange-100 text-orange-800' :
+                                        meal.type?.toLowerCase() === 'lunch' ? 'bg-blue-100 text-blue-800' :
+                                        meal.type?.toLowerCase() === 'dinner' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-gray-100 text-gray-800'
+                                      }`}
+                                    >
                                       {meal.type || 'Meal'}
                                     </Badge>
                                     {meal.cuisine && (
