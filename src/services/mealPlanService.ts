@@ -27,7 +27,7 @@ export interface Meal {
   mealType: 'meal' | 'snack';
 }
 
-// API response interfaces - updated to match new API structure
+// Updated API response interface to match the new structure you provided
 interface ApiMealPlan {
   _id: string;
   user_id: string;
@@ -288,6 +288,7 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
 
   console.log('Transformed shopping list:', shoppingList);
 
+  // Make sure preferences object matches what the cards expect
   const transformedPlan: LocalMealPlan = {
     id: apiPlan._id,
     name: apiPlan.plan_name,
@@ -298,8 +299,10 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
     duration,
     preferences: {
       numberOfPersons: apiPlan.numberPeople,
+      numberOfDays: apiPlan.duration,
       mealsPerDay: apiPlan.mealsPerDay,
       numberOfWeeks,
+      people: apiPlan.numberPeople,
       dietaryRestrictions: apiPlan.dietaryRestrictions || [],
       cuisinePreferences: apiPlan.cuisinePreferences || [],
       allergiesIntolerance: apiPlan.allergiesIntolerance || [],

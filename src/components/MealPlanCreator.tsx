@@ -9,6 +9,7 @@ import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign } from "lucide-
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
+import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
 
 interface MealPlanCreatorProps {
   onPlanCreated: (plan: any) => void;
@@ -106,12 +107,15 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   };
 
   const getLanguageName = (languageCode: string) => {
+    console.log('Current language code:', languageCode);
     const languageMap: { [key: string]: string } = {
       'en': 'english',
       'es': 'spanish',
       'pt': 'portuguese'
     };
-    return languageMap[languageCode] || 'english';
+    const mappedLanguage = languageMap[languageCode] || 'english';
+    console.log('Mapped language:', mappedLanguage);
+    return mappedLanguage;
   };
 
   const generateMealPlan = async () => {
@@ -158,44 +162,12 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
 
       console.log('Creating meal plan with data:', requestData);
 
-      const response = await fetch('https://pantry-ms-brain.onrender.com/meal-plan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('API Error:', response.status, errorData);
-        throw new Error(`Failed to create meal plan: ${response.status}`);
-      }
-
-      const apiResponse = await response.json();
-      console.log('API Response:', apiResponse);
+      const apiResponse = await createMealPlan(requestData);
+      console.log('API Response received:', apiResponse);
 
       // Transform the API response to match our local format
-      const transformedPlan = {
-        id: apiResponse._id || Date.now().toString(),
-        name: apiResponse.plan_name || planName,
-        startDate: startDate,
-        endDate: calculateEndDate(startDate, numberOfDays),
-        numberOfDays: numberOfDays,
-        numberOfPersons: numberOfPersons,
-        mealsPerDay: mealsPerDay,
-        dietaryRestrictions,
-        cuisinePreferences,
-        allergiesIntolerances,
-        additionalAllergies,
-        maxCookTime,
-        cookingSkillLevel,
-        budgetRange,
-        dislikes,
-        healthGoals,
-        meals: transformMealsFromAPI(apiResponse),
-        rawApiResponse: apiResponse
-      };
+      const transformedPlan = transformApiMealPlanToLocal(apiResponse);
+      console.log('Transformed plan:', transformedPlan);
 
       onPlanCreated(transformedPlan);
       
@@ -222,35 +194,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     const endDateObj = new Date(startDateObj);
     endDateObj.setDate(startDateObj.getDate() + days - 1);
     return endDateObj.toISOString().split('T')[0];
-  };
-
-  const transformMealsFromAPI = (apiResponse: any) => {
-    const meals: any[] = [];
-    
-    if (apiResponse.plan && apiResponse.plan.mealPlan) {
-      apiResponse.plan.mealPlan.forEach((dayPlan: any) => {
-        dayPlan.meals.forEach((meal: any, mealIndex: number) => {
-          meals.push({
-            id: `${dayPlan.day}-${mealIndex}`,
-            name: meal.name,
-            description: meal.description || '',
-            type: meal.mealType,
-            calories: meal.calories || 0,
-            prepTime: meal.cookingTime || 0,
-            servings: numberOfPersons,
-            difficulty: cookingSkillLevel,
-            ingredients: meal.ingredients ? meal.ingredients.map((ing: any) => ing.name || ing) : [],
-            instructions: meal.steps || [],
-            day: dayPlan.day,
-            date: dayPlan.date,
-            nutritionalInfo: meal.nutritionalInfo,
-            prepTip: meal.prepTip
-          });
-        });
-      });
-    }
-    
-    return meals;
   };
 
   return (
