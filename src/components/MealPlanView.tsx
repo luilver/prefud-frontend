@@ -140,14 +140,12 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     );
   }
 
-  // Calculate plan statistics
-  const totalDays = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
-                   (plan.preferences?.numberOfDays || 7);
+  // Calculate plan statistics with better fallbacks
+  const totalDays = plan.preferences?.numberOfDays || 
+                   (plan.duration ? parseInt(plan.duration.replace(' days', '')) : 7);
   const peopleCount = plan.preferences?.numberOfPersons || 
-                     plan.preferences?.people || 
-                     (plan.preferences && typeof plan.preferences.people === 'number' ? plan.preferences.people : 1);
-  const mealsPerDay = plan.preferences?.mealsPerDay || 
-                     (plan.preferences && typeof plan.preferences.mealsPerDay === 'number' ? plan.preferences.mealsPerDay : 3);
+                     plan.preferences?.people || 1;
+  const mealsPerDay = plan.preferences?.mealsPerDay || 3;
 
   // Group meals by day - handle the actual data structure from your meal plan
   const mealsByDay = (() => {
@@ -227,46 +225,46 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{plan.name}</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{plan.name}</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">
               {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
             </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button onClick={onEdit} variant="outline">
+          <Button onClick={onEdit} variant="outline" size="sm">
             <Edit className="h-4 w-4 mr-2" />
             Edit Plan
           </Button>
         </div>
       </div>
 
-      {/* Plan Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <Calendar className="h-8 w-8 text-blue-500 mr-3" />
-            <div>
-              <p className="text-2xl font-bold">{totalDays}</p>
-              <p className="text-gray-600">Days</p>
+      {/* Plan Stats - Made more compact for mobile */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+            <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 mb-2 sm:mb-0 sm:mr-3" />
+            <div className="text-center sm:text-left">
+              <p className="text-lg sm:text-2xl font-bold">{totalDays}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Days</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <Users className="h-8 w-8 text-green-500 mr-3" />
-            <div>
-              <p className="text-2xl font-bold">{peopleCount}</p>
-              <p className="text-gray-600">Persons</p>
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+            <Users className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 mb-2 sm:mb-0 sm:mr-3" />
+            <div className="text-center sm:text-left">
+              <p className="text-lg sm:text-2xl font-bold">{peopleCount}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Persons</p>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <ChefHat className="h-8 w-8 text-purple-500 mr-3" />
-            <div>
-              <p className="text-2xl font-bold">{mealsPerDay}</p>
-              <p className="text-gray-600">Meals/Day</p>
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+            <ChefHat className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 mb-2 sm:mb-0 sm:mr-3" />
+            <div className="text-center sm:text-left">
+              <p className="text-lg sm:text-2xl font-bold">{mealsPerDay}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Meals/Day</p>
             </div>
           </CardContent>
         </Card>

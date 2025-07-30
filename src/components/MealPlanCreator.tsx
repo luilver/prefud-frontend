@@ -111,9 +111,12 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     const languageMap: { [key: string]: string } = {
       'en': 'english',
       'es': 'spanish',
-      'pt': 'portuguese'
+      'pt': 'portuguese',
+      'fr': 'french',
+      'de': 'german',
+      'it': 'italian'
     };
-    const mappedLanguage = languageMap[languageCode] || 'english';
+    const mappedLanguage = languageMap[languageCode.toLowerCase()] || 'english';
     console.log('Mapped language:', mappedLanguage);
     return mappedLanguage;
   };
@@ -140,7 +143,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     setIsGenerating(true);
 
     try {
-      // Prepare the API request data
+      // Prepare the API request data with correct language mapping
       const requestData = {
         duration: numberOfDays,
         numberPeople: numberOfPersons,
@@ -161,6 +164,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       };
 
       console.log('Creating meal plan with data:', requestData);
+      console.log('Language being sent:', requestData.language);
 
       const apiResponse = await createMealPlan(requestData);
       console.log('API Response received:', apiResponse);
