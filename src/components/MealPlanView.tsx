@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
@@ -84,7 +85,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({ meal, weekNumber, dayOfWeek
                     {(meal.ingredients || meal.detailedIngredients?.map((ing: any) => ing.name) || []).map((ingredient: any, index: number) => (
                       <li key={index} className="text-xs flex items-center justify-between">
                         <span>{typeof ingredient === 'string' ? ingredient : ingredient.name}</span>
-                        <Button variant="outline" size="xs" onClick={() => handleAddToShoppingList(typeof ingredient === 'string' ? ingredient : ingredient.name)}>
+                        <Button variant="outline" size="sm" onClick={() => handleAddToShoppingList(typeof ingredient === 'string' ? ingredient : ingredient.name)}>
                           <ShoppingCart className="h-3 w-3 mr-2" />
                           Add to List
                         </Button>

@@ -236,10 +236,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAiDrinks(JSON.parse(storedAiDrinks));
     }
 
-    // Load completed meals from localStorage
+    // Load completed meals from localStorage - fix the Set constructor issue
     const storedCompletedMeals = localStorage.getItem('completedMeals');
     if (storedCompletedMeals) {
-      setCompletedMeals(new Set(JSON.parse(storedCompletedMeals)));
+      try {
+        const parsedMeals = JSON.parse(storedCompletedMeals);
+        // Ensure we have an array before creating the Set
+        if (Array.isArray(parsedMeals)) {
+          setCompletedMeals(new Set(parsedMeals));
+        } else {
+          setCompletedMeals(new Set());
+        }
+      } catch (error) {
+        console.error('Error parsing completed meals:', error);
+        setCompletedMeals(new Set());
+      }
     }
   }, []);
 
