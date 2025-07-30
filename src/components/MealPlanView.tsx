@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, Users, ChefHat, Clock, Trash2, CheckCircle, Circle, Edit, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Calendar, Users, ChefHat, Clock, Trash2, CheckCircle, Circle, Edit, ShoppingCart, Plus, ExternalLink, Package } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
 
 interface MealPlanViewProps {
@@ -15,9 +16,11 @@ interface MealPlanViewProps {
 }
 
 const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
-  const { deleteMealFromPlan, toggleMealCompletion, isMealCompleted } = useUser();
+  const { deleteMealFromPlan, toggleMealCompletion, isMealCompleted, addPantryItem } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
 
   const handleDeleteMeal = (mealId: string) => {
     if (window.confirm('Are you sure you want to delete this meal?')) {
@@ -35,6 +38,64 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
   const handleBackFromMeal = () => {
     setSelectedMeal(null);
+  };
+
+  const handleItemCheck = (itemId: string) => {
+    const newCheckedItems = new Set(checkedItems);
+    if (newCheckedItems.has(itemId)) {
+      newCheckedItems.delete(itemId);
+    } else {
+      newCheckedItems.add(itemId);
+    }
+    setCheckedItems(newCheckedItems);
+    
+    // Update select all state
+    const totalItems = plan.shoppingList?.length || 0;
+    setSelectAll(newCheckedItems.size === totalItems);
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setCheckedItems(new Set());
+      setSelectAll(false);
+    } else {
+      const allItemIds = new Set(plan.shoppingList?.map((item: any) => item.id) || []);
+      setCheckedItems(allItemIds);
+      setSelectAll(true);
+    }
+  };
+
+  const handleAddToPantry = (items?: any[]) => {
+    const itemsToAdd = items || plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) || [];
+    
+    itemsToAdd.forEach(item => {
+      addPantryItem({
+        name: item.name,
+        quantity: item.quantity || 1,
+        unit: item.unit || 'piece',
+        category: item.category || 'other',
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        purchaseDate: new Date(),
+        notes: `Added from meal plan: ${plan.name}`
+      });
+    });
+
+    // Clear checked items after adding
+    setCheckedItems(new Set());
+    setSelectAll(false);
+  };
+
+  const handleOrderOnline = (items?: any[]) => {
+    const itemsToOrder = items || plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) || [];
+    
+    // Create a shopping list string for external service
+    const itemsList = itemsToOrder.map(item => 
+      `${item.quantity || 1} ${item.unit || 'piece'} ${item.name}`
+    ).join('\n');
+    
+    // Open external shopping service (example with Instacart)
+    const searchQuery = encodeURIComponent(itemsList);
+    window.open(`https://www.instacart.com/store/search?query=${searchQuery}`, '_blank');
   };
 
   // If a meal is selected, show the RecipeView
@@ -114,6 +175,12 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   // Generate days array based on plan duration
   const days = Array.from({ length: totalDays }, (_, index) => `Day ${index + 1}`);
 
+  // Calculate shopping list stats
+  const totalItems = plan.shoppingList?.length || 0;
+  const checkedCount = checkedItems.size;
+  const totalEstimatedCost = plan.shoppingList?.reduce((total: number, item: any) => 
+    total + (item.estimatedPrice || 0), 0) || 0;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -174,7 +241,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           <TabsTrigger value="overview">Meal Schedule</TabsTrigger>
           <TabsTrigger value="shopping">
             <ShoppingCart className="h-4 w-4 mr-2" />
-            Shopping List ({plan.shoppingList?.length || 0})
+            Shopping List ({totalItems})
           </TabsTrigger>
         </TabsList>
 
@@ -310,10 +377,59 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           })}
         </TabsContent>
 
-        <TabsContent value="shopping" className="space-y-4">
+        <TabsContent value="shopping" className="space-y-6">
           {plan.shoppingList && plan.shoppingList.length > 0 ? (
-            <div className="grid gap-4">
-              {/* Group shopping items by category */}
+            <>
+              {/* Shopping List Header with Summary */}
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <ShoppingCart className="h-5 w-5 text-blue-500" />
+                        Shopping Summary
+                      </CardTitle>
+                      <CardDescription>
+                        {totalItems} items • {checkedCount} selected
+                        {totalEstimatedCost > 0 && ` • $${totalEstimatedCost.toFixed(2)} estimated`}
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="select-all"
+                        checked={selectAll}
+                        onCheckedChange={handleSelectAll}
+                      />
+                      <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                        Select All
+                      </label>
+                    </div>
+                  </div>
+                </CardHeader>
+                {checkedCount > 0 && (
+                  <CardContent className="pt-0">
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        onClick={() => handleAddToPantry()}
+                        className="flex items-center gap-2"
+                        variant="outline"
+                      >
+                        <Package className="h-4 w-4" />
+                        Add to Pantry ({checkedCount})
+                      </Button>
+                      <Button
+                        onClick={() => handleOrderOnline()}
+                        className="flex items-center gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Order Online ({checkedCount})
+                      </Button>
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+
+              {/* Shopping Items by Category */}
               {Object.entries(
                 plan.shoppingList.reduce((acc: any, item: any) => {
                   const category = item.category || 'Other';
@@ -324,32 +440,77 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
               ).map(([category, items]: [string, any]) => (
                 <Card key={category}>
                   <CardHeader>
-                    <CardTitle className="text-lg capitalize">{category}</CardTitle>
+                    <CardTitle className="text-lg capitalize flex items-center justify-between">
+                      <span>{category}</span>
+                      <Badge variant="secondary">{items.length} items</Badge>
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
-                      {items.map((item: any, index: number) => (
-                        <div key={`${item.id}-${index}`} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                    <div className="space-y-3">
+                      {items.map((item: any) => (
+                        <div 
+                          key={item.id} 
+                          className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+                            checkedItems.has(item.id) 
+                              ? 'bg-blue-50 border-blue-200' 
+                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
                           <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-medium">{item.name}</p>
+                            <Checkbox
+                              id={`item-${item.id}`}
+                              checked={checkedItems.has(item.id)}
+                              onCheckedChange={() => handleItemCheck(item.id)}
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{item.name}</p>
+                                {item.mealName && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {item.mealName}
+                                  </Badge>
+                                )}
+                              </div>
                               <p className="text-sm text-gray-600">
                                 {item.quantity} {item.unit}
+                                {item.notes && ` • ${item.notes}`}
                               </p>
                             </div>
                           </div>
-                          {item.estimatedPrice && (
-                            <div className="text-sm text-green-600 font-medium">
-                              ${item.estimatedPrice}
+                          <div className="flex items-center gap-2">
+                            {item.estimatedPrice && (
+                              <div className="text-sm font-medium text-green-600">
+                                ${item.estimatedPrice}
+                              </div>
+                            )}
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleAddToPantry([item])}
+                                className="h-8 w-8 p-0"
+                                title="Add to Pantry"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOrderOnline([item])}
+                                className="h-8 w-8 p-0"
+                                title="Order Online"
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
                             </div>
-                          )}
+                          </div>
                         </div>
                       ))}
                     </div>
                   </CardContent>
                 </Card>
               ))}
-            </div>
+            </>
           ) : (
             <Card>
               <CardContent className="text-center py-12">
