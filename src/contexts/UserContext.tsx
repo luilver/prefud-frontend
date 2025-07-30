@@ -229,9 +229,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         
         return {
           data: transformedPlans,
-          totalPages: response.totalPages || 1,
-          currentPage: response.currentPage || page,
-          totalCount: response.totalCount || transformedPlans.length
+          totalPages: response.totalPages || Math.ceil((response.total || transformedPlans.length) / limit),
+          currentPage: page,
+          totalCount: response.total || transformedPlans.length
         };
       }
       
