@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import PasswordRecovery from "@/components/PasswordRecovery";
 import LanguageSelector from "@/components/LanguageSelector";
+import { Toaster } from "@/components/ui/toaster";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -50,6 +51,9 @@ const SignIn = () => {
       } else if (errorMessage.includes("Invalid email or password")) {
         title = "Invalid credentials";
         description = "The email or password you entered is incorrect. Please try again.";
+      } else if (errorMessage.includes("password must be longer than or equal to 8 characters")) {
+        title = "Password too short";
+        description = "Password must be at least 8 characters long.";
       } else if (errorMessage.includes("email") || errorMessage.includes("password")) {
         // Generic handling for other email/password related errors
         title = "Login failed";
@@ -72,6 +76,7 @@ const SignIn = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100 flex items-center justify-center p-4">
         <PasswordRecovery onBack={() => setShowPasswordRecovery(false)} />
+        <Toaster />
       </div>
     );
   }
@@ -185,6 +190,9 @@ const SignIn = () => {
           </Card>
         </div>
       </section>
+      
+      {/* Add Toaster component */}
+      <Toaster />
     </div>
   );
 };
