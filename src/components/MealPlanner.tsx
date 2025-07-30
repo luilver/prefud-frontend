@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -126,15 +125,15 @@ const MealPlanner = () => {
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{plan.duration}</span>
+                    <span>{plan.numberOfDays || Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24)) || plan.duration} day{(plan.numberOfDays > 1 || Math.ceil((new Date(plan.endDate).getTime() - new Date(plan.startDate).getTime()) / (1000 * 60 * 60 * 24)) > 1) ? 's' : ''}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    <span>For {plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A'} people</span>
+                    <span>For {plan.preferences?.numberOfPersons || plan.preferences?.people || plan.numberOfPersons || 'N/A'} people</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <span>{plan.preferences?.mealsPerDay || '3'} meals per day</span>
+                    <span>{plan.preferences?.mealsPerDay || plan.mealsPerDay || '3'} meals per day</span>
                   </div>
                   
                   {/* Additional plan details from API */}
