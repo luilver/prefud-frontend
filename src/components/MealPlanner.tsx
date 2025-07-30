@@ -1,26 +1,69 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Calendar, Users, ChefHat, Clock, Sparkles } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { getMealPlans, transformApiMealPlanToLocal } from "@/services/mealPlanService";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
+import MealPlanSuccessModal from "./MealPlanSuccessModal";
 
 const MealPlanner = () => {
   const [showCreator, setShowCreator] = useState(false);
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [newlyCreatedPlan, setNewlyCreatedPlan] = useState<any>(null);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
   const isNavigatingBack = useRef(false);
-  const { user, mealPlans, addMealPlan, getMealPlanById } = useUser();
+  const { user, mealPlans, addMealPlan, getMealPlanById, setMealPlans } = useUser();
+
+  // Function to refresh meal plans from API
+  const refreshMealPlans = async () => {
+    if (!user?.id) return;
+    
+    setIsLoadingPlans(true);
+    try {
+      console.log('Refreshing meal plans from API...');
+      const response = await getMealPlans(user.id);
+      const transformedPlans = response.data.map(transformApiMealPlanToLocal);
+      setMealPlans(transformedPlans);
+      console.log('Meal plans refreshed successfully:', transformedPlans);
+    } catch (error) {
+      console.error('Error refreshing meal plans:', error);
+    } finally {
+      setIsLoadingPlans(false);
+    }
+  };
 
   const handlePlanCreated = (newPlan: any) => {
     console.log('New plan created:', newPlan);
-    addMealPlan(newPlan);
+    setNewlyCreatedPlan(newPlan);
     setShowCreator(false);
-    setSelectedMealPlan(newPlan);
     setIsEditing(false);
     isNavigatingBack.current = false;
+    setShowSuccessModal(true);
+  };
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    setNewlyCreatedPlan(null);
+  };
+
+  const handleViewNewPlan = async () => {
+    setShowSuccessModal(false);
+    
+    // Refresh meal plans from API to get the latest data
+    await refreshMealPlans();
+    
+    // Navigate to the newly created plan
+    if (newlyCreatedPlan) {
+      // Find the plan in the refreshed list or use the created plan
+      const refreshedPlan = getMealPlanById(newlyCreatedPlan.id) || newlyCreatedPlan;
+      setSelectedMealPlan(refreshedPlan);
+    }
+    
+    setNewlyCreatedPlan(null);
   };
 
   const handleEditPlan = () => {
@@ -82,137 +125,157 @@ const MealPlanner = () => {
 
   // Default view: show meal planner dashboard
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Meal Planner</h1>
-          <p className="text-gray-600 mt-1">Create and manage your weekly meal plans</p>
+    <>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Meal Planner</h1>
+            <p className="text-gray-600 mt-1">Create and manage your weekly meal plans</p>
+          </div>
+          <Button 
+            onClick={() => {
+              console.log('Creating new meal plan');
+              setShowCreator(true);
+              setSelectedMealPlan(null);
+              setIsEditing(false);
+              isNavigatingBack.current = false;
+            }}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
+            disabled={isLoadingPlans}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create AI Meal Plan
+          </Button>
         </div>
-        <Button 
-          onClick={() => {
-            console.log('Creating new meal plan');
-            setShowCreator(true);
-            setSelectedMealPlan(null);
-            setIsEditing(false);
-            isNavigatingBack.current = false;
-          }}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create AI Meal Plan
-        </Button>
+
+        {/* Loading state */}
+        {isLoadingPlans && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+            <span className="ml-2 text-gray-600">Loading meal plans...</span>
+          </div>
+        )}
+
+        {/* Meal Plans Grid */}
+        {mealPlans.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mealPlans.map((plan) => {
+              // Calculate days from duration string or use preferences
+              const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
+                               (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
+              const peopleCount = plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A';
+              const mealsCount = plan.preferences?.mealsPerDay || '3';
+              
+              return (
+                <Card 
+                  key={plan.id} 
+                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => handlePlanSelect(plan)}
+                >
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ChefHat className="h-5 w-5 text-purple-500" />
+                      {plan.name}
+                    </CardTitle>
+                    <CardDescription>
+                      {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>{daysCount} day{daysCount > 1 ? 's' : ''}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        <span>For {peopleCount} people</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        <span>{mealsCount} meals per day</span>
+                      </div>
+                      
+                      {/* Additional plan details from API */}
+                      {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
+                        <div className="text-xs text-purple-600">
+                          Cuisine: {plan.preferences.cuisinePreferences.join(', ')}
+                        </div>
+                      )}
+                      
+                      {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
+                        <div className="text-xs text-green-600">
+                          Diet: {plan.preferences.dietaryRestrictions.join(', ')}
+                        </div>
+                      )}
+                      
+                      {plan.preferences?.cookingSkillLevel && (
+                        <div className="text-xs text-blue-600">
+                          Skill Level: {plan.preferences.cookingSkillLevel}
+                        </div>
+                      )}
+                      
+                      <div className="mt-3 text-xs text-gray-500">
+                        {plan.meals?.length || 0} total meals planned
+                      </div>
+                      
+                      {plan.shoppingList && plan.shoppingList.length > 0 && (
+                        <div className="text-xs text-orange-600">
+                          {plan.shoppingList.length} ingredients needed
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <Card className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+            <CardContent>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-full">
+                  <Sparkles className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    Welcome to AI Meal Planning, {user?.name?.split(' ')[0] || 'Chef'}!
+                  </h3>
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    Create your first personalized meal plan with our AI assistant. 
+                    Get customized recipes based on your preferences, dietary needs, and cooking skills.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => {
+                    console.log('Creating first meal plan');
+                    setShowCreator(true);
+                    setSelectedMealPlan(null);
+                    setIsEditing(false);
+                    isNavigatingBack.current = false;
+                  }}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white mt-4"
+                  size="lg"
+                  disabled={isLoadingPlans}
+                >
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  Create Your First AI Meal Plan
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Meal Plans Grid */}
-      {mealPlans.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mealPlans.map((plan) => {
-            // Calculate days from duration string or use preferences
-            const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
-                             (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
-            const peopleCount = plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A';
-            const mealsCount = plan.preferences?.mealsPerDay || '3';
-            
-            return (
-              <Card 
-                key={plan.id} 
-                className="hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => handlePlanSelect(plan)}
-              >
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ChefHat className="h-5 w-5 text-purple-500" />
-                    {plan.name}
-                  </CardTitle>
-                  <CardDescription>
-                    {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{daysCount} day{daysCount > 1 ? 's' : ''}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>For {peopleCount} people</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span>{mealsCount} meals per day</span>
-                    </div>
-                    
-                    {/* Additional plan details from API */}
-                    {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
-                      <div className="text-xs text-purple-600">
-                        Cuisine: {plan.preferences.cuisinePreferences.join(', ')}
-                      </div>
-                    )}
-                    
-                    {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
-                      <div className="text-xs text-green-600">
-                        Diet: {plan.preferences.dietaryRestrictions.join(', ')}
-                      </div>
-                    )}
-                    
-                    {plan.preferences?.cookingSkillLevel && (
-                      <div className="text-xs text-blue-600">
-                        Skill Level: {plan.preferences.cookingSkillLevel}
-                      </div>
-                    )}
-                    
-                    <div className="mt-3 text-xs text-gray-500">
-                      {plan.meals?.length || 0} total meals planned
-                    </div>
-                    
-                    {plan.shoppingList && plan.shoppingList.length > 0 && (
-                      <div className="text-xs text-orange-600">
-                        {plan.shoppingList.length} ingredients needed
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      ) : (
-        <Card className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-          <CardContent>
-            <div className="flex flex-col items-center space-y-4">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-full">
-                <Sparkles className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Welcome to AI Meal Planning, {user?.name?.split(' ')[0] || 'Chef'}!
-                </h3>
-                <p className="text-gray-600 max-w-md mx-auto">
-                  Create your first personalized meal plan with our AI assistant. 
-                  Get customized recipes based on your preferences, dietary needs, and cooking skills.
-                </p>
-              </div>
-              <Button 
-                onClick={() => {
-                  console.log('Creating first meal plan');
-                  setShowCreator(true);
-                  setSelectedMealPlan(null);
-                  setIsEditing(false);
-                  isNavigatingBack.current = false;
-                }}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white mt-4"
-                size="lg"
-              >
-                <Sparkles className="h-5 w-5 mr-2" />
-                Create Your First AI Meal Plan
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+      {/* Success Modal */}
+      <MealPlanSuccessModal 
+        isOpen={showSuccessModal}
+        planName={newlyCreatedPlan?.name || ""}
+        onClose={handleSuccessModalClose}
+        onViewPlan={handleViewNewPlan}
+      />
+    </>
   );
 };
 

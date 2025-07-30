@@ -1,966 +1,181 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useAuth } from './AuthContext';
-import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlanService';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-interface User {
+// Define the types for User, Ingredient, and ShoppingItem
+export interface User {
   id: string;
   name: string;
   email: string;
-  phone?: string;
-  country?: string;
-  language?: 'en' | 'es' | 'pt';
-  preferences: {
-    dietaryRestrictions: string[];
-    allergies: string[];
-    cuisinePreferences: string[];
-    cookingSkillLevel: 'beginner' | 'intermediate' | 'advanced';
-    mealPrepTime: number;
-    budgetRange: 'low' | 'medium' | 'high';
-  };
-  subscription: {
-    plan: 'free' | 'family' | 'professional';
-    isSubscribed: boolean;
-    nextBilling?: string;
-    cancelAtPeriodEnd?: boolean;
-    planLimits: {
-      plansPerMonth: number;
-      usedPlans: number;
-      mealCreations: number;
-      usedMealCreations: number;
-      deliveryCommissions: number;
-      usedDeliveryCommissions: number;
-      homeDeliveries?: number;
-      usedHomeDeliveries?: number;
-    };
-  };
+  // Add other user properties as needed
 }
 
-interface PantryItem {
+export interface Ingredient {
+  id: string;
+  name: string;
+  category: string;
+  // Add other ingredient properties as needed
+}
+
+export interface ShoppingItem {
   id: string;
   name: string;
   quantity: number;
   unit: string;
   category: string;
-  expiryDate: Date;
-  purchaseDate: Date;
-  location?: string;
-  notes?: string;
-}
-
-interface ShoppingItem {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: string;
-  category: string;
-  priority: 'low' | 'medium' | 'high';
   purchased: boolean;
-  estimatedPrice?: number;
-  notes?: string;
-}
-
-interface MealPlan {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  meals: any[];
-  shoppingList?: any[];
-  duration: string;
-  preferences: any;
-  weeks: any[];
-}
-
-interface BillingHistory {
-  id: string;
-  date: string;
-  amount: number;
-  description: string;
-  status: 'paid' | 'pending' | 'failed';
-  invoiceUrl?: string;
-}
-
-interface PaymentMethod {
-  id: string;
-  brand: string;
-  last4: string;
-  expiryMonth: number;
-  expiryYear: number;
-  isDefault: boolean;
-}
-
-interface SubscriptionInfo {
-  subscribed: boolean;
-  subscription_tier: string | null;
-  subscription_end: string | null;
-  stripe_customer_id: string | null;
-}
-
-interface AIMeal {
-  id: string;
-  name: string;
-  type: string;
-  cuisine: string;
-  cookingTime: number;
-  difficulty: string;
-  description: string;
-  tags: string[];
-  ingredients: string[];
-  instructions: string[];
-  calories: number;
-  prepTime: string;
-}
-
-interface AIDrink {
-  id: string;
-  name: string;
-  type: string;
-  description: string;
-  prepTime: string;
-  calories: number;
-  ingredients: { name: string; amount: string }[];
-  instructions: string[];
-  nutritionHighlights: string[];
-  tips: string[];
+  // Add other shopping item properties as needed
 }
 
 interface UserContextType {
   user: User | null;
-  pantryItems: PantryItem[];
-  shoppingItems: ShoppingItem[];
-  mealPlans: MealPlan[];
-  completedMeals: Record<string, string[]>;
-  activeShoppingList: any[];
-  activeMealPlan: MealPlan | null;
-  ingredients: PantryItem[];
-  billingHistory: BillingHistory[];
-  paymentMethods: PaymentMethod[];
-  subscriptionInfo: SubscriptionInfo | null;
-  isAuthenticated: boolean;
   setUser: (user: User | null) => void;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  signup: (userData: any) => Promise<void>;
-  updateUserProfile: (updates: Partial<User>) => void;
-  addPantryItem: (item: Omit<PantryItem, 'id'>) => void;
-  updatePantryItem: (id: string, updates: Partial<PantryItem>) => void;
-  deletePantryItem: (id: string) => void;
-  addIngredient: (item: Omit<PantryItem, 'id'>) => void;
+  mealPlans: any[];
+  setMealPlans: (plans: any[]) => void;
+  addMealPlan: (plan: any) => void;
+  updateMealPlan: (planId: string, updatedPlan: any) => void;
+  getMealPlanById: (planId: string) => any;
+  ingredients: Ingredient[];
+  setIngredients: (ingredients: Ingredient[]) => void;
+  addIngredient: (ingredient: Ingredient) => void;
+  updateIngredient: (id: string, ingredient: Partial<Ingredient>) => void;
   deleteIngredient: (id: string) => void;
-  updatePantryFromIngredients: (ingredients: string[]) => void;
-  addShoppingItem: (item: Omit<ShoppingItem, 'id'>) => void;
-  updateShoppingItem: (id: string, updates: Partial<ShoppingItem>) => void;
-  deleteShoppingItem: (id: string) => void;
-  toggleShoppingItemPurchased: (id: string) => void;
-  addMealPlan: (plan: MealPlan) => void;
-  updateMealPlan: (id: string, updates: Partial<MealPlan>) => void;
-  deleteMealPlan: (id: string) => void;
-  deleteMealFromPlan: (planId: string, mealId: string) => void;
-  updateMealPlanShoppingList: (planId: string, shoppingList: any[]) => void;
-  toggleMealCompletion: (mealId: string, date: string) => void;
-  isMealCompleted: (mealId: string, date: string) => boolean;
-  updatePantryFromMeal: (ingredients: string[]) => void;
-  setActiveShoppingList: (list: any[]) => void;
-  setActiveMealPlan: (plan: MealPlan | null) => void;
-  refreshMealPlans: () => void;
-  getMealPlanById: (id: string) => MealPlan | null;
-  getBillingHistory: () => Promise<void>;
-  getPaymentMethods: () => Promise<void>;
-  addPaymentMethod: (method: any) => Promise<void>;
-  deletePaymentMethod: (id: string) => Promise<void>;
-  setDefaultPaymentMethod: (id: string) => Promise<void>;
-  acceptSubscription: (plan: string) => Promise<void>;
-  cancelSubscription: () => Promise<void>;
-  checkSubscription: () => Promise<void>;
-  createCheckoutWithPaymentMethod: (plan: any, paymentMethodId?: string) => Promise<string>;
-  aiMeals: AIMeal[];
-  aiDrinks: AIDrink[];
-  addAIMeal: (meal: AIMeal) => void;
-  addAIDrink: (drink: AIDrink) => void;
-  deleteAIMeal: (id: string) => void;
-  deleteAIDrink: (id: string) => void;
+  shoppingList: ShoppingItem[];
+  setShoppingList: (items: ShoppingItem[]) => void;
+  addToShoppingList: (item: ShoppingItem) => void;
+  updateShoppingItem: (id: string, item: Partial<ShoppingItem>) => void;
+  deleteFromShoppingList: (id: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
-  }
-  return context;
-};
-
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user: authUser, login: authLogin, logout: authLogout, isAuthenticated: authIsAuthenticated } = useAuth();
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
-  const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
-  const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
-  const [completedMeals, setCompletedMeals] = useState<Record<string, string[]>>({});
-  const [activeShoppingList, setActiveShoppingList] = useState<any[]>([]);
-  const [activeMealPlan, setActiveMealPlan] = useState<MealPlan | null>(null);
-  const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
-  const [aiMeals, setAIMeals] = useState<AIMeal[]>([]);
-  const [aiDrinks, setAIDrinks] = useState<AIDrink[]>([]);
+  const [mealPlans, setMealPlans] = useState<any[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [shoppingList, setShoppingList] = useState<ShoppingItem[]>([]);
 
-  // Computed properties
-  const ingredients = pantryItems;
-  const isAuthenticated = authIsAuthenticated || user !== null;
-
-  // Function to fetch meal plans from API
-  const fetchMealPlansFromAPI = useCallback(async (userId: string) => {
-    try {
-      console.log('Fetching meal plans from API for user:', userId);
-      
-      // Fetch first page to get all meal plans
-      const response = await getMealPlans(userId, 1, 50); // Fetch up to 50 plans
-      
-      if (response.data && response.data.length > 0) {
-        const transformedPlans = response.data.map(transformApiMealPlanToLocal);
-        console.log('Transformed meal plans from API:', transformedPlans);
-        
-        // Merge with existing local plans (avoid duplicates)
-        setMealPlans(prevPlans => {
-          const existingIds = prevPlans.map(plan => plan.id);
-          const newPlans = transformedPlans.filter(plan => !existingIds.includes(plan.id));
-          const mergedPlans = [...prevPlans, ...newPlans];
-          console.log('Merged meal plans:', mergedPlans);
-          return mergedPlans;
-        });
-      }
-    } catch (error) {
-      console.error('Failed to fetch meal plans from API:', error);
-      // Don't throw the error, just log it so the app continues to work
+  useEffect(() => {
+    // Load user data from localStorage on component mount
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
+
+    // Load ingredients from localStorage on component mount
+    const storedIngredients = localStorage.getItem('ingredients');
+    if (storedIngredients) {
+      setIngredients(JSON.parse(storedIngredients));
+    }
+
+     // Load shopping list from localStorage on component mount
+     const storedShoppingList = localStorage.getItem('shoppingList');
+     if (storedShoppingList) {
+       setShoppingList(JSON.parse(storedShoppingList));
+     }
   }, []);
 
-  // Listen for pantry sync events from AuthContext
   useEffect(() => {
-    const handlePantrySync = (event: CustomEvent) => {
-      const { pantry } = event.detail;
-      console.log('Syncing pantry from auth:', pantry);
-      
-      if (pantry && Array.isArray(pantry)) {
-        // Transform pantry items from API format to UserContext format
-        const transformedPantryItems: PantryItem[] = pantry.map((item: any) => ({
-          id: item._id,
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          category: item.category,
-          expiryDate: new Date(item.expiryDate),
-          purchaseDate: new Date(item.purchaseDate),
-          location: item.location,
-          notes: item.notes
-        }));
-        
-        setPantryItems(transformedPantryItems);
-        console.log('Pantry items updated from API:', transformedPantryItems);
-      }
-    };
-
-    window.addEventListener('pantry-sync', handlePantrySync as EventListener);
-    
-    return () => {
-      window.removeEventListener('pantry-sync', handlePantrySync as EventListener);
-    };
-  }, []);
-
-  // Sync with AuthContext user and fetch meal plans
-  useEffect(() => {
-    if (authUser && !user) {
-      // Create user profile from auth user
-      const userProfile: User = {
-        id: authUser.userId,
-        name: authUser.profile?.name || authUser.email.split('@')[0],
-        email: authUser.email,
-        phone: authUser.profile?.phone,
-        language: 'en',
-        preferences: {
-          dietaryRestrictions: authUser.profile?.dietTypes || [],
-          allergies: authUser.profile?.alergies || [],
-          cuisinePreferences: [],
-          cookingSkillLevel: 'beginner',
-          mealPrepTime: 30,
-          budgetRange: 'medium'
-        },
-        subscription: {
-          plan: 'free',
-          isSubscribed: false,
-          planLimits: {
-            plansPerMonth: 1,
-            usedPlans: 0,
-            mealCreations: 3,
-            usedMealCreations: 0,
-            deliveryCommissions: 0,
-            usedDeliveryCommissions: 0
-          }
-        }
-      };
-      setUser(userProfile);
-      
-      // Fetch meal plans after user is set
-      fetchMealPlansFromAPI(authUser.userId);
-    } else if (!authUser && user) {
-      setUser(null);
-    }
-  }, [authUser, user, fetchMealPlansFromAPI]);
-
-  // Load data from localStorage on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const savedPantryItems = localStorage.getItem('pantryItems');
-    const savedShoppingItems = localStorage.getItem('shoppingItems');
-    const savedMealPlans = localStorage.getItem('mealPlans');
-    const savedCompletedMeals = localStorage.getItem('completedMeals');
-    const savedSubscriptionInfo = localStorage.getItem('subscriptionInfo');
-    const savedAIMeals = localStorage.getItem('aiMeals');
-    const savedAIDrinks = localStorage.getItem('aiDrinks');
-
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    if (savedPantryItems) {
-      const items = JSON.parse(savedPantryItems);
-      // Convert date strings back to Date objects
-      const itemsWithDates = items.map((item: any) => ({
-        ...item,
-        expiryDate: new Date(item.expiryDate),
-        purchaseDate: new Date(item.purchaseDate)
-      }));
-      setPantryItems(itemsWithDates);
-    }
-    if (savedShoppingItems) {
-      setShoppingItems(JSON.parse(savedShoppingItems));
-    }
-    if (savedMealPlans) {
-      const plans = JSON.parse(savedMealPlans);
-      setMealPlans(plans);
-      if (plans.length > 0) {
-        setActiveMealPlan(plans[0]);
-        // Sync shopping items with active meal plan
-        syncShoppingItemsWithActivePlan(plans[0]);
-      }
-    }
-    if (savedCompletedMeals) {
-      setCompletedMeals(JSON.parse(savedCompletedMeals));
-    }
-    if (savedSubscriptionInfo) {
-      setSubscriptionInfo(JSON.parse(savedSubscriptionInfo));
-    }
-    if (savedAIMeals) {
-      setAIMeals(JSON.parse(savedAIMeals));
-    }
-    if (savedAIDrinks) {
-      setAIDrinks(JSON.parse(savedAIDrinks));
-    }
-  }, []);
-
-  // Sync shopping items with active meal plan
-  const syncShoppingItemsWithActivePlan = (plan: MealPlan | null) => {
-    if (plan && plan.shoppingList) {
-      // Convert meal plan shopping list to shopping items format
-      const planShoppingItems = plan.shoppingList.map((item: any) => ({
-        ...item,
-        category: item.category || 'meal-ingredient',
-        priority: item.priority || 'medium',
-        purchased: item.purchased || false,
-        estimatedPrice: item.estimatedPrice,
-        notes: item.notes || `From meal plan: ${plan.name}`
-      }));
-      setShoppingItems(planShoppingItems);
-    }
-  };
-
-  // Save data to localStorage whenever state changes
-  useEffect(() => {
+    // Save user data to localStorage whenever it changes
     if (user) {
       localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user'); // Remove user from localStorage when logging out
     }
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('pantryItems', JSON.stringify(pantryItems));
-  }, [pantryItems]);
+    // Save ingredients to localStorage whenever it changes
+    localStorage.setItem('ingredients', JSON.stringify(ingredients));
+  }, [ingredients]);
 
   useEffect(() => {
-    localStorage.setItem('shoppingItems', JSON.stringify(shoppingItems));
-  }, [shoppingItems]);
+    // Save shopping list to localStorage whenever it changes
+    localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+  }, [shoppingList]);
 
-  useEffect(() => {
-    localStorage.setItem('mealPlans', JSON.stringify(mealPlans));
-    console.log('Meal plans updated in localStorage:', mealPlans);
-  }, [mealPlans]);
-
-  useEffect(() => {
-    localStorage.setItem('completedMeals', JSON.stringify(completedMeals));
-  }, [completedMeals]);
-
-  useEffect(() => {
-    if (subscriptionInfo) {
-      localStorage.setItem('subscriptionInfo', JSON.stringify(subscriptionInfo));
-    }
-  }, [subscriptionInfo]);
-
-  useEffect(() => {
-    localStorage.setItem('aiMeals', JSON.stringify(aiMeals));
-  }, [aiMeals]);
-
-  useEffect(() => {
-    localStorage.setItem('aiDrinks', JSON.stringify(aiDrinks));
-  }, [aiDrinks]);
-
-  // Sync shopping items back to active meal plan when shopping items change
-  useEffect(() => {
-    if (activeMealPlan && shoppingItems.length > 0) {
-      const updatedPlan = {
-        ...activeMealPlan,
-        shoppingList: shoppingItems.map(item => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          category: item.category,
-          priority: item.priority,
-          purchased: item.purchased,
-          estimatedPrice: item.estimatedPrice,
-          notes: item.notes,
-          mealId: (item as any).mealId,
-          mealName: (item as any).mealName
-        }))
-      };
-      
-      setMealPlans(prev => 
-        prev.map(plan => 
-          plan.id === activeMealPlan.id ? updatedPlan : plan
-        )
-      );
-      setActiveMealPlan(updatedPlan);
-    }
-  }, [shoppingItems]);
-
-  // Authentication methods - now using AuthContext
-  const login = async (email: string, password: string) => {
-    await authLogin(email, password);
-    // User profile will be created in the useEffect above
-    await checkSubscription();
-  };
-
-  const logout = () => {
-    authLogout();
-    setUser(null);
-    setSubscriptionInfo(null);
-    // Clear all user-related state including meal plans
-    setPantryItems([]);
-    setMealPlans([]);
-    setShoppingItems([]);
-    setCompletedMeals({});
-    setActiveShoppingList([]);
-    setActiveMealPlan(null);
-    setAIMeals([]);
-    setAIDrinks([]);
-    setBillingHistory([]);
-    setPaymentMethods([]);
-    
-    // Clear localStorage for user data
-    localStorage.removeItem('user');
-    localStorage.removeItem('subscriptionInfo');
-    localStorage.removeItem('mealPlans');
-    localStorage.removeItem('shoppingItems');
-    localStorage.removeItem('completedMeals');
-    localStorage.removeItem('aiMeals');
-    localStorage.removeItem('aiDrinks');
-    
-    window.dispatchEvent(new CustomEvent('user-logout'));
-  };
-
-  const signup = async (userData: any) => {
-    // Mock signup implementation
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: userData.name,
-      email: userData.email,
-      phone: userData.phone,
-      country: userData.country,
-      language: userData.language || 'en',
-      preferences: userData.preferences || {
-        dietaryRestrictions: [],
-        allergies: [],
-        cuisinePreferences: [],
-        cookingSkillLevel: 'beginner',
-        mealPrepTime: 30,
-        budgetRange: 'medium'
-      },
-      subscription: {
-        plan: 'free',
-        isSubscribed: false,
-        planLimits: {
-          plansPerMonth: 1,
-          usedPlans: 0,
-          mealCreations: 3,
-          usedMealCreations: 0,
-          deliveryCommissions: 0,
-          usedDeliveryCommissions: 0
-        }
-      }
-    };
-    setUser(newUser);
-    await checkSubscription();
-  };
-
-  const updateUserProfile = (updates: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...updates });
-    }
-  };
-
-  const addPantryItem = (item: Omit<PantryItem, 'id'>) => {
-    const newItem: PantryItem = {
-      ...item,
-      id: Date.now().toString()
-    };
-    setPantryItems(prev => [...prev, newItem]);
-  };
-
-  const addIngredient = addPantryItem;
-
-  const updatePantryItem = (id: string, updates: Partial<PantryItem>) => {
-    setPantryItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, ...updates } : item
-      )
-    );
-  };
-
-  const deletePantryItem = (id: string) => {
-    setPantryItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const deleteIngredient = deletePantryItem;
-
-  const updatePantryFromIngredients = (ingredientNames: string[]) => {
-    ingredientNames.forEach(ingredientName => {
-      const matchingItem = pantryItems.find(item => 
-        ingredientName.toLowerCase().includes(item.name.toLowerCase())
-      );
-      
-      if (matchingItem && matchingItem.quantity > 0) {
-        updatePantryItem(matchingItem.id, {
-          quantity: Math.max(0, matchingItem.quantity - 1)
-        });
-      }
-    });
-  };
-
-  const addShoppingItem = (item: Omit<ShoppingItem, 'id'>) => {
-    const newItem: ShoppingItem = {
-      ...item,
-      id: Date.now().toString()
-    };
-    setShoppingItems(prev => [...prev, newItem]);
-  };
-
-  const updateShoppingItem = (id: string, updates: Partial<ShoppingItem>) => {
-    setShoppingItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, ...updates } : item
-      )
-    );
-  };
-
-  const deleteShoppingItem = (id: string) => {
-    setShoppingItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const toggleShoppingItemPurchased = (id: string) => {
-    setShoppingItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, purchased: !item.purchased } : item
-      )
-    );
-  };
-
-  const addMealPlan = (plan: MealPlan) => {
-    console.log('Adding meal plan:', plan);
+  const addMealPlan = (plan: any) => {
+    console.log('Adding meal plan to context:', plan);
     setMealPlans(prev => {
-      const updated = [...prev, plan];
-      console.log('Updated meal plans after add:', updated);
-      return updated;
-    });
-    if (!activeMealPlan) {
-      setActiveMealPlan(plan);
-      syncShoppingItemsWithActivePlan(plan);
-    }
-  };
-
-  const updateMealPlan = (id: string, updates: Partial<MealPlan>) => {
-    console.log('Updating meal plan:', { id, updates });
-    setMealPlans(prev => {
-      const updated = prev.map(plan => 
-        plan.id === id ? { ...plan, ...updates } : plan
-      );
-      console.log('Updated meal plans after update:', updated);
-      return updated;
-    });
-    
-    if (activeMealPlan?.id === id) {
-      const updatedPlan = { ...activeMealPlan, ...updates };
-      setActiveMealPlan(updatedPlan);
-      syncShoppingItemsWithActivePlan(updatedPlan);
-    }
-  };
-
-  const deleteMealPlan = (id: string) => {
-    setMealPlans(prev => prev.filter(plan => plan.id !== id));
-    if (activeMealPlan?.id === id) {
-      const remainingPlans = mealPlans.filter(plan => plan.id !== id);
-      const newActivePlan = remainingPlans.length > 0 ? remainingPlans[0] : null;
-      setActiveMealPlan(newActivePlan);
-      syncShoppingItemsWithActivePlan(newActivePlan);
-    }
-  };
-
-  const deleteMealFromPlan = (planId: string, mealId: string) => {
-    console.log('Deleting meal from plan:', { planId, mealId });
-    setMealPlans(prev => {
-      const updated = prev.map(plan => 
-        plan.id === planId 
-          ? { ...plan, meals: plan.meals.filter(meal => meal.id !== mealId) }
-          : plan
-      );
-      console.log('Updated meal plans after meal deletion:', updated);
-      return updated;
-    });
-  };
-
-  const updateMealPlanShoppingList = (planId: string, shoppingList: any[]) => {
-    setMealPlans(prev => 
-      prev.map(plan => 
-        plan.id === planId 
-          ? { ...plan, shoppingList }
-          : plan
-      )
-    );
-    
-    if (activeMealPlan?.id === planId) {
-      const planShoppingItems = shoppingList.map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        unit: item.unit,
-        category: item.category || 'meal-ingredient',
-        priority: item.priority || 'medium',
-        purchased: item.purchased || false,
-        estimatedPrice: item.estimatedPrice,
-        notes: item.notes || `From meal plan: ${activeMealPlan.name}`
-      }));
-      setShoppingItems(planShoppingItems);
-    }
-  };
-
-  const refreshMealPlans = () => {
-    const savedMealPlans = localStorage.getItem('mealPlans');
-    if (savedMealPlans) {
-      const plans = JSON.parse(savedMealPlans);
-      console.log('Refreshing meal plans from localStorage:', plans);
-      setMealPlans(plans);
-      
-      if (activeMealPlan) {
-        const updatedActivePlan = plans.find((plan: MealPlan) => plan.id === activeMealPlan.id);
-        if (updatedActivePlan) {
-          setActiveMealPlan(updatedActivePlan);
-        }
-      }
-    }
-  };
-
-  const getMealPlanById = (id: string): MealPlan | null => {
-    return mealPlans.find(plan => plan.id === id) || null;
-  };
-
-  const setActiveMealPlanUpdated = (plan: MealPlan | null) => {
-    setActiveMealPlan(plan);
-    syncShoppingItemsWithActivePlan(plan);
-  };
-
-  const toggleMealCompletion = (mealId: string, date: string) => {
-    setCompletedMeals(prev => {
-      const dateKey = date;
-      const currentMeals = prev[dateKey] || [];
-      
-      if (currentMeals.includes(mealId)) {
-        return {
-          ...prev,
-          [dateKey]: currentMeals.filter(id => id !== mealId)
-        };
+      // Check if plan already exists to avoid duplicates
+      const exists = prev.some(p => p.id === plan.id);
+      if (exists) {
+        // Update existing plan
+        return prev.map(p => p.id === plan.id ? plan : p);
       } else {
-        return {
-          ...prev,
-          [dateKey]: [...currentMeals, mealId]
-        };
+        // Add new plan
+        return [...prev, plan];
       }
     });
   };
 
-  const isMealCompleted = (mealId: string, date: string) => {
-    const dateKey = date;
-    const completedMealsForDate = completedMeals[dateKey] || [];
-    return completedMealsForDate.includes(mealId);
-  };
-
-  const updatePantryFromMeal = (ingredients: string[]) => {
-    ingredients.forEach(ingredient => {
-      const matchingItem = pantryItems.find(item => 
-        ingredient.toLowerCase().includes(item.name.toLowerCase())
-      );
-      
-      if (matchingItem && matchingItem.quantity > 0) {
-        updatePantryItem(matchingItem.id, {
-          quantity: Math.max(0, matchingItem.quantity - 1)
-        });
-      }
-    });
-  };
-
-  // Updated billing and subscription methods
-  const getBillingHistory = async () => {
-    const mockHistory: BillingHistory[] = [
-      {
-        id: '1',
-        date: new Date().toISOString(),
-        amount: 9.99,
-        description: 'Premium Plan - Monthly',
-        status: 'paid',
-        invoiceUrl: '#'
-      }
-    ];
-    setBillingHistory(mockHistory);
-  };
-
-  const getPaymentMethods = async () => {
-    const mockMethods: PaymentMethod[] = [
-      {
-        id: '1',
-        brand: 'visa',
-        last4: '4242',
-        expiryMonth: 12,
-        expiryYear: 2025,
-        isDefault: true
-      },
-      {
-        id: '2',
-        brand: 'mastercard',
-        last4: '8888',
-        expiryMonth: 10,
-        expiryYear: 2026,
-        isDefault: false
-      }
-    ];
-    setPaymentMethods(mockMethods);
-  };
-
-  const addPaymentMethod = async (method: any) => {
-    const newMethod: PaymentMethod = {
-      id: Date.now().toString(),
-      brand: 'visa',
-      last4: method.cardNumber.slice(-4),
-      expiryMonth: parseInt(method.expiryDate.split('/')[0]),
-      expiryYear: parseInt('20' + method.expiryDate.split('/')[1]),
-      isDefault: paymentMethods.length === 0
-    };
-    setPaymentMethods(prev => [...prev, newMethod]);
-  };
-
-  const deletePaymentMethod = async (id: string) => {
-    setPaymentMethods(prev => prev.filter(method => method.id !== id));
-  };
-
-  const setDefaultPaymentMethod = async (id: string) => {
-    setPaymentMethods(prev => 
-      prev.map(method => ({
-        ...method,
-        isDefault: method.id === id
-      }))
+  const updateMealPlan = (planId: string, updatedPlan: any) => {
+    setMealPlans(prev =>
+      prev.map(plan => (plan.id === planId ? updatedPlan : plan))
     );
   };
 
-  const acceptSubscription = async (plan: string) => {
-    if (user) {
-      let planLimits;
-      switch (plan) {
-        case 'family':
-          planLimits = {
-            plansPerMonth: 5,
-            usedPlans: user.subscription.planLimits.usedPlans,
-            mealCreations: 10,
-            usedMealCreations: user.subscription.planLimits.usedMealCreations || 0,
-            deliveryCommissions: 3,
-            usedDeliveryCommissions: user.subscription.planLimits.usedDeliveryCommissions || 0
-          };
-          break;
-        case 'professional':
-          planLimits = {
-            plansPerMonth: 12,
-            usedPlans: user.subscription.planLimits.usedPlans,
-            mealCreations: -1, // unlimited
-            usedMealCreations: user.subscription.planLimits.usedMealCreations || 0,
-            deliveryCommissions: 10,
-            usedDeliveryCommissions: user.subscription.planLimits.usedDeliveryCommissions || 0,
-            homeDeliveries: 3,
-            usedHomeDeliveries: user.subscription.planLimits.usedHomeDeliveries || 0
-          };
-          break;
-        default: // free
-          planLimits = {
-            plansPerMonth: 1,
-            usedPlans: user.subscription.planLimits.usedPlans,
-            mealCreations: 3,
-            usedMealCreations: user.subscription.planLimits.usedMealCreations || 0,
-            deliveryCommissions: 0,
-            usedDeliveryCommissions: 0
-          };
-      }
-
-      const updatedUser = {
-        ...user,
-        subscription: {
-          ...user.subscription,
-          plan: plan as 'free' | 'family' | 'professional',
-          isSubscribed: plan !== 'free',
-          planLimits
-        }
-      };
-      setUser(updatedUser);
-      
-      // Update subscription info
-      const newSubscriptionInfo: SubscriptionInfo = {
-        subscribed: plan !== 'free',
-        subscription_tier: plan === 'family' ? 'Family' : plan === 'professional' ? 'Professional' : null,
-        subscription_end: plan !== 'free' ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
-        stripe_customer_id: 'cus_mock_customer_id'
-      };
-      setSubscriptionInfo(newSubscriptionInfo);
-    }
+  const getMealPlanById = (planId: string) => {
+    return mealPlans.find(plan => plan.id === planId);
   };
 
-  const cancelSubscription = async () => {
-    if (user) {
-      setUser({
-        ...user,
-        subscription: {
-          ...user.subscription,
-          cancelAtPeriodEnd: true
-        }
-      });
-    }
+  const addIngredient = (ingredient: Ingredient) => {
+    setIngredients(prev => [...prev, ingredient]);
   };
 
-  const checkSubscription = useCallback(async () => {
-    // Mock subscription check - in real app this would call Supabase edge function
-    try {
-      const mockSubscriptionInfo: SubscriptionInfo = {
-        subscribed: user?.subscription?.isSubscribed || false,
-        subscription_tier: user?.subscription?.plan === 'family' ? 'Family' : user?.subscription?.plan === 'professional' ? 'Professional' : null,
-        subscription_end: user?.subscription?.isSubscribed ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
-        stripe_customer_id: user?.subscription?.isSubscribed ? 'cus_mock_customer_id' : null
-      };
-      setSubscriptionInfo(mockSubscriptionInfo);
-    } catch (error) {
-      console.error('Failed to check subscription:', error);
-    }
-  }, [user?.subscription?.isSubscribed, user?.subscription?.plan]);
-
-  const createCheckoutWithPaymentMethod = async (plan: any, paymentMethodId?: string): Promise<string> => {
-    // Mock checkout creation - in real app this would call Supabase edge function
-    try {
-      console.log('Creating checkout for plan:', plan, 'with payment method:', paymentMethodId);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Return mock checkout URL
-      return 'https://checkout.stripe.com/mock-session-url';
-    } catch (error) {
-      console.error('Failed to create checkout:', error);
-      throw error;
-    }
+  const updateIngredient = (id: string, ingredient: Partial<Ingredient>) => {
+    setIngredients(prev =>
+      prev.map(item => (item.id === id ? { ...item, ...ingredient } : item))
+    );
   };
 
-  const addAIMeal = (meal: AIMeal) => {
-    setAIMeals(prev => [...prev, meal]);
+  const deleteIngredient = (id: string) => {
+    setIngredients(prev => prev.filter(item => item.id !== id));
   };
 
-  const addAIDrink = (drink: AIDrink) => {
-    setAIDrinks(prev => [...prev, drink]);
+  const addToShoppingList = (item: ShoppingItem) => {
+    setShoppingList(prev => [...prev, item]);
   };
 
-  const deleteAIMeal = (id: string) => {
-    setAIMeals(prev => prev.filter(meal => meal.id !== id));
+  const updateShoppingItem = (id: string, item: Partial<ShoppingItem>) => {
+    setShoppingList(prev =>
+      prev.map(shoppingItem => (shoppingItem.id === id ? { ...shoppingItem, ...item } : shoppingItem))
+    );
   };
 
-  const deleteAIDrink = (id: string) => {
-    setAIDrinks(prev => prev.filter(drink => drink.id !== id));
+  const deleteFromShoppingList = (id: string) => {
+    setShoppingList(prev => prev.filter(item => item.id !== id));
   };
 
-  const value = {
+  const value: UserContextType = {
     user,
-    pantryItems,
-    shoppingItems,
-    mealPlans,
-    completedMeals,
-    activeShoppingList,
-    activeMealPlan,
-    ingredients,
-    billingHistory,
-    paymentMethods,
-    subscriptionInfo,
-    isAuthenticated,
     setUser,
-    login,
-    logout,
-    signup,
-    updateUserProfile,
-    addPantryItem,
-    updatePantryItem,
-    deletePantryItem,
-    addIngredient,
-    deleteIngredient,
-    updatePantryFromIngredients,
-    addShoppingItem,
-    updateShoppingItem,
-    deleteShoppingItem,
-    toggleShoppingItemPurchased,
+    mealPlans,
+    setMealPlans,
     addMealPlan,
     updateMealPlan,
-    deleteMealPlan,
-    deleteMealFromPlan,
-    updateMealPlanShoppingList,
-    toggleMealCompletion,
-    isMealCompleted,
-    updatePantryFromMeal,
-    setActiveShoppingList,
-    setActiveMealPlan: setActiveMealPlanUpdated,
-    refreshMealPlans,
     getMealPlanById,
-    getBillingHistory,
-    getPaymentMethods,
-    addPaymentMethod,
-    deletePaymentMethod,
-    setDefaultPaymentMethod,
-    acceptSubscription,
-    cancelSubscription,
-    checkSubscription,
-    createCheckoutWithPaymentMethod,
-    aiMeals,
-    aiDrinks,
-    addAIMeal,
-    addAIDrink,
-    deleteAIMeal,
-    deleteAIDrink,
+    ingredients,
+    setIngredients,
+    addIngredient,
+    updateIngredient,
+    deleteIngredient,
+    shoppingList,
+    setShoppingList,
+    addToShoppingList,
+    updateShoppingItem,
+    deleteFromShoppingList,
   };
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={value}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
 };
