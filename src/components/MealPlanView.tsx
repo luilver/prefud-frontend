@@ -36,15 +36,40 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const mealsPerDay = plan.preferences?.mealsPerDay || 
                      (plan.preferences && typeof plan.preferences.mealsPerDay === 'number' ? plan.preferences.mealsPerDay : 3);
 
-  // Group meals by day
-  const mealsByDay = plan.meals?.reduce((acc: any, meal: any) => {
-    const dayKey = meal.day || 'Day 1';
-    if (!acc[dayKey]) {
-      acc[dayKey] = [];
+  // Group meals by day - handle both direct meals array and meals within weeks
+  const mealsByDay = (() => {
+    const groupedMeals: any = {};
+    
+    // If meals are directly in the plan
+    if (plan.meals && plan.meals.length > 0) {
+      plan.meals.forEach((meal: any) => {
+        const dayKey = meal.day || 'Day 1';
+        if (!groupedMeals[dayKey]) {
+          groupedMeals[dayKey] = [];
+        }
+        groupedMeals[dayKey].push(meal);
+      });
     }
-    acc[dayKey].push(meal);
-    return acc;
-  }, {}) || {};
+    
+    // If meals are within weeks structure
+    if (plan.weeks && plan.weeks.length > 0) {
+      plan.weeks.forEach((week: any) => {
+        if (week.days && week.days.length > 0) {
+          week.days.forEach((day: any, dayIndex: number) => {
+            const dayKey = `Day ${dayIndex + 1}`;
+            if (day.meals && day.meals.length > 0) {
+              if (!groupedMeals[dayKey]) {
+                groupedMeals[dayKey] = [];
+              }
+              groupedMeals[dayKey].push(...day.meals);
+            }
+          });
+        }
+      });
+    }
+    
+    return groupedMeals;
+  })();
 
   // Generate days array based on plan duration
   const days = Array.from({ length: totalDays }, (_, index) => `Day ${index + 1}`);
