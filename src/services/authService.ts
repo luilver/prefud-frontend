@@ -46,6 +46,23 @@ interface UserProfile {
   __v: number;
 }
 
+interface PantryApiResponse {
+  _id: string;
+  user_id: string;
+  ingredients: {
+    name: string;
+    quantity: number;
+    unit: string;
+    classification: string;
+    carbonFootPrintToWaste: number;
+    daysToExpire: number;
+    dayAdded: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
 interface PantryItem {
   _id: string;
   name: string;
@@ -137,15 +154,50 @@ class AuthService {
         throw new Error(errorData.message.message);
       }
 
-      const pantryData: PantryItem[] = await response.json();
-      console.log('Pantry data fetched successfully:', pantryData);
-      return pantryData;
+      const pantryResponse: PantryApiResponse = await response.json();
+      console.log('Pantry API response:', pantryResponse);
+      
+      // Transform API response to internal format
+      const transformedPantryItems: PantryItem[] = pantryResponse.ingredients.map((ingredient) => {
+        const dayAdded = new Date(ingredient.dayAdded);
+        const expiryDate = new Date(dayAdded);
+        expiryDate.setDate(expiryDate.getDate() + ingredient.daysToExpire);
+        
+        return {
+          _id: `${pantryResponse._id}_${ingredient.name}`, // Create unique ID
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: this.mapClassificationToCategory(ingredient.classification),
+          expiryDate: expiryDate.toISOString(),
+          purchaseDate: ingredient.dayAdded,
+          notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste}kg CO2`
+        };
+      });
+      
+      console.log('Transformed pantry items:', transformedPantryItems);
+      return transformedPantryItems;
     } catch (error) {
       console.error('Get pantry error:', error);
       // Return empty array if pantry fetch fails to not break the login flow
       console.log('Returning empty pantry due to error');
       return [];
     }
+  }
+
+  private mapClassificationToCategory(classification: string): string {
+    const categoryMap: Record<string, string> = {
+      'dairy': 'Dairy',
+      'nut': 'Pantry',
+      'protein': 'Meat',
+      'vegetable': 'Vegetables',
+      'fruit': 'Fruits',
+      'grain': 'Grains',
+      'spice': 'Pantry',
+      'herb': 'Pantry'
+    };
+    
+    return categoryMap[classification.toLowerCase()] || 'Pantry';
   }
 
   async requestPasswordReset(email: string): Promise<ApiResponse> {
