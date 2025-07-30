@@ -126,19 +126,45 @@ const MealPlanner = () => {
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{plan.duration || 'Custom duration'}</span>
+                    <span>{plan.duration}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    <span>For {plan.preferences?.people || 'N/A'} people</span>
+                    <span>For {plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A'} people</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     <span>{plan.preferences?.mealsPerDay || '3'} meals per day</span>
                   </div>
+                  
+                  {/* Additional plan details from API */}
+                  {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
+                    <div className="text-xs text-purple-600">
+                      Cuisine: {plan.preferences.cuisinePreferences.join(', ')}
+                    </div>
+                  )}
+                  
+                  {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
+                    <div className="text-xs text-green-600">
+                      Diet: {plan.preferences.dietaryRestrictions.join(', ')}
+                    </div>
+                  )}
+                  
+                  {plan.preferences?.cookingSkillLevel && (
+                    <div className="text-xs text-blue-600">
+                      Skill Level: {plan.preferences.cookingSkillLevel}
+                    </div>
+                  )}
+                  
                   <div className="mt-3 text-xs text-gray-500">
                     {plan.meals?.length || 0} total meals planned
                   </div>
+                  
+                  {plan.shoppingList && plan.shoppingList.length > 0 && (
+                    <div className="text-xs text-orange-600">
+                      {plan.shoppingList.length} ingredients needed
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
