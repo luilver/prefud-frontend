@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -123,6 +122,7 @@ const ShoppingList = () => {
     if (checkedItemNames.length > 0) {
       checkedItemNames.forEach(itemName => {
         addPantryItem({
+          id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           name: itemName,
           quantity: 1,
           unit: 'item',
