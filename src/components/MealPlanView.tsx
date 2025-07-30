@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,7 +58,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       setCheckedItems(new Set());
       setSelectAll(false);
     } else {
-      const allItemIds = new Set(plan.shoppingList?.map((item: any) => item.id) || []);
+      const allItemIds = new Set<string>(plan.shoppingList?.map((item: any) => item.id) || []);
       setCheckedItems(allItemIds);
       setSelectAll(true);
     }
