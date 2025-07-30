@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign } from "lucide-react";
+import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign, Globe } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -119,6 +119,18 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     const mappedLanguage = languageMap[languageCode.toLowerCase()] || 'english';
     console.log('Mapped language:', mappedLanguage);
     return mappedLanguage;
+  };
+
+  const getLanguageDisplayName = (languageCode: string) => {
+    const displayMap: { [key: string]: string } = {
+      'en': 'English',
+      'es': 'Español',
+      'pt': 'Português', 
+      'fr': 'Français',
+      'de': 'Deutsch',
+      'it': 'Italiano'
+    };
+    return displayMap[languageCode.toLowerCase()] || 'English';
   };
 
   const generateMealPlan = async () => {
@@ -300,6 +312,10 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 </p>
                 <p className="text-xs text-purple-600 mt-1">
                   {numberOfDays} day{numberOfDays > 1 ? 's' : ''} • {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} meal{mealsPerDay > 1 ? 's' : ''} per day
+                </p>
+                <p className="text-xs text-purple-600 mt-1 flex items-center gap-1">
+                  <Globe className="h-3 w-3" />
+                  <strong>Language:</strong> {getLanguageDisplayName(language)}
                 </p>
               </div>
             )}
