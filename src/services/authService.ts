@@ -1,4 +1,3 @@
-
 interface LoginResponse {
   email: string;
   isActive: boolean;
@@ -47,12 +46,26 @@ interface UserProfile {
   __v: number;
 }
 
+interface PantryItem {
+  _id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  category: string;
+  expiryDate: string;
+  purchaseDate: string;
+  location?: string;
+  notes?: string;
+}
+
 interface CompleteLoginResponse extends LoginResponse {
   profile: UserProfile;
+  pantry: PantryItem[];
 }
 
 class AuthService {
   private baseURL = 'https://pantry-auth-1.onrender.com';
+  private pantryURL = 'https://pantry-ms-brain.onrender.com';
 
   async login(email: string, password: string): Promise<CompleteLoginResponse> {
     try {
@@ -74,9 +87,13 @@ class AuthService {
       // Fetch user profile after successful login
       const profile = await this.getProfile(loginData.userId);
       
+      // Fetch user pantry after successful login
+      const pantry = await this.getPantry(loginData.userId);
+      
       return {
         ...loginData,
-        profile
+        profile,
+        pantry
       };
     } catch (error) {
       console.error('Login error:', error);
@@ -103,6 +120,31 @@ class AuthService {
     } catch (error) {
       console.error('Get profile error:', error);
       throw error;
+    }
+  }
+
+  async getPantry(userId: string): Promise<PantryItem[]> {
+    try {
+      const response = await fetch(`${this.pantryURL}/meal-plan/pantry/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        throw new Error(errorData.message.message);
+      }
+
+      const pantryData: PantryItem[] = await response.json();
+      console.log('Pantry data fetched successfully:', pantryData);
+      return pantryData;
+    } catch (error) {
+      console.error('Get pantry error:', error);
+      // Return empty array if pantry fetch fails to not break the login flow
+      console.log('Returning empty pantry due to error');
+      return [];
     }
   }
 

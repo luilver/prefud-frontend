@@ -34,6 +34,17 @@ interface AuthUser {
     updatedAt: string;
     __v: number;
   };
+  pantry?: {
+    _id: string;
+    name: string;
+    quantity: number;
+    unit: string;
+    category: string;
+    expiryDate: string;
+    purchaseDate: string;
+    location?: string;
+    notes?: string;
+  }[];
 }
 
 interface AuthContextType {
@@ -78,6 +89,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // Valid session, restore user
             setUser(parsedUser);
             console.log('Session restored successfully');
+            
+            // Trigger pantry sync event for UserContext
+            if (parsedUser.pantry) {
+              window.dispatchEvent(new CustomEvent('pantry-sync', { 
+                detail: { pantry: parsedUser.pantry } 
+              }));
+            }
           }
         }
       } catch (error) {
@@ -106,7 +124,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         expirationToken: response.expirationToken,
         token: response.token,
         userId: response.userId,
-        profile: response.profile
+        profile: response.profile,
+        pantry: response.pantry
       };
 
       // Store user data and token for session persistence
@@ -115,6 +134,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       setUser(userData);
       console.log('Login successful, session saved');
+      
+      // Trigger pantry sync event for UserContext
+      if (response.pantry) {
+        window.dispatchEvent(new CustomEvent('pantry-sync', { 
+          detail: { pantry: response.pantry } 
+        }));
+      }
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

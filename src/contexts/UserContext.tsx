@@ -209,18 +209,51 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const ingredients = pantryItems;
   const isAuthenticated = authIsAuthenticated || user !== null;
 
+  // Listen for pantry sync events from AuthContext
+  useEffect(() => {
+    const handlePantrySync = (event: CustomEvent) => {
+      const { pantry } = event.detail;
+      console.log('Syncing pantry from auth:', pantry);
+      
+      if (pantry && Array.isArray(pantry)) {
+        // Transform pantry items from API format to UserContext format
+        const transformedPantryItems: PantryItem[] = pantry.map((item: any) => ({
+          id: item._id,
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          category: item.category,
+          expiryDate: new Date(item.expiryDate),
+          purchaseDate: new Date(item.purchaseDate),
+          location: item.location,
+          notes: item.notes
+        }));
+        
+        setPantryItems(transformedPantryItems);
+        console.log('Pantry items updated from API:', transformedPantryItems);
+      }
+    };
+
+    window.addEventListener('pantry-sync', handlePantrySync as EventListener);
+    
+    return () => {
+      window.removeEventListener('pantry-sync', handlePantrySync as EventListener);
+    };
+  }, []);
+
   // Sync with AuthContext user
   useEffect(() => {
     if (authUser && !user) {
       // Create user profile from auth user
       const userProfile: User = {
         id: authUser.userId,
-        name: authUser.email.split('@')[0], // Use email prefix as name
+        name: authUser.profile?.name || authUser.email.split('@')[0],
         email: authUser.email,
+        phone: authUser.profile?.phone,
         language: 'en',
         preferences: {
-          dietaryRestrictions: [],
-          allergies: [],
+          dietaryRestrictions: authUser.profile?.dietTypes || [],
+          allergies: authUser.profile?.alergies || [],
           cuisinePreferences: [],
           cookingSkillLevel: 'beginner',
           mealPrepTime: 30,
@@ -389,6 +422,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     authLogout();
     setUser(null);
     setSubscriptionInfo(null);
+    // Clear pantry items when logging out
+    setPantryItems([]);
     localStorage.removeItem('user');
     localStorage.removeItem('subscriptionInfo');
     window.dispatchEvent(new CustomEvent('user-logout'));
