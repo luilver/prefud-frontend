@@ -32,9 +32,9 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                    (plan.preferences?.numberOfDays || 7);
   const peopleCount = plan.preferences?.numberOfPersons || 
                      plan.preferences?.people || 
-                     (plan.preferences && typeof plan.preferences.people === 'number' ? plan.preferences.people : 'N/A');
+                     (plan.preferences && typeof plan.preferences.people === 'number' ? plan.preferences.people : 1);
   const mealsPerDay = plan.preferences?.mealsPerDay || 
-                     (plan.preferences && typeof plan.preferences.mealsPerDay === 'number' ? plan.preferences.mealsPerDay : '3');
+                     (plan.preferences && typeof plan.preferences.mealsPerDay === 'number' ? plan.preferences.mealsPerDay : 3);
 
   // Group meals by day
   const mealsByDay = plan.meals?.reduce((acc: any, meal: any) => {
