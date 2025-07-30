@@ -36,14 +36,33 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const mealsPerDay = plan.preferences?.mealsPerDay || 
                      (plan.preferences && typeof plan.preferences.mealsPerDay === 'number' ? plan.preferences.mealsPerDay : 3);
 
-  // Group meals by day - handle both direct meals array and meals within weeks
+  // Group meals by day - handle the actual data structure from your meal plan
   const mealsByDay = (() => {
     const groupedMeals: any = {};
     
-    // If meals are directly in the plan
+    console.log('Plan structure:', plan);
+    console.log('Plan meals:', plan.meals);
+    
+    // If meals are directly in the plan (your current structure)
     if (plan.meals && plan.meals.length > 0) {
       plan.meals.forEach((meal: any) => {
-        const dayKey = meal.day || 'Day 1';
+        // Map the meal day based on the date or day property
+        let dayKey = 'Day 1';
+        
+        if (meal.day) {
+          dayKey = `Day ${meal.day}`;
+        } else if (meal.date) {
+          // Calculate day from date
+          const startDate = new Date(plan.startDate);
+          const mealDate = new Date(meal.date);
+          const dayDiff = Math.floor((mealDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+          dayKey = `Day ${dayDiff}`;
+        } else if (meal.id && meal.id.includes('-')) {
+          // Extract day from ID pattern like "1-0", "2-1", etc.
+          const dayFromId = meal.id.split('-')[0];
+          dayKey = `Day ${dayFromId}`;
+        }
+        
         if (!groupedMeals[dayKey]) {
           groupedMeals[dayKey] = [];
         }
@@ -68,6 +87,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       });
     }
     
+    console.log('Grouped meals by day:', groupedMeals);
     return groupedMeals;
   })();
 
@@ -197,10 +217,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                             </CardHeader>
                             <CardContent className="pt-0">
                               <div className="space-y-2 text-sm text-gray-600">
-                                {meal.cookingTime && (
+                                {meal.prepTime && (
                                   <div className="flex items-center gap-2">
                                     <Clock className="h-4 w-4" />
-                                    <span>{meal.cookingTime} min</span>
+                                    <span>{meal.prepTime} min</span>
                                   </div>
                                 )}
                                 {meal.difficulty && (
