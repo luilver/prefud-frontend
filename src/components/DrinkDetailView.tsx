@@ -1,13 +1,13 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Clock, Users, Droplets, Leaf, ShoppingCart, Eye } from "lucide-react";
+import { ArrowLeft, Clock, Users, Droplets, Leaf, ShoppingCart, Eye, Play, CheckCircle2, Circle } from "lucide-react";
 import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
+import DrinkShoppingModal from "./DrinkShoppingModal";
 
 interface DrinkDetailViewProps {
   drink: ApiDrink;
@@ -18,6 +18,8 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   const { addShoppingItem } = useUser();
   const { toast } = useToast();
   const [showIngredients, setShowIngredients] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [showShoppingModal, setShowShoppingModal] = useState(false);
 
   const handleCreateShoppingList = () => {
     try {
@@ -45,6 +47,24 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
         variant: "destructive"
       });
     }
+  };
+
+  const toggleStepCompletion = (stepIndex: number) => {
+    setCompletedSteps(prev => 
+      prev.includes(stepIndex)
+        ? prev.filter(index => index !== stepIndex)
+        : [...prev, stepIndex]
+    );
+  };
+
+  const watchRecipeVideo = () => {
+    // Mock video URL - in real app this would be from the API
+    const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(drink.drink_name + ' recipe')}`;
+    window.open(videoUrl, '_blank');
+  };
+
+  const openShoppingModal = () => {
+    setShowShoppingModal(true);
   };
 
   const healthyDrink = drink.drinkPlan.healthyDrink;
@@ -86,16 +106,44 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-green-800">Preparation Steps</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-green-800">Preparation Steps</CardTitle>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={watchRecipeVideo}
+                    className="flex items-center space-x-1"
+                  >
+                    <Play className="h-4 w-4" />
+                    <span>Watch Video</span>
+                  </Button>
+                  <span className="text-sm text-gray-500">
+                    {completedSteps.length}/{healthyDrink.steps.length} completed
+                  </span>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {healthyDrink.steps.map((step, index) => (
                   <div key={index} className="flex space-x-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                      {index + 1}
+                    <div 
+                      className="flex-shrink-0 cursor-pointer"
+                      onClick={() => toggleStepCompletion(index)}
+                    >
+                      {completedSteps.includes(index) ? (
+                        <CheckCircle2 className="h-6 w-6 text-green-500" />
+                      ) : (
+                        <Circle className="h-6 w-6 text-gray-400 hover:text-green-500" />
+                      )}
                     </div>
-                    <p className="text-gray-700">{step}</p>
+                    <p className={`text-gray-700 ${
+                      completedSteps.includes(index) ? 'line-through text-gray-400' : ''
+                    }`}>
+                      <span className="font-medium text-green-600 mr-2">Step {index + 1}:</span>
+                      {step}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -212,13 +260,22 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             )}
           </Card>
 
-          <Button 
-            onClick={handleCreateShoppingList}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
-          >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Create Shopping List
-          </Button>
+          <div className="space-y-3">
+            <Button 
+              onClick={openShoppingModal}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Create Shopping List
+            </Button>
+            <Button 
+              onClick={handleCreateShoppingList}
+              variant="outline"
+              className="w-full"
+            >
+              Add to Quick Shopping
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -237,6 +294,12 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
           </CardContent>
         </Card>
       )}
+
+      <DrinkShoppingModal
+        drink={drink}
+        isOpen={showShoppingModal}
+        onClose={() => setShowShoppingModal(false)}
+      />
     </div>
   );
 };
