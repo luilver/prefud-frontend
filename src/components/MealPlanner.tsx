@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +5,7 @@ import { Plus, Calendar, Users, ChefHat, Clock, Sparkles, ChevronLeft, ChevronRi
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
+import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import { 
   Pagination,
   PaginationContent,
@@ -25,6 +25,8 @@ const MealPlanner = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
   const [hasLoadedInitialPlans, setHasLoadedInitialPlans] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successPlan, setSuccessPlan] = useState<any>(null);
   const isNavigatingBack = useRef(false);
   const { user, mealPlans, addMealPlan, getMealPlanById, fetchMealPlansFromAPI } = useUser();
   const { toast } = useToast();
@@ -76,9 +78,20 @@ const MealPlanner = () => {
     console.log('New plan created:', newPlan);
     addMealPlan(newPlan);
     setShowCreator(false);
-    setSelectedMealPlan(newPlan);
     setIsEditing(false);
     isNavigatingBack.current = false;
+    
+    // Show success modal and toast
+    setSuccessPlan(newPlan);
+    setShowSuccessModal(true);
+    
+    // Show success toast
+    toast({
+      title: "🎉 Meal Plan Created Successfully!",
+      description: `Your meal plan "${newPlan.name}" is ready to explore.`,
+      duration: 8000,
+    });
+    
     // Refresh the first page to show the new plan
     setCurrentPage(1);
     loadMealPlans(1);
@@ -112,6 +125,18 @@ const MealPlanner = () => {
     if (page !== currentPage && page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const handleViewSuccessPlan = () => {
+    if (successPlan) {
+      setShowSuccessModal(false);
+      setSelectedMealPlan(successPlan);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setSuccessPlan(null);
   };
 
   // Update selected meal plan when context changes - but only if we're viewing a plan and not navigating back
@@ -153,6 +178,22 @@ const MealPlanner = () => {
   // Default view: show meal planner dashboard
   return (
     <div className="space-y-6">
+      {/* Success Modal */}
+      {showSuccessModal && successPlan && (
+        <MealPlanSuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleCloseSuccessModal}
+          onViewPlan={handleViewSuccessPlan}
+          mealPlan={{
+            name: successPlan.name,
+            numberOfDays: successPlan.duration ? parseInt(successPlan.duration.replace(' days', '')) : 
+                         (successPlan.preferences?.numberOfWeeks ? successPlan.preferences.numberOfWeeks * 7 : 7),
+            numberOfPersons: successPlan.preferences?.numberOfPersons || successPlan.preferences?.people || 1,
+            mealsPerDay: successPlan.preferences?.mealsPerDay || 3
+          }}
+        />
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
