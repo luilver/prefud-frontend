@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanView from "./MealPlanView";
+import MealPlanSuccessModal from "./MealPlanSuccessModal";
 
 interface MealPlanCreatorProps {
   onPlanCreated: (plan: any) => void;
@@ -38,6 +39,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [showPlanView, setShowPlanView] = useState(false);
   const [createdPlan, setCreatedPlan] = useState<any>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   const { user, refreshMealPlans } = useUser();
   const { language } = useLanguage();
@@ -212,6 +214,18 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       // Hide the loader
       hideLoader();
 
+      // Check if the response indicates success (status 201 or successful response)
+      const isSuccess = apiResponse && (
+        apiResponse.status === 201 || 
+        apiResponse.id || 
+        apiResponse.meal_plan_id || 
+        !apiResponse.error
+      );
+
+      if (!isSuccess) {
+        throw new Error(apiResponse?.error || 'Failed to create meal plan');
+      }
+
       // Transform the API response to match our local format
       const transformedPlan = transformApiMealPlanToLocal(apiResponse);
       console.log('Transformed plan:', transformedPlan);
@@ -219,15 +233,23 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       // Store the created plan
       setCreatedPlan(transformedPlan);
       
+      // Show success toast immediately
+      toast({
+        title: "🎉 Meal Plan Created Successfully!",
+        description: `Your meal plan "${planName}" is ready to explore.`,
+        duration: 8000,
+      });
+
+      console.log('Showing success modal with plan:', transformedPlan);
+      
+      // Show the success modal
+      setShowSuccessModal(true);
+
       // Add to context
       onPlanCreated(transformedPlan);
 
       // Refresh meal plans from server
       await refreshMealPlans();
-
-      // Navigate back to planner with success data
-      // The success modal should be triggered from the parent component
-      onBack();
 
     } catch (error) {
       console.error('Error generating meal plan:', error);
@@ -268,6 +290,21 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     // Stay on the creator form so user can modify settings
   };
 
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    setCreatedPlan(null);
+    // Navigate back to meal planner
+    onBack();
+  };
+
+  const handleViewSuccessPlan = () => {
+    if (createdPlan) {
+      setShowSuccessModal(false);
+      setSelectedMealPlan(createdPlan);
+      setShowPlanView(true);
+    }
+  };
+
   if (showPlanView && createdPlan) {
     return (
       <MealPlanView
@@ -281,6 +318,19 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   return (
     <div className="space-y-6">
       <LoaderComponent />
+      
+      {/* Success Modal */}
+      <MealPlanSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        onViewPlan={handleViewSuccessPlan}
+        mealPlan={createdPlan ? {
+          name: createdPlan.name || planName,
+          numberOfDays: numberOfDays,
+          numberOfPersons: numberOfPersons,
+          mealsPerDay: mealsPerDay
+        } : undefined}
+      />
       
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack}>
