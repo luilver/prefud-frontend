@@ -23,8 +23,8 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     allergiesIntolerance: [] as string[],
     dislikes: '',
     maxCookingTime: 30,
-    cookingSkillLevel: '',
-    budgetRange: '',
+    cookingSkillLevel: 'intermediate',
+    budgetRange: 'medium',
     drink_name: '',
     numberPeople: 1,
     preferences: {} as any
@@ -53,7 +53,12 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
       ...prev,
       [key]: value,
       // Map type to drinkType for consistency
-      ...(key === 'type' ? { drinkType: value } : {})
+      ...(key === 'type' ? { drinkType: value } : {}),
+      // Ensure we have all required API fields with defaults
+      maxCookingTime: prev.maxCookingTime || 30,
+      cookingSkillLevel: prev.cookingSkillLevel || 'intermediate',
+      budgetRange: prev.budgetRange || 'medium',
+      numberPeople: prev.numberPeople || 1
     }));
   };
 

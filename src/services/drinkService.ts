@@ -71,6 +71,22 @@ export interface ApiDrinksResponse {
   totalPages: number;
 }
 
+export interface CreateDrinkRequest {
+  user_id: string;
+  drink_name: string;
+  numberPeople: number;
+  dietaryRestrictions: string[];
+  cuisinePreferences: string[];
+  allergiesIntolerance: string[];
+  dislikes: string;
+  maxCookingTime: number;
+  cookingSkillLevel: string;
+  budgetRange: string;
+  drinkType: string;
+  language: string;
+  healthGoals: string[];
+}
+
 export const getDrinksByUser = async (userId: string, page: number = 1, limit: number = 10): Promise<ApiDrinksResponse> => {
   try {
     console.log('Fetching drinks for user:', userId);
@@ -91,6 +107,31 @@ export const getDrinksByUser = async (userId: string, page: number = 1, limit: n
     return data;
   } catch (error) {
     console.error('Error fetching user drinks:', error);
+    throw error;
+  }
+};
+
+export const createHealthyDrink = async (drinkData: CreateDrinkRequest): Promise<ApiDrinkPlan> => {
+  try {
+    console.log('Creating healthy drink with data:', drinkData);
+    
+    const response = await fetch(`${API_BASE_URL}/meal-plan/healthy-drink`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(drinkData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Created drink plan:', data);
+    return data;
+  } catch (error) {
+    console.error('Error creating healthy drink:', error);
     throw error;
   }
 };

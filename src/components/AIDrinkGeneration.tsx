@@ -6,6 +6,9 @@ import { Separator } from "@/components/ui/separator";
 import { Clock, Users, Zap, Droplets, RefreshCw, Save, ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
 import CocktailAnimation from "./CocktailAnimation";
+import { createHealthyDrink, ApiDrinkPlan } from "@/services/drinkService";
+import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIDrinkGenerationProps {
   data: any;
@@ -14,87 +17,102 @@ interface AIDrinkGenerationProps {
 }
 
 const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => {
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDrink, setGeneratedDrink] = useState<any>(null);
   const [shoppingList, setShoppingList] = useState<any[]>([]);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  
+  const { user } = useUser();
+  const { language } = useLanguage();
 
   useEffect(() => {
-    generateDrink();
+    // Don't auto-generate on mount, wait for user to trigger
   }, []);
 
-  const generateDrink = () => {
+  const getLanguageName = (languageCode: string) => {
+    const languageMap: { [key: string]: string } = {
+      'en': 'english',
+      'es': 'spanish',
+      'pt': 'portuguese',
+      'fr': 'french',
+      'de': 'german',
+      'it': 'italian'
+    };
+    return languageMap[languageCode.toLowerCase()] || 'english';
+  };
+
+  const generateDrink = async () => {
+    if (!user?.id) {
+      toast.error("Please log in to generate a drink");
+      return;
+    }
+
     setIsGenerating(true);
     
-    // Simulate AI generation with cocktail animation
-    setTimeout(() => {
-      const drinkTypes = {
-        smoothie: "Smoothie",
-        juice: "Fresh Juice",
-        tea: "Wellness Tea",
-        protein: "Protein Shake",
-        detox: "Detox Drink",
-        energy: "Energy Boost"
+    try {
+      const requestData = {
+        user_id: user.id,
+        drink_name: data.drink_name || `Healthy ${data.type || 'Drink'}`,
+        numberPeople: data.numberPeople || 1,
+        dietaryRestrictions: data.dietaryRestrictions || [],
+        cuisinePreferences: data.cuisinePreferences || [],
+        allergiesIntolerance: data.allergiesIntolerance || [],
+        dislikes: data.dislikes || "",
+        maxCookingTime: data.maxCookingTime || 30,
+        cookingSkillLevel: data.cookingSkillLevel || "intermediate",
+        budgetRange: data.budgetRange || "medium",
+        drinkType: data.type || "smoothie",
+        language: getLanguageName(language),
+        healthGoals: data.healthGoals || []
       };
 
-      // Generate ingredients based on preferences
-      const baseIngredients = [
-        { name: "Fresh Spinach", amount: "2 cups", category: "Vegetables", price: "$3.50" },
-        { name: "Banana", amount: "1 large", category: "Fruits", price: "$0.75" },
-        { name: "Mango", amount: "1/2 cup", category: "Fruits", price: "$2.00" },
-        { name: "Coconut Water", amount: "1 cup", category: "Liquids", price: "$1.25" },
-        { name: "Chia Seeds", amount: "1 tbsp", category: "Superfoods", price: "$4.00" },
-        { name: "Fresh Ginger", amount: "1 inch", category: "Spices", price: "$0.50" },
-        { name: "Lemon", amount: "1/2 fruit", category: "Fruits", price: "$0.50" },
-        { name: "Honey", amount: "1 tsp", category: "Sweeteners", price: "$2.00" }
-      ];
-
-      const mockDrink = {
-        name: data.drink_name || `Healthy ${drinkTypes[data.type as keyof typeof drinkTypes] || 'Drink'}`,
-        type: data.type,
-        description: "A nutritious and delicious drink crafted specifically for your health goals and preferences.",
-        prepTime: "5-10 minutes",
+      console.log('Generating drink with request data:', requestData);
+      
+      const apiResponse = await createHealthyDrink(requestData);
+      
+      // Transform API response to match our local format
+      const transformedDrink = {
+        name: apiResponse.healthyDrink.name,
+        type: apiResponse.healthyDrink.drinkType,
+        description: apiResponse.healthyDrink.description,
+        prepTime: `${apiResponse.healthyDrink.cookingTime} minutes`,
         servings: data.numberPeople || 1,
-        calories: Math.floor(Math.random() * 200) + 150,
-        ingredients: baseIngredients,
-        instructions: [
-          "Wash all fresh ingredients thoroughly",
-          "Add liquids to blender first",
-          "Add soft fruits and vegetables",
-          "Add superfoods and spices",
-          "Blend on high speed for 60-90 seconds until smooth",
-          "Taste and adjust sweetness if needed",
-          "Pour into glasses and serve immediately",
-          "Garnish with fresh ingredients if desired"
+        calories: apiResponse.healthyDrink.calories,
+        ingredients: apiResponse.healthyDrink.ingredients.map(ing => ({
+          name: ing.name,
+          amount: `${ing.quantity} ${ing.unit}`,
+          category: apiResponse.ingredientsList.find(item => item.name === ing.name)?.classification || 'Other',
+          price: `$${(Math.random() * 5 + 1).toFixed(2)}` // Mock price for shopping list
+        })),
+        instructions: apiResponse.healthyDrink.steps,
+        nutritionHighlights: [
+          apiResponse.healthyDrink.benefits,
+          `Rich in vitamins: ${apiResponse.healthyDrink.nutritionalInfo.vitamins.join(', ')}`,
+          `${apiResponse.healthyDrink.nutritionalInfo.protein}g protein, ${apiResponse.healthyDrink.nutritionalInfo.fiber}g fiber`
         ],
-        nutritionHighlights: data.healthGoals?.map((goal: string) => {
-          const benefits: Record<string, string> = {
-            'energy-boost': 'Natural sugars and B-vitamins for sustained energy',
-            'weight-loss': 'Low in calories, high in fiber for satiety',
-            'digestive-health': 'Contains fiber and digestive enzymes',
-            'immunity-boost': 'Rich in vitamin C and antioxidants',
-            'skin-health': 'Antioxidants and vitamins for glowing skin',
-            'detox': 'Natural detoxifying compounds',
-            'muscle-gain': 'High protein content for muscle support',
-            'stress-relief': 'Adaptogens and calming nutrients'
-          };
-          return benefits[goal] || 'Supports overall health and wellness';
-        }) || ['Supports overall health and wellness'],
         tips: [
-          "For best results, use fresh ingredients when possible",
-          "Adjust liquid amount for desired consistency",
-          "Can be stored in refrigerator for up to 24 hours",
+          apiResponse.healthyDrink.prepTip,
+          apiResponse.healthyDrink.instructions,
+          "Store in refrigerator and consume within 24 hours",
           "Add ice for a refreshing cold drink"
         ],
         healthGoals: data.healthGoals || [],
         dietaryRestrictions: data.dietaryRestrictions || [],
-        servingSize: data.numberPeople || 1
+        servingSize: data.numberPeople || 1,
+        apiData: apiResponse // Store original API data
       };
 
-      setGeneratedDrink(mockDrink);
-      setShoppingList(baseIngredients);
+      setGeneratedDrink(transformedDrink);
+      setShoppingList(transformedDrink.ingredients);
       setIsGenerating(false);
-    }, 4000); // 4 seconds for animation
+      
+      toast.success("Healthy drink was created successfully!");
+      
+    } catch (error) {
+      console.error('Error generating drink:', error);
+      setIsGenerating(false);
+      toast.error("Failed to generate drink. Please try again.");
+    }
   };
 
   const toggleShoppingItem = (ingredientName: string) => {
@@ -117,6 +135,25 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       toast.success("Drink recipe saved to your collection!");
     }
   };
+
+  // Show generation interface if no drink has been generated yet
+  if (!isGenerating && !generatedDrink) {
+    return (
+      <div className="text-center space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-green-800 mb-2">Ready to Generate Your Drink</h2>
+          <p className="text-green-600">Click below to create your personalized healthy drink</p>
+        </div>
+        <Button
+          onClick={generateDrink}
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+        >
+          <Zap className="h-5 w-5 mr-2" />
+          Generate AI Drink
+        </Button>
+      </div>
+    );
+  }
 
   if (isGenerating) {
     return (
