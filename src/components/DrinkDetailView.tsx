@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +59,6 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   };
 
   const watchRecipeVideo = () => {
-    // Mock video URL - in real app this would be from the API
     const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(drink.drink_name + ' recipe')}`;
     window.open(videoUrl, '_blank');
   };
@@ -71,19 +71,62 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" onClick={onBack} className="flex items-center space-x-2">
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Drinks</span>
+      {/* Header - Made responsive */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <Button variant="ghost" onClick={onBack} className="p-2">
+          <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-green-800">{drink.drink_name}</h1>
-          <p className="text-green-600">{healthyDrink.name}</p>
+        <div className="flex-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{drink.drink_name}</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">{healthyDrink.name}</p>
         </div>
       </div>
 
+      {/* Quick Stats Cards - Made more compact for mobile */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
+            <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mb-1 sm:mb-2" />
+            <div className="text-center">
+              <p className="text-sm sm:text-lg font-bold">{healthyDrink.cookingTime}</p>
+              <p className="text-xs text-gray-600">min</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
+            <Users className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 mb-1 sm:mb-2" />
+            <div className="text-center">
+              <p className="text-sm sm:text-lg font-bold">{drink.numberPeople}</p>
+              <p className="text-xs text-gray-600">Servings</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
+            <Droplets className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 mb-1 sm:mb-2" />
+            <div className="text-center">
+              <p className="text-sm sm:text-lg font-bold">{healthyDrink.calories}</p>
+              <p className="text-xs text-gray-600">Cal</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white/70 backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
+            <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 mb-1 sm:mb-2" />
+            <div className="text-center">
+              <p className="text-sm sm:text-lg font-bold">{drink.drinkPlan.totalCarbonFootprint}</p>
+              <p className="text-xs text-gray-600">kg CO₂</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content - Responsive Grid */}
       <div className="grid lg:grid-cols-3 gap-6">
+        {/* Main Content - Left Side */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Description & Benefits Card */}
           <Card>
             <CardHeader>
               <CardTitle className="text-green-800">Description & Benefits</CardTitle>
@@ -104,11 +147,12 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             </CardContent>
           </Card>
 
+          {/* Preparation Steps Card */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <CardTitle className="text-green-800">Preparation Steps</CardTitle>
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -118,7 +162,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                     <Play className="h-4 w-4" />
                     <span>Watch Video</span>
                   </Button>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 self-center">
                     {completedSteps.length}/{healthyDrink.steps.length} completed
                   </span>
                 </div>
@@ -129,16 +173,16 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                 {healthyDrink.steps.map((step, index) => (
                   <div key={index} className="flex space-x-3">
                     <div 
-                      className="flex-shrink-0 cursor-pointer"
+                      className="flex-shrink-0 cursor-pointer mt-1"
                       onClick={() => toggleStepCompletion(index)}
                     >
                       {completedSteps.includes(index) ? (
-                        <CheckCircle2 className="h-6 w-6 text-green-500" />
+                        <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
                       ) : (
-                        <Circle className="h-6 w-6 text-gray-400 hover:text-green-500" />
+                        <Circle className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 hover:text-green-500" />
                       )}
                     </div>
-                    <p className={`text-gray-700 ${
+                    <p className={`text-sm sm:text-base text-gray-700 ${
                       completedSteps.includes(index) ? 'line-through text-gray-400' : ''
                     }`}>
                       <span className="font-medium text-green-600 mr-2">Step {index + 1}:</span>
@@ -151,71 +195,74 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
           </Card>
         </div>
 
+        {/* Sidebar - Right Side */}
         <div className="space-y-6">
+          {/* Drink Type & Quick Info */}
           <Card>
             <CardHeader>
               <CardTitle className="text-green-800 flex items-center space-x-2">
                 <Eye className="h-5 w-5" />
-                <span>Quick Info</span>
+                <span>Drink Info</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600 flex items-center space-x-1">
-                  <Clock className="h-4 w-4" />
-                  <span>Prep Time</span>
-                </span>
-                <span className="font-medium">{healthyDrink.cookingTime} min</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600 flex items-center space-x-1">
-                  <Users className="h-4 w-4" />
-                  <span>Servings</span>
-                </span>
-                <span className="font-medium">{drink.numberPeople}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600 flex items-center space-x-1">
-                  <Droplets className="h-4 w-4" />
-                  <span>Calories</span>
-                </span>
-                <span className="font-medium">{healthyDrink.calories}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600 flex items-center space-x-1">
-                  <Leaf className="h-4 w-4" />
-                  <span>Carbon Footprint</span>
-                </span>
-                <span className="font-medium">{drink.drinkPlan.totalCarbonFootprint}kg CO₂</span>
-              </div>
-              <Separator />
               <div>
                 <p className="text-sm font-medium text-green-700 mb-2">Drink Type</p>
-                <Badge variant="secondary">{healthyDrink.drinkType}</Badge>
+                <Badge variant="secondary" className="capitalize">{healthyDrink.drinkType}</Badge>
+              </div>
+              <Separator />
+              <div className="space-y-2">
+                {drink.healthGoals && drink.healthGoals.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-green-700 mb-2">Health Goals</p>
+                    <div className="flex flex-wrap gap-1">
+                      {drink.healthGoals.map((goal, index) => (
+                        <Badge key={index} variant="outline" className="text-xs capitalize">
+                          {goal}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {drink.dietaryRestrictions && drink.dietaryRestrictions.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-green-700 mb-2">Dietary</p>
+                    <div className="flex flex-wrap gap-1">
+                      {drink.dietaryRestrictions.map((restriction, index) => (
+                        <Badge key={index} variant="outline" className="text-xs capitalize">
+                          {restriction}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
 
+          {/* Nutritional Info */}
           <Card>
             <CardHeader>
               <CardTitle className="text-green-800">Nutritional Info</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Protein</span>
-                <span className="font-medium">{healthyDrink.nutritionalInfo.protein}g</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Fat</span>
-                <span className="font-medium">{healthyDrink.nutritionalInfo.fat}g</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Carbs</span>
-                <span className="font-medium">{healthyDrink.nutritionalInfo.carbohydrates}g</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Fiber</span>
-                <span className="font-medium">{healthyDrink.nutritionalInfo.fiber}g</span>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Protein</span>
+                  <span className="font-medium">{healthyDrink.nutritionalInfo.protein}g</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Fat</span>
+                  <span className="font-medium">{healthyDrink.nutritionalInfo.fat}g</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Carbs</span>
+                  <span className="font-medium">{healthyDrink.nutritionalInfo.carbohydrates}g</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Fiber</span>
+                  <span className="font-medium">{healthyDrink.nutritionalInfo.fiber}g</span>
+                </div>
               </div>
               <Separator />
               <div>
@@ -231,6 +278,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             </CardContent>
           </Card>
 
+          {/* Ingredients */}
           <Card>
             <CardHeader>
               <CardTitle className="text-green-800 flex items-center justify-between">
@@ -248,9 +296,9 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               <CardContent>
                 <div className="space-y-2">
                   {healthyDrink.ingredients.map((ingredient, index) => (
-                    <div key={index} className="flex justify-between items-center py-1">
-                      <span className="text-gray-700 capitalize">{ingredient.name}</span>
-                      <span className="text-sm text-gray-500">
+                    <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                      <span className="text-sm sm:text-base text-gray-700 capitalize">{ingredient.name}</span>
+                      <span className="text-xs sm:text-sm text-gray-500 font-medium">
                         {ingredient.quantity} {ingredient.unit}
                       </span>
                     </div>
@@ -260,6 +308,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             )}
           </Card>
 
+          {/* Action Buttons - Made responsive */}
           <div className="space-y-3">
             <Button 
               onClick={openShoppingModal}
@@ -279,16 +328,17 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
         </div>
       </div>
 
+      {/* Pro Tip - Made responsive */}
       {healthyDrink.prepTip && (
         <Card className="border-blue-200 bg-blue-50">
           <CardContent className="pt-6">
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-blue-500 rounded-full">
+            <div className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-3">
+              <div className="p-2 bg-blue-500 rounded-full flex-shrink-0">
                 <Droplets className="h-4 w-4 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h4 className="font-medium text-blue-800 mb-1">Pro Tip</h4>
-                <p className="text-blue-700">{healthyDrink.prepTip}</p>
+                <p className="text-sm sm:text-base text-blue-700">{healthyDrink.prepTip}</p>
               </div>
             </div>
           </CardContent>
