@@ -218,9 +218,20 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       const transformedPlan = transformApiMealPlanToLocal(apiResponse);
       console.log('Transformed plan:', transformedPlan);
 
-      // Store the created plan and show success modal
+      // Store the created plan first
       setCreatedPlan(transformedPlan);
-      setShowSuccessModal(true);
+      
+      // Show success toast immediately
+      toast({
+        title: "🎉 Meal Plan Created Successfully!",
+        description: `Your ${numberOfDays}-day meal plan "${planName}" is ready to explore.`,
+        duration: 8000,
+      });
+
+      // Add a small delay before showing modal to ensure state is updated
+      setTimeout(() => {
+        setShowSuccessModal(true);
+      }, 100);
 
       // Add to context
       onPlanCreated(transformedPlan);
@@ -257,6 +268,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   };
 
   const handleViewMealPlan = () => {
+    console.log('Viewing meal plan:', createdPlan);
     setShowSuccessModal(false);
     setShowPlanView(true);
   };
@@ -291,18 +303,20 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     <div className="space-y-6">
       <LoaderComponent />
       
-      {/* Success Modal */}
-      <MealPlanSuccessModal
-        isOpen={showSuccessModal}
-        onClose={handleCloseSuccessModal}
-        onViewPlan={handleViewMealPlan}
-        mealPlan={createdPlan ? {
-          name: createdPlan.name,
-          numberOfDays: numberOfDays,
-          numberOfPersons: numberOfPersons,
-          mealsPerDay: mealsPerDay
-        } : undefined}
-      />
+      {/* Success Modal - Make sure it's always rendered when state is true */}
+      {showSuccessModal && createdPlan && (
+        <MealPlanSuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleCloseSuccessModal}
+          onViewPlan={handleViewMealPlan}
+          mealPlan={{
+            name: createdPlan.name,
+            numberOfDays: numberOfDays,
+            numberOfPersons: numberOfPersons,
+            mealsPerDay: mealsPerDay
+          }}
+        />
+      )}
       
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack}>
