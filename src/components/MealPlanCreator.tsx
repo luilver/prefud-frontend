@@ -214,16 +214,11 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       // Hide the loader
       hideLoader();
 
-      // Check if the response indicates success (status 201 or successful response)
-      const isSuccess = apiResponse && (
-        apiResponse.status === 201 || 
-        apiResponse.id || 
-        apiResponse.meal_plan_id || 
-        !apiResponse.error
-      );
+      // Check if the response indicates success - API returns the meal plan object directly
+      const isSuccess = apiResponse && apiResponse._id && apiResponse.plan;
 
       if (!isSuccess) {
-        throw new Error(apiResponse?.error || 'Failed to create meal plan');
+        throw new Error('Failed to create meal plan - invalid response format');
       }
 
       // Transform the API response to match our local format
@@ -300,7 +295,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const handleViewSuccessPlan = () => {
     if (createdPlan) {
       setShowSuccessModal(false);
-      setSelectedMealPlan(createdPlan);
       setShowPlanView(true);
     }
   };
