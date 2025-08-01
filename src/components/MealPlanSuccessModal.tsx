@@ -1,11 +1,12 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Sparkles, Calendar, Users, Clock } from "lucide-react";
+import { CheckCircle, Sparkles, Calendar, Users, Clock, Eye } from "lucide-react";
 
 interface MealPlanSuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onViewPlan?: () => void;
   mealPlan?: {
     name: string;
     numberOfDays: number;
@@ -14,7 +15,7 @@ interface MealPlanSuccessModalProps {
   };
 }
 
-const MealPlanSuccessModal = ({ isOpen, onClose, mealPlan }: MealPlanSuccessModalProps) => {
+const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPlanSuccessModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -56,13 +57,24 @@ const MealPlanSuccessModal = ({ isOpen, onClose, mealPlan }: MealPlanSuccessModa
             </div>
           )}
           
-          <div className="pt-4">
+          <div className="pt-4 space-y-3">
+            {onViewPlan && (
+              <Button 
+                onClick={onViewPlan}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                View Meal Plan Details
+              </Button>
+            )}
+            
             <Button 
               onClick={onClose}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              variant="outline"
+              className="w-full"
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              View My Meal Plans
+              Back to Meal Plans
             </Button>
           </div>
         </div>

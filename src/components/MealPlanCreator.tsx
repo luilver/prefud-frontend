@@ -11,6 +11,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
+import MealPlanSuccessModal from "./MealPlanSuccessModal";
+import MealPlanView from "./MealPlanView";
 
 interface MealPlanCreatorProps {
   onPlanCreated: (plan: any) => void;
@@ -35,6 +37,9 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [newDislike, setNewDislike] = useState("");
   const [healthGoals, setHealthGoals] = useState<string[]>([]);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdPlan, setCreatedPlan] = useState<any>(null);
+  const [showPlanView, setShowPlanView] = useState(false);
   
   const { user, refreshMealPlans } = useUser();
   const { language } = useLanguage();
@@ -213,14 +218,11 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       const transformedPlan = transformApiMealPlanToLocal(apiResponse);
       console.log('Transformed plan:', transformedPlan);
 
-      // Show success toast
-      toast({
-        title: "Meal Plan Created Successfully!",
-        description: `Your ${numberOfDays}-day meal plan "${planName}" is ready to explore.`,
-        duration: 5000,
-      });
+      // Store the created plan and show success modal
+      setCreatedPlan(transformedPlan);
+      setShowSuccessModal(true);
 
-      // Add to context and navigate
+      // Add to context
       onPlanCreated(transformedPlan);
 
       // Refresh meal plans from server
@@ -254,9 +256,46 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     return endDateObj.toISOString().split('T')[0];
   };
 
+  const handleViewMealPlan = () => {
+    setShowSuccessModal(false);
+    setShowPlanView(true);
+  };
+
+  const handleBackFromPlanView = () => {
+    setShowPlanView(false);
+    onBack(); // Navigate back to meal planner
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    onBack(); // Navigate back to meal planner
+  };
+
+  if (showPlanView && createdPlan) {
+    return (
+      <MealPlanView
+        plan={createdPlan}
+        onBack={handleBackFromPlanView}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <LoaderComponent />
+      
+      {/* Success Modal */}
+      <MealPlanSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+        onViewPlan={handleViewMealPlan}
+        mealPlan={createdPlan ? {
+          name: createdPlan.name,
+          numberOfDays: numberOfDays,
+          numberOfPersons: numberOfPersons,
+          mealsPerDay: mealsPerDay
+        } : undefined}
+      />
       
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack}>
