@@ -271,11 +271,18 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     onBack(); // Navigate back to meal planner
   };
 
+  const handleEditPlan = () => {
+    // For now, just go back to the creator form - user can edit by creating a new plan
+    setShowPlanView(false);
+    // Stay on the creator form so user can modify settings
+  };
+
   if (showPlanView && createdPlan) {
     return (
       <MealPlanView
         plan={createdPlan}
         onBack={handleBackFromPlanView}
+        onEdit={handleEditPlan}
       />
     );
   }
