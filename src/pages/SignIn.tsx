@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,7 +73,7 @@ const SignIn = () => {
 
   if (showPasswordRecovery) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted to-secondary/20 flex items-center justify-center p-4">
         <PasswordRecovery onBack={() => setShowPasswordRecovery(false)} />
         <Toaster />
       </div>
@@ -82,21 +81,25 @@ const SignIn = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-green-100">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted to-secondary/20">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-green-200">
+      <header className="bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
-              <Utensils className="h-6 w-6 text-white" />
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 bg-gradient-to-r from-primary to-accent rounded-xl shadow-md">
+              <Utensils className="h-6 w-6 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Pantry
             </h1>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <LanguageSelector variant="button" />
-            <Button variant="ghost" onClick={() => navigate('/')} className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')} 
+              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
               <ArrowLeft className="h-4 w-4" />
               <span>{t('common.back')} to {t('nav.home')}</span>
             </Button>
@@ -107,37 +110,46 @@ const SignIn = () => {
       {/* Sign In Form */}
       <section className="py-8 md:py-20 px-4">
         <div className="container mx-auto max-w-md">
-          <Card className="bg-white/90 backdrop-blur-sm border-green-200 shadow-2xl">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl md:text-3xl text-green-700 mb-2">{t('signin.title')}</CardTitle>
-              <CardDescription className="text-base md:text-lg">
+          <Card className="bg-card/95 backdrop-blur-lg border-border/50 shadow-2xl">
+            <CardHeader className="text-center space-y-4 pb-8">
+              <div className="mx-auto p-3 bg-gradient-to-r from-primary to-accent rounded-xl w-fit">
+                <Utensils className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <CardTitle className="text-2xl md:text-3xl text-foreground font-bold">
+                {t('signin.title')}
+              </CardTitle>
+              <CardDescription className="text-base md:text-lg text-muted-foreground">
                 {t('signin.subtitle')}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <Label htmlFor="email" className="text-base">{t('signin.email')}</Label>
+            <CardContent className="space-y-6">
+              <form onSubmit={handleLogin} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-base font-medium text-foreground">
+                    {t('signin.email')}
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="border-green-200 focus:border-green-400 h-12 text-base mt-1"
+                    className="border-border/50 focus:border-primary bg-background/50 h-12 text-base transition-colors"
                     placeholder={t('signin.email.placeholder')}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="password" className="text-base">{t('signin.password')}</Label>
-                  <div className="relative mt-1">
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-base font-medium text-foreground">
+                    {t('signin.password')}
+                  </Label>
+                  <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="border-green-200 focus:border-green-400 h-12 text-base pr-12"
+                      className="border-border/50 focus:border-primary bg-background/50 h-12 text-base pr-12 transition-colors"
                       placeholder={t('signin.password.placeholder')}
                     />
                     <Button
@@ -148,9 +160,9 @@ const SignIn = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-400" />
+                        <EyeOff className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
                       ) : (
-                        <Eye className="h-5 w-5 text-gray-400" />
+                        <Eye className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
                       )}
                     </Button>
                   </div>
@@ -159,7 +171,7 @@ const SignIn = () => {
                   <Button 
                     type="button"
                     variant="link" 
-                    className="text-green-600 hover:text-green-700 p-0"
+                    className="text-primary hover:text-primary/80 p-0 font-medium"
                     onClick={() => setShowPasswordRecovery(true)}
                   >
                     {t('signin.forgot-password')}
@@ -167,20 +179,20 @@ const SignIn = () => {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-12 text-base bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isLoading}
                 >
                   {isLoading ? t('signin.signing-in') : t('signin.button')}
                 </Button>
               </form>
               
-              <div className="mt-6 text-center">
-                <p className="text-gray-600">
+              <div className="text-center pt-4 border-t border-border/50">
+                <p className="text-muted-foreground">
                   {t('signin.no-account')}{' '}
                   <Button
                     variant="link"
                     onClick={() => navigate('/signup')}
-                    className="text-green-600 hover:text-green-700 p-0 font-semibold"
+                    className="text-primary hover:text-primary/80 p-0 font-semibold"
                   >
                     {t('signin.create-here')}
                   </Button>
@@ -191,7 +203,6 @@ const SignIn = () => {
         </div>
       </section>
       
-      {/* Add Toaster component */}
       <Toaster />
     </div>
   );
