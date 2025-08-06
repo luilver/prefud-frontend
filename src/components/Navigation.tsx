@@ -114,30 +114,6 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         )}
       </div>
 
-      {/* Collapse/Expand Toggle */}
-      <div className={cn(
-        "border-b border-green-200/60",
-        isCollapsed ? "p-2" : "p-4"
-      )}>
-        <Button
-          variant="ghost"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={cn(
-            "text-green-700 hover:bg-green-100/60 transition-all duration-200",
-            isCollapsed ? "w-full h-10 px-2" : "w-full justify-start h-10 px-3"
-          )}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <>
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              <span className="text-sm">Collapse</span>
-            </>
-          )}
-        </Button>
-      </div>
-
       {/* Navigation Items */}
       <div className="flex-1 p-2 space-y-1">
         {navItems.map((item) => {
@@ -165,9 +141,9 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         })}
       </div>
 
-      {/* Kitchen Decoration */}
+      {/* Kitchen Decoration - moved up */}
       {!isCollapsed && (
-        <div className="p-4 border-t border-green-200/60">
+        <div className="p-4">
           <div className="flex items-center justify-center space-x-2 text-green-500/30">
             <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-orange-300/40 rounded-full animate-pulse delay-500"></div>
@@ -175,6 +151,30 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
           </div>
         </div>
       )}
+
+      {/* Collapse/Expand Toggle - moved to bottom */}
+      <div className={cn(
+        "border-t border-green-200/60",
+        isCollapsed ? "p-2" : "p-4"
+      )}>
+        <Button
+          variant="ghost"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={cn(
+            "text-green-700 hover:bg-green-100/60 transition-all duration-200",
+            isCollapsed ? "w-full h-10 px-2" : "w-full justify-start h-10 px-3"
+          )}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <>
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              <span className="text-sm">Collapse</span>
+            </>
+          )}
+        </Button>
+      </div>
     </nav>
   );
 };
