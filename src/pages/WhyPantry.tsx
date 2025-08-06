@@ -5,7 +5,6 @@ import { Utensils, ArrowLeft, Leaf, Clock, DollarSign, Users, TrendingDown, Recy
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
-import Footer from "@/components/Footer";
 
 const WhyPantry = () => {
   const navigate = useNavigate();
@@ -332,7 +331,7 @@ const WhyPantry = () => {
             <Button 
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all bg-transparent"
+              className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all"
               onClick={() => navigate('/')}
             >
               {t('why-pantry.cta.secondary')}
@@ -340,8 +339,6 @@ const WhyPantry = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };

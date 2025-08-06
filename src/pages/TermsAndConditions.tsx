@@ -3,7 +3,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Scale, Shield, Bot, Cookie } from 'lucide-react';
-import Footer from '@/components/Footer';
 
 const TermsAndConditions = () => {
   return (
@@ -202,8 +201,6 @@ const TermsAndConditions = () => {
           </div>
         </div>
       </div>
-      
-      <Footer />
     </div>
   );
 };
