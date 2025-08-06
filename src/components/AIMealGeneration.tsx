@@ -1,549 +1,695 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Clock, Users, Zap, ChefHat, Save, ShoppingCart, Check, CheckSquare, Store, Package, Plus, MapPin, CreditCard } from "lucide-react";
-import { toast } from "sonner";
-import CocktailAnimation from "./CocktailAnimation";
-import { createMealPlan, ApiMealPlan } from "@/services/mealPlanService";
-import { useUser } from "@/contexts/UserContext";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { Badge } from "@/components/ui/badge";
+import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, ShoppingCart, Package, Plus } from "lucide-react";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
-import OrderOnlineModal from "./OrderOnlineModal";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useUser } from "@/contexts/UserContext";
+import { toast } from "sonner";
 
 interface AIMealGenerationProps {
   mealData: any;
-  onMealCreated?: (meal: any) => void;
+  onMealCreated: (meal: any) => void;
 }
 
 const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedMeal, setGeneratedMeal] = useState<any>(null);
+  const [meal, setMeal] = useState<any>(null);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingList, setShowShoppingList] = useState(false);
-  const [checkedIngredients, setCheckedIngredients] = useState<Record<string, boolean>>({});
-  const [showActionDialog, setShowActionDialog] = useState(false);
-  const [showOrderOnlineModal, setShowOrderOnlineModal] = useState(false);
-  const [completedSteps, setCompletedSteps] = useState<Record<number, boolean>>({});
-  const [cookingProgress, setCookingProgress] = useState(0);
-  
-  const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
-  const { language } = useLanguage();
-  const { showLoader, hideLoader, isLoading } = useCookingLoader();
+  const [shoppingList, setShoppingList] = useState<any[]>([]);
+  const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
+  const { user, addPantryItem } = useUser();
 
   useEffect(() => {
-    if (mealData && user?.id && !generatedMeal) {
-      generateMeal();
-    }
-  }, [mealData, user, language, generatedMeal]);
-
-  const getLanguageName = (languageCode: string) => {
-    const languageMap: { [key: string]: string } = {
-      'en': 'english',
-      'es': 'spanish',
-      'pt': 'portuguese',
-      'fr': 'french',
-      'de': 'german',
-      'it': 'italian'
-    };
-    return languageMap[languageCode.toLowerCase()] || 'english';
-  };
+    generateMeal();
+  }, []);
 
   const generateMeal = async () => {
-    if (!user?.id) {
-      toast.error("Please log in to generate a meal plan");
-      return;
-    }
-
-    setIsGenerating(true);
-    showLoader("Generating your personalized meal plan...");
-
-    try {
-      const requestData = {
-        user_id: user.id,
-        mealName: mealData.mealName || `Healthy ${mealData.type || 'Meal'}`,
-        numberPeople: mealData.numberPeople || 1,
-        dietaryRestrictions: mealData.dietaryRestrictions || [],
-        cuisinePreferences: mealData.cuisinePreferences || [],
-        allergiesIntolerance: mealData.allergiesIntolerance || [],
-        dislikes: mealData.dislikes || "",
-        maxCookingTime: mealData.maxCookingTime || 30,
-        cookingSkillLevel: mealData.cookingSkillLevel || "intermediate",
-        budgetRange: mealData.budgetRange || "medium",
-        mealType: mealData.type || "dinner",
-        language: getLanguageName(language),
-        healthGoals: mealData.healthGoals || []
+    showLoader("Analyzing your preferences and creating the perfect meal...");
+    
+    // Simulate API call with realistic data
+    setTimeout(() => {
+      const generatedMeal = {
+        id: Date.now().toString(),
+        name: getRandomMealName(),
+        description: "A delightful fusion of flavors that will satisfy your taste buds.",
+        cookingTime: Math.floor(Math.random() * 40) + 20,
+        servings: mealData.servings || 2,
+        difficulty: mealData.cookingSkillLevel || "Medium",
+        cuisine: mealData.cuisinePreferences?.[0] || "Fusion",
+        calories: Math.floor(Math.random() * 300) + 300,
+        ingredients: generateIngredients(),
+        instructions: generateInstructions(),
+        nutritionalInfo: generateNutritionalInfo(),
+        tags: generateTags(mealData)
       };
-
-      console.log('Generating meal with request data:', requestData);
-
-      const apiResponse = await createMealPlan(requestData);
-
-      // Transform API response to match our local format
-      const transformedMeal = {
-        name: apiResponse.mealPlan.name,
-        type: apiResponse.mealPlan.mealType,
-        description: apiResponse.mealPlan.description,
-        cookingTime: `${apiResponse.mealPlan.cookingTime} minutes`,
-        servings: mealData.numberPeople || 1,
-        calories: apiResponse.mealPlan.calories,
-        difficulty: apiResponse.mealPlan.difficulty,
-        ingredients: apiResponse.mealPlan.ingredients.map(ing => ({
-          name: ing.name,
-          amount: `${ing.quantity} ${ing.unit}`,
-          category: apiResponse.ingredientsList.find(item => item.name === ing.name)?.classification || 'Other'
-        })),
-        instructions: apiResponse.mealPlan.steps,
-        nutritionHighlights: [
-          apiResponse.mealPlan.benefits,
-          `Rich in vitamins: ${apiResponse.mealPlan.nutritionalInfo.vitamins.join(', ')}`,
-          `${apiResponse.mealPlan.nutritionalInfo.protein}g protein, ${apiResponse.mealPlan.nutritionalInfo.fiber}g fiber`
-        ],
-        videoTutorials: [
-          "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "https://www.youtube.com/watch?v=SBmSRK3feww"
-        ],
-        healthGoals: mealData.healthGoals || [],
-        dietaryRestrictions: mealData.dietaryRestrictions || [],
-        servingSize: mealData.numberPeople || 1,
-        apiData: apiResponse // Store original API data
-      };
-
-      setGeneratedMeal(transformedMeal);
-      setIsGenerating(false);
+      setMeal(generatedMeal);
       hideLoader();
-      toast.success("Healthy meal plan was created successfully!");
-
-    } catch (error) {
-      console.error('Error generating meal:', error);
-      setIsGenerating(false);
-      hideLoader();
-      toast.error("Failed to generate meal. Please try again.");
-    }
+    }, 3000);
   };
 
-  const toggleIngredientCheck = (ingredientName: string, checked: boolean) => {
-    setCheckedIngredients(prev => ({
-      ...prev,
-      [ingredientName]: checked
-    }));
+  const getRandomMealName = () => {
+    const names = [
+      "Hearty Veggie Bowl",
+      "Mediterranean Delight", 
+      "Asian Fusion Stir-fry",
+      "Protein Power Plate",
+      "Garden Fresh Salad",
+      "Spiced Comfort Bowl",
+      "Healthy Harvest Mix",
+      "Savory Quinoa Bowl"
+    ];
+    return names[Math.floor(Math.random() * names.length)];
   };
 
-  const handleSelectAll = () => {
-    if (!generatedMeal?.ingredients) return;
-    
-    const allChecked = generatedMeal.ingredients.every((ing: any) => checkedIngredients[ing.name]);
-    const newCheckedItems: Record<string, boolean> = {};
-    
-    if (!allChecked) {
-      // Select all items
-      generatedMeal.ingredients.forEach((ing: any) => {
-        newCheckedItems[ing.name] = true;
-      });
-    }
-    // If all are checked, uncheck all (empty object)
-    
-    setCheckedIngredients(newCheckedItems);
+  const generateIngredients = () => {
+    const baseIngredients = [
+      { name: "quinoa", quantity: "1", unit: "cup" },
+      { name: "mixed vegetables", quantity: "2", unit: "cups" },
+      { name: "olive oil", quantity: "2", unit: "tbsp" },
+      { name: "garlic", quantity: "2", unit: "cloves" },
+      { name: "onion", quantity: "1", unit: "medium" },
+      { name: "bell pepper", quantity: "1", unit: "large" },
+      { name: "salt", quantity: "1", unit: "tsp" },
+      { name: "black pepper", quantity: "1/2", unit: "tsp" }
+    ];
+    return baseIngredients.slice(0, Math.floor(Math.random() * 3) + 6);
   };
 
-  const getSelectedIngredients = () => {
-    if (!generatedMeal?.ingredients) return [];
-    
-    return generatedMeal.ingredients
-      .filter((ing: any) => checkedIngredients[ing.name])
-      .map((ing: any) => ({
-        id: `ingredient-${ing.name}`,
-        name: ing.name,
-        quantity: ing.amount.split(' ')[0] || '1',
-        unit: ing.amount.split(' ').slice(1).join(' ') || 'item',
-        category: ing.category || 'Other',
-        mealName: generatedMeal.name,
-        estimatedPrice: parseFloat((Math.random() * 5 + 1).toFixed(2)),
-        notes: `From AI meal: ${generatedMeal.name}`
-      }));
+  const generateInstructions = () => {
+    return [
+      "Prepare all ingredients by washing and chopping as needed.",
+      "Heat oil in a large pan over medium-high heat.",
+      "Add aromatics and cook until fragrant, about 2-3 minutes.",
+      "Add main ingredients and cook according to type and preference.",
+      "Season with salt, pepper, and selected spices.",
+      "Combine all elements and cook until heated through.",
+      "Taste and adjust seasoning as needed.",
+      "Serve hot and enjoy!"
+    ];
   };
 
-  const handleAddToPantry = () => {
-    const selectedIngredients = getSelectedIngredients();
-    
-    if (selectedIngredients.length === 0) {
-      toast.error("Please select ingredients to add to your pantry.");
-      return;
-    }
+  const generateNutritionalInfo = () => {
+    const calories = meal?.calories || 400;
+    return {
+      calories,
+      protein: Math.floor(calories * 0.25 / 4),
+      carbs: Math.floor(calories * 0.45 / 4),
+      fat: Math.floor(calories * 0.30 / 9),
+      fiber: Math.floor(Math.random() * 8) + 5
+    };
+  };
 
-    selectedIngredients.forEach(ingredient => {
-      addPantryItem({
+  const generateTags = (prefs: any) => {
+    const tags = [];
+    if (prefs.healthGoals) tags.push(...prefs.healthGoals.slice(0, 2));
+    if (prefs.dietaryRestrictions) tags.push(...prefs.dietaryRestrictions.slice(0, 2));
+    tags.push("Quick", "Healthy", "Comfort Food");
+    return [...new Set(tags)].slice(0, 4);
+  };
+
+  const generateShoppingList = () => {
+    if (!meal) return;
+    
+    showLoader("Generating your shopping list...");
+    
+    setTimeout(() => {
+      const list = meal.ingredients.map((ingredient: any, index: number) => ({
+        id: `${meal.id}-ingredient-${index}`,
         name: ingredient.name,
-        quantity: parseInt(ingredient.quantity) || 1,
+        quantity: ingredient.quantity,
         unit: ingredient.unit,
-        category: 'meal-ingredient',
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        purchaseDate: new Date(),
-        notes: ingredient.notes
-      });
-    });
-
-    setCheckedIngredients({});
-    setShowActionDialog(false);
-    toast.success(`${selectedIngredients.length} ingredients added to your pantry!`);
+        category: getCategoryForIngredient(ingredient.name),
+        estimatedPrice: Math.floor(Math.random() * 800) + 200, // $2-10
+        mealName: meal.name,
+        notes: `For ${meal.name} recipe`
+      }));
+      
+      setShoppingList(list);
+      setShowShoppingList(true);
+      hideLoader();
+      toast.success("Shopping list generated!");
+    }, 1500);
   };
 
-  const handleOrderOnline = () => {
-    const selectedIngredients = getSelectedIngredients();
-    
-    if (selectedIngredients.length === 0) {
-      toast.error("Please select ingredients to order online.");
-      return;
-    }
-
-    setShowActionDialog(false);
-    setShowOrderOnlineModal(true);
+  const getCategoryForIngredient = (ingredientName: string) => {
+    const categories: { [key: string]: string } = {
+      'quinoa': 'grains',
+      'mixed vegetables': 'produce',
+      'olive oil': 'condiments',
+      'garlic': 'produce',
+      'onion': 'produce',
+      'bell pepper': 'produce',
+      'salt': 'spices',
+      'black pepper': 'spices'
+    };
+    return categories[ingredientName.toLowerCase()] || 'other';
   };
 
   const toggleStep = (stepIndex: number) => {
-    setCompletedSteps(prev => {
-      const newState = { ...prev, [stepIndex]: !prev[stepIndex] };
-      const completedCount = Object.values(newState).filter(Boolean).length;
-      const totalSteps = generatedMeal?.instructions?.length || 0;
-      setCookingProgress((completedCount / totalSteps) * 100);
-      return newState;
-    });
-  };
-
-  const saveMeal = () => {
-    if (generatedMeal && onMealCreated) {
-      onMealCreated(generatedMeal);
-      toast.success("Meal recipe saved successfully!");
+    if (completedSteps.includes(stepIndex)) {
+      setCompletedSteps(completedSteps.filter(i => i !== stepIndex));
     } else {
-      toast.success("Meal recipe saved to your collection!");
+      setCompletedSteps([...completedSteps, stepIndex]);
     }
   };
 
-  if (isGenerating) {
+  const openFullscreenVideo = () => {
+    setIsFullscreen(true);
+    setIsVideoPlaying(true);
+  };
+
+  const closeFullscreenVideo = () => {
+    setIsFullscreen(false);
+    setIsVideoPlaying(false);
+  };
+
+  const handleSaveMeal = () => {
+    if (meal) {
+      // Save meal logic here - for now just show success and call parent
+      onMealCreated(meal);
+      toast.success("Meal saved successfully!");
+    }
+  };
+
+  const handleAddToPantry = (item: any) => {
+    addPantryItem({
+      name: item.name,
+      quantity: parseFloat(item.quantity) || 1,
+      unit: item.unit || 'piece',
+      category: item.category || 'other',
+      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      purchaseDate: new Date(),
+      notes: item.notes || `Added from ${item.mealName}`
+    });
+    toast.success(`${item.name} added to pantry!`);
+  };
+
+  const handleOrderOnline = (item: any) => {
+    // Simulate online ordering
+    toast.success(`${item.name} added to online cart!`);
+  };
+
+  const enhancedInstructions = useMemo(() => {
+    if (!meal) return [];
+    
+    const cookingTips = [
+      "🔥 Heat your pan to medium-high heat",
+      "⏱️ Don't rush this step - patience makes perfect!",
+      "👨‍🍳 Pro tip: Taste as you go",
+      "🌟 This is where the magic happens",
+      "💡 Keep stirring to prevent sticking",
+      "🎯 Almost there - you're doing great!",
+      "✨ The aroma should be amazing now",
+      "🏆 Final stretch - you've got this!"
+    ];
+    
+    return meal.instructions.map((instruction: string, index: number) => ({
+      text: instruction,
+      tip: cookingTips[index % cookingTips.length],
+      estimatedTime: 2 + (index % 5)
+    }));
+  }, [meal?.instructions]);
+
+  const nutrition = useMemo(() => {
+    if (!meal) return null;
+    return generateNutritionalInfo();
+  }, [meal]);
+
+  if (isLoading || !meal) {
     return (
-      <div className="text-center space-y-8">
-        <div>
-          <h2 className="text-2xl font-bold text-green-800 mb-2">AI is Creating Your Meal Plan</h2>
-          <p className="text-green-600">Analyzing your preferences to create the perfect healthy meal...</p>
-        </div>
-        <CocktailAnimation />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+        <LoaderComponent />
       </div>
     );
   }
 
-  if (!mealData) {
+  // Shopping List View
+  if (showShoppingList) {
     return (
-      <div className="text-center space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-green-800 mb-2">Ready to Generate Your Meal Plan</h2>
-          <p className="text-green-600">Click below to create your personalized healthy meal plan</p>
+      <div className="max-w-4xl mx-auto space-y-6 p-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => setShowShoppingList(false)} className="p-2">
+              ← Back to Recipe
+            </Button>
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Shopping List</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
+                For {meal.name} • {shoppingList.length} items
+              </p>
+            </div>
+          </div>
         </div>
-        <Button
-          onClick={generateMeal}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
-        >
-          <Zap className="h-5 w-5 mr-2" />
-          Generate AI Meal
-        </Button>
-      </div>
-    );
-  }
 
-  if (!generatedMeal) {
-    return (
-      <div className="text-center">
-        <p className="text-red-600">Failed to generate meal. Please try again.</p>
-        <Button onClick={generateMeal} className="mt-4">
-          Retry Generation
-        </Button>
+        {/* Shopping List */}
+        <div className="space-y-4">
+          {Object.entries(
+            shoppingList.reduce((acc: any, item: any) => {
+              const category = item.category || 'other';
+              if (!acc[category]) acc[category] = [];
+              acc[category].push(item);
+              return acc;
+            }, {})
+          ).map(([category, items]: [string, any]) => (
+            <Card key={category}>
+              <CardHeader>
+                <CardTitle className="text-lg capitalize flex items-center justify-between">
+                  <span>{category}</span>
+                  <Badge variant="secondary">{items.length} items</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {items.map((item: any) => (
+                    <div 
+                      key={item.id} 
+                      className="flex items-center justify-between p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium capitalize">{item.name}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {item.mealName}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {item.quantity} {item.unit}
+                          {item.notes && ` • ${item.notes}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {item.estimatedPrice && (
+                          <div className="text-sm font-medium text-green-600">
+                            ${(item.estimatedPrice / 100).toFixed(2)}
+                          </div>
+                        )}
+                        <div className="flex gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAddToPantry(item)}
+                            className="h-8"
+                          >
+                            <Package className="h-4 w-4 mr-1" />
+                            Add to Pantry
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleOrderOnline(item)}
+                            className="h-8"
+                          >
+                            <ShoppingCart className="h-4 w-4 mr-1" />
+                            Order Online
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Total Summary */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-semibold">Total Items: {shoppingList.length}</p>
+                <p className="text-sm text-gray-600">
+                  Estimated Total: ${(shoppingList.reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100).toFixed(2)}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    shoppingList.forEach(item => handleAddToPantry(item));
+                  }}
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Add All to Pantry
+                </Button>
+                <Button
+                  onClick={() => {
+                    shoppingList.forEach(item => handleOrderOnline(item));
+                  }}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Order All Online
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-green-800 mb-2">{generatedMeal.name}</h2>
-        <p className="text-green-600">{generatedMeal.description}</p>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-green-200 text-center">
-          <CardContent className="p-4">
-            <Clock className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">{generatedMeal.cookingTime}</p>
-            <p className="text-xs text-green-600">Cooking Time</p>
-          </CardContent>
-        </Card>
-        <Card className="border-green-200 text-center">
-          <CardContent className="p-4">
-            <Users className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">{generatedMeal.servings} serving{generatedMeal.servings > 1 ? 's' : ''}</p>
-            <p className="text-xs text-green-600">Servings</p>
-          </CardContent>
-        </Card>
-        <Card className="border-green-200 text-center">
-          <CardContent className="p-4">
-            <Zap className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">{generatedMeal.calories} cal</p>
-            <p className="text-xs text-green-600">Calories</p>
-          </CardContent>
-        </Card>
-        <Card className="border-green-200 text-center">
-          <CardContent className="p-4">
-            <ChefHat className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">{generatedMeal.difficulty}</p>
-            <p className="text-xs text-green-600">Difficulty</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="ingredients" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
-          <TabsTrigger value="video">Video Tutorial</TabsTrigger>
-          <TabsTrigger value="steps">Cooking Steps</TabsTrigger>
-          <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="ingredients" className="space-y-4">
-          <Card className="border-green-200">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-green-800 flex items-center gap-2">
-                    <ShoppingCart className="h-5 w-5" />
-                    Ingredients ({generatedMeal.ingredients?.length || 0})
-                  </CardTitle>
-                  <p className="text-sm text-green-600 mt-1">
-                    Select ingredients you need and choose your preferred action
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={handleSelectAll}
-                  className="flex items-center gap-2"
-                >
-                  <CheckSquare className="h-4 w-4" />
-                  {generatedMeal.ingredients?.every((ing: any) => checkedIngredients[ing.name]) ? 'Unselect All' : 'Select All'}
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {generatedMeal.ingredients?.map((ingredient: any, index: number) => (
-                <div 
-                  key={index} 
-                  className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
-                    checkedIngredients[ingredient.name]
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-white border-gray-200 hover:border-green-300'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id={`ingredient-${index}`}
-                      checked={checkedIngredients[ingredient.name] || false}
-                      onCheckedChange={(checked) => toggleIngredientCheck(ingredient.name, checked as boolean)}
-                      className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                    />
-                    <div>
-                      <span className={`font-medium ${
-                        checkedIngredients[ingredient.name] ? 'text-green-700' : 'text-gray-700'
-                      }`}>
-                        {ingredient.name}
-                      </span>
-                      <p className="text-sm text-gray-500">{ingredient.amount} • {ingredient.category}</p>
-                    </div>
-                  </div>
-                  <Badge 
-                    variant={checkedIngredients[ingredient.name] ? "default" : "secondary"}
-                    className={checkedIngredients[ingredient.name] ? "bg-green-500" : ""}
-                  >
-                    {ingredient.category}
-                  </Badge>
-                </div>
-              ))}
-              
-              <Separator className="my-4" />
-              
-              <div className="flex justify-center">
-                <Button
-                  onClick={() => setShowActionDialog(true)}
-                  disabled={Object.values(checkedIngredients).filter(Boolean).length === 0}
-                  className="bg-green-600 hover:bg-green-700 text-white px-8"
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Pantry or Order Online ({Object.values(checkedIngredients).filter(Boolean).length})
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="video">
-          <Card className="border-green-200">
-            <CardHeader>
-              <CardTitle className="text-green-800">Video Tutorial</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {generatedMeal.videoTutorials?.map((video: string, index: number) => (
-                  <div key={index} className="relative aspect-w-16 aspect-h-9">
-                    <iframe
-                      src={video}
-                      title={`Video Tutorial ${index + 1}`}
-                      allowFullScreen
-                      className="rounded-md"
-                    />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="steps">
-          <Card className="border-green-200">
-            <CardHeader>
-              <CardTitle className="text-green-800">Cooking Steps</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {generatedMeal.instructions?.map((step: string, index: number) => (
-                  <div
-                    key={index}
-                    className={`flex items-start p-4 rounded-lg border transition-all ${completedSteps[index] ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200 hover:border-green-300'}`}
-                    onClick={() => toggleStep(index)}
-                  >
-                    <div className="mr-3">
-                      <Checkbox
-                        id={`step-${index}`}
-                        checked={completedSteps[index] || false}
-                        onCheckedChange={() => toggleStep(index)}
-                        className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p className={`text-green-700 ${completedSteps[index] ? 'line-through text-green-500' : ''}`}>
-                        {step}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Separator className="my-4" />
-              <progress value={cookingProgress} max="100" className="w-full h-2 rounded-full bg-gray-200 appearance-none">
-                {cookingProgress}%
-              </progress>
-              <div className="text-center text-sm text-gray-500 mt-2">
-                {cookingProgress.toFixed(0)}% Complete
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="nutrition">
-          <Card className="border-green-200">
-            <CardHeader>
-              <CardTitle className="text-green-800">Nutrition Facts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {generatedMeal.nutritionHighlights?.map((benefit: string, index: number) => (
-                  <div key={index} className="flex items-start space-x-2">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-                    <span className="text-green-700">{benefit}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Action Selection Dialog */}
-      <Dialog open={showActionDialog} onOpenChange={setShowActionDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Choose Action for Selected Ingredients</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-gray-600">
-              You have selected {Object.values(checkedIngredients).filter(Boolean).length} ingredients. 
-              What would you like to do with them?
-            </p>
-            
-            <div className="bg-gray-50 p-3 rounded">
-              <p className="text-sm font-medium mb-2">Selected ingredients:</p>
-              <div className="text-sm text-gray-600">
-                {generatedMeal.ingredients
-                  ?.filter((ing: any) => checkedIngredients[ing.name])
-                  .slice(0, 3)
-                  .map((ing: any) => ing.name)
-                  .join(', ')}
-                {Object.values(checkedIngredients).filter(Boolean).length > 3 && 
-                  ` +${Object.values(checkedIngredients).filter(Boolean).length - 3} more`}
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <Button 
-                onClick={handleAddToPantry}
-                variant="outline"
-                className="flex flex-col items-center gap-2 h-auto py-4 border-green-300 text-green-700 hover:bg-green-50"
-              >
-                <Store className="h-6 w-6" />
-                <span>Add to Pantry</span>
-                <span className="text-xs text-gray-500">For items you have</span>
-              </Button>
-              
-              <Button 
-                onClick={handleOrderOnline}
-                variant="outline"
-                className="flex flex-col items-center gap-2 h-auto py-4 border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <Package className="h-6 w-6" />
-                <span>Order Online</span>
-                <span className="text-xs text-gray-500">Get them delivered</span>
-              </Button>
-            </div>
+    <>
+      <div className="max-w-4xl mx-auto space-y-6 p-4">
+        {/* Header - Removed Try Again, Favorite, and Share buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={generateShoppingList}
+              className="flex-shrink-0"
+            >
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Generate Shopping List
+            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
 
-      {/* Order Online Modal */}
-      <OrderOnlineModal
-        isOpen={showOrderOnlineModal}
-        onClose={() => setShowOrderOnlineModal(false)}
-        items={getSelectedIngredients()}
-        mealPlanName={generatedMeal.name}
-      />
+        {/* Meal Header Card */}
+        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
+          <CardHeader>
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 break-words">
+                  {meal.name}
+                </CardTitle>
+                <CardDescription className="text-base sm:text-lg break-words mb-4">
+                  {meal.description}
+                </CardDescription>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {meal.tags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="capitalize">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Quick Stats */}
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
+                    <span className="font-medium text-sm sm:text-base">{meal.cookingTime} mins</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
+                    <span className="font-medium text-sm sm:text-base">{meal.servings} servings</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
+                    <span className="font-medium capitalize text-sm sm:text-base">{meal.difficulty}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="w-full sm:w-48 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <ChefHat className="h-12 w-12 sm:h-16 sm:w-16 text-purple-600 opacity-50" />
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button 
-          onClick={saveMeal}
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          <Save className="h-4 w-4 mr-2" />
-          Save Recipe
-        </Button>
-        <Button 
-          onClick={generateMeal}
-          variant="outline"
-          className="border-green-300 text-green-700 hover:bg-green-50"
-        >
-          <Zap className="h-4 w-4 mr-2" />
-          Generate New Version
-        </Button>
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Tabs defaultValue="recipe" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="recipe">Recipe</TabsTrigger>
+                <TabsTrigger value="video">Video Tutorial</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="recipe" className="space-y-6">
+                {/* Ingredients */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <BookOpen className="h-5 w-5 text-purple-600" />
+                      <span>Ingredients</span>
+                    </CardTitle>
+                    <CardDescription>Everything you need for this recipe</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3">
+                      {meal.ingredients.map((ingredient: any, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors border">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0"></div>
+                            <span className="flex-1 break-words capitalize">{ingredient.name}</span>
+                          </div>
+                          <span className="text-sm text-gray-600 font-medium">
+                            {ingredient.quantity} {ingredient.unit}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Instructions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Flame className="h-5 w-5 text-orange-600" />
+                      <span>Cooking Instructions</span>
+                    </CardTitle>
+                    <CardDescription>Follow these steps for the perfect result</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {enhancedInstructions.map((instruction, index) => (
+                        <div
+                          key={index}
+                          className={`relative p-4 rounded-lg border transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+                            completedSteps.includes(index)
+                              ? 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 shadow-md'
+                              : 'bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200 hover:border-purple-200 hover:shadow-lg'
+                          }`}
+                          onClick={() => toggleStep(index)}
+                        >
+                          <div className="flex items-start space-x-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0 ${
+                              completedSteps.includes(index)
+                                ? 'bg-purple-500 text-white shadow-lg scale-110'
+                                : 'bg-gradient-to-br from-purple-400 to-pink-400 text-white shadow-md'
+                            }`}>
+                              {completedSteps.includes(index) ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                index + 1
+                              )}
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-base leading-relaxed transition-all duration-300 break-words ${
+                                completedSteps.includes(index) 
+                                  ? 'line-through text-gray-500' 
+                                  : 'text-gray-800'
+                              }`}>
+                                {instruction.text}
+                              </p>
+                              
+                              {!completedSteps.includes(index) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">
+                                    <Timer className="h-3 w-3 mr-1" />
+                                    ~{instruction.estimatedTime} min
+                                  </span>
+                                  <span className="text-gray-600 italic">
+                                    {instruction.tip}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {completedSteps.includes(index) && (
+                            <div className="absolute top-2 right-2">
+                              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center animate-pulse">
+                                <Check className="h-3 w-3 text-white" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="video">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Play className="h-5 w-5 text-red-600" />
+                      <span>Video Tutorial</span>
+                    </CardTitle>
+                    <CardDescription>
+                      Watch step-by-step preparation for {meal.name}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
+                      {!isVideoPlaying ? (
+                        <div className="text-center space-y-4">
+                          <Button
+                            onClick={() => setIsVideoPlaying(true)}
+                            size="lg"
+                            className="bg-red-600 hover:bg-red-700 rounded-full"
+                          >
+                            <Play className="h-6 w-6 mr-2" />
+                            Play Video
+                          </Button>
+                          <Button
+                            onClick={openFullscreenVideo}
+                            variant="outline"
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          >
+                            <Maximize className="h-4 w-4 mr-2" />
+                            Fullscreen
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="text-white text-center space-y-4">
+                          <iframe
+                            width="100%"
+                            height="315"
+                            src="https://www.youtube.com/embed/ixpYIgHlU60"
+                            title="Recipe Video Tutorial"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="rounded-lg"
+                          ></iframe>
+                          <div className="flex justify-center gap-2">
+                            <Button
+                              onClick={() => setIsVideoPlaying(false)}
+                              variant="ghost"
+                              className="text-white hover:bg-white/20"
+                            >
+                              Close Video
+                            </Button>
+                            <Button
+                              onClick={openFullscreenVideo}
+                              variant="ghost"
+                              className="text-white hover:bg-white/20"
+                            >
+                              <Maximize className="h-4 w-4 mr-2" />
+                              Fullscreen
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Nutrition */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Nutrition (per serving)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Calories</span>
+                    <span>{nutrition?.calories}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Protein</span>
+                    <span>{nutrition?.protein}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Carbs</span>
+                    <span>{nutrition?.carbs}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Fat</span>
+                    <span>{nutrition?.fat}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Fiber</span>
+                    <span>{nutrition?.fiber}g</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Cooking Progress */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Cooking Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {completedSteps.length} of {enhancedInstructions.length} steps completed
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div
+                      className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
+                    ></div>
+                  </div>
+                  {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
+                    <div className="mt-3 p-2 bg-purple-100 rounded-lg">
+                      <p className="text-sm text-purple-700 font-medium">🎉 Recipe completed!</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Action Button */}
+            <Button 
+              onClick={handleSaveMeal}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              size="lg"
+            >
+              Save This Meal
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Fullscreen Video Modal */}
+      {isFullscreen && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="relative w-full h-full">
+            <Button
+              onClick={closeFullscreenVideo}
+              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-2"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/ixpYIgHlU60?autoplay=1"
+              title="Recipe Video Tutorial - Fullscreen"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
