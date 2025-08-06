@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Calendar,
@@ -40,14 +41,10 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
     const baseStyles = "transition-all duration-200";
     
     if (isActive) {
-      if (item.id === "ai-meals") return `${baseStyles} bg-purple-600 text-white shadow-lg`;
-      if (item.id === "ai-drinks") return `${baseStyles} bg-blue-600 text-white shadow-lg`;
-      return `${baseStyles} bg-green-600 text-white shadow-lg`;
+      return `${baseStyles} bg-primary text-primary-foreground shadow-lg`;
     }
     
-    if (item.id === "ai-meals") return `${baseStyles} text-purple-700 hover:bg-purple-100`;
-    if (item.id === "ai-drinks") return `${baseStyles} text-blue-700 hover:bg-blue-100`;
-    return `${baseStyles} text-green-700 hover:bg-green-100`;
+    return `${baseStyles} text-muted-foreground hover:bg-accent hover:text-accent-foreground`;
   };
 
   if (isMobile) {
@@ -85,10 +82,10 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
       "fixed left-0 top-0 h-full bg-white/90 backdrop-blur-md border-r border-green-200/60 shadow-lg z-40 flex flex-col transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
-      {/* Sidebar Header */}
+      {/* Sidebar Header - aligned with dashboard header height */}
       <div className={cn(
-        "border-b border-green-200/60 transition-all duration-300",
-        isCollapsed ? "p-3" : "p-6"
+        "border-b border-green-200/60 transition-all duration-300 h-20 flex items-center",
+        isCollapsed ? "px-3 justify-center" : "px-6 justify-between"
       )}>
         {isCollapsed ? (
           <div className="flex justify-center">
@@ -97,7 +94,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between w-full">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
                 <CookingPot className="h-6 w-6 text-white" />
