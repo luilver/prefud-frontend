@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,10 +51,15 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     sodium: Math.floor(Math.random() * 800) + 200
   }), [meal.calories]);
 
-  const getIngredientsWithQuantities = (ingredients: string[]) => {
+  const getIngredientsWithQuantities = (ingredients: any[]) => {
     return ingredients.map(ingredient => {
-      if (/^\d/.test(ingredient)) {
-        return ingredient;
+      // Ensure ingredient is a string, handle objects or other types
+      const ingredientStr = typeof ingredient === 'string' ? ingredient : 
+                           typeof ingredient === 'object' && ingredient?.name ? ingredient.name :
+                           String(ingredient);
+      
+      if (/^\d/.test(ingredientStr)) {
+        return ingredientStr;
       }
       
       const quantities = {
@@ -74,18 +80,18 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         'butter': '2 tbsp'
       };
       
-      const ingredientLower = ingredient.toLowerCase();
+      const ingredientLower = ingredientStr.toLowerCase();
       for (const [key, quantity] of Object.entries(quantities)) {
         if (ingredientLower.includes(key)) {
-          return `${quantity} ${ingredient}`;
+          return `${quantity} ${ingredientStr}`;
         }
       }
       
-      return `1 unit ${ingredient}`;
+      return `1 unit ${ingredientStr}`;
     });
   };
 
-  const enhancedIngredients = useMemo(() => getIngredientsWithQuantities(meal.ingredients), [meal.ingredients]);
+  const enhancedIngredients = useMemo(() => getIngredientsWithQuantities(meal.ingredients || []), [meal.ingredients]);
 
   const enhancedInstructions = useMemo(() => {
     const cookingTips = [
@@ -99,7 +105,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
       "🏆 Final stretch - you've got this!"
     ];
     
-    return meal.instructions.map((instruction: string, index: number) => ({
+    return (meal.instructions || []).map((instruction: string, index: number) => ({
       text: instruction,
       tip: cookingTips[index % cookingTips.length],
       estimatedTime: 2 + (index % 5) // Fixed time based on step index instead of random
