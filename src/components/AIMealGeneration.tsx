@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, ShoppingCart, Package, Plus, CheckSquare, CreditCard, MapPin } from "lucide-react";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
 interface AIMealGenerationProps {
@@ -38,6 +39,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   
   const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
   const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
+  const { language } = useLanguage();
 
   useEffect(() => {
     generateMeal();
@@ -53,7 +55,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         cookingSkillLevel: mealData.cookingSkillLevel || "intermediate",
         budgetRange: mealData.budgetRange || "medium",
         healthGoals: mealData.healthGoals || [],
-        language: "english", // You can get this from language context if needed
+        language: language, // Use the current language from context
         user_id: user?.id || "687e6b38bc111405da8cb671", // Use actual user ID
         plan_name: mealData.mealName || "AI Generated Meal",
         mealType: mealData.mealType?.toLowerCase() || "dinner",
