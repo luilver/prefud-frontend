@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Calendar,
@@ -16,8 +15,8 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSidebar } from "@/contexts/SidebarContext";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 interface NavigationProps {
   activeTab: string;
@@ -27,7 +26,7 @@ interface NavigationProps {
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, setIsCollapsed } = useSidebar();
 
   const navItems = [
     { id: "planner", label: t("dashboard.nav.planner"), icon: Calendar },

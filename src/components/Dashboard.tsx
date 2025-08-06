@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,8 @@ import { Utensils, ChefHat, Sparkles, Plus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSidebar } from "@/contexts/SidebarContext";
+import { SidebarProvider } from "@/contexts/SidebarContext";
 import Navigation from "./Navigation";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
@@ -19,23 +22,17 @@ import AIMealCreator from "./AIMealCreator";
 import AIDrinkCreator from "./AIDrinkCreator";
 import LanguageSelector from "./LanguageSelector";
 
-const Dashboard = () => {
+const DashboardContent = () => {
   const [activeTab, setActiveTab] = useState("planner");
   const { user, logout } = useUser();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
+  const { isCollapsed } = useSidebar();
 
   // Calculate dynamic margin based on sidebar state
   const getSidebarWidth = () => {
     if (isMobile) return 0;
-    // We'll need to track if sidebar is collapsed via a context or prop
-    // For now, we'll use a default approach
-    const sidebarElement = document.querySelector('nav');
-    if (sidebarElement) {
-      const computedWidth = window.getComputedStyle(sidebarElement).width;
-      return parseInt(computedWidth);
-    }
-    return 256; // default width
+    return isCollapsed ? 64 : 256; // 16*4 = 64px for collapsed, 64*4 = 256px for expanded
   };
 
   const handleStartPlanning = () => {
@@ -223,6 +220,14 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Dashboard = () => {
+  return (
+    <SidebarProvider>
+      <DashboardContent />
+    </SidebarProvider>
   );
 };
 
