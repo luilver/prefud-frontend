@@ -10,10 +10,14 @@ import {
   Leaf,
   CookingPot,
   CupSoda,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface NavigationProps {
   activeTab: string;
@@ -23,6 +27,7 @@ interface NavigationProps {
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
     { id: "planner", label: t("dashboard.nav.planner"), icon: Calendar },
@@ -75,26 +80,66 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
     );
   }
 
-  // Desktop Sidebar Navigation
+  // Desktop Sidebar Navigation with collapse functionality
   return (
-    <nav className="fixed left-0 top-0 h-full w-64 bg-white/90 backdrop-blur-md border-r border-green-200/60 shadow-lg z-40 flex flex-col">
+    <nav className={cn(
+      "fixed left-0 top-0 h-full bg-white/90 backdrop-blur-md border-r border-green-200/60 shadow-lg z-40 flex flex-col transition-all duration-300",
+      isCollapsed ? "w-16" : "w-64"
+    )}>
       {/* Sidebar Header */}
-      <div className="p-6 border-b border-green-200/60">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
-            <CookingPot className="h-6 w-6 text-white" />
+      <div className={cn(
+        "border-b border-green-200/60 transition-all duration-300",
+        isCollapsed ? "p-3" : "p-6"
+      )}>
+        {isCollapsed ? (
+          <div className="flex justify-center">
+            <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+              <CookingPot className="h-6 w-6 text-white" />
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-green-700 to-orange-600 bg-clip-text text-transparent">
-              Pantry
-            </h2>
-            <p className="text-sm text-green-600/80">Smart Kitchen</p>
+        ) : (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+                <CookingPot className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold bg-gradient-to-r from-green-700 to-orange-600 bg-clip-text text-transparent">
+                  Pantry
+                </h2>
+                <p className="text-sm text-green-600/80">Smart Kitchen</p>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* Collapse/Expand Toggle */}
+      <div className={cn(
+        "border-b border-green-200/60",
+        isCollapsed ? "p-2" : "p-4"
+      )}>
+        <Button
+          variant="ghost"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={cn(
+            "text-green-700 hover:bg-green-100/60 transition-all duration-200",
+            isCollapsed ? "w-full h-10 px-2" : "w-full justify-start h-10 px-3"
+          )}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <>
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              <span className="text-sm">Collapse</span>
+            </>
+          )}
+        </Button>
       </div>
 
       {/* Navigation Items */}
-      <div className="flex-1 p-4 space-y-2">
+      <div className="flex-1 p-2 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -105,25 +150,31 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               variant={isActive ? "default" : "ghost"}
               onClick={() => onTabChange(item.id)}
               className={cn(
-                "w-full justify-start h-12 px-4 text-sm font-medium rounded-lg",
+                "transition-all duration-200 rounded-lg",
+                isCollapsed 
+                  ? "w-full h-12 px-0 justify-center" 
+                  : "w-full justify-start h-12 px-4",
                 getButtonStyles(item, isActive)
               )}
+              title={isCollapsed ? item.label : undefined}
             >
-              <Icon className="h-5 w-5 mr-3" />
-              <span>{item.label}</span>
+              <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+              {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
             </Button>
           );
         })}
       </div>
 
       {/* Kitchen Decoration */}
-      <div className="p-4 border-t border-green-200/60">
-        <div className="flex items-center justify-center space-x-2 text-green-500/30">
-          <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse"></div>
-          <div className="w-2 h-2 bg-orange-300/40 rounded-full animate-pulse delay-500"></div>
-          <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse delay-1000"></div>
+      {!isCollapsed && (
+        <div className="p-4 border-t border-green-200/60">
+          <div className="flex items-center justify-center space-x-2 text-green-500/30">
+            <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-orange-300/40 rounded-full animate-pulse delay-500"></div>
+            <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse delay-1000"></div>
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

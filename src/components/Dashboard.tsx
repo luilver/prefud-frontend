@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +25,19 @@ const Dashboard = () => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
 
+  // Calculate dynamic margin based on sidebar state
+  const getSidebarWidth = () => {
+    if (isMobile) return 0;
+    // We'll need to track if sidebar is collapsed via a context or prop
+    // For now, we'll use a default approach
+    const sidebarElement = document.querySelector('nav');
+    if (sidebarElement) {
+      const computedWidth = window.getComputedStyle(sidebarElement).width;
+      return parseInt(computedWidth);
+    }
+    return 256; // default width
+  };
+
   const handleStartPlanning = () => {
     setActiveTab("planner");
     setTimeout(() => {
@@ -52,7 +64,6 @@ const Dashboard = () => {
           }}
         />
         
-        {/* Floating kitchen elements */}
         <div className="absolute top-20 left-[10%] w-6 h-6 bg-green-200/20 rounded-full animate-pulse"></div>
         <div className="absolute top-40 right-[15%] w-4 h-4 bg-orange-200/25 rounded-full animate-pulse delay-1000"></div>
         <div className="absolute bottom-32 left-[20%] w-5 h-5 bg-green-300/15 rounded-full animate-pulse delay-2000"></div>
@@ -62,9 +73,10 @@ const Dashboard = () => {
       {/* Navigation */}
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Header for Desktop (when sidebar is present) */}
+      {/* Header for Desktop (with dynamic positioning) */}
       {!isMobile && (
-        <header className="fixed top-0 left-64 right-0 bg-white/90 backdrop-blur-md border-b border-green-200/60 z-30">
+        <header className="fixed top-0 right-0 bg-white/90 backdrop-blur-md border-b border-green-200/60 z-30 transition-all duration-300"
+          style={{ left: `${getSidebarWidth()}px` }}>
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -137,8 +149,11 @@ const Dashboard = () => {
         </header>
       )}
 
-      {/* Main Content */}
-      <div className={`relative ${!isMobile ? 'ml-64 mt-16' : 'mb-20'} min-h-screen`}>
+      {/* Main Content with dynamic positioning */}
+      <div 
+        className={`relative min-h-screen transition-all duration-300 ${isMobile ? 'mb-20' : 'mt-16'}`}
+        style={!isMobile ? { marginLeft: `${getSidebarWidth()}px` } : {}}
+      >
         <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
           {/* Kitchen-inspired content wrapper */}
           <div className="relative">
