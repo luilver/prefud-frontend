@@ -368,7 +368,7 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
           disabled={!isValid}
           className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
         >
-          Continue to Ingredients
+          Next
         </Button>
         {!isValid && (
           <p className="text-red-500 text-sm mt-2">
