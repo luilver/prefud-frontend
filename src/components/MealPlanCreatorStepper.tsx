@@ -422,16 +422,33 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
   };
 
   const generateMealPlan = async () => {
-    if (!planData.planName || !planData.startDate || !planData.cookingSkillLevel || !planData.budgetRange) {
+    console.log('🚀 Generate Meal Plan clicked!');
+    console.log('Current plan data:', planData);
+    console.log('User:', user);
+    
+    // More flexible validation - only check truly required fields
+    if (!planData.planName.trim()) {
+      console.log('❌ Validation failed: Missing plan name');
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: "Please enter a plan name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!planData.startDate) {
+      console.log('❌ Validation failed: Missing start date');
+      toast({
+        title: "Missing Information",
+        description: "Please select a start date.",
         variant: "destructive"
       });
       return;
     }
 
     if (!user?.id) {
+      console.log('❌ Validation failed: No user ID');
       toast({
         title: "Authentication Required",
         description: "Please log in to create a meal plan.",
@@ -440,13 +457,21 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       return;
     }
 
+    // Set default values if not provided instead of blocking
+    const effectiveCookingSkillLevel = planData.cookingSkillLevel || "Intermediate";
+    const effectiveBudgetRange = planData.budgetRange || "Medium";
+
+    console.log('✅ Validation passed, starting meal plan generation...');
+    setIsGenerating(true);
+
     // Show the cooking loader
     showLoader("Analyzing your preferences and creating your perfect meal plan...");
 
     // Set up timeout for 3 minutes (180 seconds)
     const timeout = setTimeout(() => {
-      console.log('Meal plan generation timed out after 3 minutes');
+      console.log('⏰ Meal plan generation timed out after 3 minutes');
       hideLoader();
+      setIsGenerating(false);
       toast({
         title: "Still Cooking!",
         description: "Your meal plan is being prepared in the background. Please check your meal plans in a few minutes.",
@@ -481,8 +506,8 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
         allergiesIntolerance: planData.allergiesIntolerances,
         dislikes: [...planData.dislikes, planData.additionalAllergies].filter(item => item.trim()).join(', '),
         maxCookingTime: planData.maxCookTime,
-        cookingSkillLevel: planData.cookingSkillLevel,
-        budgetRange: planData.budgetRange,
+        cookingSkillLevel: effectiveCookingSkillLevel,
+        budgetRange: effectiveBudgetRange,
         healthGoals: planData.healthGoals,
         language: getLanguageName(language),
         user_id: user.id,
@@ -491,9 +516,11 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
         plan_description: planData.planDescription || `Personalized meal plan for ${planData.numberOfPersons} person${planData.numberOfPersons > 1 ? 's' : ''}`
       };
 
-      console.log('Creating meal plan with data:', requestData);
+      console.log('📤 Sending API request with data:', requestData);
 
       const apiResponse = await createMealPlan(requestData);
+      
+      console.log('✅ API response received:', apiResponse);
       
       // Clear the timeout since we got a response
       if (timeout) {
@@ -503,8 +530,11 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       
       // Hide the loader
       hideLoader();
+      setIsGenerating(false);
       
       const transformedPlan = transformApiMealPlanToLocal(apiResponse);
+
+      console.log('🔄 Transformed plan:', transformedPlan);
 
       // Show success toast
       toast({
@@ -520,7 +550,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       await refreshMealPlans();
 
     } catch (error) {
-      console.error('Error generating meal plan:', error);
+      console.error('❌ Error generating meal plan:', error);
       
       // Clear the timeout
       if (timeout) {
@@ -530,6 +560,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       
       // Hide the loader
       hideLoader();
+      setIsGenerating(false);
       
       toast({
         title: "Generation Failed",
