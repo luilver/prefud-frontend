@@ -47,49 +47,71 @@ const SignUp = () => {
         </div>
       </header>
 
-      {/* Enhanced main content with brand alignment */}
-      <section className="relative py-6 sm:py-10 px-3 sm:px-4">
+      {/* Compact main content with better mobile optimization */}
+      <section className="relative py-4 sm:py-6 px-3 sm:px-4">
         <div className="container mx-auto max-w-full sm:max-w-6xl">
-          {/* Welcome card with enhanced brand design */}
-          <div className="relative mb-8 sm:mb-12">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/10 to-primary/5 rounded-3xl blur-xl"></div>
-            <Card className="relative bg-card/95 backdrop-blur-md border-border shadow-2xl mb-6 sm:mb-8 rounded-3xl overflow-hidden">
+          {/* Compact welcome card - reduced size significantly */}
+          <div className="relative mb-6 sm:mb-8 lg:hidden">
+            <Card className="relative bg-card/95 backdrop-blur-md border-border shadow-xl rounded-2xl overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
               
-              <CardHeader className="text-center px-6 sm:px-8 py-8 sm:py-12">
-                <div className="flex justify-center mb-6">
-                  <div className="p-4 bg-gradient-to-r from-primary to-accent rounded-3xl shadow-2xl">
-                    <Sparkles className="h-12 w-12 text-primary-foreground" />
+              <CardHeader className="text-center px-4 py-6">
+                <div className="flex justify-center mb-3">
+                  <div className="p-2.5 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-lg">
+                    <Sparkles className="h-6 w-6 text-primary-foreground" />
                   </div>
                 </div>
                 
-                <CardTitle className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-4">
+                <CardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
                   {t('signup.title')}
                 </CardTitle>
                 
-                <CardDescription className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                <CardDescription className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {t('signup.subtitle')}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+
+          {/* Desktop welcome card - even more compact */}
+          <div className="relative mb-6 sm:mb-8 hidden lg:block">
+            <Card className="relative bg-card/95 backdrop-blur-md border-border shadow-xl rounded-2xl overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
+              
+              <CardHeader className="text-center px-6 py-8">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-lg">
+                    <Sparkles className="h-8 w-8 text-primary-foreground" />
+                  </div>
+                </div>
+                
+                <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
+                  {t('signup.title')}
+                </CardTitle>
+                
+                <CardDescription className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                   {t('signup.subtitle')}
                 </CardDescription>
               </CardHeader>
             </Card>
           </div>
           
-          {/* Signup steps container */}
-          <div className="px-1 sm:px-0">
+          {/* Signup steps container - now takes more space */}
+          <div className="px-0">
             <SignupSteps />
           </div>
           
-          {/* Enhanced footer with brand colors */}
-          <div className="mt-8 sm:mt-12 text-center px-4 sm:px-0">
+          {/* Compact footer */}
+          <div className="mt-6 sm:mt-8 text-center">
             <div className="relative">
-              <div className="absolute inset-0 bg-card/60 backdrop-blur-sm rounded-2xl"></div>
-              <div className="relative p-6 sm:p-8">
-                <p className="text-muted-foreground text-base sm:text-lg">
+              <div className="absolute inset-0 bg-card/60 backdrop-blur-sm rounded-xl"></div>
+              <div className="relative p-4 sm:p-6">
+                <p className="text-muted-foreground text-sm sm:text-base">
                   {t('signup.already-account')}{' '}
                   <Button
                     variant="link"
                     onClick={() => navigate('/signin')}
-                    className="text-primary hover:text-accent p-0 font-bold text-base sm:text-lg transition-colors duration-200 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hover:from-accent hover:to-primary"
+                    className="text-primary hover:text-accent p-0 font-bold text-sm sm:text-base transition-colors duration-200"
                   >
                     {t('signup.signin-here')}
                   </Button>
