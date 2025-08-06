@@ -1,72 +1,81 @@
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Clock, Users, ChefHat, Utensils, RefreshCw, Heart } from "lucide-react";
+import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, RotateCcw } from "lucide-react";
+import { useCookingLoader } from "@/hooks/useCookingLoader";
+import { useUser } from "@/contexts/UserContext";
+import { toast } from "sonner";
 
 interface AIMealGenerationProps {
-  mealData: any;
-  onMealCreated: (meal: any) => void;
+  preferences: any;
+  onBack: () => void;
+  onSaveMeal: (meal: any) => void;
 }
 
-const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedMeal, setGeneratedMeal] = useState<any>(null);
+const AIMealGeneration = ({ preferences, onBack, onSaveMeal }: AIMealGenerationProps) => {
+  const [meal, setMeal] = useState<any>(null);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { isLoading, startCooking } = useCookingLoader();
+  const { saveAIMeal } = useUser();
+
+  useEffect(() => {
+    generateMeal();
+  }, []);
 
   const generateMeal = async () => {
-    setIsGenerating(true);
+    startCooking();
     
-    // Simulate AI generation with realistic delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Mock AI-generated meal based on user preferences
-    const mockMeal = {
-      id: Date.now().toString(),
-      name: generateMealName(),
-      description: generateDescription(),
-      cuisine: mealData.cuisinePreference || "Fusion",
-      cookingTime: mealData.cookingTime || 30,
-      servings: mealData.servings || 2,
-      difficulty: "Medium",
-      ingredients: mealData.ingredients?.slice(0, 8) || [],
-      instructions: generateInstructions(),
-      nutritionInfo: {
-        calories: Math.floor(Math.random() * 400) + 300,
-        protein: Math.floor(Math.random() * 30) + 15,
-        carbs: Math.floor(Math.random() * 40) + 20,
-        fat: Math.floor(Math.random() * 20) + 10
-      },
-      tags: generateTags(),
-      createdAt: new Date().toISOString()
-    };
-    
-    setGeneratedMeal(mockMeal);
-    setIsGenerating(false);
+    // Simulate API call with realistic data
+    setTimeout(() => {
+      const generatedMeal = {
+        id: Date.now().toString(),
+        name: getRandomMealName(),
+        description: "A delightful fusion of flavors that will satisfy your taste buds.",
+        cookingTime: Math.floor(Math.random() * 40) + 20,
+        servings: preferences.servings || 2,
+        difficulty: preferences.difficulty || "Medium",
+        cuisine: preferences.cuisine || "Fusion",
+        calories: Math.floor(Math.random() * 300) + 300,
+        ingredients: generateIngredients(),
+        instructions: generateInstructions(),
+        nutritionalInfo: generateNutritionalInfo(),
+        tags: generateTags(preferences)
+      };
+      setMeal(generatedMeal);
+    }, 3000);
   };
 
-  const generateMealName = () => {
-    const adjectives = ["Crispy", "Savory", "Delicious", "Spiced", "Fresh", "Hearty", "Zesty"];
-    const proteins = mealData.ingredients?.find((ing: string) => 
-      ["Chicken", "Beef", "Fish", "Tofu", "Eggs"].some(p => ing.includes(p))
-    ) || "Veggie";
-    const styles = ["Bowl", "Stir-fry", "Salad", "Pasta", "Curry", "Soup"];
-    
-    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-    const style = styles[Math.floor(Math.random() * styles.length)];
-    
-    return `${adj} ${proteins} ${style}`;
-  };
-
-  const generateDescription = () => {
-    const descriptions = [
-      "A perfectly balanced meal combining fresh ingredients with aromatic spices.",
-      "A delightful fusion of flavors that will satisfy your taste buds.",
-      "A nutritious and delicious meal that's perfect for any occasion.",
-      "A creative combination of ingredients that creates a memorable dining experience.",
-      "A wholesome meal that brings together the best of comfort and nutrition."
+  const getRandomMealName = () => {
+    const names = [
+      "Hearty Veggie Bowl",
+      "Mediterranean Delight",
+      "Asian Fusion Stir-fry",
+      "Protein Power Plate",
+      "Garden Fresh Salad",
+      "Spiced Comfort Bowl",
+      "Healthy Harvest Mix",
+      "Savory Quinoa Bowl"
     ];
-    return descriptions[Math.floor(Math.random() * descriptions.length)];
+    return names[Math.floor(Math.random() * names.length)];
+  };
+
+  const generateIngredients = () => {
+    const baseIngredients = [
+      { name: "quinoa", quantity: "1", unit: "cup" },
+      { name: "mixed vegetables", quantity: "2", unit: "cups" },
+      { name: "olive oil", quantity: "2", unit: "tbsp" },
+      { name: "garlic", quantity: "2", unit: "cloves" },
+      { name: "onion", quantity: "1", unit: "medium" },
+      { name: "bell pepper", quantity: "1", unit: "large" },
+      { name: "salt", quantity: "1", unit: "tsp" },
+      { name: "black pepper", quantity: "1/2", unit: "tsp" }
+    ];
+    return baseIngredients.slice(0, Math.floor(Math.random() * 3) + 6);
   };
 
   const generateInstructions = () => {
@@ -82,185 +91,457 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     ];
   };
 
-  const generateTags = () => {
-    const allTags = ["Quick", "Healthy", "Comfort Food", "One-Pan", "High Protein", "Low Carb", "Spicy", "Mild"];
-    const tags = [];
-    
-    if (mealData.cookingTime <= 20) tags.push("Quick");
-    if (mealData.dietaryRestrictions?.includes("vegetarian")) tags.push("Vegetarian");
-    if (mealData.dietaryRestrictions?.includes("vegan")) tags.push("Vegan");
-    if (mealData.dietaryRestrictions?.includes("gluten-free")) tags.push("Gluten-Free");
-    
-    // Add random tags
-    const remainingTags = allTags.filter(tag => !tags.includes(tag));
-    const additionalTags = remainingTags.slice(0, 3 - tags.length);
-    
-    return [...tags, ...additionalTags];
+  const generateNutritionalInfo = () => {
+    const calories = meal?.calories || 400;
+    return {
+      calories,
+      protein: Math.floor(calories * 0.25 / 4),
+      carbs: Math.floor(calories * 0.45 / 4),
+      fat: Math.floor(calories * 0.30 / 9),
+      fiber: Math.floor(Math.random() * 8) + 5
+    };
   };
 
-  const handleSaveMeal = () => {
-    if (generatedMeal) {
-      onMealCreated(generatedMeal);
+  const generateTags = (prefs: any) => {
+    const tags = [];
+    if (prefs.healthGoals) tags.push(...prefs.healthGoals.slice(0, 2));
+    if (prefs.dietaryRestrictions) tags.push(...prefs.dietaryRestrictions.slice(0, 2));
+    tags.push("Quick", "Healthy", "Comfort Food");
+    return [...new Set(tags)].slice(0, 4);
+  };
+
+  const toggleStep = (stepIndex: number) => {
+    if (completedSteps.includes(stepIndex)) {
+      setCompletedSteps(completedSteps.filter(i => i !== stepIndex));
+    } else {
+      setCompletedSteps([...completedSteps, stepIndex]);
     }
   };
 
-  useEffect(() => {
-    generateMeal();
-  }, []);
+  const openFullscreenVideo = () => {
+    setIsFullscreen(true);
+    setIsVideoPlaying(true);
+  };
 
-  if (isGenerating) {
+  const closeFullscreenVideo = () => {
+    setIsFullscreen(false);
+    setIsVideoPlaying(false);
+  };
+
+  const handleSaveMeal = () => {
+    if (meal) {
+      saveAIMeal(meal);
+      onSaveMeal(meal);
+      toast.success("Meal saved successfully!");
+    }
+  };
+
+  const handleTryAgain = () => {
+    setMeal(null);
+    setCompletedSteps([]);
+    generateMeal();
+  };
+
+  const enhancedInstructions = useMemo(() => {
+    if (!meal) return [];
+    
+    const cookingTips = [
+      "🔥 Heat your pan to medium-high heat",
+      "⏱️ Don't rush this step - patience makes perfect!",
+      "👨‍🍳 Pro tip: Taste as you go",
+      "🌟 This is where the magic happens",
+      "💡 Keep stirring to prevent sticking",
+      "🎯 Almost there - you're doing great!",
+      "✨ The aroma should be amazing now",
+      "🏆 Final stretch - you've got this!"
+    ];
+    
+    return meal.instructions.map((instruction: string, index: number) => ({
+      text: instruction,
+      tip: cookingTips[index % cookingTips.length],
+      estimatedTime: 2 + (index % 5)
+    }));
+  }, [meal?.instructions]);
+
+  const nutrition = useMemo(() => {
+    if (!meal) return null;
+    return generateNutritionalInfo();
+  }, [meal]);
+
+  if (isLoading || !meal) {
     return (
-      <Card className="text-center py-12">
-        <CardContent>
-          <div className="space-y-6">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-purple-600 animate-pulse" />
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-2">AI is Creating Your Meal</h3>
-              <p className="text-gray-600 mb-4">
-                Analyzing your preferences and ingredients to create the perfect meal...
-              </p>
-              <div className="w-64 h-2 bg-gray-200 rounded-full mx-auto overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full animate-pulse"></div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="relative">
+            <div className="w-24 h-24 mx-auto mb-4 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
+              <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+                <ChefHat className="h-8 w-8 text-purple-600" />
               </div>
             </div>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-400 rounded-full animate-bounce"></div>
+            <div className="absolute -bottom-1 -left-2 w-4 h-4 bg-pink-400 rounded-full animate-bounce delay-300"></div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold text-gray-800">Creating Your Perfect Meal</h3>
+            <p className="text-gray-600">Our AI chef is crafting something special just for you...</p>
+            <div className="w-64 bg-gray-200 rounded-full h-2 mx-auto">
+              <div className="bg-gradient-to-r from-purple-400 to-pink-400 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
-  if (!generatedMeal) {
-    return null;
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Generated Meal Card */}
-      <Card className="border-2 border-purple-200">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
-                <ChefHat className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-2xl">{generatedMeal.name}</CardTitle>
-                <CardDescription className="text-lg">
-                  {generatedMeal.description}
-                </CardDescription>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateMeal}
-              disabled={isGenerating}
+    <>
+      <div className="max-w-4xl mx-auto space-y-6 p-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <Button variant="ghost" onClick={onBack} className="self-start">
+            ← Back to Preferences
+          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleTryAgain}
+              className="flex-shrink-0"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Regenerate
+              <RotateCcw className="h-4 w-4 mr-1" />
+              Try Again
+            </Button>
+            <Button variant="outline" size="sm" className="flex-shrink-0">
+              <Heart className="h-4 w-4 mr-1" />
+              Favorite
+            </Button>
+            <Button variant="outline" size="sm" className="flex-shrink-0">
+              <Share2 className="h-4 w-4 mr-1" />
+              Share
             </Button>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Meal Info */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center space-x-2 text-sm">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span>{generatedMeal.cookingTime} mins</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <Users className="h-4 w-4 text-gray-500" />
-              <span>{generatedMeal.servings} servings</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <Utensils className="h-4 w-4 text-gray-500" />
-              <span>{generatedMeal.cuisine}</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <ChefHat className="h-4 w-4 text-gray-500" />
-              <span>{generatedMeal.difficulty}</span>
-            </div>
-          </div>
+        </div>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2">
-            {generatedMeal.tags.map((tag: string, index: number) => (
-              <Badge key={index} variant="secondary">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-
-          {/* Nutrition Info */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="font-semibold mb-3">Nutrition (per serving)</h4>
-            <div className="grid grid-cols-4 gap-4 text-sm">
-              <div className="text-center">
-                <div className="font-semibold text-lg">{generatedMeal.nutritionInfo.calories}</div>
-                <div className="text-gray-600">Calories</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold text-lg">{generatedMeal.nutritionInfo.protein}g</div>
-                <div className="text-gray-600">Protein</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold text-lg">{generatedMeal.nutritionInfo.carbs}g</div>
-                <div className="text-gray-600">Carbs</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold text-lg">{generatedMeal.nutritionInfo.fat}g</div>
-                <div className="text-gray-600">Fat</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Ingredients */}
-          <div>
-            <h4 className="font-semibold mb-3">Ingredients</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {generatedMeal.ingredients.map((ingredient: string, index: number) => (
-                <div key={index} className="bg-white border rounded-lg p-2 text-sm">
-                  {ingredient}
+        {/* Meal Header Card */}
+        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
+          <CardHeader>
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 break-words">
+                  {meal.name}
+                </CardTitle>
+                <CardDescription className="text-base sm:text-lg break-words mb-4">
+                  {meal.description}
+                </CardDescription>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {meal.tags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="capitalize">
+                      {tag}
+                    </Badge>
+                  ))}
                 </div>
-              ))}
+                
+                {/* Quick Stats */}
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
+                    <span className="font-medium text-sm sm:text-base">{meal.cookingTime} mins</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
+                    <span className="font-medium text-sm sm:text-base">{meal.servings} servings</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
+                    <span className="font-medium capitalize text-sm sm:text-base">{meal.difficulty}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="w-full sm:w-48 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <ChefHat className="h-12 w-12 sm:h-16 sm:w-16 text-purple-600 opacity-50" />
+              </div>
             </div>
+          </CardHeader>
+        </Card>
+
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Tabs defaultValue="recipe" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="recipe">Recipe</TabsTrigger>
+                <TabsTrigger value="video">Video Tutorial</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="recipe" className="space-y-6">
+                {/* Ingredients */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <BookOpen className="h-5 w-5 text-purple-600" />
+                      <span>Ingredients</span>
+                    </CardTitle>
+                    <CardDescription>Everything you need for this recipe</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3">
+                      {meal.ingredients.map((ingredient: any, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors border">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0"></div>
+                            <span className="flex-1 break-words capitalize">{ingredient.name}</span>
+                          </div>
+                          <span className="text-sm text-gray-600 font-medium">
+                            {ingredient.quantity} {ingredient.unit}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Instructions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Flame className="h-5 w-5 text-orange-600" />
+                      <span>Cooking Instructions</span>
+                    </CardTitle>
+                    <CardDescription>Follow these steps for the perfect result</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {enhancedInstructions.map((instruction, index) => (
+                        <div
+                          key={index}
+                          className={`relative p-4 rounded-lg border transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+                            completedSteps.includes(index)
+                              ? 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 shadow-md'
+                              : 'bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200 hover:border-purple-200 hover:shadow-lg'
+                          }`}
+                          onClick={() => toggleStep(index)}
+                        >
+                          <div className="flex items-start space-x-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0 ${
+                              completedSteps.includes(index)
+                                ? 'bg-purple-500 text-white shadow-lg scale-110'
+                                : 'bg-gradient-to-br from-purple-400 to-pink-400 text-white shadow-md'
+                            }`}>
+                              {completedSteps.includes(index) ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                index + 1
+                              )}
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-base leading-relaxed transition-all duration-300 break-words ${
+                                completedSteps.includes(index) 
+                                  ? 'line-through text-gray-500' 
+                                  : 'text-gray-800'
+                              }`}>
+                                {instruction.text}
+                              </p>
+                              
+                              {!completedSteps.includes(index) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">
+                                    <Timer className="h-3 w-3 mr-1" />
+                                    ~{instruction.estimatedTime} min
+                                  </span>
+                                  <span className="text-gray-600 italic">
+                                    {instruction.tip}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {completedSteps.includes(index) && (
+                            <div className="absolute top-2 right-2">
+                              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center animate-pulse">
+                                <Check className="h-3 w-3 text-white" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="video">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Play className="h-5 w-5 text-red-600" />
+                      <span>Video Tutorial</span>
+                    </CardTitle>
+                    <CardDescription>
+                      Watch step-by-step preparation for {meal.name}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
+                      {!isVideoPlaying ? (
+                        <div className="text-center space-y-4">
+                          <Button
+                            onClick={() => setIsVideoPlaying(true)}
+                            size="lg"
+                            className="bg-red-600 hover:bg-red-700 rounded-full"
+                          >
+                            <Play className="h-6 w-6 mr-2" />
+                            Play Video
+                          </Button>
+                          <Button
+                            onClick={openFullscreenVideo}
+                            variant="outline"
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          >
+                            <Maximize className="h-4 w-4 mr-2" />
+                            Fullscreen
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="text-white text-center space-y-4">
+                          <iframe
+                            width="100%"
+                            height="315"
+                            src="https://www.youtube.com/embed/ixpYIgHlU60"
+                            title="Recipe Video Tutorial"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="rounded-lg"
+                          ></iframe>
+                          <div className="flex justify-center gap-2">
+                            <Button
+                              onClick={() => setIsVideoPlaying(false)}
+                              variant="ghost"
+                              className="text-white hover:bg-white/20"
+                            >
+                              Close Video
+                            </Button>
+                            <Button
+                              onClick={openFullscreenVideo}
+                              variant="ghost"
+                              className="text-white hover:bg-white/20"
+                            >
+                              <Maximize className="h-4 w-4 mr-2" />
+                              Fullscreen
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
 
-          {/* Instructions */}
-          <div>
-            <h4 className="font-semibold mb-3">Instructions</h4>
-            <ol className="space-y-2">
-              {generatedMeal.instructions.map((step: string, index: number) => (
-                <li key={index} className="flex space-x-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-purple-600 text-white text-sm rounded-full flex items-center justify-center">
-                    {index + 1}
-                  </span>
-                  <span className="text-sm">{step}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </CardContent>
-      </Card>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Nutrition */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Nutrition (per serving)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Calories</span>
+                    <span>{nutrition?.calories}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Protein</span>
+                    <span>{nutrition?.protein}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Carbs</span>
+                    <span>{nutrition?.carbs}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Fat</span>
+                    <span>{nutrition?.fat}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Fiber</span>
+                    <span>{nutrition?.fiber}g</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Action Buttons */}
-      <div className="flex justify-center space-x-4">
-        <Button
-          onClick={handleSaveMeal}
-          size="lg"
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-        >
-          <Heart className="mr-2 h-5 w-5" />
-          Save This Meal
-        </Button>
-        <Button variant="outline" size="lg" onClick={generateMeal}>
-          <RefreshCw className="mr-2 h-5 w-5" />
-          Try Again
-        </Button>
+            {/* Cooking Progress */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Cooking Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {completedSteps.length} of {enhancedInstructions.length} steps completed
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div
+                      className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
+                    ></div>
+                  </div>
+                  {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
+                    <div className="mt-3 p-2 bg-purple-100 rounded-lg">
+                      <p className="text-sm text-purple-700 font-medium">🎉 Recipe completed!</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Action Button */}
+            <Button 
+              onClick={handleSaveMeal}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              size="lg"
+            >
+              Save This Meal
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Fullscreen Video Modal */}
+      {isFullscreen && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="relative w-full h-full">
+            <Button
+              onClick={closeFullscreenVideo}
+              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-2"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/ixpYIgHlU60?autoplay=1"
+              title="Recipe Video Tutorial - Fullscreen"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
