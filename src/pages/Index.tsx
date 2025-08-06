@@ -299,6 +299,28 @@ const Index = () => {
                 Pantry
               </span>
             </div>
+            <div className="flex items-center justify-center space-x-6 mb-4 text-sm text-muted-foreground">
+              <Link 
+                to="/terms" 
+                className="hover:text-primary transition-colors duration-200"
+              >
+                Terms & Conditions
+              </Link>
+              <span className="text-border">•</span>
+              <Link 
+                to="/pricing" 
+                className="hover:text-primary transition-colors duration-200"
+              >
+                Pricing
+              </Link>
+              <span className="text-border">•</span>
+              <Link 
+                to="/why-pantry" 
+                className="hover:text-primary transition-colors duration-200"
+              >
+                Why Pantry
+              </Link>
+            </div>
             <p className="text-muted-foreground">
               {t('home.footer.copyright')}
             </p>
