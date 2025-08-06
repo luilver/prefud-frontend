@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
+import PageSizeSelector from "./PageSizeSelector";
 import { 
   Pagination,
   PaginationContent,
@@ -22,7 +24,9 @@ const MealPlanner = () => {
   const [selectedMealPlan, setSelectedMealPlan] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5); // Default to 5 items per page
   const [totalPages, setTotalPages] = useState(1);
+  const [currentPagePlans, setCurrentPagePlans] = useState<any[]>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
   const [hasLoadedInitialPlans, setHasLoadedInitialPlans] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -31,37 +35,27 @@ const MealPlanner = () => {
   const { user, mealPlans, addMealPlan, getMealPlanById, fetchMealPlansFromAPI } = useUser();
   const { toast } = useToast();
 
-  const PLANS_PER_PAGE = 6; // Show 6 plans per page for better UX
-
-  // Load meal plans when component mounts or page changes
+  // Load meal plans when component mounts, page changes, or page size changes
   useEffect(() => {
     if (user?.id && !showCreator && !selectedMealPlan) {
-      loadMealPlans(currentPage);
+      loadMealPlans(currentPage, pageSize);
     }
-  }, [user?.id, currentPage, showCreator, selectedMealPlan]);
+  }, [user?.id, currentPage, pageSize, showCreator, selectedMealPlan]);
 
-  const loadMealPlans = async (page: number) => {
+  const loadMealPlans = async (page: number, limit: number) => {
     if (!user?.id) return;
 
     setIsLoadingPlans(true);
     try {
-      console.log('Loading meal plans for page:', page);
-      const response = await fetchMealPlansFromAPI(user.id, page, PLANS_PER_PAGE);
+      console.log(`Loading meal plans for page: ${page}, limit: ${limit}`);
+      const response = await fetchMealPlansFromAPI(user.id, page, limit);
       
-      if (page === 1) {
-        // Replace existing plans for first page
-        // Update the context with new plans
-        response.data.forEach(plan => {
-          const existingPlan = getMealPlanById(plan.id);
-          if (!existingPlan) {
-            addMealPlan(plan);
-          }
-        });
-      }
-      
-      setTotalPages(response.totalPages);
+      // Set the current page plans from the API response
+      setCurrentPagePlans(response.data || []);
+      setTotalPages(response.totalPages || 1);
       setHasLoadedInitialPlans(true);
-      console.log('Loaded meal plans:', response);
+      
+      console.log('Loaded meal plans for current page:', response);
     } catch (error) {
       console.error('Error loading meal plans:', error);
       toast({
@@ -69,6 +63,7 @@ const MealPlanner = () => {
         description: "Failed to load your meal plans. Please try again.",
         variant: "destructive",
       });
+      setCurrentPagePlans([]);
     } finally {
       setIsLoadingPlans(false);
     }
@@ -94,7 +89,7 @@ const MealPlanner = () => {
     
     // Refresh the first page to show the new plan
     setCurrentPage(1);
-    loadMealPlans(1);
+    loadMealPlans(1, pageSize);
   };
 
   const handleEditPlan = () => {
@@ -116,15 +111,22 @@ const MealPlanner = () => {
     const updatedPlan = getMealPlanById(plan.id) || plan;
     console.log('Selecting plan:', updatedPlan);
     setSelectedMealPlan(updatedPlan);
-    setShowCreator(false); // Ensure creator is not shown when selecting a plan
-    setIsEditing(false); // Ensure editing mode is off
+    setShowCreator(false);
+    setIsEditing(false);
     isNavigatingBack.current = false;
   };
 
   const handlePageChange = (page: number) => {
     if (page !== currentPage && page >= 1 && page <= totalPages) {
+      console.log(`Changing to page: ${page}`);
       setCurrentPage(page);
     }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    console.log(`Changing page size to: ${newSize}`);
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
   };
 
   const handleViewSuccessPlan = () => {
@@ -172,9 +174,6 @@ const MealPlanner = () => {
     );
   }
 
-  // Get current page plans for display
-  const currentPlans = mealPlans || [];
-
   // Default view: show meal planner dashboard
   return (
     <div className="space-y-6">
@@ -215,6 +214,19 @@ const MealPlanner = () => {
         </Button>
       </div>
 
+      {/* Page Size Selector and Results Info */}
+      {!isLoadingPlans && hasLoadedInitialPlans && (
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
+          <PageSizeSelector 
+            pageSize={pageSize} 
+            onPageSizeChange={handlePageSizeChange}
+          />
+          <div className="text-sm text-gray-600">
+            Showing page {currentPage} of {totalPages} ({currentPagePlans.length} plans)
+          </div>
+        </div>
+      )}
+
       {/* Loading State */}
       {isLoadingPlans && (
         <div className="flex items-center justify-center py-12">
@@ -226,10 +238,10 @@ const MealPlanner = () => {
       )}
 
       {/* Meal Plans Grid */}
-      {!isLoadingPlans && currentPlans.length > 0 ? (
+      {!isLoadingPlans && currentPagePlans.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentPlans.map((plan) => {
+            {currentPagePlans.map((plan) => {
               // Calculate days from duration string or use preferences
               const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
                                (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
@@ -387,7 +399,7 @@ const MealPlanner = () => {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+          </div>
         )
       )}
     </div>

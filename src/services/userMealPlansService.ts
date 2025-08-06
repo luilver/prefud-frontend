@@ -1,11 +1,11 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://lovable-meal-planner.onrender.com/api';
 
-export const getMealPlansByUser = async (userId: string) => {
+export const getMealPlansByUser = async (userId: string, page: number = 1, limit: number = 5) => {
   try {
-    console.log('Fetching meal plans for user:', userId);
+    console.log(`Fetching meal plans for user: ${userId}, page: ${page}, limit: ${limit}`);
     
-    const response = await fetch(`${API_BASE_URL}/meal-plans/user/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/meal-plans/user/${userId}?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
