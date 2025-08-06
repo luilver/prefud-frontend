@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Calendar,
@@ -11,6 +12,8 @@ import {
   CupSoda,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface NavigationProps {
   activeTab: string;
@@ -19,23 +22,35 @@ interface NavigationProps {
 
 const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   const navItems = [
     { id: "planner", label: t("dashboard.nav.planner"), icon: Calendar },
     { id: "ai-meals", label: t("dashboard.nav.meals"), icon: CookingPot },
     { id: "ai-drinks", label: t("dashboard.nav.drinks"), icon: CupSoda },
     { id: "ingredients", label: t("dashboard.nav.pantry"), icon: Package },
-    // { id: "shopping", label: t('dashboard.nav.shopping'), icon: ShoppingCart },
-    // { id: "environment", label: t('dashboard.nav.environment'), icon: Leaf },
-    // { id: "calories", label: t('dashboard.nav.calories'), icon: TrendingUp },
-    // { id: "highlights", label: t('dashboard.nav.highlights'), icon: Sparkles },
     { id: "profile", label: t("dashboard.nav.profile"), icon: User },
   ];
 
-  return (
-    <nav className="bg-white/70 backdrop-blur-sm border-b border-green-200">
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 sm:py-3">
+  const getButtonStyles = (item: any, isActive: boolean) => {
+    const baseStyles = "transition-all duration-200";
+    
+    if (isActive) {
+      if (item.id === "ai-meals") return `${baseStyles} bg-purple-600 text-white shadow-lg`;
+      if (item.id === "ai-drinks") return `${baseStyles} bg-blue-600 text-white shadow-lg`;
+      return `${baseStyles} bg-green-600 text-white shadow-lg`;
+    }
+    
+    if (item.id === "ai-meals") return `${baseStyles} text-purple-700 hover:bg-purple-100`;
+    if (item.id === "ai-drinks") return `${baseStyles} text-blue-700 hover:bg-blue-100`;
+    return `${baseStyles} text-green-700 hover:bg-green-100`;
+  };
+
+  if (isMobile) {
+    // Mobile Bottom Tab Navigation
+    return (
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-green-200/60 shadow-lg">
+        <div className="flex justify-around items-center py-2 px-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -43,31 +58,70 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
             return (
               <Button
                 key={item.id}
-                variant={isActive ? "default" : "ghost"}
+                variant="ghost"
                 onClick={() => onTabChange(item.id)}
-                className={`
-                  flex items-center space-x-1 sm:space-x-2 whitespace-nowrap min-w-fit
-                  text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2
-                  ${
-                    isActive
-                      ? item.id === "ai-meals"
-                        ? "bg-purple-600 text-white shadow-md"
-                        : item.id === "ai-drinks"
-                        ? "bg-blue-600 text-white shadow-md"
-                        : "bg-green-600 text-white shadow-md"
-                      : item.id === "ai-meals"
-                      ? "text-purple-700 hover:bg-purple-100"
-                      : item.id === "ai-drinks"
-                      ? "text-blue-700 hover:bg-blue-100"
-                      : "text-green-700 hover:bg-green-100"
-                  }
-                `}
+                className={cn(
+                  "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1",
+                  getButtonStyles(item, isActive)
+                )}
               >
-                <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">{item.label}</span>
+                <Icon className="h-5 w-5 mb-1" />
+                <span className="text-xs font-medium truncate">{item.label}</span>
               </Button>
             );
           })}
+        </div>
+      </nav>
+    );
+  }
+
+  // Desktop Sidebar Navigation
+  return (
+    <nav className="fixed left-0 top-0 h-full w-64 bg-white/90 backdrop-blur-md border-r border-green-200/60 shadow-lg z-40 flex flex-col">
+      {/* Sidebar Header */}
+      <div className="p-6 border-b border-green-200/60">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+            <CookingPot className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-green-700 to-orange-600 bg-clip-text text-transparent">
+              Pantry
+            </h2>
+            <p className="text-sm text-green-600/80">Smart Kitchen</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Items */}
+      <div className="flex-1 p-4 space-y-2">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+
+          return (
+            <Button
+              key={item.id}
+              variant={isActive ? "default" : "ghost"}
+              onClick={() => onTabChange(item.id)}
+              className={cn(
+                "w-full justify-start h-12 px-4 text-sm font-medium rounded-lg",
+                getButtonStyles(item, isActive)
+              )}
+            >
+              <Icon className="h-5 w-5 mr-3" />
+              <span>{item.label}</span>
+            </Button>
+          );
+        })}
+      </div>
+
+      {/* Kitchen Decoration */}
+      <div className="p-4 border-t border-green-200/60">
+        <div className="flex items-center justify-center space-x-2 text-green-500/30">
+          <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse"></div>
+          <div className="w-2 h-2 bg-orange-300/40 rounded-full animate-pulse delay-500"></div>
+          <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse delay-1000"></div>
         </div>
       </div>
     </nav>
