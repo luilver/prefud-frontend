@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +5,16 @@ import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2, Eye, Salad, Loader2 } 
 import { useUser } from "@/contexts/UserContext";
 import AIMealCreatorStepper from "./AIMealCreatorStepper";
 import AIMealView from "./AIMealView";
+import PageSizeSelector from "./PageSizeSelector";
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
 
 const AIMealCreator = () => {
@@ -13,6 +22,8 @@ const AIMealCreator = () => {
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [apiMeals, setApiMeals] = useState<any[]>([]);
   const [isLoadingMeals, setIsLoadingMeals] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const { aiMeals, addAIMeal, user } = useUser();
   const { toast } = useToast();
 
@@ -59,6 +70,13 @@ const AIMealCreator = () => {
     }
   };
 
+  // Calculate pagination
+  const totalMeals = [...aiMeals, ...apiMeals];
+  const totalPages = Math.ceil(totalMeals.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPageMeals = totalMeals.slice(startIndex, endIndex);
+
   const handleStartCreation = () => {
     setShowCreator(true);
   };
@@ -75,6 +93,8 @@ const AIMealCreator = () => {
     };
     addAIMeal(newMeal);
     setShowCreator(false);
+    // Reset to first page when new meal is added
+    setCurrentPage(1);
     // Refresh API meals after creating a new one
     fetchUserMeals();
   };
@@ -84,7 +104,6 @@ const AIMealCreator = () => {
   };
 
   const handleViewApiMeal = (apiMeal: any) => {
-    // Transform API meal data to match the expected format
     const transformedMeal = {
       id: apiMeal._id,
       name: apiMeal.specialMeal.specialMeal.name,
@@ -111,6 +130,19 @@ const AIMealCreator = () => {
     setSelectedMeal(transformedMeal);
   };
 
+  const handlePageChange = (page: number) => {
+    if (page !== currentPage && page >= 1 && page <= totalPages) {
+      console.log(`Changing to page: ${page}`);
+      setCurrentPage(page);
+    }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    console.log(`Changing page size to: ${newSize}`);
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
   if (showCreator) {
     return (
       <AIMealCreatorStepper 
@@ -129,12 +161,8 @@ const AIMealCreator = () => {
     );
   }
 
-  // Combine local AI meals and API meals
-  const totalMeals = [...aiMeals, ...apiMeals];
-
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center space-x-2">
           <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
@@ -149,7 +177,6 @@ const AIMealCreator = () => {
         </p>
       </div>
 
-      {/* Create New Meal Button */}
       <div className="flex justify-center">
         <Button 
           onClick={handleStartCreation}
@@ -161,7 +188,18 @@ const AIMealCreator = () => {
         </Button>
       </div>
 
-      {/* Loading State */}
+      {!isLoadingMeals && totalMeals.length > 0 && (
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
+          <PageSizeSelector 
+            pageSize={pageSize} 
+            onPageSizeChange={handlePageSizeChange}
+          />
+          <div className="text-sm text-gray-600">
+            Showing page {currentPage} of {totalPages} ({currentPageMeals.length} meals)
+          </div>
+        </div>
+      )}
+
       {isLoadingMeals && (
         <div className="flex items-center justify-center py-8">
           <div className="text-center">
@@ -171,98 +209,153 @@ const AIMealCreator = () => {
         </div>
       )}
 
-      {/* Created Meals List */}
       {!isLoadingMeals && totalMeals.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-center">Your AI Created Meals</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {/* Local AI Meals */}
-            {aiMeals.map((meal, index) => (
-              <Card key={`local-${index}`} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <ChefHat className="h-5 w-5 text-purple-600" />
-                    <CardTitle className="text-lg">{meal.name}</CardTitle>
-                  </div>
-                  <CardDescription>
-                    {meal.cuisine} • {meal.cookingTime} mins • {meal.difficulty}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {meal.tags?.slice(0, 3).map((tag: string, tagIndex: number) => (
-                      <span 
-                        key={tagIndex}
-                        className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
+            {currentPageMeals.map((meal, index) => {
+              const isLocalMeal = aiMeals.includes(meal);
+              const actualIndex = isLocalMeal ? aiMeals.indexOf(meal) : apiMeals.indexOf(meal);
+              
+              if (isLocalMeal) {
+                return (
+                  <Card key={`local-${actualIndex}`} className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-center space-x-2">
+                        <ChefHat className="h-5 w-5 text-purple-600" />
+                        <CardTitle className="text-lg">{meal.name}</CardTitle>
+                      </div>
+                      <CardDescription>
+                        {meal.cuisine} • {meal.cookingTime} mins • {meal.difficulty}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {meal.tags?.slice(0, 3).map((tag: string, tagIndex: number) => (
+                          <span 
+                            key={tagIndex}
+                            className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleViewMeal(meal)}
                       >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => handleViewMeal(meal)}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    View Recipe
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-
-            {/* API Meals */}
-            {apiMeals.map((apiMeal, index) => (
-              <Card key={`api-${apiMeal._id || index}`} className="hover:shadow-lg transition-shadow border-green-200">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <ChefHat className="h-5 w-5 text-green-600" />
-                    <CardTitle className="text-lg">{apiMeal.specialMeal.specialMeal.name}</CardTitle>
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                      Saved
-                    </span>
-                  </div>
-                  <CardDescription>
-                    {apiMeal.cuisinePreferences?.[0] || 'Various'} • {apiMeal.specialMeal.specialMeal.cookingTime || apiMeal.maxCookingTime} mins • {apiMeal.cookingSkillLevel}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-3">{apiMeal.specialMeal.specialMeal.description}</p>
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                      {apiMeal.mealType}
-                    </span>
-                    {apiMeal.dietaryRestrictions?.slice(0, 2).map((restriction: string, tagIndex: number) => (
-                      <span 
-                        key={tagIndex}
-                        className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
+                        <Eye className="h-4 w-4 mr-1" />
+                        View Recipe
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              } else {
+                return (
+                  <Card key={`api-${meal._id || actualIndex}`} className="hover:shadow-lg transition-shadow border-green-200">
+                    <CardHeader>
+                      <div className="flex items-center space-x-2">
+                        <ChefHat className="h-5 w-5 text-green-600" />
+                        <CardTitle className="text-lg">{meal.specialMeal.specialMeal.name}</CardTitle>
+                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          Saved
+                        </span>
+                      </div>
+                      <CardDescription>
+                        {meal.cuisinePreferences?.[0] || 'Various'} • {meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime} mins • {meal.cookingSkillLevel}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600 mb-3">{meal.specialMeal.specialMeal.description}</p>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                          {meal.mealType}
+                        </span>
+                        {meal.dietaryRestrictions?.slice(0, 2).map((restriction: string, tagIndex: number) => (
+                          <span 
+                            key={tagIndex}
+                            className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
+                          >
+                            {restriction}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="text-xs text-gray-500 mb-2">
+                        {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} people
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleViewApiMeal(meal)}
                       >
-                        {restriction}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="text-xs text-gray-500 mb-2">
-                    {apiMeal.specialMeal.specialMeal.calories} cal • {apiMeal.numberPeople} people
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => handleViewApiMeal(apiMeal)}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    View Recipe
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                        <Eye className="h-4 w-4 mr-1" />
+                        View Recipe
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              }
+            })}
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    if (
+                      page === 1 || 
+                      page === totalPages || 
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={page === currentPage}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    } else if (
+                      (page === currentPage - 2 && currentPage > 3) ||
+                      (page === currentPage + 2 && currentPage < totalPages - 2)
+                    ) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Empty State */}
       {!isLoadingMeals && totalMeals.length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
