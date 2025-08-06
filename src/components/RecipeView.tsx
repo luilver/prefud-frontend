@@ -1,9 +1,11 @@
-
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X } from "lucide-react";
+import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X, ShoppingCart } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
+import MealShoppingModal from "./MealShoppingModal";
 
 interface RecipeViewProps {
   meal: any;
@@ -14,6 +16,9 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const { addShoppingItem } = useUser();
+  const { toast } = useToast();
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -33,6 +38,72 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
     setIsVideoPlaying(false);
   };
 
+  const openShoppingModal = () => {
+    setShowShoppingModal(true);
+  };
+
+  const handleCreateShoppingList = () => {
+    try {
+      const ingredients = getIngredientsForShopping();
+      ingredients.forEach((ingredient) => {
+        addShoppingItem({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || 'ingredient',
+          priority: 'medium',
+          purchased: false,
+          notes: `From meal: ${meal.name}`
+        });
+      });
+
+      toast({
+        title: "Shopping List Created!",
+        description: `Added ${ingredients.length} ingredients to your shopping list.`,
+      });
+    } catch (error) {
+      console.error('Error creating shopping list:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create shopping list. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getIngredientsForShopping = () => {
+    if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
+      return meal.ingredientsData.map((ingredient: any) => ({
+        name: ingredient.name || ingredient,
+        quantity: ingredient.quantity || 1,
+        unit: ingredient.unit || 'unit',
+        classification: ingredient.classification || 'ingredient'
+      }));
+    }
+    
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      return meal.ingredients.map((ingredient: string) => {
+        const match = ingredient.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
+        if (match) {
+          return {
+            name: match[3],
+            quantity: parseFloat(match[1]),
+            unit: match[2],
+            classification: 'ingredient'
+          };
+        }
+        return {
+          name: ingredient,
+          quantity: 1,
+          unit: 'unit',
+          classification: 'ingredient'
+        };
+      });
+    }
+    
+    return [];
+  };
+
   const nutrition = useMemo(() => ({
     calories: meal.calories,
     protein: Math.floor(meal.calories * 0.2 / 4),
@@ -42,7 +113,6 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
     sodium: Math.floor(Math.random() * 800) + 200
   }), [meal.calories]);
 
-  // Use actual ingredient data from the meal, with fallback to simple ingredient names
   const getIngredientsDisplay = () => {
     // Check if meal has structured ingredient data (from API)
     if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
@@ -127,13 +197,13 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
             ← Back to Plan
           </Button>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Heart className="h-4 w-4 mr-1" />
-              Save
-            </Button>
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Share2 className="h-4 w-4 mr-1" />
-              Share
+            <Button 
+              onClick={openShoppingModal}
+              className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
+              size="sm"
+            >
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Shopping List
             </Button>
           </div>
         </div>
@@ -395,12 +465,16 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Add to Shopping List
+                <Button 
+                  onClick={handleCreateShoppingList}
+                  className="w-full justify-start" 
+                  variant="outline"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Quick Shopping
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
-                  <Heart className="h-4 w-4 mr-2" />
+                  <BookOpen className="h-4 w-4 mr-2" />
                   Mark as Favorite
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
@@ -462,6 +536,12 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
           </div>
         </div>
       )}
+
+      <MealShoppingModal
+        meal={meal}
+        isOpen={showShoppingModal}
+        onClose={() => setShowShoppingModal(false)}
+      />
     </>
   );
 };
