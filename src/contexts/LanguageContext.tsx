@@ -70,7 +70,7 @@ const translations = {
       "Use ingredients before they expire",
     "home.features.save-money.title": "Save Money",
     "home.features.save-money.description": "Shop smarter with automated lists",
-    "home.footer.copyright": "© 2024 Pantry. All rights reserved.",
+    "home.footer.copyright": "© 2025 Pantry by Bessel LLC. All rights reserved.",
     "home.nav.why-pantry": "Why Pantry?",
     "home.nav.get-started": "Get Started",
 
@@ -376,7 +376,7 @@ const translations = {
     "home.features.save-money.title": "Ahorrar Dinero",
     "home.features.save-money.description":
       "Compra más inteligentemente con listas automatizadas",
-    "home.footer.copyright": "© 2024 Pantry. Todos los derechos reservados.",
+    "home.footer.copyright": "© 2025 Pantry de Bessel LLC. Todos los derechos reservados.",
     "home.nav.why-pantry": "¿Por qué Pantry?",
     "home.nav.get-started": "Comenzar",
 
@@ -696,7 +696,7 @@ const translations = {
     "home.features.save-money.title": "Economizar Dinheiro",
     "home.features.save-money.description":
       "Compre mais inteligentemente com listas automatizadas",
-    "home.footer.copyright": "© 2024 Pantry. Todos os direitos reservados.",
+    "home.footer.copyright": "© 2025 Pantry do Bessel LLC. Todos os direitos reservados.",
     "home.nav.why-pantry": "Por que Pantry?",
     "home.nav.get-started": "Começar",
 
