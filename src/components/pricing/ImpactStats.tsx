@@ -11,57 +11,47 @@ const ImpactStats = () => {
       icon: Leaf,
       titleKey: 'pricing.environmental-impact',
       descriptionKey: 'pricing.environmental-description',
-      colorClasses: {
-        bg: 'bg-gradient-to-br from-green-50 to-green-100',
-        border: 'border-green-200',
-        icon: 'text-green-600',
-        title: 'text-green-800',
-        description: 'text-green-700'
-      }
+      gradient: 'from-emerald-500/10 to-green-500/10',
+      iconColor: 'text-emerald-600',
+      borderColor: 'border-emerald-200/20'
     },
     {
       icon: DollarSign,
       titleKey: 'pricing.money-savings',
       descriptionKey: 'pricing.money-description',
-      colorClasses: {
-        bg: 'bg-gradient-to-br from-blue-50 to-blue-100',
-        border: 'border-blue-200',
-        icon: 'text-blue-600',
-        title: 'text-blue-800',
-        description: 'text-blue-700'
-      }
+      gradient: 'from-blue-500/10 to-cyan-500/10',
+      iconColor: 'text-blue-600',
+      borderColor: 'border-blue-200/20'
     },
     {
       icon: Clock,
       titleKey: 'pricing.time-efficiency',
       descriptionKey: 'pricing.time-description',
-      colorClasses: {
-        bg: 'bg-gradient-to-br from-orange-50 to-orange-100',
-        border: 'border-orange-200',
-        icon: 'text-orange-600',
-        title: 'text-orange-800',
-        description: 'text-orange-700'
-      }
+      gradient: 'from-orange-500/10 to-amber-500/10',
+      iconColor: 'text-orange-600',
+      borderColor: 'border-orange-200/20'
     }
   ];
 
   return (
-    <div className="grid md:grid-cols-3 gap-8 mb-20">
+    <div className="grid md:grid-cols-3 gap-6 mb-24">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
           <Card 
             key={index} 
-            className={`${stat.colorClasses.bg} ${stat.colorClasses.border} border-2 hover:shadow-lg transition-all duration-300 hover:scale-105`}
+            className={`bg-gradient-to-br ${stat.gradient} ${stat.borderColor} border hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group`}
           >
             <CardContent className="p-8 text-center">
-              <div className="mb-6">
-                <Icon className={`h-16 w-16 ${stat.colorClasses.icon} mx-auto`} />
+              <div className="mb-6 flex justify-center">
+                <div className="p-3 rounded-full bg-background/50 backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
+                  <Icon className={`h-8 w-8 ${stat.iconColor}`} />
+                </div>
               </div>
-              <h3 className={`text-xl font-bold ${stat.colorClasses.title} mb-4`}>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
                 {t(stat.titleKey)}
               </h3>
-              <p className={`${stat.colorClasses.description} text-base leading-relaxed`}>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 {t(stat.descriptionKey)}
               </p>
             </CardContent>

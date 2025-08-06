@@ -156,13 +156,13 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-orange-50">
-      <div className="container mx-auto px-6 py-12 max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-6 py-16 max-w-7xl">
         <PricingHeader />
         <ImpactStats />
         
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-20">
+        <div className="grid lg:grid-cols-3 gap-8 mb-24 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <PricingCard 
               key={plan.id}
