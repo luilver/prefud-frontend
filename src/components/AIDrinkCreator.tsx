@@ -2,11 +2,21 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf } from "lucide-react";
+import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import AIDrinkCreatorStepper from "./AIDrinkCreatorStepper";
 import AIDrinkView from "./AIDrinkView";
 import DrinkDetailView from "./DrinkDetailView";
+import PageSizeSelector from "./PageSizeSelector";
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { getDrinksByUser, ApiDrink } from "@/services/drinkService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,22 +26,28 @@ const AIDrinkCreator = () => {
   const [selectedApiDrink, setSelectedApiDrink] = useState<ApiDrink | null>(null);
   const [apiDrinks, setApiDrinks] = useState<ApiDrink[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const { user, aiDrinks, addAIDrink } = useUser();
   const { toast } = useToast();
 
   useEffect(() => {
     if (user?.id) {
-      fetchUserDrinks();
+      fetchUserDrinks(currentPage, pageSize);
     }
-  }, [user?.id]);
+  }, [user?.id, currentPage, pageSize]);
 
-  const fetchUserDrinks = async () => {
+  const fetchUserDrinks = async (page: number = 1, limit: number = 5) => {
     if (!user?.id) return;
     
     setLoading(true);
     try {
-      const response = await getDrinksByUser(user.id, 1, 20);
+      console.log('Fetching drinks for user:', user.id, 'page:', page, 'limit:', limit);
+      
+      const response = await getDrinksByUser(user.id, page, limit);
       setApiDrinks(response.data || []);
+      setTotalPages(response.totalPages || 1);
       console.log('Fetched user drinks:', response.data);
     } catch (error) {
       console.error('Failed to fetch user drinks:', error);
@@ -43,6 +59,19 @@ const AIDrinkCreator = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page !== currentPage && page >= 1 && page <= totalPages) {
+      console.log(`Changing to page: ${page}`);
+      setCurrentPage(page);
+    }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    console.log(`Changing page size to: ${newSize}`);
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
   };
 
   const handleStartCreation = () => {
@@ -62,8 +91,9 @@ const AIDrinkCreator = () => {
     };
     addAIDrink(newDrink);
     setShowStepper(false);
-    // Refresh API drinks list
-    fetchUserDrinks();
+    // Refresh API drinks list and reset to first page
+    setCurrentPage(1);
+    fetchUserDrinks(1, pageSize);
   };
 
   const handleViewDrink = (drink: any) => {
@@ -102,6 +132,7 @@ const AIDrinkCreator = () => {
   }
 
   const totalDrinks = aiDrinks.length + apiDrinks.length;
+  const hasApiDrinks = apiDrinks.length > 0;
 
   return (
     <div className="space-y-6">
@@ -129,13 +160,27 @@ const AIDrinkCreator = () => {
       {loading ? (
         <Card>
           <CardContent className="py-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-            <p className="text-green-600">Loading your drinks...</p>
+            <div className="flex items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin mr-2 text-green-600" />
+              <p className="text-green-600">Loading your drinks...</p>
+            </div>
           </CardContent>
         </Card>
-      ) : apiDrinks.length > 0 ? (
+      ) : hasApiDrinks ? (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-center text-green-800">Your Created Drinks</h2>
+          
+          {/* Pagination Controls */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
+            <PageSizeSelector 
+              pageSize={pageSize} 
+              onPageSizeChange={handlePageSizeChange}
+            />
+            <div className="text-sm text-gray-600">
+              Showing page {currentPage} of {totalPages} ({apiDrinks.length} drinks)
+            </div>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {apiDrinks.map((drink) => (
               <Card key={drink._id} className="border-green-200 hover:shadow-lg transition-shadow">
@@ -187,6 +232,59 @@ const AIDrinkCreator = () => {
               </Card>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    if (
+                      page === 1 || 
+                      page === totalPages || 
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={page === currentPage}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    } else if (
+                      (page === currentPage - 2 && currentPage > 3) ||
+                      (page === currentPage + 2 && currentPage < totalPages - 2)
+                    ) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       ) : null}
 
