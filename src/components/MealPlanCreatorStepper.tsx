@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, ChefHat, Users, Clock, DollarSign, Target, Utensils, Heart, AlertCircle, CheckCircle, Sparkles, Plus, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, ChefHat, Users, Clock, DollarSign, Target, Utensils, Heart, AlertCircle, CheckCircle, Sparkles, Plus, X, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
@@ -95,8 +95,18 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
+  const getLanguageDisplayName = (lang: string) => {
+    const languageNames: { [key: string]: string } = {
+      en: "English",
+      es: "Español", 
+      pt: "Português"
+    };
+    return languageNames[lang] || "English";
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
 
     setPlanData(prevData => {
       if (type === "checkbox") {
@@ -239,7 +249,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
         cookingSkillLevel: effectiveCookingSkillLevel,
         budgetRange: effectiveBudgetRange,
         healthGoals: planData.healthGoals,
-        language: getLanguageName(language),
+        language: getLanguageDisplayName(language),
         user_id: user.id,
         start_date: planData.startDate.toISOString().split('T')[0],
         plan_name: planData.planName,
@@ -273,14 +283,22 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
       });
 
       // Set the success modal data with properly mapped information
-      setSuccessPlan({
+      const successPlanData = {
         ...transformedPlan,
-        // Ensure the success modal gets the right format
-        name: transformedPlan.name,
-        numberOfDays: transformedPlan.preferences?.numberOfDays || (transformedPlan.duration ? parseInt(transformedPlan.duration.replace(' days', '')) : 7),
-        numberOfPersons: transformedPlan.preferences?.numberOfPersons || 1,
-        mealsPerDay: transformedPlan.preferences?.mealsPerDay || 3
-      });
+        name: transformedPlan.name || planData.planName,
+        numberOfDays: planData.numberOfWeeks * 7,
+        numberOfPersons: planData.numberOfPersons,
+        mealsPerDay: planData.mealsPerDay,
+        preferences: {
+          ...transformedPlan.preferences,
+          numberOfDays: planData.numberOfWeeks * 7,
+          numberOfPersons: planData.numberOfPersons,
+          mealsPerDay: planData.mealsPerDay
+        }
+      };
+      
+      console.log('📋 Setting success plan data:', successPlanData);
+      setSuccessPlan(successPlanData);
       setShowSuccessModal(true);
 
       // Call the parent callback with the transformed plan
@@ -653,21 +671,19 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
         onViewPlan={handleViewSuccessPlan}
         mealPlan={successPlan ? {
           name: successPlan.name,
-          numberOfDays: successPlan.numberOfDays || (successPlan.preferences?.numberOfDays) || 7,
-          numberOfPersons: successPlan.numberOfPersons || (successPlan.preferences?.numberOfPersons) || 1,
-          mealsPerDay: successPlan.mealsPerDay || (successPlan.preferences?.mealsPerDay) || 3
+          numberOfDays: successPlan.numberOfDays || 7,
+          numberOfPersons: successPlan.numberOfPersons || 1,
+          mealsPerDay: successPlan.mealsPerDay || 3
         } : undefined}
       />
 
       {/* Timeout Modal */}
       <MealPlanTimeoutModal
         isOpen={showTimeoutModal}
-        onClose={() => setShowTimeoutModal(false)}
-        onBackToPlanner={() => {
+        onClose={() => {
           setShowTimeoutModal(false);
           onBack();
         }}
-        planName={planData.planName}
       />
     </div>
   );
