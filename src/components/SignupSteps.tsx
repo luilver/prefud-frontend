@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star } from "lucide-react";
+import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star, Sparkles } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import UserProfileForm from "./UserProfileForm";
@@ -60,7 +60,8 @@ const SignupSteps = () => {
         "Pantry Management",
         "Email Support"
       ],
-      popular: false
+      popular: false,
+      gradient: "from-gray-500 to-gray-600"
     },
     {
       id: "family",
@@ -77,7 +78,8 @@ const SignupSteps = () => {
         "Nutritional Analysis",
         "Priority Support"
       ],
-      popular: true
+      popular: true,
+      gradient: "from-green-500 to-orange-500"
     },
     {
       id: "professional",
@@ -97,7 +99,8 @@ const SignupSteps = () => {
         "Phone Support",
         "Priority Processing"
       ],
-      popular: false
+      popular: false,
+      gradient: "from-purple-600 to-blue-600"
     }
   ];
 
@@ -184,11 +187,11 @@ const SignupSteps = () => {
   };
 
   const stepItems = [
-    { step: 1, title: "Basic Info", icon: User },
-    { step: 2, title: "Verify Email", icon: Mail },
-    { step: 3, title: "Profile", icon: User },
-    { step: 4, title: "Subscription", icon: Crown },
-    { step: 5, title: "Payment", icon: CreditCard },
+    { step: 1, title: "Account", icon: User, color: "from-blue-500 to-cyan-500" },
+    { step: 2, title: "Verify", icon: Mail, color: "from-purple-500 to-pink-500" },
+    { step: 3, title: "Profile", icon: User, color: "from-green-500 to-teal-500" },
+    { step: 4, title: "Plan", icon: Crown, color: "from-orange-500 to-red-500" },
+    { step: 5, title: "Payment", icon: CreditCard, color: "from-indigo-500 to-purple-500" },
   ];
 
   if (showWelcome) {
@@ -196,96 +199,144 @@ const SignupSteps = () => {
   }
 
   return (
-    <div className="max-w-full sm:max-w-4xl mx-auto space-y-4 sm:space-y-6">
-      {/* Progress Steps - Mobile Responsive */}
-      <div className="flex justify-center mb-6 sm:mb-8 overflow-x-auto">
-        <div className="flex items-center space-x-2 sm:space-x-4 px-4 sm:px-0 min-w-max">
-          {stepItems.map(({ step, title, icon: Icon }) => (
-            <div key={step} className="flex items-center">
-              <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${
-                currentStep >= step 
-                  ? 'bg-green-500 border-green-500 text-white' 
-                  : 'border-gray-300 text-gray-400'
-              }`}>
-                {currentStep > step ? (
-                  <Check className="h-3 w-3 sm:h-5 sm:w-5" />
-                ) : (
-                  <Icon className="h-3 w-3 sm:h-5 sm:w-5" />
+    <div className="max-w-full sm:max-w-5xl mx-auto space-y-6 sm:space-y-8">
+      {/* Enhanced Progress Steps with animations and gradients */}
+      <div className="relative mb-8 sm:mb-12">
+        <div className="flex justify-center overflow-x-auto pb-4">
+          <div className="flex items-center space-x-3 sm:space-x-6 px-4 sm:px-0 min-w-max">
+            {stepItems.map(({ step, title, icon: Icon, color }, index) => (
+              <div key={step} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className={`relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full transition-all duration-500 ${
+                    currentStep >= step 
+                      ? `bg-gradient-to-r ${color} text-white shadow-lg scale-110` 
+                      : 'bg-white border-2 border-gray-300 text-gray-400 shadow-sm'
+                  }`}>
+                    {currentStep > step ? (
+                      <Check className="h-5 w-5 sm:h-6 sm:w-6" />
+                    ) : (
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                    )}
+                    
+                    {/* Animated ring for current step */}
+                    {currentStep === step && (
+                      <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${color} opacity-20 animate-pulse scale-125`}></div>
+                    )}
+                  </div>
+                  
+                  <span className={`mt-2 text-xs sm:text-sm font-medium transition-all duration-300 ${
+                    currentStep >= step 
+                      ? 'text-gray-800 font-semibold' 
+                      : 'text-gray-400'
+                  }`}>
+                    {title}
+                  </span>
+                </div>
+                
+                {index < stepItems.length - 1 && (
+                  <div className={`w-8 sm:w-16 h-1 mx-4 rounded-full transition-all duration-500 ${
+                    currentStep > step 
+                      ? `bg-gradient-to-r ${stepItems[index + 1].color}` 
+                      : 'bg-gray-200'
+                  }`} />
                 )}
               </div>
-              <span className={`ml-1 sm:ml-2 text-xs sm:text-sm font-medium ${
-                currentStep >= step ? 'text-green-600' : 'text-gray-400'
-              }`}>
-                {title}
-              </span>
-              {step < stepItems.length && (
-                <div className={`w-4 sm:w-8 h-0.5 ml-2 sm:ml-4 ${
-                  currentStep > step ? 'bg-green-500' : 'bg-gray-300'
-                }`} />
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Step 1: Basic Info - Now with translations */}
+      {/* Step 1: Basic Info - Enhanced design */}
       {currentStep === 1 && (
-        <Card className="max-w-full sm:max-w-md mx-auto bg-white/90 backdrop-blur-sm">
-          <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-            <CardTitle className="text-lg sm:text-xl">{t('signup.account.title')}</CardTitle>
-            <CardDescription className="text-sm sm:text-base">{t('signup.account.description')}</CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            <form onSubmit={handleBasicInfoSubmit} className="space-y-3 sm:space-y-4">
-              <div>
-                <Label htmlFor="email" className="text-sm sm:text-base">{t('signup.account.email')}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={signupData.email}
-                  onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="password" className="text-sm sm:text-base">{t('signup.account.password')}</Label>
-                <div className="relative mt-1">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={signupData.password}
-                    onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
-                    required
-                    className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </Button>
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-3xl blur-xl"></div>
+          <Card className="relative max-w-full sm:max-w-lg mx-auto bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+            
+            <CardHeader className="px-6 sm:px-8 py-6 sm:py-8 text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl shadow-lg">
+                  <User className="h-8 w-8 text-white" />
                 </div>
               </div>
+              <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+                {t('signup.account.title')}
+              </CardTitle>
+              <CardDescription className="text-base sm:text-lg text-gray-600">
+                {t('signup.account.description')}
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="px-6 sm:px-8 pb-6 sm:pb-8">
+              <form onSubmit={handleBasicInfoSubmit} className="space-y-5 sm:space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm sm:text-base font-medium text-gray-700">
+                    {t('signup.account.email')}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      type="email"
+                      value={signupData.email}
+                      onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
+                      required
+                      className="h-12 sm:h-14 text-sm sm:text-base border-2 border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 rounded-xl transition-all duration-200 bg-gray-50/50 focus:bg-white"
+                      placeholder="Enter your email address"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm sm:text-base font-medium text-gray-700">
+                    {t('signup.account.password')}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={signupData.password}
+                      onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
+                      required
+                      className="h-12 sm:h-14 text-sm sm:text-base border-2 border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 rounded-xl transition-all duration-200 bg-gray-50/50 focus:bg-white pr-12"
+                      placeholder="Create a secure password"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100 rounded-lg"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
 
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
-                disabled={isLoading}
-              >
-                {isLoading ? t('signup.account.sending') : t('signup.account.continue')}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 sm:h-14 text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>{t('signup.account.sending')}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <span>{t('signup.account.continue')}</span>
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Step 2: OTP Verification */}
@@ -297,7 +348,7 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 3: User Profile - Now includes phone fields and name fields */}
+      {/* Step 3: User Profile */}
       {currentStep === 3 && (
         <UserProfileForm 
           onComplete={handleProfileComplete}
@@ -305,74 +356,109 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 4: Subscription Choice - Updated layout and pricing */}
+      {/* Step 4: Subscription Choice - Enhanced design */}
       {currentStep === 4 && (
-        <div className="space-y-4 sm:space-y-6">
-          <div className="text-center mb-6 sm:mb-8 px-4 sm:px-0">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Choose Your Plan</h2>
-            <p className="text-gray-600 text-sm sm:text-base">Select the plan that works best for you</p>
+        <div className="space-y-8 sm:space-y-12">
+          {/* Header with enhanced styling */}
+          <div className="text-center space-y-4 px-4 sm:px-0">
+            <div className="flex justify-center mb-6">
+              <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl shadow-2xl">
+                <Crown className="h-10 w-10 text-white" />
+              </div>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              Choose Your Plan
+            </h2>
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+              Select the perfect plan to start your personalized meal planning journey
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
-            {subscriptionPlans.map((plan) => (
-              <Card 
-                key={plan.id} 
-                className={`relative border-2 cursor-pointer transition-all h-full ${
-                  plan.popular 
-                    ? 'border-green-500 ring-2 ring-green-200 shadow-lg' 
-                    : 'border-gray-200 hover:border-green-500 hover:shadow-md'
-                }`}
-                onClick={() => handleSubscriptionChoice(plan.id)}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                      <Star className="h-3 w-3" />
-                      <span>Most Popular</span>
-                    </div>
-                  </div>
-                )}
+          {/* Enhanced plan cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 px-2 sm:px-0">
+            {subscriptionPlans.map((plan, index) => (
+              <div key={plan.id} className="relative group">
+                {/* Background gradient blur */}
+                <div className={`absolute inset-0 bg-gradient-to-r ${plan.gradient} opacity-0 group-hover:opacity-10 rounded-3xl blur-xl transition-all duration-500`}></div>
                 
-                <CardHeader className="text-center pb-4 px-4 sm:px-6 py-4 sm:py-6">
-                  <div className="flex justify-center mb-4">
-                    <Crown className={`h-8 w-8 ${plan.popular ? 'text-green-500' : 'text-gray-400'}`} />
-                  </div>
-                  <CardTitle className="text-xl sm:text-2xl mb-2">{plan.name}</CardTitle>
-                  <CardDescription className="text-sm mb-4 min-h-[3rem] flex items-center justify-center">
-                    {plan.description}
-                  </CardDescription>
-                  <div className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
-                    {plan.price === 0 ? 'Free' : `$${plan.price}`}
-                    {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
-                  </div>
-                </CardHeader>
-
-                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col justify-between flex-1">
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-800 mb-3">Features</h4>
-                    <ul className="space-y-2">
-                      {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start space-x-3">
-                          <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-gray-700">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <Card 
+                  className={`relative cursor-pointer transition-all duration-500 border-2 rounded-3xl overflow-hidden h-full transform group-hover:scale-[1.02] group-hover:shadow-2xl ${
+                    plan.popular 
+                      ? 'border-green-400 shadow-2xl bg-gradient-to-b from-white to-green-50/30' 
+                      : 'border-gray-200 hover:border-gray-300 bg-white shadow-lg'
+                  }`}
+                  onClick={() => handleSubscriptionChoice(plan.id)}
+                >
+                  {/* Top gradient line */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${plan.gradient}`}></div>
                   
-                  <Button 
-                    className={`w-full h-12 text-sm sm:text-base font-medium ${
-                      plan.id === 'free' 
-                        ? 'bg-gray-600 hover:bg-gray-700 text-white' 
-                        : plan.id === 'family'
-                        ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-white'
-                        : 'bg-gray-800 hover:bg-gray-700 text-white'
-                    }`}
-                  >
-                    Choose {plan.name}
-                  </Button>
-                </CardContent>
-              </Card>
+                  {/* Popular badge */}
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="bg-gradient-to-r from-green-500 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg flex items-center space-x-2">
+                        <Star className="h-4 w-4 fill-current" />
+                        <span>Most Popular</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <CardHeader className="text-center pb-4 px-6 sm:px-8 py-8 sm:py-10">
+                    <div className="flex justify-center mb-6">
+                      <div className={`p-4 bg-gradient-to-r ${plan.gradient} rounded-2xl shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                        <Crown className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    
+                    <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">
+                      {plan.name}
+                    </CardTitle>
+                    
+                    <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
+                      {plan.price === 0 ? (
+                        <span className="bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">Free</span>
+                      ) : (
+                        <span className={`bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}>
+                          ${plan.price}
+                        </span>
+                      )}
+                      {plan.price > 0 && <span className="text-lg font-normal text-gray-500">/{plan.interval}</span>}
+                    </div>
+                    
+                    <CardDescription className="text-base text-gray-600 min-h-[3rem] flex items-center justify-center px-4">
+                      {plan.description}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="px-6 sm:px-8 pb-8 flex flex-col justify-between flex-1">
+                    <div className="mb-8">
+                      <h4 className="font-bold text-gray-800 mb-6 text-center text-lg">What's included</h4>
+                      <ul className="space-y-4">
+                        {plan.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-start space-x-3">
+                            <div className={`flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r ${plan.gradient} flex items-center justify-center mt-0.5`}>
+                              <Check className="h-3 w-3 text-white font-bold" />
+                            </div>
+                            <span className="text-sm text-gray-700 leading-relaxed">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <Button 
+                      className={`w-full h-14 text-base font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${
+                        plan.id === 'free' 
+                          ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white' 
+                          : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-white`
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>Choose {plan.name}</span>
+                        <Sparkles className="h-5 w-5" />
+                      </div>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
