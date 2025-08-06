@@ -7,6 +7,7 @@ import PricingHeader from "@/components/pricing/PricingHeader";
 import ImpactStats from "@/components/pricing/ImpactStats";
 import PricingCard from "@/components/pricing/PricingCard";
 import PricingFAQ from "@/components/pricing/PricingFAQ";
+import Footer from "@/components/Footer";
 
 interface PricingPlan {
   id: string;
@@ -174,6 +175,7 @@ const Pricing = () => {
 
         <PricingFAQ />
       </div>
+      <Footer />
     </div>
   );
 };
