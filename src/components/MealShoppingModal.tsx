@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,10 @@ interface MealShoppingModalProps {
   meal: any;
   isOpen: boolean;
   onClose: () => void;
+  onRequestDelivery?: () => void;
 }
 
-const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) => {
+const MealShoppingModal = ({ meal, isOpen, onClose, onRequestDelivery }: MealShoppingModalProps) => {
   const { addPantryItem } = useUser();
   const { toast } = useToast();
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
@@ -112,7 +112,13 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
       return;
     }
 
-    setShowDeliveryOptions(true);
+    // Close this modal and open the order online modal
+    if (onRequestDelivery) {
+      onRequestDelivery();
+    } else {
+      // Fallback to old delivery options if callback not provided
+      setShowDeliveryOptions(true);
+    }
   };
 
   const confirmDelivery = (deliveryTime: string) => {
@@ -217,7 +223,7 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
                 className="flex-1"
               >
                 <Truck className="h-4 w-4 mr-2" />
-                Request Delivery ({selectedIngredients.length})
+                Order Online ({selectedIngredients.length})
               </Button>
             </div>
           </div>

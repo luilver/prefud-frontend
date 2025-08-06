@@ -6,6 +6,7 @@ import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import MealShoppingModal from "./MealShoppingModal";
+import OrderOnlineModal from "./OrderOnlineModal";
 
 interface AIMealViewProps {
   meal: any;
@@ -17,6 +18,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const [showOrderOnlineModal, setShowOrderOnlineModal] = useState(false);
   const { deleteAIMeal, addShoppingItem } = useUser();
 
   const toggleStep = (stepIndex: number) => {
@@ -512,6 +514,17 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         meal={meal}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
+        onRequestDelivery={() => {
+          setShowShoppingModal(false);
+          setShowOrderOnlineModal(true);
+        }}
+      />
+
+      <OrderOnlineModal
+        meal={meal}
+        ingredients={getIngredientsForShopping()}
+        isOpen={showOrderOnlineModal}
+        onClose={() => setShowOrderOnlineModal(false)}
       />
     </>
   );
