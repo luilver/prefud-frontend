@@ -1,11 +1,11 @@
-
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, Trash2 } from "lucide-react";
+import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X, ShoppingCart } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
+import MealShoppingModal from "./MealShoppingModal";
 
 interface AIMealViewProps {
   meal: any;
@@ -16,7 +16,8 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const { deleteAIMeal } = useUser();
+  const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const { deleteAIMeal, addShoppingItem } = useUser();
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -40,6 +41,66 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     deleteAIMeal(meal.id);
     toast.success("AI meal deleted successfully!");
     onBack();
+  };
+
+  const openShoppingModal = () => {
+    setShowShoppingModal(true);
+  };
+
+  const handleCreateShoppingList = () => {
+    try {
+      const ingredients = getIngredientsForShopping();
+      ingredients.forEach((ingredient) => {
+        addShoppingItem({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || 'ingredient',
+          priority: 'medium',
+          purchased: false,
+          notes: `From AI meal: ${meal.name}`
+        });
+      });
+
+      toast.success(`Shopping List Created! Added ${ingredients.length} ingredients to your shopping list.`);
+    } catch (error) {
+      console.error('Error creating shopping list:', error);
+      toast.error("Failed to create shopping list. Please try again.");
+    }
+  };
+
+  const getIngredientsForShopping = () => {
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      return meal.ingredients.map((ingredient: any) => {
+        if (typeof ingredient === 'object' && ingredient.name) {
+          return {
+            name: ingredient.name,
+            quantity: ingredient.quantity || 1,
+            unit: ingredient.unit || 'unit',
+            classification: ingredient.classification || 'ingredient'
+          };
+        }
+        
+        const ingredientStr = String(ingredient);
+        const match = ingredientStr.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
+        if (match) {
+          return {
+            name: match[3],
+            quantity: parseFloat(match[1]),
+            unit: match[2],
+            classification: 'ingredient'
+          };
+        }
+        return {
+          name: ingredientStr,
+          quantity: 1,
+          unit: 'unit',
+          classification: 'ingredient'
+        };
+      });
+    }
+    
+    return [];
   };
 
   const nutrition = useMemo(() => ({
@@ -120,22 +181,13 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
             ← Back to AI Meals
           </Button>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Heart className="h-4 w-4 mr-1" />
-              Save
-            </Button>
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Share2 className="h-4 w-4 mr-1" />
-              Share
-            </Button>
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-shrink-0 text-red-600 hover:text-red-700"
-              onClick={handleDelete}
+              onClick={openShoppingModal}
+              className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
+              size="sm"
             >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Delete
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Shopping List
             </Button>
           </div>
         </div>
@@ -381,6 +433,30 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
 
             <Card>
               <CardHeader>
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  onClick={handleCreateShoppingList}
+                  className="w-full justify-start" 
+                  variant="outline"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Quick Shopping
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Mark as Favorite
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <ChefHat className="h-4 w-4 mr-2" />
+                  Mark as Cooked
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <CardTitle className="text-lg">Cooking Progress</CardTitle>
               </CardHeader>
               <CardContent>
@@ -431,6 +507,12 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
           </div>
         </div>
       )}
+
+      <MealShoppingModal
+        meal={meal}
+        isOpen={showShoppingModal}
+        onClose={() => setShowShoppingModal(false)}
+      />
     </>
   );
 };
