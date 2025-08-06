@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { User, ArrowLeft, Languages } from "lucide-react";
+import { User, ArrowLeft, Languages, ExternalLink } from "lucide-react";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
@@ -17,6 +17,7 @@ interface UserProfileFormProps {
 
 const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
   const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -29,7 +30,8 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
     selectedLanguage: language,
     healthGoals: [] as string[],
     dietTypes: [] as string[],
-    allergies: [] as string[]
+    allergies: [] as string[],
+    acceptedTerms: false
   });
 
   const healthGoalsOptions = [
@@ -54,6 +56,10 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.acceptedTerms) {
+      return; // Prevent submission if terms not accepted
+    }
     
     // Update global language when form is submitted
     setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
@@ -294,6 +300,35 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
             </div>
           </div>
 
+          {/* Terms and Conditions */}
+          <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Agreement</h3>
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="terms"
+                checked={formData.acceptedTerms}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, acceptedTerms: !!checked }))}
+                className="border-green-300 data-[state=checked]:bg-green-500 mt-1"
+              />
+              <div className="space-y-1">
+                <Label htmlFor="terms" className="text-sm sm:text-base cursor-pointer leading-relaxed">
+                  I agree to the{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/terms-and-conditions')}
+                    className="text-green-600 hover:text-green-700 underline inline-flex items-center gap-1"
+                  >
+                    Terms and Conditions
+                    <ExternalLink className="h-3 w-3" />
+                  </button>
+                </Label>
+                <p className="text-xs text-gray-500">
+                  By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
             <Button
               type="button"
@@ -306,7 +341,8 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
+              disabled={!formData.acceptedTerms}
+              className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed h-10 sm:h-12 text-sm sm:text-base"
             >
               {t('common.continue')}
             </Button>
