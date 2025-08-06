@@ -572,14 +572,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
       {/* Order Online Modal */}
       <OrderOnlineModal
-        meal={{ name: plan.name }}
-        ingredients={orderItems.map(item => ({
-          name: item.name,
-          quantity: item.quantity || 1,
-          unit: item.unit || 'piece'
-        }))}
         isOpen={showOrderModal}
         onClose={() => setShowOrderModal(false)}
+        items={orderItems}
+        mealPlanName={plan.name}
       />
     </div>
   );
