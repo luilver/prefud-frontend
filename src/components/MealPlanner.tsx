@@ -399,7 +399,7 @@ const MealPlanner = () => {
                 </Button>
               </div>
             </CardContent>
-          </div>
+          </Card>
         )
       )}
     </div>
