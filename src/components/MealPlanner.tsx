@@ -183,14 +183,13 @@ const MealPlanner = () => {
         <MealPlanSuccessModal
           isOpen={showSuccessModal}
           onClose={handleCloseSuccessModal}
-          onViewMeal={handleViewSuccessPlan}
-          meal={{
+          onViewPlan={handleViewSuccessPlan}
+          mealPlan={{
             name: successPlan.name,
-            cuisine: successPlan.preferences?.cuisinePreferences?.[0] || "Mixed",
-            cookingTime: 45, // Default cooking time for meal plans
-            servings: successPlan.preferences?.numberOfPersons || successPlan.preferences?.people || 1,
-            difficulty: successPlan.preferences?.cookingSkillLevel || "intermediate",
-            description: `${successPlan.duration || '7 days'} meal plan with ${successPlan.preferences?.mealsPerDay || 3} meals per day`
+            numberOfDays: successPlan.duration ? parseInt(successPlan.duration.replace(' days', '')) : 
+                         (successPlan.preferences?.numberOfWeeks ? successPlan.preferences.numberOfWeeks * 7 : 7),
+            numberOfPersons: successPlan.preferences?.numberOfPersons || successPlan.preferences?.people || 1,
+            mealsPerDay: successPlan.preferences?.mealsPerDay || 3
           }}
         />
       )}

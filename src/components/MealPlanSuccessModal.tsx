@@ -1,23 +1,21 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Sparkles, Clock, Users, ChefHat, Eye, Utensils } from "lucide-react";
+import { CheckCircle, Sparkles, Calendar, Users, Clock, Eye } from "lucide-react";
 
 interface MealPlanSuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onViewMeal?: () => void;
-  meal?: {
+  onViewPlan?: () => void;
+  mealPlan?: {
     name: string;
-    cuisine: string;
-    cookingTime: number;
-    servings: number;
-    difficulty: string;
-    description?: string;
+    numberOfDays: number;
+    numberOfPersons: number;
+    mealsPerDay: number;
   };
 }
 
-const MealPlanSuccessModal = ({ isOpen, onClose, onViewMeal, meal }: MealPlanSuccessModalProps) => {
+const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPlanSuccessModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -31,51 +29,42 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewMeal, meal }: MealPlanSuc
             </div>
           </div>
           <DialogTitle className="text-center text-2xl font-bold text-gray-800">
-            AI Meal Created Successfully! 🎉
+            Meal Plan Created Successfully! 🎉
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 text-center">
           <p className="text-gray-600">
-            Your personalized AI meal <strong>"{meal?.name}"</strong> has been generated and is ready to cook!
+            Your personalized AI meal plan <strong>"{mealPlan?.name}"</strong> has been generated and is ready to use!
           </p>
           
-          {meal && (
+          {mealPlan && (
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-3 gap-4 text-sm">
                 <div className="flex flex-col items-center space-y-1">
-                  <Clock className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium">{meal.cookingTime} mins</span>
+                  <Calendar className="h-4 w-4 text-purple-600" />
+                  <span className="font-medium">{mealPlan.numberOfDays} Days</span>
                 </div>
                 <div className="flex flex-col items-center space-y-1">
                   <Users className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium">{meal.servings} serving{meal.servings > 1 ? 's' : ''}</span>
+                  <span className="font-medium">{mealPlan.numberOfPersons} Person{mealPlan.numberOfPersons > 1 ? 's' : ''}</span>
                 </div>
                 <div className="flex flex-col items-center space-y-1">
-                  <Utensils className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium">{meal.cuisine}</span>
-                </div>
-                <div className="flex flex-col items-center space-y-1">
-                  <ChefHat className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium">{meal.difficulty}</span>
+                  <Clock className="h-4 w-4 text-purple-600" />
+                  <span className="font-medium">{mealPlan.mealsPerDay} Meals/Day</span>
                 </div>
               </div>
-              {meal.description && (
-                <div className="mt-3 pt-3 border-t border-purple-200">
-                  <p className="text-xs text-purple-700 italic">{meal.description}</p>
-                </div>
-              )}
             </div>
           )}
           
           <div className="pt-4 space-y-3">
-            {onViewMeal && (
+            {onViewPlan && (
               <Button 
-                onClick={onViewMeal}
+                onClick={onViewPlan}
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
               >
                 <Eye className="h-4 w-4 mr-2" />
-                View Recipe Details
+                View Meal Plan Details
               </Button>
             )}
             
@@ -85,7 +74,7 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewMeal, meal }: MealPlanSuc
               className="w-full"
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              Create Another Meal
+              Back to Meal Plans
             </Button>
           </div>
         </div>
