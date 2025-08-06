@@ -226,46 +226,66 @@ export const getMealPlans = async (userId: string, page: number = 1, limit: numb
 export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan => {
   console.log('Transforming API meal plan:', apiPlan);
   
-  // Calculate duration and dates
-  const startDate = new Date(apiPlan.start_date);
-  const endDate = new Date(startDate.getTime() + (apiPlan.duration * 24 * 60 * 60 * 1000));
-  const duration = `${apiPlan.duration} days`;
+  // Calculate duration and dates with better error handling
+  let startDate: Date;
+  let endDate: Date;
+  let duration: string;
+
+  // Handle missing or invalid start_date
+  if (apiPlan.start_date) {
+    startDate = new Date(apiPlan.start_date);
+    // Check if the date is valid
+    if (isNaN(startDate.getTime())) {
+      console.warn('Invalid start_date received, using current date as fallback');
+      startDate = new Date();
+    }
+  } else {
+    console.warn('No start_date provided, using current date as fallback');
+    startDate = new Date();
+  }
+
+  // Calculate end date and duration
+  const durationDays = apiPlan.duration || 7; // Default to 7 days if duration is missing
+  endDate = new Date(startDate.getTime() + (durationDays * 24 * 60 * 60 * 1000));
+  duration = `${durationDays} days`;
 
   // Transform meals from the nested structure
   const transformedMeals: any[] = [];
   
-  if (apiPlan.plan && apiPlan.plan.mealPlan) {
+  if (apiPlan.plan && apiPlan.plan.mealPlan && Array.isArray(apiPlan.plan.mealPlan)) {
     apiPlan.plan.mealPlan.forEach((dayPlan) => {
-      dayPlan.meals.forEach((meal, mealIndex) => {
-        transformedMeals.push({
-          id: `${dayPlan.day}-${mealIndex}`,
-          name: meal.name,
-          description: meal.description || '',
-          type: meal.mealType,
-          calories: meal.calories || 0,
-          prepTime: meal.cookingTime || 0,
-          servings: apiPlan.numberPeople || 1,
-          difficulty: apiPlan.cookingSkillLevel || 'medium',
-          ingredients: meal.ingredients ? meal.ingredients.map(ing => ing.name) : [],
-          instructions: meal.steps || [],
-          steps: meal.steps || [],
-          week: Math.ceil(dayPlan.day / 7),
-          day: dayPlan.day,
-          date: dayPlan.date,
-          dayOfWeek: dayPlan.dayOfWeek,
-          nutritionalInfo: meal.nutritionalInfo,
-          prepTip: meal.prepTip,
-          carbonFootprint: meal.carbonFootprint,
-          detailedIngredients: meal.ingredients || []
+      if (dayPlan.meals && Array.isArray(dayPlan.meals)) {
+        dayPlan.meals.forEach((meal, mealIndex) => {
+          transformedMeals.push({
+            id: `${dayPlan.day || 1}-${mealIndex}`,
+            name: meal.name || 'Unnamed Meal',
+            description: meal.description || '',
+            type: meal.mealType || 'meal',
+            calories: meal.calories || 0,
+            prepTime: meal.cookingTime || 0,
+            servings: apiPlan.numberPeople || 1,
+            difficulty: apiPlan.cookingSkillLevel || 'medium',
+            ingredients: meal.ingredients ? meal.ingredients.map(ing => ing.name) : [],
+            instructions: meal.steps || [],
+            steps: meal.steps || [],
+            week: Math.ceil((dayPlan.day || 1) / 7),
+            day: dayPlan.day || 1,
+            date: dayPlan.date || startDate.toISOString().split('T')[0],
+            dayOfWeek: dayPlan.dayOfWeek || 'Unknown',
+            nutritionalInfo: meal.nutritionalInfo,
+            prepTip: meal.prepTip,
+            carbonFootprint: meal.carbonFootprint,
+            detailedIngredients: meal.ingredients || []
+          });
         });
-      });
+      }
     });
   }
 
   console.log('Transformed meals:', transformedMeals);
 
   // Create weeks array based on duration
-  const numberOfWeeks = Math.ceil(apiPlan.duration / 7);
+  const numberOfWeeks = Math.ceil(durationDays / 7);
   const weeks = Array.from({ length: numberOfWeeks }, (_, index) => ({
     id: `week-${index + 1}`,
     weekNumber: index + 1,
@@ -273,36 +293,38 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
   }));
 
   // Transform shopping list from ingredients list
-  const shoppingList = apiPlan.plan?.ingredientsList?.map((ingredient, index) => ({
-    id: `ingredient-${index}`,
-    name: ingredient.name,
-    quantity: ingredient.quantity,
-    unit: ingredient.unit,
-    category: ingredient.classification || 'other',
-    priority: 'medium',
-    purchased: false,
-    estimatedPrice: 0,
-    carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
-    daysToExpire: ingredient.daysToExpire
-  })) || [];
+  const shoppingList = (apiPlan.plan?.ingredientsList && Array.isArray(apiPlan.plan.ingredientsList)) 
+    ? apiPlan.plan.ingredientsList.map((ingredient, index) => ({
+        id: `ingredient-${index}`,
+        name: ingredient.name || 'Unknown Ingredient',
+        quantity: ingredient.quantity || 1,
+        unit: ingredient.unit || 'piece',
+        category: ingredient.classification || 'other',
+        priority: 'medium',
+        purchased: false,
+        estimatedPrice: 0,
+        carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
+        daysToExpire: ingredient.daysToExpire
+      })) 
+    : [];
 
   console.log('Transformed shopping list:', shoppingList);
 
   // Make sure preferences object matches what the cards expect
   const transformedPlan: LocalMealPlan = {
     id: apiPlan._id,
-    name: apiPlan.plan_name,
+    name: apiPlan.plan_name || 'Unnamed Meal Plan',
     startDate: startDate.toISOString().split('T')[0],
     endDate: endDate.toISOString().split('T')[0],
     meals: transformedMeals,
     shoppingList,
     duration,
     preferences: {
-      numberOfPersons: apiPlan.numberPeople,
-      numberOfDays: apiPlan.duration,
-      mealsPerDay: apiPlan.mealsPerDay,
+      numberOfPersons: apiPlan.numberPeople || 1,
+      numberOfDays: durationDays,
+      mealsPerDay: apiPlan.mealsPerDay || 3,
       numberOfWeeks,
-      people: apiPlan.numberPeople,
+      people: apiPlan.numberPeople || 1,
       dietaryRestrictions: apiPlan.dietaryRestrictions || [],
       cuisinePreferences: apiPlan.cuisinePreferences || [],
       allergiesIntolerance: apiPlan.allergiesIntolerance || [],
@@ -313,7 +335,7 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
       healthGoals: apiPlan.healthGoals || []
     },
     weeks,
-    totalCarbonFootprint: apiPlan.plan?.totalCarbonFootprint
+    totalCarbonFootprint: apiPlan.plan?.totalCarbonFootprint || 0
   };
 
   console.log('Final transformed plan:', transformedPlan);
