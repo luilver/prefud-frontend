@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, ArrowRight, Sparkles, Clock, Users, ChefHat, Utensils, Eye, Target, DollarSign, Heart } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Clock, Users, ChefHat, Utensils, Eye, Target, DollarSign, Heart, AlertTriangle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -30,6 +30,8 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     dietaryRestrictions: [],
     cuisinePreferences: [],
     healthGoals: [],
+    allergiesIntolerances: [],
+    customAllergies: "",
     dislikes: "",
     specialRequests: ""
   });
@@ -47,6 +49,8 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
       dietaryRestrictions: [],
       cuisinePreferences: [],
       healthGoals: [],
+      allergiesIntolerances: [],
+      customAllergies: "",
       dislikes: "",
       specialRequests: ""
     }
@@ -88,6 +92,10 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   const healthGoalsOptions = [
     "Weight Loss", "Muscle Gain", "Heart Health", "Energy Boost", 
     "Immune Support", "Digestive Health", "Anti-Inflammatory", "Detox"
+  ];
+
+  const allergiesOptions = [
+    "Nuts", "Peanuts", "Shellfish", "Eggs", "Dairy", "Soy", "Fish", "Wheat", "Sesame", "Sulfites"
   ];
 
   const getLanguageDisplayName = () => {
@@ -306,6 +314,41 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
               </div>
 
               <div>
+                <label className="flex items-center space-x-2 text-sm font-medium mb-3">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span>Allergies & Intolerances</span>
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {allergiesOptions.map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`allergy-${option}`}
+                        checked={mealData.allergiesIntolerances?.includes(option)}
+                        onCheckedChange={(checked) => {
+                          const current = mealData.allergiesIntolerances || [];
+                          if (checked) {
+                            handleStepData({ allergiesIntolerances: [...current, option] });
+                          } else {
+                            handleStepData({ allergiesIntolerances: current.filter((item: string) => item !== option) });
+                          }
+                        }}
+                      />
+                      <label htmlFor={`allergy-${option}`} className="text-sm">{option}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Custom Allergies/Intolerances (Optional)</label>
+                <Textarea 
+                  placeholder="List any other ingredients or foods you're allergic to or intolerant of..."
+                  value={mealData.customAllergies}
+                  onChange={(e) => handleStepData({ customAllergies: e.target.value })}
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium mb-2">Dislikes (Optional)</label>
                 <Textarea 
                   placeholder="List any ingredients or foods you dislike..."
@@ -383,10 +426,30 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                   </div>
                 )}
 
-                {mealData.dislikes && (
+                {mealData.allergiesIntolerances?.length > 0 && (
                   <div className="bg-red-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-red-700">Dislikes</h3>
-                    <p className="text-sm text-red-600">{mealData.dislikes}</p>
+                    <h3 className="font-semibold mb-2 text-red-700">Allergies & Intolerances</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {mealData.allergiesIntolerances.map((allergy: string) => (
+                        <span key={allergy} className="bg-red-200 text-red-800 px-2 py-1 rounded-full text-xs">
+                          {allergy}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {mealData.customAllergies && (
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-2 text-red-700">Custom Allergies/Intolerances</h3>
+                    <p className="text-sm text-red-600">{mealData.customAllergies}</p>
+                  </div>
+                )}
+
+                {mealData.dislikes && (
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-2 text-yellow-700">Dislikes</h3>
+                    <p className="text-sm text-yellow-600">{mealData.dislikes}</p>
                   </div>
                 )}
 
