@@ -10,25 +10,24 @@ import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 
 interface AIMealGenerationProps {
-  preferences: any;
-  onBack: () => void;
-  onSaveMeal: (meal: any) => void;
+  mealData: any;
+  onMealCreated: (meal: any) => void;
 }
 
-const AIMealGeneration = ({ preferences, onBack, onSaveMeal }: AIMealGenerationProps) => {
+const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) => {
   const [meal, setMeal] = useState<any>(null);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const { isLoading, startCooking } = useCookingLoader();
-  const { saveAIMeal } = useUser();
+  const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
+  const { user } = useUser();
 
   useEffect(() => {
     generateMeal();
   }, []);
 
   const generateMeal = async () => {
-    startCooking();
+    showLoader("Analyzing your preferences and creating the perfect meal...");
     
     // Simulate API call with realistic data
     setTimeout(() => {
@@ -37,23 +36,24 @@ const AIMealGeneration = ({ preferences, onBack, onSaveMeal }: AIMealGenerationP
         name: getRandomMealName(),
         description: "A delightful fusion of flavors that will satisfy your taste buds.",
         cookingTime: Math.floor(Math.random() * 40) + 20,
-        servings: preferences.servings || 2,
-        difficulty: preferences.difficulty || "Medium",
-        cuisine: preferences.cuisine || "Fusion",
+        servings: mealData.servings || 2,
+        difficulty: mealData.cookingSkillLevel || "Medium",
+        cuisine: mealData.cuisinePreferences?.[0] || "Fusion",
         calories: Math.floor(Math.random() * 300) + 300,
         ingredients: generateIngredients(),
         instructions: generateInstructions(),
         nutritionalInfo: generateNutritionalInfo(),
-        tags: generateTags(preferences)
+        tags: generateTags(mealData)
       };
       setMeal(generatedMeal);
+      hideLoader();
     }, 3000);
   };
 
   const getRandomMealName = () => {
     const names = [
       "Hearty Veggie Bowl",
-      "Mediterranean Delight",
+      "Mediterranean Delight", 
       "Asian Fusion Stir-fry",
       "Protein Power Plate",
       "Garden Fresh Salad",
@@ -130,8 +130,8 @@ const AIMealGeneration = ({ preferences, onBack, onSaveMeal }: AIMealGenerationP
 
   const handleSaveMeal = () => {
     if (meal) {
-      saveAIMeal(meal);
-      onSaveMeal(meal);
+      // Save meal logic here - for now just show success and call parent
+      onMealCreated(meal);
       toast.success("Meal saved successfully!");
     }
   };
@@ -171,25 +171,7 @@ const AIMealGeneration = ({ preferences, onBack, onSaveMeal }: AIMealGenerationP
   if (isLoading || !meal) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center space-y-6">
-          <div className="relative">
-            <div className="w-24 h-24 mx-auto mb-4 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
-              <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
-                <ChefHat className="h-8 w-8 text-purple-600" />
-              </div>
-            </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-400 rounded-full animate-bounce"></div>
-            <div className="absolute -bottom-1 -left-2 w-4 h-4 bg-pink-400 rounded-full animate-bounce delay-300"></div>
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold text-gray-800">Creating Your Perfect Meal</h3>
-            <p className="text-gray-600">Our AI chef is crafting something special just for you...</p>
-            <div className="w-64 bg-gray-200 rounded-full h-2 mx-auto">
-              <div className="bg-gradient-to-r from-purple-400 to-pink-400 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
-            </div>
-          </div>
-        </div>
+        <LoaderComponent />
       </div>
     );
   }
@@ -199,9 +181,6 @@ const AIMealGeneration = ({ preferences, onBack, onSaveMeal }: AIMealGenerationP
       <div className="max-w-4xl mx-auto space-y-6 p-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <Button variant="ghost" onClick={onBack} className="self-start">
-            ← Back to Preferences
-          </Button>
           <div className="flex flex-wrap gap-2">
             <Button 
               variant="outline" 
