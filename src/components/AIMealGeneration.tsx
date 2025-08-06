@@ -1,10 +1,14 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, ShoppingCart, Package, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, ShoppingCart, Package, Plus, CheckSquare, CreditCard, MapPin } from "lucide-react";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
@@ -21,8 +25,19 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingList, setShowShoppingList] = useState(false);
   const [shoppingList, setShoppingList] = useState<any[]>([]);
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
+  const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  const [deliveryAddress, setDeliveryAddress] = useState({
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: ''
+  });
+  
   const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
-  const { user, addPantryItem } = useUser();
+  const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
 
   useEffect(() => {
     generateMeal();
@@ -131,6 +146,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       
       setShoppingList(list);
       setShowShoppingList(true);
+      setCheckedIngredients(new Set());
       hideLoader();
       toast.success("Shopping list generated!");
     }, 1500);
@@ -148,6 +164,87 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       'black pepper': 'spices'
     };
     return categories[ingredientName.toLowerCase()] || 'other';
+  };
+
+  const toggleIngredientCheck = (ingredientId: string) => {
+    setCheckedIngredients(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(ingredientId)) {
+        newSet.delete(ingredientId);
+      } else {
+        newSet.add(ingredientId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAllIngredients = () => {
+    if (checkedIngredients.size === shoppingList.length) {
+      setCheckedIngredients(new Set());
+    } else {
+      setCheckedIngredients(new Set(shoppingList.map(item => item.id)));
+    }
+  };
+
+  const handleAddToPantry = () => {
+    const selectedItems = shoppingList.filter(item => checkedIngredients.has(item.id));
+    
+    if (selectedItems.length === 0) {
+      toast.error("Please select ingredients to add to pantry");
+      return;
+    }
+
+    selectedItems.forEach(item => {
+      addPantryItem({
+        name: item.name,
+        quantity: parseFloat(item.quantity) || 1,
+        unit: item.unit || 'piece',
+        category: item.category || 'other',
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        purchaseDate: new Date(),
+        notes: item.notes || `Added from ${item.mealName}`
+      });
+    });
+    
+    setCheckedIngredients(new Set());
+    toast.success(`${selectedItems.length} ingredients added to pantry!`);
+  };
+
+  const handleOrderOnline = () => {
+    const selectedItems = shoppingList.filter(item => checkedIngredients.has(item.id));
+    
+    if (selectedItems.length === 0) {
+      toast.error("Please select ingredients to order online");
+      return;
+    }
+
+    getPaymentMethods();
+    setShowOrderDialog(true);
+  };
+
+  const handleCompleteOrder = () => {
+    const selectedItems = shoppingList.filter(item => checkedIngredients.has(item.id));
+    
+    if (!deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.state || !deliveryAddress.zipCode) {
+      toast.error("Please fill in all delivery address fields");
+      return;
+    }
+
+    if (!selectedPaymentMethod) {
+      toast.error("Please select a payment method");
+      return;
+    }
+
+    // Simulate order processing
+    const totalCost = selectedItems.reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100;
+    
+    toast.success(`Order placed successfully! ${selectedItems.length} items ordered for $${totalCost.toFixed(2)}`);
+    
+    // Reset state
+    setCheckedIngredients(new Set());
+    setShowOrderDialog(false);
+    setSelectedPaymentMethod("");
+    setDeliveryAddress({ street: '', city: '', state: '', zipCode: '', country: '' });
   };
 
   const toggleStep = (stepIndex: number) => {
@@ -170,28 +267,9 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
 
   const handleSaveMeal = () => {
     if (meal) {
-      // Save meal logic here - for now just show success and call parent
       onMealCreated(meal);
       toast.success("Meal saved successfully!");
     }
-  };
-
-  const handleAddToPantry = (item: any) => {
-    addPantryItem({
-      name: item.name,
-      quantity: parseFloat(item.quantity) || 1,
-      unit: item.unit || 'piece',
-      category: item.category || 'other',
-      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      purchaseDate: new Date(),
-      notes: item.notes || `Added from ${item.mealName}`
-    });
-    toast.success(`${item.name} added to pantry!`);
-  };
-
-  const handleOrderOnline = (item: any) => {
-    // Simulate online ordering
-    toast.success(`${item.name} added to online cart!`);
   };
 
   const enhancedInstructions = useMemo(() => {
@@ -230,6 +308,11 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
 
   // Shopping List View
   if (showShoppingList) {
+    const selectedCount = checkedIngredients.size;
+    const totalCost = shoppingList
+      .filter(item => checkedIngredients.has(item.id))
+      .reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100;
+
     return (
       <div className="max-w-4xl mx-auto space-y-6 p-4">
         {/* Header */}
@@ -245,110 +328,212 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
               </p>
             </div>
           </div>
+          <Button
+            variant="outline"
+            onClick={handleSelectAllIngredients}
+            className="flex items-center gap-2"
+          >
+            <CheckSquare className="h-4 w-4" />
+            {checkedIngredients.size === shoppingList.length ? 'Unselect All' : 'Select All'}
+          </Button>
         </div>
 
         {/* Shopping List */}
-        <div className="space-y-4">
-          {Object.entries(
-            shoppingList.reduce((acc: any, item: any) => {
-              const category = item.category || 'other';
-              if (!acc[category]) acc[category] = [];
-              acc[category].push(item);
-              return acc;
-            }, {})
-          ).map(([category, items]: [string, any]) => (
-            <Card key={category}>
-              <CardHeader>
-                <CardTitle className="text-lg capitalize flex items-center justify-between">
-                  <span>{category}</span>
-                  <Badge variant="secondary">{items.length} items</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {items.map((item: any) => (
-                    <div 
-                      key={item.id} 
-                      className="flex items-center justify-between p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium capitalize">{item.name}</p>
-                          <Badge variant="outline" className="text-xs">
-                            {item.mealName}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          {item.quantity} {item.unit}
-                          {item.notes && ` • ${item.notes}`}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {item.estimatedPrice && (
-                          <div className="text-sm font-medium text-green-600">
-                            ${(item.estimatedPrice / 100).toFixed(2)}
-                          </div>
-                        )}
-                        <div className="flex gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleAddToPantry(item)}
-                            className="h-8"
-                          >
-                            <Package className="h-4 w-4 mr-1" />
-                            Add to Pantry
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleOrderOnline(item)}
-                            className="h-8"
-                          >
-                            <ShoppingCart className="h-4 w-4 mr-1" />
-                            Order Online
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Total Summary */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-semibold">Total Items: {shoppingList.length}</p>
-                <p className="text-sm text-gray-600">
-                  Estimated Total: ${(shoppingList.reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100).toFixed(2)}
-                </p>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Ingredients</span>
+              <Badge variant="secondary">{selectedCount} of {shoppingList.length} selected</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {shoppingList.map((item: any) => (
+                <div 
+                  key={item.id} 
+                  className="flex items-center gap-4 p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <Checkbox
+                    id={item.id}
+                    checked={checkedIngredients.has(item.id)}
+                    onCheckedChange={() => toggleIngredientCheck(item.id)}
+                    className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium capitalize">{item.name}</p>
+                      <Badge variant="outline" className="text-xs">
+                        {item.category}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {item.quantity} {item.unit}
+                    </p>
+                  </div>
+                  <div className="text-sm font-medium text-green-600">
+                    ${(item.estimatedPrice / 100).toFixed(2)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Card className="flex-1">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <p className="font-semibold">Selected Items: {selectedCount}</p>
+                  <p className="text-sm text-gray-600">
+                    Total Cost: ${totalCost.toFixed(2)}
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    shoppingList.forEach(item => handleAddToPantry(item));
-                  }}
+                  onClick={handleAddToPantry}
+                  disabled={selectedCount === 0}
+                  className="flex-1"
                 >
                   <Package className="h-4 w-4 mr-2" />
-                  Add All to Pantry
+                  Add to Pantry
                 </Button>
                 <Button
-                  onClick={() => {
-                    shoppingList.forEach(item => handleOrderOnline(item));
-                  }}
+                  onClick={handleOrderOnline}
+                  disabled={selectedCount === 0}
+                  className="flex-1"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  Order All Online
+                  Order Online
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Order Online Dialog */}
+        <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Complete Your Order</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              {/* Selected Items */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-medium mb-2">Selected Items ({selectedCount})</h3>
+                <div className="text-sm text-gray-600">
+                  {shoppingList
+                    .filter(item => checkedIngredients.has(item.id))
+                    .map(item => item.name)
+                    .join(', ')}
+                </div>
+                <div className="text-lg font-semibold text-green-600 mt-2">
+                  Total: ${totalCost.toFixed(2)}
+                </div>
+              </div>
+
+              {/* Payment Method Section */}
+              <div className="space-y-4">
+                <h3 className="font-medium flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Payment Method
+                </h3>
+                <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a payment method..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {paymentMethods.map((method) => (
+                      <SelectItem key={method.id} value={method.id}>
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          <span className="capitalize">{method.brand}</span>
+                          <span>****{method.last4}</span>
+                          {method.isDefault && <Badge variant="secondary" className="text-xs">Default</Badge>}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Delivery Address */}
+              <div className="space-y-4">
+                <h3 className="font-medium flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Delivery Address
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label htmlFor="street">Street Address</Label>
+                    <Input
+                      id="street"
+                      value={deliveryAddress.street}
+                      onChange={(e) => setDeliveryAddress(prev => ({ ...prev, street: e.target.value }))}
+                      placeholder="123 Main Street"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={deliveryAddress.city}
+                      onChange={(e) => setDeliveryAddress(prev => ({ ...prev, city: e.target.value }))}
+                      placeholder="New York"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input
+                      id="state"
+                      value={deliveryAddress.state}
+                      onChange={(e) => setDeliveryAddress(prev => ({ ...prev, state: e.target.value }))}
+                      placeholder="NY"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="zipCode">ZIP Code</Label>
+                    <Input
+                      id="zipCode"
+                      value={deliveryAddress.zipCode}
+                      onChange={(e) => setDeliveryAddress(prev => ({ ...prev, zipCode: e.target.value }))}
+                      placeholder="10001"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="country">Country</Label>
+                    <Input
+                      id="country"
+                      value={deliveryAddress.country}
+                      onChange={(e) => setDeliveryAddress(prev => ({ ...prev, country: e.target.value }))}
+                      placeholder="United States"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button 
+                  onClick={handleCompleteOrder}
+                  className="flex-1 bg-blue-500 hover:bg-blue-600"
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Place Order
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowOrderDialog(false)}
+                  className="flex-1"
+                >
+                  Cancel
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -356,7 +541,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   return (
     <>
       <div className="max-w-4xl mx-auto space-y-6 p-4">
-        {/* Header - Removed Try Again, Favorite, and Share buttons */}
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-wrap gap-2">
             <Button 
