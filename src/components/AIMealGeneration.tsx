@@ -44,13 +44,77 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   }, []);
 
   const generateMeal = async () => {
-    showLoader("Analyzing your preferences and creating the perfect meal...");
+    showLoader("Creating your personalized meal with AI...");
     
-    // Simulate API call with realistic data
-    setTimeout(() => {
+    try {
+      // Map the mealData to match the API expected format
+      const apiPayload = {
+        dislikes: mealData.dislikes || "",
+        cookingSkillLevel: mealData.cookingSkillLevel || "intermediate",
+        budgetRange: mealData.budgetRange || "medium",
+        healthGoals: mealData.healthGoals || [],
+        language: "english", // You can get this from language context if needed
+        user_id: user?.id || "687e6b38bc111405da8cb671", // Use actual user ID
+        plan_name: mealData.mealName || "AI Generated Meal",
+        mealType: mealData.mealType?.toLowerCase() || "dinner",
+        numberPeople: mealData.servings || 2,
+        maxCookingTime: mealData.cookingTime || 30,
+        specialRequest: mealData.specialRequests || "",
+        dietaryRestrictions: mealData.dietaryRestrictions?.map((r: string) => r.toLowerCase().replace("-", " ")) || [],
+        cuisinePreferences: mealData.cuisinePreferences?.map((c: string) => c.toLowerCase()) || [],
+        allergiesIntolerance: mealData.allergiesIntolerances?.map((a: string) => a.toLowerCase()) || [],
+        customIntolerance: mealData.customAllergies || ""
+      };
+
+      console.log("Sending API request with payload:", apiPayload);
+
+      const response = await fetch('https://pantry-ms-brain.onrender.com/meal-plan/special', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(apiPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("API response:", data);
+
+      // Transform the API response to match our expected meal format
       const generatedMeal = {
         id: Date.now().toString(),
-        name: getRandomMealName(),
+        name: data.specialMeal.name,
+        description: data.specialMeal.description,
+        cookingTime: data.specialMeal.cookingTime,
+        servings: apiPayload.numberPeople,
+        difficulty: apiPayload.cookingSkillLevel,
+        cuisine: apiPayload.cuisinePreferences?.[0] || "Fusion",
+        calories: data.specialMeal.calories,
+        ingredients: data.specialMeal.ingredients,
+        instructions: data.specialMeal.steps,
+        nutritionalInfo: data.specialMeal.nutritionalInfo,
+        tags: generateTags(mealData),
+        benefits: data.specialMeal.benefits,
+        prepTip: data.specialMeal.prepTip,
+        carbonFootprint: data.totalCarbonFootprint,
+        ingredientsList: data.ingredientsList
+      };
+
+      setMeal(generatedMeal);
+      hideLoader();
+      toast.success("Your AI-generated meal is ready!");
+    } catch (error) {
+      console.error("Error generating meal:", error);
+      hideLoader();
+      toast.error("Failed to generate meal. Please try again.");
+      
+      // Fallback to mock data if API fails
+      const fallbackMeal = {
+        id: Date.now().toString(),
+        name: "Healthy Veggie Bowl",
         description: "A delightful fusion of flavors that will satisfy your taste buds.",
         cookingTime: Math.floor(Math.random() * 40) + 20,
         servings: mealData.servings || 2,
@@ -62,9 +126,8 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         nutritionalInfo: generateNutritionalInfo(),
         tags: generateTags(mealData)
       };
-      setMeal(generatedMeal);
-      hideLoader();
-    }, 3000);
+      setMeal(fallbackMeal);
+    }
   };
 
   const getRandomMealName = () => {
@@ -123,7 +186,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     const tags = [];
     if (prefs.healthGoals) tags.push(...prefs.healthGoals.slice(0, 2));
     if (prefs.dietaryRestrictions) tags.push(...prefs.dietaryRestrictions.slice(0, 2));
-    tags.push("Quick", "Healthy", "Comfort Food");
+    tags.push("AI Generated", "Healthy");
     return [...new Set(tags)].slice(0, 4);
   };
 
@@ -133,12 +196,15 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     showLoader("Generating your shopping list...");
     
     setTimeout(() => {
-      const list = meal.ingredients.map((ingredient: any, index: number) => ({
+      // Use the actual ingredients from the API response if available
+      const ingredientsToUse = meal.ingredientsList || meal.ingredients;
+      
+      const list = ingredientsToUse.map((ingredient: any, index: number) => ({
         id: `${meal.id}-ingredient-${index}`,
         name: ingredient.name,
         quantity: ingredient.quantity,
         unit: ingredient.unit,
-        category: getCategoryForIngredient(ingredient.name),
+        category: ingredient.classification || getCategoryForIngredient(ingredient.name),
         estimatedPrice: Math.floor(Math.random() * 800) + 200, // $2-10
         mealName: meal.name,
         notes: `For ${meal.name} recipe`
@@ -160,8 +226,16 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       'garlic': 'produce',
       'onion': 'produce',
       'bell pepper': 'produce',
+      'bell peppers': 'produce',
+      'chicken breast': 'protein',
+      'avocado': 'produce',
+      'cilantro': 'produce',
+      'lime': 'produce',
       'salt': 'spices',
-      'black pepper': 'spices'
+      'black pepper': 'spices',
+      'cumin': 'spices',
+      'chili powder': 'spices',
+      'garlic powder': 'spices'
     };
     return categories[ingredientName.toLowerCase()] || 'other';
   };
@@ -295,7 +369,8 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
 
   const nutrition = useMemo(() => {
     if (!meal) return null;
-    return generateNutritionalInfo();
+    // Use nutritional info from API response if available, otherwise generate
+    return meal.nutritionalInfo || generateNutritionalInfo();
   }, [meal]);
 
   if (isLoading || !meal) {
@@ -568,6 +643,23 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   {meal.description}
                 </CardDescription>
                 
+                {/* Benefits and Prep Tip from API */}
+                {meal.benefits && (
+                  <div className="mb-4 p-3 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-700">
+                      <strong>Benefits:</strong> {meal.benefits}
+                    </p>
+                  </div>
+                )}
+                
+                {meal.prepTip && (
+                  <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-700">
+                      <strong>Prep Tip:</strong> {meal.prepTip}
+                    </p>
+                  </div>
+                )}
+                
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {meal.tags.map((tag: string, index: number) => (
@@ -591,6 +683,11 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                     <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
                     <span className="font-medium capitalize text-sm sm:text-base">{meal.difficulty}</span>
                   </div>
+                  {meal.carbonFootprint && (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-green-600 text-xs">🌱 {meal.carbonFootprint} kg CO2</span>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -797,7 +894,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   </div>
                   <div className="flex justify-between">
                     <span>Carbs</span>
-                    <span>{nutrition?.carbs}g</span>
+                    <span>{nutrition?.carbohydrates || nutrition?.carbs}g</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Fat</span>
@@ -807,6 +904,12 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                     <span>Fiber</span>
                     <span>{nutrition?.fiber}g</span>
                   </div>
+                  {nutrition?.vitamins && (
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium mb-1">Vitamins:</p>
+                      <p className="text-xs text-gray-600">{nutrition.vitamins.join(', ')}</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
