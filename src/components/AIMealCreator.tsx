@@ -16,6 +16,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
+import { getSpecialMealsByUser } from "@/services/userMealPlansService";
 
 const AIMealCreator = () => {
   const [showCreator, setShowCreator] = useState(false);
@@ -23,40 +24,30 @@ const AIMealCreator = () => {
   const [apiMeals, setApiMeals] = useState<any[]>([]);
   const [isLoadingMeals, setIsLoadingMeals] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const { aiMeals, addAIMeal, user } = useUser();
   const { toast } = useToast();
 
-  // Fetch meals from API when component mounts
+  // Fetch meals from API when component mounts or when pagination changes
   useEffect(() => {
     if (user?.id) {
-      fetchUserMeals();
+      fetchUserMeals(currentPage, pageSize);
     }
-  }, [user?.id]);
+  }, [user?.id, currentPage, pageSize]);
 
-  const fetchUserMeals = async () => {
+  const fetchUserMeals = async (page: number = 1, limit: number = 5) => {
     if (!user?.id) return;
 
     setIsLoadingMeals(true);
     try {
-      console.log('Fetching meals for user:', user.id);
+      console.log('Fetching special meals for user:', user.id, 'page:', page, 'limit:', limit);
       
-      const response = await fetch(`https://pantry-ms-brain.onrender.com/meal-plan/special/${user.id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Fetched API meals:', data);
+      const response = await getSpecialMealsByUser(user.id, page, limit);
       
-      if (data.data && Array.isArray(data.data)) {
-        setApiMeals(data.data);
+      if (response.data && Array.isArray(response.data)) {
+        setApiMeals(response.data);
+        setTotalPages(response.totalPages || 1);
       }
     } catch (error) {
       console.error('Error fetching user meals:', error);
@@ -70,12 +61,16 @@ const AIMealCreator = () => {
     }
   };
 
-  // Calculate pagination
-  const totalMeals = [...aiMeals, ...apiMeals];
-  const totalPages = Math.ceil(totalMeals.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentPageMeals = totalMeals.slice(startIndex, endIndex);
+  // Calculate pagination for local AI meals only
+  const totalLocalMeals = aiMeals.length;
+  const localTotalPages = Math.ceil(totalLocalMeals / pageSize);
+  const localStartIndex = (currentPage - 1) * pageSize;
+  const localEndIndex = localStartIndex + pageSize;
+  const currentPageLocalMeals = aiMeals.slice(localStartIndex, localEndIndex);
+
+  // Combine totals for display
+  const totalMealsCount = totalLocalMeals + apiMeals.length;
+  const currentPageMealsCount = currentPageLocalMeals.length + apiMeals.length;
 
   const handleStartCreation = () => {
     setShowCreator(true);
@@ -96,7 +91,7 @@ const AIMealCreator = () => {
     // Reset to first page when new meal is added
     setCurrentPage(1);
     // Refresh API meals after creating a new one
-    fetchUserMeals();
+    fetchUserMeals(1, pageSize);
   };
 
   const handleViewMeal = (meal: any) => {
@@ -131,7 +126,7 @@ const AIMealCreator = () => {
   };
 
   const handlePageChange = (page: number) => {
-    if (page !== currentPage && page >= 1 && page <= totalPages) {
+    if (page !== currentPage && page >= 1 && page <= Math.max(localTotalPages, totalPages)) {
       console.log(`Changing to page: ${page}`);
       setCurrentPage(page);
     }
@@ -161,6 +156,8 @@ const AIMealCreator = () => {
     );
   }
 
+  const maxTotalPages = Math.max(localTotalPages, totalPages);
+
   return (
     <div className="space-y-6">
       <div className="text-center space-y-4">
@@ -188,14 +185,14 @@ const AIMealCreator = () => {
         </Button>
       </div>
 
-      {!isLoadingMeals && totalMeals.length > 0 && (
+      {!isLoadingMeals && totalMealsCount > 0 && (
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
           <PageSizeSelector 
             pageSize={pageSize} 
             onPageSizeChange={handlePageSizeChange}
           />
           <div className="text-sm text-gray-600">
-            Showing page {currentPage} of {totalPages} ({currentPageMeals.length} meals)
+            Showing page {currentPage} of {maxTotalPages} ({currentPageMealsCount} meals)
           </div>
         </div>
       )}
@@ -209,100 +206,95 @@ const AIMealCreator = () => {
         </div>
       )}
 
-      {!isLoadingMeals && totalMeals.length > 0 && (
+      {!isLoadingMeals && totalMealsCount > 0 && (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-center">Your AI Created Meals</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {currentPageMeals.map((meal, index) => {
-              const isLocalMeal = aiMeals.includes(meal);
-              const actualIndex = isLocalMeal ? aiMeals.indexOf(meal) : apiMeals.indexOf(meal);
-              
-              if (isLocalMeal) {
-                return (
-                  <Card key={`local-${actualIndex}`} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center space-x-2">
-                        <ChefHat className="h-5 w-5 text-purple-600" />
-                        <CardTitle className="text-lg">{meal.name}</CardTitle>
-                      </div>
-                      <CardDescription>
-                        {meal.cuisine} • {meal.cookingTime} mins • {meal.difficulty}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {meal.tags?.slice(0, 3).map((tag: string, tagIndex: number) => (
-                          <span 
-                            key={tagIndex}
-                            className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full"
-                        onClick={() => handleViewMeal(meal)}
+            {/* Local AI Meals */}
+            {currentPageLocalMeals.map((meal, index) => (
+              <Card key={`local-${index}`} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <ChefHat className="h-5 w-5 text-purple-600" />
+                    <CardTitle className="text-lg">{meal.name}</CardTitle>
+                  </div>
+                  <CardDescription>
+                    {meal.cuisine} • {meal.cookingTime} mins • {meal.difficulty}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {meal.tags?.slice(0, 3).map((tag: string, tagIndex: number) => (
+                      <span 
+                        key={tagIndex}
+                        className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full"
                       >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View Recipe
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              } else {
-                return (
-                  <Card key={`api-${meal._id || actualIndex}`} className="hover:shadow-lg transition-shadow border-green-200">
-                    <CardHeader>
-                      <div className="flex items-center space-x-2">
-                        <ChefHat className="h-5 w-5 text-green-600" />
-                        <CardTitle className="text-lg">{meal.specialMeal.specialMeal.name}</CardTitle>
-                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                          Saved
-                        </span>
-                      </div>
-                      <CardDescription>
-                        {meal.cuisinePreferences?.[0] || 'Various'} • {meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime} mins • {meal.cookingSkillLevel}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 mb-3">{meal.specialMeal.specialMeal.description}</p>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                          {meal.mealType}
-                        </span>
-                        {meal.dietaryRestrictions?.slice(0, 2).map((restriction: string, tagIndex: number) => (
-                          <span 
-                            key={tagIndex}
-                            className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
-                          >
-                            {restriction}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="text-xs text-gray-500 mb-2">
-                        {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} people
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full"
-                        onClick={() => handleViewApiMeal(meal)}
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleViewMeal(meal)}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    View Recipe
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* API Meals */}
+            {apiMeals.map((meal, index) => (
+              <Card key={`api-${meal._id || index}`} className="hover:shadow-lg transition-shadow border-green-200">
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <ChefHat className="h-5 w-5 text-green-600" />
+                    <CardTitle className="text-lg">{meal.specialMeal.specialMeal.name}</CardTitle>
+                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                      Saved
+                    </span>
+                  </div>
+                  <CardDescription>
+                    {meal.cuisinePreferences?.[0] || 'Various'} • {meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime} mins • {meal.cookingSkillLevel}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">{meal.specialMeal.specialMeal.description}</p>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                      {meal.mealType}
+                    </span>
+                    {meal.dietaryRestrictions?.slice(0, 2).map((restriction: string, tagIndex: number) => (
+                      <span 
+                        key={tagIndex}
+                        className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
                       >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View Recipe
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              }
-            })}
+                        {restriction}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-xs text-gray-500 mb-2">
+                    {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} people
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleViewApiMeal(meal)}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    View Recipe
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
-          {totalPages > 1 && (
+          {maxTotalPages > 1 && (
             <div className="flex justify-center mt-8">
               <Pagination>
                 <PaginationContent>
@@ -313,10 +305,10 @@ const AIMealCreator = () => {
                     />
                   </PaginationItem>
                   
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  {Array.from({ length: maxTotalPages }, (_, i) => i + 1).map((page) => {
                     if (
                       page === 1 || 
-                      page === totalPages || 
+                      page === maxTotalPages || 
                       (page >= currentPage - 1 && page <= currentPage + 1)
                     ) {
                       return (
@@ -332,7 +324,7 @@ const AIMealCreator = () => {
                       );
                     } else if (
                       (page === currentPage - 2 && currentPage > 3) ||
-                      (page === currentPage + 2 && currentPage < totalPages - 2)
+                      (page === currentPage + 2 && currentPage < maxTotalPages - 2)
                     ) {
                       return (
                         <PaginationItem key={page}>
@@ -346,7 +338,7 @@ const AIMealCreator = () => {
                   <PaginationItem>
                     <PaginationNext 
                       onClick={() => handlePageChange(currentPage + 1)}
-                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      className={currentPage >= maxTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -356,7 +348,7 @@ const AIMealCreator = () => {
         </div>
       )}
 
-      {!isLoadingMeals && totalMeals.length === 0 && (
+      {!isLoadingMeals && totalMealsCount === 0 && (
         <Card className="text-center py-12">
           <CardContent>
             <div className="space-y-4">
