@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight, Sparkles, Calendar, Users, Clock, ChefHat, DollarSign, Globe } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -72,6 +73,72 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
     setPlanData(prev => ({ ...prev, ...stepData }));
   };
 
+  const validateStep = (step: number) => {
+    switch (step) {
+      case 1:
+        if (!planData.planName.trim()) {
+          toast({
+            title: "Missing Information",
+            description: "Please enter a plan name.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        if (!planData.planDescription.trim()) {
+          toast({
+            title: "Missing Information", 
+            description: "Please enter a plan description.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        if (!planData.startDate) {
+          toast({
+            title: "Missing Information",
+            description: "Please select a start date.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        if (planData.numberOfDays < 1) {
+          toast({
+            title: "Invalid Information",
+            description: "Number of days must be at least 1.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        if (planData.numberOfPersons < 1) {
+          toast({
+            title: "Invalid Information",
+            description: "Number of persons must be at least 1.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        if (planData.mealsPerDay < 1) {
+          toast({
+            title: "Invalid Information",
+            description: "Meals per day must be at least 1.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        return true;
+      default:
+        return true;
+    }
+  };
+
+  const handleNext = () => {
+    if (!validateStep(currentStep)) {
+      return;
+    }
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -89,19 +156,39 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
             <CardContent className="space-y-4">
               {/* Plan Name */}
               <div>
-                <label htmlFor="planName" className="block text-sm font-medium text-gray-700">Plan Name</label>
+                <label htmlFor="planName" className="block text-sm font-medium text-gray-700">
+                  Plan Name <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   id="planName"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.planName}
                   onChange={(e) => handleDataChange({ planName: e.target.value })}
+                  placeholder="e.g., Weekly Family Meal Plan"
+                />
+              </div>
+
+              {/* Plan Description */}
+              <div>
+                <label htmlFor="planDescription" className="block text-sm font-medium text-gray-700">
+                  Plan Description <span className="text-red-500">*</span>
+                </label>
+                <Textarea
+                  id="planDescription"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  value={planData.planDescription}
+                  onChange={(e) => handleDataChange({ planDescription: e.target.value })}
+                  placeholder="Describe your meal plan goals and preferences..."
+                  rows={3}
                 />
               </div>
 
               {/* Start Date */}
               <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+                  Start Date <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="date"
                   id="startDate"
@@ -113,37 +200,46 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
               {/* Number of Days */}
               <div>
-                <label htmlFor="numberOfDays" className="block text-sm font-medium text-gray-700">Number of Days</label>
+                <label htmlFor="numberOfDays" className="block text-sm font-medium text-gray-700">
+                  Number of Days <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="number"
                   id="numberOfDays"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.numberOfDays}
                   onChange={(e) => handleDataChange({ numberOfDays: parseInt(e.target.value) })}
+                  min="1"
                 />
               </div>
 
               {/* Number of Persons */}
               <div>
-                <label htmlFor="numberOfPersons" className="block text-sm font-medium text-gray-700">Number of Persons</label>
+                <label htmlFor="numberOfPersons" className="block text-sm font-medium text-gray-700">
+                  Number of Persons <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="number"
                   id="numberOfPersons"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.numberOfPersons}
                   onChange={(e) => handleDataChange({ numberOfPersons: parseInt(e.target.value) })}
+                  min="1"
                 />
               </div>
 
               {/* Meals Per Day */}
               <div>
-                <label htmlFor="mealsPerDay" className="block text-sm font-medium text-gray-700">Meals Per Day</label>
+                <label htmlFor="mealsPerDay" className="block text-sm font-medium text-gray-700">
+                  Meals Per Day <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="number"
                   id="mealsPerDay"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.mealsPerDay}
                   onChange={(e) => handleDataChange({ mealsPerDay: parseInt(e.target.value) })}
+                  min="1"
                 />
               </div>
             </CardContent>
@@ -376,6 +472,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <p><strong>Name:</strong> {planData.planName}</p>
+                    <p><strong>Description:</strong> {planData.planDescription}</p>
                     <p><strong>People:</strong> {planData.numberOfPersons} persons</p>
                     <p><strong>Duration:</strong> {planData.numberOfDays} days</p>
                     <p><strong>Meals per day:</strong> {planData.mealsPerDay}</p>
@@ -426,12 +523,22 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
     console.log('Current plan data:', planData);
     console.log('User:', user);
     
-    // More flexible validation - only check truly required fields
+    // Enhanced validation with toast messages
     if (!planData.planName.trim()) {
       console.log('❌ Validation failed: Missing plan name');
       toast({
         title: "Missing Information",
         description: "Please enter a plan name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!planData.planDescription.trim()) {
+      console.log('❌ Validation failed: Missing plan description');
+      toast({
+        title: "Missing Information", 
+        description: "Please enter a plan description.",
         variant: "destructive"
       });
       return;
@@ -513,7 +620,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
         user_id: user.id,
         start_date: new Date(planData.startDate).toISOString(),
         plan_name: planData.planName,
-        plan_description: planData.planDescription || `Personalized meal plan for ${planData.numberOfPersons} person${planData.numberOfPersons > 1 ? 's' : ''}`
+        plan_description: planData.planDescription
       };
 
       console.log('📤 Sending API request with data:', requestData);
@@ -645,7 +752,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
             Previous
           </Button>
           <Button 
-            onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
+            onClick={handleNext}
             className="bg-purple-600 hover:bg-purple-700"
           >
             Next
