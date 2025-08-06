@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, User, Heart, Target, AlertTriangle } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useNavigate } from "react-router-dom";
+import { User, ArrowLeft, Languages } from "lucide-react";
+import CountrySelect, { countries } from "./CountrySelect";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
@@ -16,319 +16,301 @@ interface UserProfileFormProps {
 }
 
 const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
-  const [profileData, setProfileData] = useState({
+  const { language, setLanguage, t } = useLanguage();
+  const [formData, setFormData] = useState({
     name: "",
     lastName: "",
-    phonePrefix: "+1",
+    country: "",
     phone: "",
     weight: "",
     heightFeet: "",
     heightInches: "",
     birthday: "",
+    selectedLanguage: language,
     healthGoals: [] as string[],
     dietTypes: [] as string[],
-    allergies: [] as string[],
-    acceptTerms: false
+    allergies: [] as string[]
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const { t } = useLanguage();
-  const navigate = useNavigate();
 
-  const healthGoalOptions = [
-    "Weight Loss",
-    "Weight Gain", 
-    "Muscle Building",
-    "Heart Health",
-    "Diabetes Management",
-    "General Wellness"
+  const healthGoalsOptions = [
+    "Lose weight", "Gain muscle", "Maintain weight", "Improve energy",
+    "Better digestion", "Heart health", "Lower cholesterol", "Manage diabetes"
   ];
 
-  const dietTypeOptions = [
-    "Vegetarian",
-    "Vegan", 
-    "Keto",
-    "Paleo",
-    "Mediterranean",
-    "Gluten-Free"
+  const dietTypesOptions = [
+    "Vegetarian", "Vegan", "Pescatarian", "Keto", "Paleo", "Mediterranean",
+    "Low-carb", "Gluten-free", "Dairy-free", "No restrictions"
   ];
 
-  const allergyOptions = [
-    "Nuts",
-    "Shellfish",
-    "Dairy",
-    "Eggs",
-    "Soy",
-    "Fish"
+  const allergiesOptions = [
+    "Nuts", "Shellfish", "Dairy", "Eggs", "Soy", "Gluten", "Fish", "Sesame", "None"
   ];
 
-  const phonePrefixes = [
-    { value: "+1", label: "+1 (US/CA)" },
-    { value: "+44", label: "+44 (UK)" },
-    { value: "+33", label: "+33 (FR)" },
-    { value: "+49", label: "+49 (DE)" },
-    { value: "+34", label: "+34 (ES)" },
-    { value: "+39", label: "+39 (IT)" },
-    { value: "+55", label: "+55 (BR)" }
+  const languageOptions = [
+    { value: 'en', label: t('language.english'), flag: '🇺🇸' },
+    { value: 'es', label: t('language.spanish'), flag: '🇪🇸' },
+    { value: 'pt', label: t('language.portuguese'), flag: '🇵🇹' }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
-    if (!profileData.name.trim()) {
-      return;
-    }
-    if (!profileData.lastName.trim()) {
-      return;
-    }
-    if (!profileData.acceptTerms) {
-      return;
-    }
+    // Update global language when form is submitted
+    setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
     
-    setIsLoading(true);
+    const selectedCountry = countries.find(c => c.code === formData.country);
+    const phoneWithPrefix = selectedCountry ? `${selectedCountry.prefix}${formData.phone}` : formData.phone;
     
-    // Simulate processing
-    setTimeout(() => {
-      onComplete(profileData);
-      setIsLoading(false);
-    }, 500);
+    onComplete({
+      ...formData,
+      phone: phoneWithPrefix,
+      weight: parseFloat(formData.weight) || 0,
+      heightFeet: parseInt(formData.heightFeet) || 0,
+      heightInches: parseInt(formData.heightInches) || 0,
+      language: formData.selectedLanguage
+    });
   };
 
-  const handleCheckboxChange = (category: 'healthGoals' | 'dietTypes' | 'allergies', value: string, checked: boolean) => {
-    setProfileData(prev => ({
+  const handleCheckboxChange = (category: 'healthGoals' | 'dietTypes' | 'allergies', value: string) => {
+    setFormData(prev => ({
       ...prev,
-      [category]: checked 
-        ? [...prev[category], value]
-        : prev[category].filter(item => item !== value)
+      [category]: prev[category].includes(value)
+        ? prev[category].filter(item => item !== value)
+        : [...prev[category], value]
     }));
   };
+
+  const selectedCountry = countries.find(c => c.code === formData.country);
 
   return (
     <Card className="max-w-full sm:max-w-2xl mx-auto bg-white/90 backdrop-blur-sm">
       <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg sm:text-xl flex items-center space-x-2">
-              <User className="h-5 w-5 text-green-600" />
-              <span>{t('signup.profile.title')}</span>
-            </CardTitle>
-            <CardDescription className="text-sm sm:text-base mt-1">
-              {t('signup.profile.description')}
-            </CardDescription>
-          </div>
-          <Button variant="ghost" onClick={onBack} className="flex items-center space-x-1">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('common.back')}</span>
-          </Button>
+        <div className="flex items-center space-x-2 mb-2">
+          <User className="h-5 w-5 text-green-600" />
+          <CardTitle className="text-lg sm:text-xl">Tell us about yourself</CardTitle>
         </div>
+        <CardDescription className="text-sm sm:text-base">
+          Help us personalize your meal planning experience
+        </CardDescription>
       </CardHeader>
-      
       <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          {/* Personal Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Personal Information */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Personal Information</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <Label htmlFor="name" className="text-sm sm:text-base">First Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  required
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName" className="text-sm sm:text-base">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                  required
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
+            </div>
+
             <div>
-              <Label htmlFor="name" className="text-sm sm:text-base">
-                {t('signup.profile.name')} <span className="text-red-500">*</span>
-              </Label>
+              <Label htmlFor="country" className="text-sm sm:text-base">Country</Label>
+              <CountrySelect
+                value={formData.country}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, country: value }))}
+                placeholder="Select your country"
+                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number</Label>
+              <div className="flex space-x-2 mt-1">
+                <div className="w-20 sm:w-24">
+                  <Input
+                    value={selectedCountry ? selectedCountry.prefix : ''}
+                    disabled
+                    className="border-green-200 bg-gray-50 h-10 sm:h-12 text-sm sm:text-base text-center"
+                  />
+                </div>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Enter phone number"
+                  required
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="birthday" className="text-sm sm:text-base">Birthday</Label>
               <Input
-                id="name"
-                type="text"
-                value={profileData.name}
-                onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                id="birthday"
+                type="date"
+                value={formData.birthday}
+                onChange={(e) => setFormData(prev => ({ ...prev, birthday: e.target.value }))}
                 required
                 className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
               />
             </div>
-            
-            <div>
-              <Label htmlFor="lastName" className="text-sm sm:text-base">
-                {t('signup.profile.lastName')} <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="lastName"
-                type="text"
-                value={profileData.lastName}
-                onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
-                required
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-              />
-            </div>
           </div>
 
-          {/* Phone */}
-          <div>
-            <Label className="text-sm sm:text-base">{t('signup.profile.phone')}</Label>
-            <div className="flex space-x-2 mt-1">
-              <Select 
-                value={profileData.phonePrefix} 
-                onValueChange={(value) => setProfileData(prev => ({ ...prev, phonePrefix: value }))}
-              >
-                <SelectTrigger className="w-32 border-green-200 focus:border-green-400 h-10 sm:h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {phonePrefixes.map((prefix) => (
-                    <SelectItem key={prefix.value} value={prefix.value}>
-                      {prefix.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                type="tel"
-                value={profileData.phone}
-                onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                placeholder="1234567890"
-                className="flex-1 border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base"
-              />
+          {/* Language Preference */}
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center space-x-2">
+              <Languages className="h-4 w-4 text-green-600" />
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t('signup.language.title')}</h3>
             </div>
+            <p className="text-sm text-gray-600">{t('signup.language.description')}</p>
+            <Select
+              value={formData.selectedLanguage}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, selectedLanguage: value as Language }))}
+            >
+              <SelectTrigger className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base">
+                <SelectValue placeholder={t('signup.language.select')} />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {languageOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">{option.flag}</span>
+                      <span>{option.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Physical Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="weight" className="text-sm sm:text-base">{t('signup.profile.weight')}</Label>
-              <Input
-                id="weight"
-                type="number"
-                value={profileData.weight}
-                onChange={(e) => setProfileData(prev => ({ ...prev, weight: e.target.value }))}
-                placeholder="lbs"
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-              />
+          {/* Physical Information */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Physical Information</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div>
+                <Label htmlFor="weight" className="text-sm sm:text-base">Weight (lbs)</Label>
+                <Input
+                  id="weight"
+                  type="number"
+                  value={formData.weight}
+                  onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="heightFeet" className="text-sm sm:text-base">Height (feet)</Label>
+                <Input
+                  id="heightFeet"
+                  type="number"
+                  min="0"
+                  max="8"
+                  value={formData.heightFeet}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heightFeet: e.target.value }))}
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="heightInches" className="text-sm sm:text-base">Height (inches)</Label>
+                <Input
+                  id="heightInches"
+                  type="number"
+                  min="0"
+                  max="11"
+                  value={formData.heightInches}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heightInches: e.target.value }))}
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
             </div>
-            
-            <div>
-              <Label htmlFor="heightFeet" className="text-sm sm:text-base">{t('signup.profile.height')}</Label>
-              <Input
-                id="heightFeet"
-                type="number"
-                value={profileData.heightFeet}
-                onChange={(e) => setProfileData(prev => ({ ...prev, heightFeet: e.target.value }))}
-                placeholder="ft"
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="heightInches" className="text-sm sm:text-base">{t('signup.profile.inches')}</Label>
-              <Input
-                id="heightInches"
-                type="number"
-                value={profileData.heightInches}
-                onChange={(e) => setProfileData(prev => ({ ...prev, heightInches: e.target.value }))}
-                placeholder="in"
-                min="0"
-                max="11"
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-              />
-            </div>
-          </div>
-
-          {/* Birthday */}
-          <div>
-            <Label htmlFor="birthday" className="text-sm sm:text-base">{t('signup.profile.birthday')}</Label>
-            <Input
-              id="birthday"
-              type="date"
-              value={profileData.birthday}
-              onChange={(e) => setProfileData(prev => ({ ...prev, birthday: e.target.value }))}
-              className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-            />
           </div>
 
           {/* Health Goals */}
-          <div>
-            <Label className="text-sm sm:text-base flex items-center space-x-2">
-              <Target className="h-4 w-4 text-green-600" />
-              <span>{t('signup.profile.healthGoals')}</span>
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-              {healthGoalOptions.map((goal) => (
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Health Goals</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {healthGoalsOptions.map((goal) => (
                 <div key={goal} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`health-${goal}`}
-                    checked={profileData.healthGoals.includes(goal)}
-                    onCheckedChange={(checked) => handleCheckboxChange('healthGoals', goal, !!checked)}
+                    id={`goal-${goal}`}
+                    checked={formData.healthGoals.includes(goal)}
+                    onCheckedChange={() => handleCheckboxChange('healthGoals', goal)}
+                    className="border-green-300 data-[state=checked]:bg-green-500"
                   />
-                  <Label htmlFor={`health-${goal}`} className="text-sm">{goal}</Label>
+                  <Label htmlFor={`goal-${goal}`} className="text-sm sm:text-base cursor-pointer">
+                    {goal}
+                  </Label>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Diet Types */}
-          <div>
-            <Label className="text-sm sm:text-base flex items-center space-x-2">
-              <Heart className="h-4 w-4 text-green-600" />
-              <span>{t('signup.profile.dietTypes')}</span>
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-              {dietTypeOptions.map((diet) => (
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Dietary Preferences</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {dietTypesOptions.map((diet) => (
                 <div key={diet} className="flex items-center space-x-2">
                   <Checkbox
                     id={`diet-${diet}`}
-                    checked={profileData.dietTypes.includes(diet)}
-                    onCheckedChange={(checked) => handleCheckboxChange('dietTypes', diet, !!checked)}
+                    checked={formData.dietTypes.includes(diet)}
+                    onCheckedChange={() => handleCheckboxChange('dietTypes', diet)}
+                    className="border-green-300 data-[state=checked]:bg-green-500"
                   />
-                  <Label htmlFor={`diet-${diet}`} className="text-sm">{diet}</Label>
+                  <Label htmlFor={`diet-${diet}`} className="text-sm sm:text-base cursor-pointer">
+                    {diet}
+                  </Label>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Allergies */}
-          <div>
-            <Label className="text-sm sm:text-base flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
-              <span>{t('signup.profile.allergies')}</span>
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-              {allergyOptions.map((allergy) => (
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Allergies & Restrictions</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {allergiesOptions.map((allergy) => (
                 <div key={allergy} className="flex items-center space-x-2">
                   <Checkbox
                     id={`allergy-${allergy}`}
-                    checked={profileData.allergies.includes(allergy)}
-                    onCheckedChange={(checked) => handleCheckboxChange('allergies', allergy, !!checked)}
+                    checked={formData.allergies.includes(allergy)}
+                    onCheckedChange={() => handleCheckboxChange('allergies', allergy)}
+                    className="border-green-300 data-[state=checked]:bg-green-500"
                   />
-                  <Label htmlFor={`allergy-${allergy}`} className="text-sm">{allergy}</Label>
+                  <Label htmlFor={`allergy-${allergy}`} className="text-sm sm:text-base cursor-pointer">
+                    {allergy}
+                  </Label>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Terms and Conditions */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="acceptTerms"
-                checked={profileData.acceptTerms}
-                onCheckedChange={(checked) => setProfileData(prev => ({ ...prev, acceptTerms: !!checked }))}
-                className="mt-0.5"
-              />
-              <Label htmlFor="acceptTerms" className="text-sm leading-relaxed">
-                <span className="text-red-500">*</span> I agree to the{' '}
-                <Button
-                  type="button"
-                  variant="link"
-                  className="text-green-600 hover:text-green-700 p-0 font-semibold text-sm underline"
-                  onClick={() => navigate('/terms')}
-                >
-                  Terms and Conditions
-                </Button>
-                {' '}and understand that AI-generated meal plans are for informational purposes only and should not replace professional medical advice.
-              </Label>
-            </div>
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="flex-1 border-green-500 text-green-600 hover:bg-green-50 h-10 sm:h-12 text-sm sm:text-base"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t('common.back')}
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
+            >
+              {t('common.continue')}
+            </Button>
           </div>
-
-          <Button 
-            type="submit" 
-            className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
-            disabled={isLoading || !profileData.name.trim() || !profileData.lastName.trim() || !profileData.acceptTerms}
-          >
-            {isLoading ? t('signup.profile.completing') : t('signup.profile.continue')}
-          </Button>
         </form>
       </CardContent>
     </Card>
