@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,7 +89,7 @@ const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing 
   const [successPlan, setSuccessPlan] = useState<any>(null);
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
   const { user, fetchMealPlansFromAPI } = useUser();
-  const { language, getLanguageName } = useLanguage();
+  const { language } = useLanguage();
   const { toast } = useToast();
   const { showLoader, hideLoader, isLoading } = useCookingLoader();
 
