@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, ArrowRight, Sparkles, Clock, Users, ChefHat, Utensils, Eye, Target, DollarSign, Heart, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Clock, Users, ChefHat, Utensils, Eye, Target, DollarSign, Heart, AlertTriangle, Globe } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCookingLoader } from "@/hooks/useCookingLoader";
 import AIMealGeneration from "./AIMealGeneration";
 
 interface AIMealCreatorStepperProps {
@@ -37,6 +37,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   });
   const { user } = useUser();
   const { language, t } = useLanguage();
+  const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
 
   const form = useForm({
     defaultValues: {
@@ -63,8 +64,18 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     { id: 4, title: "Generate", description: "AI creates your meal" }
   ];
 
-  const handleNext = () => {
-    if (currentStep < steps.length) {
+  const handleNext = async () => {
+    if (currentStep === 3) {
+      // Show the cooking loader when transitioning to generation
+      showLoader("Analyzing your preferences and creating the perfect meal...");
+      
+      // Simulate API processing time
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Hide loader and move to generation step
+      hideLoader();
+      setCurrentStep(currentStep + 1);
+    } else if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -377,7 +388,10 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="font-semibold mb-3 text-purple-700">Basic Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div><strong>Language:</strong> {getLanguageDisplayName()}</div>
+                    <div className="flex items-center gap-1">
+                      <Globe className="h-3 w-3" />
+                      <strong>Language:</strong> {getLanguageDisplayName()}
+                    </div>
                     <div><strong>Meal Name:</strong> {mealData.mealName || "Not specified"}</div>
                     <div><strong>Meal Type:</strong> {mealData.mealType || "Not selected"}</div>
                     <div><strong>Servings:</strong> {mealData.servings}</div>
@@ -474,6 +488,8 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <LoaderComponent />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
