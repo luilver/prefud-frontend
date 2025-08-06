@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, RotateCcw } from "lucide-react";
+import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, ShoppingCart, Package, Plus } from "lucide-react";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
@@ -19,8 +19,10 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showShoppingList, setShowShoppingList] = useState(false);
+  const [shoppingList, setShoppingList] = useState<any[]>([]);
   const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
-  const { user } = useUser();
+  const { user, addPantryItem } = useUser();
 
   useEffect(() => {
     generateMeal();
@@ -110,6 +112,44 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     return [...new Set(tags)].slice(0, 4);
   };
 
+  const generateShoppingList = () => {
+    if (!meal) return;
+    
+    showLoader("Generating your shopping list...");
+    
+    setTimeout(() => {
+      const list = meal.ingredients.map((ingredient: any, index: number) => ({
+        id: `${meal.id}-ingredient-${index}`,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: getCategoryForIngredient(ingredient.name),
+        estimatedPrice: Math.floor(Math.random() * 800) + 200, // $2-10
+        mealName: meal.name,
+        notes: `For ${meal.name} recipe`
+      }));
+      
+      setShoppingList(list);
+      setShowShoppingList(true);
+      hideLoader();
+      toast.success("Shopping list generated!");
+    }, 1500);
+  };
+
+  const getCategoryForIngredient = (ingredientName: string) => {
+    const categories: { [key: string]: string } = {
+      'quinoa': 'grains',
+      'mixed vegetables': 'produce',
+      'olive oil': 'condiments',
+      'garlic': 'produce',
+      'onion': 'produce',
+      'bell pepper': 'produce',
+      'salt': 'spices',
+      'black pepper': 'spices'
+    };
+    return categories[ingredientName.toLowerCase()] || 'other';
+  };
+
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
       setCompletedSteps(completedSteps.filter(i => i !== stepIndex));
@@ -136,10 +176,22 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     }
   };
 
-  const handleTryAgain = () => {
-    setMeal(null);
-    setCompletedSteps([]);
-    generateMeal();
+  const handleAddToPantry = (item: any) => {
+    addPantryItem({
+      name: item.name,
+      quantity: parseFloat(item.quantity) || 1,
+      unit: item.unit || 'piece',
+      category: item.category || 'other',
+      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      purchaseDate: new Date(),
+      notes: item.notes || `Added from ${item.mealName}`
+    });
+    toast.success(`${item.name} added to pantry!`);
+  };
+
+  const handleOrderOnline = (item: any) => {
+    // Simulate online ordering
+    toast.success(`${item.name} added to online cart!`);
   };
 
   const enhancedInstructions = useMemo(() => {
@@ -176,28 +228,145 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     );
   }
 
+  // Shopping List View
+  if (showShoppingList) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6 p-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => setShowShoppingList(false)} className="p-2">
+              ← Back to Recipe
+            </Button>
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Shopping List</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
+                For {meal.name} • {shoppingList.length} items
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Shopping List */}
+        <div className="space-y-4">
+          {Object.entries(
+            shoppingList.reduce((acc: any, item: any) => {
+              const category = item.category || 'other';
+              if (!acc[category]) acc[category] = [];
+              acc[category].push(item);
+              return acc;
+            }, {})
+          ).map(([category, items]: [string, any]) => (
+            <Card key={category}>
+              <CardHeader>
+                <CardTitle className="text-lg capitalize flex items-center justify-between">
+                  <span>{category}</span>
+                  <Badge variant="secondary">{items.length} items</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {items.map((item: any) => (
+                    <div 
+                      key={item.id} 
+                      className="flex items-center justify-between p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium capitalize">{item.name}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {item.mealName}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {item.quantity} {item.unit}
+                          {item.notes && ` • ${item.notes}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {item.estimatedPrice && (
+                          <div className="text-sm font-medium text-green-600">
+                            ${(item.estimatedPrice / 100).toFixed(2)}
+                          </div>
+                        )}
+                        <div className="flex gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAddToPantry(item)}
+                            className="h-8"
+                          >
+                            <Package className="h-4 w-4 mr-1" />
+                            Add to Pantry
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleOrderOnline(item)}
+                            className="h-8"
+                          >
+                            <ShoppingCart className="h-4 w-4 mr-1" />
+                            Order Online
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Total Summary */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-semibold">Total Items: {shoppingList.length}</p>
+                <p className="text-sm text-gray-600">
+                  Estimated Total: ${(shoppingList.reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100).toFixed(2)}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    shoppingList.forEach(item => handleAddToPantry(item));
+                  }}
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Add All to Pantry
+                </Button>
+                <Button
+                  onClick={() => {
+                    shoppingList.forEach(item => handleOrderOnline(item));
+                  }}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Order All Online
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="max-w-4xl mx-auto space-y-6 p-4">
-        {/* Header */}
+        {/* Header - Removed Try Again, Favorite, and Share buttons */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-wrap gap-2">
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={handleTryAgain}
+              onClick={generateShoppingList}
               className="flex-shrink-0"
             >
-              <RotateCcw className="h-4 w-4 mr-1" />
-              Try Again
-            </Button>
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Heart className="h-4 w-4 mr-1" />
-              Favorite
-            </Button>
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Share2 className="h-4 w-4 mr-1" />
-              Share
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Generate Shopping List
             </Button>
           </div>
         </div>
