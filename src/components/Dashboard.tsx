@@ -102,7 +102,7 @@ const DashboardContent = () => {
 
       {/* Header for Mobile */}
       {isMobile && (
-        <header className="relative bg-white/90 backdrop-blur-md border-b border-green-200/60 sticky top-0 z-50 shadow-sm">
+        <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-green-200/60 z-50 shadow-sm">
           <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-orange-400/5 to-green-600/5"></div>
           <div className="relative container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
             <div className="flex items-center justify-between">
@@ -148,7 +148,7 @@ const DashboardContent = () => {
 
       {/* Main Content with dynamic positioning */}
       <div 
-        className={`relative min-h-screen transition-all duration-300 ${isMobile ? 'mb-20' : 'mt-16'}`}
+        className={`relative min-h-screen transition-all duration-300 ${isMobile ? 'pt-20 mb-20' : 'mt-16'}`}
         style={!isMobile ? { marginLeft: `${getSidebarWidth()}px` } : {}}
       >
         <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
