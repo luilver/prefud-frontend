@@ -1,424 +1,164 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, Sparkles, Calendar, Users, Clock, ChefHat, DollarSign, Globe } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, ChefHat, Users, Clock, DollarSign, Target, Utensils, Heart, AlertCircle, CheckCircle, Sparkles, Plus, X } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
+import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
 
 interface MealPlanCreatorStepperProps {
+  initialData?: any;
   onPlanCreated: (plan: any) => void;
   onBack: () => void;
-  initialData?: any;
   isEditing?: boolean;
 }
 
-const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing }: MealPlanCreatorStepperProps) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [planData, setPlanData] = useState({
-    planName: initialData?.name || "",
-    planDescription: initialData?.description || "",
-    startDate: initialData?.startDate || "",
-    numberOfDays: initialData?.preferences?.numberOfDays || 7,
-    numberOfPersons: initialData?.preferences?.numberOfPersons || initialData?.preferences?.people || 1,
-    mealsPerDay: initialData?.preferences?.mealsPerDay || 3,
-    dietaryRestrictions: initialData?.preferences?.dietaryRestrictions || [],
-    cuisinePreferences: initialData?.preferences?.cuisinePreferences || [],
-    allergiesIntolerances: initialData?.preferences?.allergiesIntolerance || [],
-    additionalAllergies: "",
-    maxCookTime: initialData?.preferences?.maxCookingTime || 30,
-    cookingSkillLevel: initialData?.preferences?.cookingSkillLevel || "",
-    budgetRange: initialData?.preferences?.budgetRange || "",
-    dislikes: [],
-    healthGoals: initialData?.preferences?.healthGoals || [],
-  });
+interface PlanData {
+  planName: string;
+  planDescription: string;
+  numberOfWeeks: number;
+  numberOfPersons: number;
+  mealsPerDay: number;
+  dietaryRestrictions: string[];
+  cuisinePreferences: string[];
+  allergiesIntolerances: string[];
+  dislikes: string[];
+  additionalAllergies: string;
+  maxCookTime: number;
+  cookingSkillLevel: string;
+  budgetRange: string;
+  healthGoals: string[];
+  startDate: Date | null;
+}
+
+const defaultPlanData: PlanData = {
+  planName: "",
+  planDescription: "",
+  numberOfWeeks: 1,
+  numberOfPersons: 1,
+  mealsPerDay: 3,
+  dietaryRestrictions: [],
+  cuisinePreferences: [],
+  allergiesIntolerances: [],
+  dislikes: [],
+  additionalAllergies: "",
+  maxCookTime: 30,
+  cookingSkillLevel: "Intermediate",
+  budgetRange: "Medium",
+  healthGoals: [],
+  startDate: null,
+};
+
+const MealPlanCreatorStepper = ({ initialData, onPlanCreated, onBack, isEditing }: MealPlanCreatorStepperProps) => {
+  const [step, setStep] = useState(1);
+  const [planData, setPlanData] = useState<PlanData>(initialData ? {
+    planName: initialData.name || "",
+    planDescription: initialData.planDescription || "",
+    numberOfWeeks: initialData.preferences?.numberOfWeeks || 1,
+    numberOfPersons: initialData.preferences?.numberOfPersons || 1,
+    mealsPerDay: initialData.preferences?.mealsPerDay || 3,
+    dietaryRestrictions: initialData.preferences?.dietaryRestrictions || [],
+    cuisinePreferences: initialData.preferences?.cuisinePreferences || [],
+    allergiesIntolerances: initialData.preferences?.allergiesIntolerance || [],
+    dislikes: initialData.preferences?.dislikes ? initialData.preferences.dislikes.split(',').map((item: string) => item.trim()) : [],
+    additionalAllergies: initialData.preferences?.additionalAllergies || "",
+    maxCookTime: initialData.preferences?.maxCookingTime || 30,
+    cookingSkillLevel: initialData.preferences?.cookingSkillLevel || "Intermediate",
+    budgetRange: initialData.preferences?.budgetRange || "Medium",
+    healthGoals: initialData.preferences?.healthGoals || [],
+    startDate: initialData.startDate ? new Date(initialData.startDate) : null,
+  } : defaultPlanData);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successPlan, setSuccessPlan] = useState<any>(null);
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
-  const [createdPlan, setCreatedPlan] = useState<any>(null);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  
-  const { user, refreshMealPlans } = useUser();
-  const { language } = useLanguage();
+  const { user, fetchMealPlansFromAPI } = useUser();
+  const { language, getLanguageName } = useLanguage();
   const { toast } = useToast();
-  const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { showLoader, hideLoader, isLoading } = useCookingLoader();
 
-  const steps = [
-    { id: 1, title: "Plan Details", description: "Basic information about your meal plan" },
-    { id: 2, title: "Dietary Preferences", description: "Your dietary needs and restrictions" },
-    { id: 3, title: "Cuisine & Cooking", description: "Cuisine preferences and cooking constraints" },
-    { id: 4, title: "Food Preferences", description: "Foods you like and dislike (optional)" },
-    { id: 5, title: "Generate Plan", description: "Review and create your meal plan" }
-  ];
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1);
 
-  const getLanguageDisplayName = (languageCode: string) => {
-    const displayMap: { [key: string]: string } = {
-      'en': 'English',
-      'es': 'Español',
-      'pt': 'Português', 
-      'fr': 'Français',
-      'de': 'Deutsch',
-      'it': 'Italiano'
-    };
-    return displayMap[languageCode.toLowerCase()] || 'English';
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type, checked } = e.target;
+
+    setPlanData(prevData => {
+      if (type === "checkbox") {
+        const isAdding = checked;
+        if (name === "healthGoals") {
+          const goal = value;
+          return {
+            ...prevData,
+            healthGoals: isAdding
+              ? [...prevData.healthGoals, goal]
+              : prevData.healthGoals.filter(g => g !== goal),
+          };
+        } else if (name === "dietaryRestrictions") {
+          const restriction = value;
+          return {
+            ...prevData,
+            dietaryRestrictions: isAdding
+              ? [...prevData.dietaryRestrictions, restriction]
+              : prevData.dietaryRestrictions.filter(r => r !== restriction),
+          };
+        } else if (name === "cuisinePreferences") {
+          const cuisine = value;
+          return {
+            ...prevData,
+            cuisinePreferences: isAdding
+              ? [...prevData.cuisinePreferences, cuisine]
+              : prevData.cuisinePreferences.filter(c => c !== cuisine),
+          };
+        } else if (name === "allergiesIntolerances") {
+          const allergy = value;
+          return {
+            ...prevData,
+            allergiesIntolerances: isAdding
+              ? [...prevData.allergiesIntolerances, allergy]
+              : prevData.allergiesIntolerances.filter(a => a !== allergy),
+          };
+        }
+      } else if (name === "dislikes") {
+        const valueToAdd = value as string;
+        return {
+          ...prevData,
+          dislikes: valueToAdd ? valueToAdd.split(',').map(item => item.trim()) : [],
+        };
+      } else if (type === "number") {
+        return {
+          ...prevData,
+          [name]: parseInt(value, 10) || 1,
+        };
+      } else {
+        return {
+          ...prevData,
+          [name]: value,
+        };
+      }
+    });
   };
 
-  const handleDataChange = (stepData: any) => {
-    setPlanData(prev => ({ ...prev, ...stepData }));
-  };
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5 text-purple-600" />
-                <span>Plan Details</span>
-              </CardTitle>
-              <CardDescription>
-                Basic information about your meal plan
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Plan Name */}
-              <div>
-                <label htmlFor="planName" className="block text-sm font-medium text-gray-700">Plan Name</label>
-                <input
-                  type="text"
-                  id="planName"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.planName}
-                  onChange={(e) => handleDataChange({ planName: e.target.value })}
-                />
-              </div>
-
-              {/* Start Date */}
-              <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.startDate}
-                  onChange={(e) => handleDataChange({ startDate: e.target.value })}
-                />
-              </div>
-
-              {/* Number of Days */}
-              <div>
-                <label htmlFor="numberOfDays" className="block text-sm font-medium text-gray-700">Number of Days</label>
-                <input
-                  type="number"
-                  id="numberOfDays"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.numberOfDays}
-                  onChange={(e) => handleDataChange({ numberOfDays: parseInt(e.target.value) })}
-                />
-              </div>
-
-              {/* Number of Persons */}
-              <div>
-                <label htmlFor="numberOfPersons" className="block text-sm font-medium text-gray-700">Number of Persons</label>
-                <input
-                  type="number"
-                  id="numberOfPersons"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.numberOfPersons}
-                  onChange={(e) => handleDataChange({ numberOfPersons: parseInt(e.target.value) })}
-                />
-              </div>
-
-              {/* Meals Per Day */}
-              <div>
-                <label htmlFor="mealsPerDay" className="block text-sm font-medium text-gray-700">Meals Per Day</label>
-                <input
-                  type="number"
-                  id="mealsPerDay"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.mealsPerDay}
-                  onChange={(e) => handleDataChange({ mealsPerDay: parseInt(e.target.value) })}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 2:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <ChefHat className="h-5 w-5 text-green-600" />
-                <span>Dietary Preferences</span>
-              </CardTitle>
-              <CardDescription>
-                Your dietary needs and restrictions
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Dietary Restrictions */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Dietary Restrictions</label>
-                <div className="mt-2 space-y-2">
-                  {["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Keto", "Paleo"].map((option) => (
-                    <div key={option} className="flex items-center">
-                      <input
-                        id={`dietary-${option}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.dietaryRestrictions.includes(option)}
-                        onChange={(e) => {
-                          const updatedRestrictions = e.target.checked
-                            ? [...planData.dietaryRestrictions, option]
-                            : planData.dietaryRestrictions.filter((item) => item !== option);
-                          handleDataChange({ dietaryRestrictions: updatedRestrictions });
-                        }}
-                      />
-                      <label htmlFor={`dietary-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Allergies Intolerances */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Allergies & Intolerances</label>
-                <div className="mt-2 space-y-2">
-                  {["Nuts", "Shellfish", "Soy", "Eggs", "Fish"].map((option) => (
-                    <div key={option} className="flex items-center">
-                      <input
-                        id={`allergy-${option}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.allergiesIntolerances.includes(option)}
-                        onChange={(e) => {
-                          const updatedAllergies = e.target.checked
-                            ? [...planData.allergiesIntolerances, option]
-                            : planData.allergiesIntolerances.filter((item) => item !== option);
-                          handleDataChange({ allergiesIntolerances: updatedAllergies });
-                        }}
-                      />
-                      <label htmlFor={`allergy-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 3:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Clock className="h-5 w-5 text-blue-600" />
-                <span>Cuisine & Cooking</span>
-              </CardTitle>
-              <CardDescription>
-                Cuisine preferences and cooking constraints
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Cuisine Preferences */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Cuisine Preferences</label>
-                <div className="mt-2 space-y-2">
-                  {["Italian", "Mexican", "Asian", "American", "Indian"].map((option) => (
-                    <div key={option} className="flex items-center">
-                      <input
-                        id={`cuisine-${option}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.cuisinePreferences.includes(option)}
-                        onChange={(e) => {
-                          const updatedCuisines = e.target.checked
-                            ? [...planData.cuisinePreferences, option]
-                            : planData.cuisinePreferences.filter((item) => item !== option);
-                          handleDataChange({ cuisinePreferences: updatedCuisines });
-                        }}
-                      />
-                      <label htmlFor={`cuisine-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Max Cook Time */}
-              <div>
-                <label htmlFor="maxCookTime" className="block text-sm font-medium text-gray-700">Max Cook Time (minutes)</label>
-                <input
-                  type="number"
-                  id="maxCookTime"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.maxCookTime}
-                  onChange={(e) => handleDataChange({ maxCookTime: parseInt(e.target.value) })}
-                />
-              </div>
-
-              {/* Cooking Skill Level */}
-              <div>
-                <label htmlFor="cookingSkillLevel" className="block text-sm font-medium text-gray-700">Cooking Skill Level</label>
-                <select
-                  id="cookingSkillLevel"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.cookingSkillLevel}
-                  onChange={(e) => handleDataChange({ cookingSkillLevel: e.target.value })}
-                >
-                  <option value="">Select Skill Level</option>
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
-                </select>
-              </div>
-
-              {/* Budget Range */}
-              <div>
-                <label htmlFor="budgetRange" className="block text-sm font-medium text-gray-700">Budget Range</label>
-                <select
-                  id="budgetRange"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.budgetRange}
-                  onChange={(e) => handleDataChange({ budgetRange: e.target.value })}
-                >
-                  <option value="">Select Budget Range</option>
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </select>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 4:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5 text-orange-600" />
-                <span>Food Preferences</span>
-              </CardTitle>
-              <CardDescription>
-                Foods you like and dislike (optional)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Dislikes */}
-              <div>
-                <label htmlFor="dislikes" className="block text-sm font-medium text-gray-700">Dislikes (comma-separated)</label>
-                <input
-                  type="text"
-                  id="dislikes"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.dislikes}
-                  onChange={(e) => handleDataChange({ dislikes: e.target.value.split(',') })}
-                />
-              </div>
-
-              {/* Health Goals */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Health Goals</label>
-                <div className="mt-2 space-y-2">
-                  {["Weight Loss", "Muscle Gain", "Heart Health", "Diabetes Friendly"].map((option) => (
-                    <div key={option} className="flex items-center">
-                      <input
-                        id={`health-${option}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.healthGoals.includes(option)}
-                        onChange={(e) => {
-                          const updatedGoals = e.target.checked
-                            ? [...planData.healthGoals, option]
-                            : planData.healthGoals.filter((item) => item !== option);
-                          handleDataChange({ healthGoals: updatedGoals });
-                        }}
-                      />
-                      <label htmlFor={`health-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      
-      case 5:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5 text-purple-600" />
-                <span>Generate Your Plan</span>
-              </CardTitle>
-              <CardDescription>
-                Review your preferences and create your personalized meal plan
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-3">Plan Summary:</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p><strong>Name:</strong> {planData.planName}</p>
-                    <p><strong>People:</strong> {planData.numberOfPersons} persons</p>
-                    <p><strong>Duration:</strong> {planData.numberOfDays} days</p>
-                    <p><strong>Meals per day:</strong> {planData.mealsPerDay}</p>
-                  </div>
-                  <div>
-                    <p><strong>Skill level:</strong> {planData.cookingSkillLevel}</p>
-                    <p><strong>Budget:</strong> {planData.budgetRange}</p>
-                    <p><strong>Dietary restrictions:</strong> {planData.dietaryRestrictions.length > 0 ? planData.dietaryRestrictions.join(', ') : 'None'}</p>
-                    <p className="flex items-center gap-1">
-                      <Globe className="h-3 w-3" />
-                      <strong>Language:</strong> {getLanguageDisplayName(language)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={generateMealPlan}
-                disabled={isGenerating}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg py-6"
-              >
-                <Sparkles className="h-5 w-5 mr-2" />
-                {isGenerating ? "Generating Your Plan..." : "Generate AI Meal Plan"}
-              </Button>
-              
-              {isGenerating && (
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
-                    <span>Analyzing your preferences...</span>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    This may take a few moments while we create your personalized meal plan.
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        );
-      
-      default:
-        return null;
-    }
+  const handleDateChange = (date: Date | undefined) => {
+    setPlanData(prevData => ({
+      ...prevData,
+      startDate: date || null,
+    }));
   };
 
   const generateMealPlan = async () => {
@@ -475,30 +215,20 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       toast({
         title: "Still Cooking!",
         description: "Your meal plan is being prepared in the background. Please check your meal plans in a few minutes.",
-        duration: 5000,
+        duration: 8000,
       });
-      // Navigate back and refresh
-      onBack();
-      refreshMealPlans();
+      setShowTimeoutModal(true);
     }, 180000); // 3 minutes
 
-    setTimeoutId(timeout);
-
     try {
-      const getLanguageName = (languageCode: string) => {
-        const languageMap: { [key: string]: string } = {
-          'en': 'english',
-          'es': 'spanish',
-          'pt': 'portuguese',
-          'fr': 'french',
-          'de': 'german',
-          'it': 'italian'
-        };
-        return languageMap[languageCode.toLowerCase()] || 'english';
-      };
+      // Calculate end date
+      const startDate = new Date(planData.startDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + (planData.numberOfWeeks * 7) - 1);
 
+      // Prepare the request data matching the API specification
       const requestData = {
-        duration: planData.numberOfDays,
+        duration: planData.numberOfWeeks * 7,
         numberPeople: planData.numberOfPersons,
         mealsPerDay: planData.mealsPerDay,
         dietaryRestrictions: planData.dietaryRestrictions,
@@ -511,7 +241,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
         healthGoals: planData.healthGoals,
         language: getLanguageName(language),
         user_id: user.id,
-        start_date: new Date(planData.startDate).toISOString(),
+        start_date: planData.startDate.toISOString().split('T')[0],
         plan_name: planData.planName,
         plan_description: planData.planDescription || `Personalized meal plan for ${planData.numberOfPersons} person${planData.numberOfPersons > 1 ? 's' : ''}`
       };
@@ -525,7 +255,6 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       // Clear the timeout since we got a response
       if (timeout) {
         clearTimeout(timeout);
-        setTimeoutId(null);
       }
       
       // Hide the loader
@@ -538,15 +267,26 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
       // Show success toast
       toast({
-        title: "Meal Plan Created Successfully!",
-        description: `Your ${planData.numberOfDays}-day meal plan "${planData.planName}" is ready to explore.`,
-        duration: 5000,
+        title: "🎉 Meal Plan Created Successfully!",
+        description: `Your meal plan "${transformedPlan.name}" is ready to explore.`,
+        duration: 8000,
       });
 
-      // Add to context and navigate
+      // Set the success modal data with properly mapped information
+      setSuccessPlan({
+        ...transformedPlan,
+        // Ensure the success modal gets the right format
+        name: transformedPlan.name,
+        numberOfDays: transformedPlan.preferences?.numberOfDays || (transformedPlan.duration ? parseInt(transformedPlan.duration.replace(' days', '')) : 7),
+        numberOfPersons: transformedPlan.preferences?.numberOfPersons || 1,
+        mealsPerDay: transformedPlan.preferences?.mealsPerDay || 3
+      });
+      setShowSuccessModal(true);
+
+      // Call the parent callback with the transformed plan
       onPlanCreated(transformedPlan);
 
-      // Refresh meal plans from server
+      // Refresh meal plans in the background
       await refreshMealPlans();
 
     } catch (error) {
@@ -555,7 +295,6 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       // Clear the timeout
       if (timeout) {
         clearTimeout(timeout);
-        setTimeoutId(null);
       }
       
       // Hide the loader
@@ -564,110 +303,371 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       
       toast({
         title: "Generation Failed",
-        description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
+        description: "Failed to generate meal plan. Please try again.",
         variant: "destructive"
       });
     }
   };
 
-  const handleSuccessModalClose = async () => {
-    setShowSuccessModal(false);
-    
-    if (createdPlan) {
-      // Add to context and navigate
-      onPlanCreated(createdPlan);
-    }
-
-    // Refresh meal plans from server
-    try {
-      await refreshMealPlans();
-    } catch (error) {
-      console.error('Error refreshing meal plans:', error);
+  const refreshMealPlans = async () => {
+    if (user?.id) {
+      try {
+        // Fetch the first page of meal plans to refresh the list
+        await fetchMealPlansFromAPI(user.id, 1, 6);
+      } catch (error) {
+        console.error('Error refreshing meal plans:', error);
+      }
     }
   };
 
-  const handleTimeoutModalClose = async () => {
-    setShowTimeoutModal(false);
-    
-    // Navigate back to meal planner
-    onBack();
+  const handleViewSuccessPlan = () => {
+    if (successPlan) {
+      console.log('📋 Viewing success plan:', successPlan);
+      setShowSuccessModal(false);
+      // Pass the full transformed plan to the parent callback
+      onPlanCreated(successPlan);
+    }
+  };
 
-    // Refresh meal plans from server in case the plan was created in the background
-    try {
-      await refreshMealPlans();
-    } catch (error) {
-      console.error('Error refreshing meal plans:', error);
+  const renderStepContent = () => {
+    switch (step) {
+      case 1:
+        return (
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div>
+                <Label htmlFor="planName">Plan Name</Label>
+                <Input
+                  type="text"
+                  id="planName"
+                  name="planName"
+                  value={planData.planName}
+                  onChange={handleChange}
+                  placeholder="My Awesome Meal Plan"
+                />
+              </div>
+              <div>
+                <Label htmlFor="planDescription">Plan Description</Label>
+                <Textarea
+                  id="planDescription"
+                  name="planDescription"
+                  value={planData.planDescription}
+                  onChange={handleChange}
+                  placeholder="A brief description of this meal plan"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="numberOfWeeks">Number of Weeks</Label>
+                <Select value={planData.numberOfWeeks.toString()} onValueChange={(value) => setPlanData(prev => ({ ...prev, numberOfWeeks: parseInt(value) }))}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4].map(week => (
+                      <SelectItem key={week} value={week.toString()}>{week} Week{week > 1 ? 's' : ''}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="numberOfPersons">Number of Persons</Label>
+                <Select value={planData.numberOfPersons.toString()} onValueChange={(value) => setPlanData(prev => ({ ...prev, numberOfPersons: parseInt(value) }))}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6].map(person => (
+                      <SelectItem key={person} value={person.toString()}>{person} Person{person > 1 ? 's' : ''}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="mealsPerDay">Meals Per Day</Label>
+                <Select value={planData.mealsPerDay.toString()} onValueChange={(value) => setPlanData(prev => ({ ...prev, mealsPerDay: parseInt(value) }))}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4].map(meal => (
+                      <SelectItem key={meal} value={meal.toString()}>{meal} Meal{meal > 1 ? 's' : ''}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label>Start Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !planData.startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {planData.startDate ? format(planData.startDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={planData.startDate}
+                    onSelect={handleDateChange}
+                    disabled={(date) =>
+                      date < new Date()
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </CardContent>
+        );
+      case 2:
+        return (
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Dietary Restrictions</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Pescatarian", "Ketogenic", "Paleo"].map(option => (
+                  <div key={option} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={option}
+                      name="dietaryRestrictions"
+                      value={option}
+                      checked={planData.dietaryRestrictions.includes(option)}
+                      onCheckedChange={(checked) => handleChange({
+                        target: {
+                          name: "dietaryRestrictions",
+                          value: option,
+                          type: "checkbox",
+                          checked: checked === true,
+                        }
+                      } as any)}
+                    />
+                    <Label htmlFor={option}>{option}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Cuisine Preferences</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {["Italian", "Mexican", "Chinese", "Indian", "American", "Mediterranean", "Japanese", "Thai", "French", "Korean"].map(option => (
+                  <div key={option} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={option}
+                      name="cuisinePreferences"
+                      value={option}
+                      checked={planData.cuisinePreferences.includes(option)}
+                      onCheckedChange={(checked) => handleChange({
+                        target: {
+                          name: "cuisinePreferences",
+                          value: option,
+                          type: "checkbox",
+                          checked: checked === true,
+                        }
+                      } as any)}
+                    />
+                    <Label htmlFor={option}>{option}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Allergies & Intolerances</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {["Peanuts", "Tree Nuts", "Dairy", "Eggs", "Soy", "Wheat", "Fish", "Shellfish"].map(option => (
+                  <div key={option} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={option}
+                      name="allergiesIntolerances"
+                      value={option}
+                      checked={planData.allergiesIntolerances.includes(option)}
+                      onCheckedChange={(checked) => handleChange({
+                        target: {
+                          name: "allergiesIntolerances",
+                          value: option,
+                          type: "checkbox",
+                          checked: checked === true,
+                        }
+                      } as any)}
+                    />
+                    <Label htmlFor={option}>{option}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="additionalAllergies">Additional Allergies/Dislikes (comma-separated)</Label>
+              <Input
+                type="text"
+                id="additionalAllergies"
+                name="additionalAllergies"
+                value={planData.additionalAllergies}
+                onChange={handleChange}
+                placeholder="e.g., Sesame, Mustard"
+              />
+            </div>
+          </CardContent>
+        );
+      case 3:
+        return (
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="maxCookTime">Max Cooking Time (minutes)</Label>
+              <Select value={planData.maxCookTime.toString()} onValueChange={(value) => setPlanData(prev => ({ ...prev, maxCookTime: parseInt(value) }))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[15, 30, 45, 60, 90].map(time => (
+                    <SelectItem key={time} value={time.toString()}>{time} minutes</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Cooking Skill Level</Label>
+              <RadioGroup defaultValue={planData.cookingSkillLevel} onValueChange={(value) => setPlanData(prev => ({ ...prev, cookingSkillLevel: value }))} className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Beginner" id="beginner" />
+                  <Label htmlFor="beginner">Beginner</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Intermediate" id="intermediate" />
+                  <Label htmlFor="intermediate">Intermediate</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Advanced" id="advanced" />
+                  <Label htmlFor="advanced">Advanced</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div>
+              <Label>Budget Range</Label>
+              <RadioGroup defaultValue={planData.budgetRange} onValueChange={(value) => setPlanData(prev => ({ ...prev, budgetRange: value }))} className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Low" id="low" />
+                  <Label htmlFor="low">Low</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Medium" id="medium" />
+                  <Label htmlFor="medium">Medium</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="High" id="high" />
+                  <Label htmlFor="high">High</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div>
+              <Label>Health Goals</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {["Weight Loss", "Muscle Gain", "Healthy Eating", "Improved Energy", "Balanced Diet"].map(option => (
+                  <div key={option} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={option}
+                      name="healthGoals"
+                      value={option}
+                      checked={planData.healthGoals.includes(option)}
+                      onCheckedChange={(checked) => handleChange({
+                        target: {
+                          name: "healthGoals",
+                          value: option,
+                          type: "checkbox",
+                          checked: checked === true,
+                        }
+                      } as any)}
+                    />
+                    <Label htmlFor={option}>{option}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        );
+      default:
+        return null;
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <LoaderComponent />
-      
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Meal Planner</span>
+        <Button variant="ghost" onClick={onBack}>
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Back to Meal Planner
         </Button>
-        <div className="flex items-center space-x-2">
-          <Sparkles className="h-5 w-5 text-purple-600" />
-          <h1 className="text-xl font-semibold">{isEditing ? 'Edit' : 'Create'} AI Meal Plan</h1>
-        </div>
+        <h2 className="text-2xl font-bold">{isEditing ? "Edit Meal Plan" : "Create AI Meal Plan"}</h2>
+        <div></div>
       </div>
 
-      {/* Progress Steps */}
-      <div className="space-y-4">
-        <Progress value={(currentStep / steps.length) * 100} className="w-full" />
-        <div className="flex justify-between text-xs text-gray-500">
-          {steps.map((step) => (
-            <span key={step.id} className={currentStep >= step.id ? 'text-purple-600 font-medium' : ''}>
-              {step.title}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Step Content */}
-      <div className="min-h-[400px]">
+      <Card>
+        <CardHeader className="space-y-2">
+          <CardTitle className="text-lg font-semibold">Step {step} of 3</CardTitle>
+          <CardDescription>Fill in the details to create your personalized meal plan.</CardDescription>
+        </CardHeader>
         {renderStepContent()}
+      </Card>
+
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={prevStep} disabled={step === 1}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Previous
+        </Button>
+        {step < 3 ? (
+          <Button onClick={nextStep}>
+            Next
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        ) : (
+          <Button onClick={generateMealPlan} disabled={isGenerating || isLoading}>
+            {isGenerating || isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate Meal Plan
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
-      {/* Navigation Buttons */}
-      {currentStep < 5 && (
-        <div className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-            disabled={currentStep === 1}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Previous
-          </Button>
-          <Button 
-            onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            Next
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
+      {/* Success Modal */}
       <MealPlanSuccessModal
         isOpen={showSuccessModal}
-        onClose={handleSuccessModalClose}
-        mealPlan={createdPlan ? {
-          name: createdPlan.name,
-          numberOfDays: planData.numberOfDays,
-          numberOfPersons: planData.numberOfPersons,
-          mealsPerDay: planData.mealsPerDay
+        onClose={() => {
+          setShowSuccessModal(false);
+          setSuccessPlan(null);
+        }}
+        onViewPlan={handleViewSuccessPlan}
+        mealPlan={successPlan ? {
+          name: successPlan.name,
+          numberOfDays: successPlan.numberOfDays || (successPlan.preferences?.numberOfDays) || 7,
+          numberOfPersons: successPlan.numberOfPersons || (successPlan.preferences?.numberOfPersons) || 1,
+          mealsPerDay: successPlan.mealsPerDay || (successPlan.preferences?.mealsPerDay) || 3
         } : undefined}
       />
 
+      {/* Timeout Modal */}
       <MealPlanTimeoutModal
         isOpen={showTimeoutModal}
-        onClose={handleTimeoutModalClose}
+        onClose={() => setShowTimeoutModal(false)}
+        onBackToPlanner={() => {
+          setShowTimeoutModal(false);
+          onBack();
+        }}
+        planName={planData.planName}
       />
     </div>
   );
