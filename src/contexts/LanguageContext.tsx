@@ -240,6 +240,8 @@ const translations = {
     "mealPlanCreator.cuisine.asian": "Asian",
     "mealPlanCreator.cuisine.american": "American",
     "mealPlanCreator.cuisine.indian": "Indian",
+    "mealPlanCreator.generate.btn": "Generate Plan with AI",
+    "mealPlanCreator.generate.btnLoad": "Generating Plan with AI...",
 
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "Meal Plan Created Successfully! 🎉",
@@ -1010,6 +1012,9 @@ const translations = {
     "mealPlanCreator.cuisine.asian": "Asiática",
     "mealPlanCreator.cuisine.american": "Americana",
     "mealPlanCreator.cuisine.indian": "India",
+    "mealPlanCreator.generate.btn": "Generar plan con IA",
+    "mealPlanCreator.generate.btnLoad": "Generando plan con IA...",
+
 
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "¡Plan de Comidas Creado Exitosamente! 🎉",
@@ -1801,6 +1806,8 @@ const translations = {
     "mealPlanCreator.cuisine.asian": "Asiática",
     "mealPlanCreator.cuisine.american": "Americana",
     "mealPlanCreator.cuisine.indian": "Indiana",
+    "mealPlanCreator.generate.btn": "Gerar Plano com IA",
+     "mealPlanCreator.generate.btnLoad": "Criando plano com IA...",
 
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "Plano de Refeições Criado com Sucesso! 🎉",

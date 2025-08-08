@@ -18,6 +18,7 @@ interface MealPlanSuccessModalProps {
 
 const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPlanSuccessModalProps) => {
   const { t } = useLanguage();
+  console.log('this is the meal plan received ', mealPlan)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -60,7 +61,7 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPla
           )}
           
           <div className="pt-4 space-y-3">
-            {onViewPlan && (
+            {/* {onViewPlan && (
               <Button 
                 onClick={onViewPlan}
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
@@ -68,7 +69,7 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPla
                 <Eye className="h-4 w-4 mr-2" />
                 {t('mealPlanSuccess.viewDetails') || 'View Meal Plan Details'}
               </Button>
-            )}
+            )} */}
             
             <Button 
               onClick={onClose}
