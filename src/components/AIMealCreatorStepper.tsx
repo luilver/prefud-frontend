@@ -58,16 +58,16 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   });
 
   const steps = [
-    { id: 1, title: "Meal Details", description: "Basic meal information" },
-    { id: 2, title: "Preferences", description: "Your dietary needs" },
-    { id: 3, title: "Summary", description: "Review your selections" },
-    { id: 4, title: "Generate", description: "AI creates your meal" }
+    { id: 1, title: t("aiMealCreatorStepper.step1Title") || "Meal Details", description: t("aiMealCreatorStepper.step1Desc") || "Basic meal information" },
+    { id: 2, title: t("aiMealCreatorStepper.step2Title") || "Preferences", description: t("aiMealCreatorStepper.step2Desc") || "Your dietary needs" },
+    { id: 3, title: t("aiMealCreatorStepper.step3Title") || "Summary", description: t("aiMealCreatorStepper.step3Desc") || "Review your selections" },
+    { id: 4, title: t("aiMealCreatorStepper.step4Title") || "Generate", description: t("aiMealCreatorStepper.step4Desc") || "AI creates your meal" }
   ];
 
   const handleNext = async () => {
     if (currentStep === 3) {
       // Show the cooking loader when transitioning to generation
-      showLoader("Analyzing your preferences and creating the perfect meal...");
+      showLoader(t("aiMealCreatorStepper.loaderMessage") || "Analyzing your preferences and creating the perfect meal...");
       
       // Simulate API processing time
       await new Promise(resolve => setTimeout(resolve, 3000));
@@ -91,29 +91,62 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   };
 
   const dietaryOptions = [
-    "Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Keto", "Paleo", 
-    "Low-Carb", "Low-Fat", "Pescatarian", "Nut-Free"
+    { key: "Vegetarian", label: t('aiMealCreatorStepper.dietary.vegetarian') || 'Vegetarian' },
+    { key: "Vegan", label: t('aiMealCreatorStepper.dietary.vegan') || 'Vegan' },
+    { key: "Gluten-Free", label: t('aiMealCreatorStepper.dietary.glutenfree') || 'Gluten-Free' },
+    { key: "Dairy-Free", label: t('aiMealCreatorStepper.dietary.dairyfree') || 'Dairy-Free' },
+    { key: "Keto", label: t('aiMealCreatorStepper.dietary.keto') || 'Keto' },
+    { key: "Paleo", label: t('aiMealCreatorStepper.dietary.paleo') || 'Paleo' },
+    { key: "Low-Carb", label: t('aiMealCreatorStepper.dietary.lowcarb') || 'Low-Carb' },
+    { key: "Low-Fat", label: t('aiMealCreatorStepper.dietary.lowfat') || 'Low-Fat' },
+    { key: "Pescatarian", label: t('aiMealCreatorStepper.dietary.pescatarian') || 'Pescatarian' },
+    { key: "Nut-Free", label: t('aiMealCreatorStepper.dietary.nutfree') || 'Nut-Free' },
   ];
 
   const cuisineOptions = [
-    "Italian", "Mexican", "Asian", "Mediterranean", "Indian", "American", 
-    "French", "Japanese", "Thai", "Greek", "Spanish", "Chinese"
+    { key: "Italian", label: t('aiMealCreatorStepper.cuisine.italian') || 'Italian' },
+    { key: "Mexican", label: t('aiMealCreatorStepper.cuisine.mexican') || 'Mexican' },
+    { key: "Asian", label: t('aiMealCreatorStepper.cuisine.asian') || 'Asian' },
+    { key: "Mediterranean", label: t('aiMealCreatorStepper.cuisine.mediterranean') || 'Mediterranean' },
+    { key: "Indian", label: t('aiMealCreatorStepper.cuisine.indian') || 'Indian' },
+    { key: "American", label: t('aiMealCreatorStepper.cuisine.american') || 'American' },
+    { key: "French", label: t('aiMealCreatorStepper.cuisine.french') || 'French' },
+    { key: "Japanese", label: t('aiMealCreatorStepper.cuisine.japanese') || 'Japanese' },
+    { key: "Thai", label: t('aiMealCreatorStepper.cuisine.thai') || 'Thai' },
+    { key: "Greek", label: t('aiMealCreatorStepper.cuisine.greek') || 'Greek' },
+    { key: "Spanish", label: t('aiMealCreatorStepper.cuisine.spanish') || 'Spanish' },
+    { key: "Chinese", label: t('aiMealCreatorStepper.cuisine.chinese') || 'Chinese' },
   ];
 
   const healthGoalsOptions = [
-    "Weight Loss", "Muscle Gain", "Heart Health", "Energy Boost", 
-    "Immune Support", "Digestive Health", "Anti-Inflammatory", "Detox"
+    { key: "Weight Loss", label: t('aiMealCreatorStepper.health.weightloss') || 'Weight Loss' },
+    { key: "Muscle Gain", label: t('aiMealCreatorStepper.health.musclegain') || 'Muscle Gain' },
+    { key: "Heart Health", label: t('aiMealCreatorStepper.health.hearthealth') || 'Heart Health' },
+    { key: "Energy Boost", label: t('aiMealCreatorStepper.health.energyboost') || 'Energy Boost' },
+    { key: "Immune Support", label: t('aiMealCreatorStepper.health.immunesupport') || 'Immune Support' },
+    { key: "Digestive Health", label: t('aiMealCreatorStepper.health.digestivehealth') || 'Digestive Health' },
+    { key: "Anti-Inflammatory", label: t('aiMealCreatorStepper.health.antiinflammatory') || 'Anti-Inflammatory' },
+    { key: "Detox", label: t('aiMealCreatorStepper.health.detox') || 'Detox' },
   ];
 
   const allergiesOptions = [
-    "Nuts", "Peanuts", "Shellfish", "Eggs", "Dairy", "Soy", "Fish", "Wheat", "Sesame", "Sulfites"
+    { key: "Nuts", label: t('aiMealCreatorStepper.allergy.nuts') || 'Nuts' },
+    { key: "Peanuts", label: t('aiMealCreatorStepper.allergy.peanuts') || 'Peanuts' },
+    { key: "Shellfish", label: t('aiMealCreatorStepper.allergy.shellfish') || 'Shellfish' },
+    { key: "Eggs", label: t('aiMealCreatorStepper.allergy.eggs') || 'Eggs' },
+    { key: "Dairy", label: t('aiMealCreatorStepper.allergy.dairy') || 'Dairy' },
+    { key: "Soy", label: t('aiMealCreatorStepper.allergy.soy') || 'Soy' },
+    { key: "Fish", label: t('aiMealCreatorStepper.allergy.fish') || 'Fish' },
+    { key: "Wheat", label: t('aiMealCreatorStepper.allergy.wheat') || 'Wheat' },
+    { key: "Sesame", label: t('aiMealCreatorStepper.allergy.sesame') || 'Sesame' },
+    { key: "Sulfites", label: t('aiMealCreatorStepper.allergy.sulfites') || 'Sulfites' },
   ];
 
   const getLanguageDisplayName = () => {
     const languageNames = {
-      en: "English",
-      es: "Español", 
-      pt: "Português"
+      en: t("language.english") || "English",
+      es: t("language.spanish") || "Español",
+      pt: t("language.portuguese") || "Português"
     };
     return languageNames[language as keyof typeof languageNames] || "English";
   };
@@ -126,34 +159,41 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Utensils className="h-5 w-5 text-purple-600" />
-                <span>Meal Details</span>
+                <span>{t("aiMealCreatorStepper.mealDetailsTitle") || "Meal Details"}</span>
               </CardTitle>
               <CardDescription>
-                Tell us about the meal you want to create
+                {t("aiMealCreatorStepper.mealDetailsDesc") || "Tell us about the meal you want to create"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-2">Special Meal Name (Optional)</label>
+                <label className="block text-sm font-medium mb-2">{t("aiMealCreatorStepper.mealNameLabel") || "Special Meal Name (Optional)"}</label>
                 <Input
-                  placeholder="e.g., My Special Sunday Dinner"
+                  placeholder={t("aiMealCreatorStepper.mealNamePlaceholder") || "e.g., My Special Sunday Dinner"}
                   value={mealData.mealName}
                   onChange={(e) => handleStepData({ mealName: e.target.value })}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Meal Type</label>
+                <label className="block text-sm font-medium mb-2">{t("aiMealCreatorStepper.mealTypeLabel") || "Meal Type"}</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {["Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Appetizer", "Custom"].map((type) => (
+                  {[{ key: "Breakfast", label: t('aiMealCreatorStepper.mealType.breakfast') || 'Breakfast' },
+                    { key: "Lunch", label: t('aiMealCreatorStepper.mealType.lunch') || 'Lunch' },
+                    { key: "Dinner", label: t('aiMealCreatorStepper.mealType.dinner') || 'Dinner' },
+                    { key: "Snack", label: t('aiMealCreatorStepper.mealType.snack') || 'Snack' },
+                    { key: "Dessert", label: t('aiMealCreatorStepper.mealType.dessert') || 'Dessert' },
+                    { key: "Appetizer", label: t('aiMealCreatorStepper.mealType.appetizer') || 'Appetizer' },
+                    { key: "Custom", label: t('aiMealCreatorStepper.mealType.custom') || 'Custom' },
+                  ].map((type) => (
                     <Button
-                      key={type}
+                      key={type.key}
                       type="button"
-                      variant={mealData.mealType === type ? "default" : "outline"}
-                      onClick={() => handleStepData({ mealType: type })}
+                      variant={mealData.mealType === type.key ? "default" : "outline"}
+                      onClick={() => handleStepData({ mealType: type.key })}
                       className="h-16 flex flex-col space-y-1"
                     >
-                      <span className="font-medium text-sm">{type}</span>
+                      <span className="font-medium text-sm">{type.label}</span>
                     </Button>
                   ))}
                 </div>
@@ -163,7 +203,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                 <div>
                   <label className="flex items-center space-x-2 text-sm font-medium mb-2">
                     <Users className="h-4 w-4" />
-                    <span>Servings</span>
+                    <span>{t("aiMealCreatorStepper.servingsLabel") || "Servings"}</span>
                   </label>
                   <Input 
                     type="number" 
@@ -176,7 +216,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                 <div>
                   <label className="flex items-center space-x-2 text-sm font-medium mb-2">
                     <Clock className="h-4 w-4" />
-                    <span>Max Cooking Time (mins)</span>
+                    <span>{t("aiMealCreatorStepper.cookingTimeLabel") || "Max Cooking Time (mins)"}</span>
                   </label>
                   <Input 
                     type="number" 
@@ -189,19 +229,19 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                 <div>
                   <label className="flex items-center space-x-2 text-sm font-medium mb-2">
                     <ChefHat className="h-4 w-4" />
-                    <span>Cooking Skill Level</span>
+                    <span>{t("aiMealCreatorStepper.skillLevelLabel") || "Cooking Skill Level"}</span>
                   </label>
                   <Select 
                     value={mealData.cookingSkillLevel} 
                     onValueChange={(value) => handleStepData({ cookingSkillLevel: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select skill level" />
+                      <SelectValue placeholder={t("aiMealCreatorStepper.skillLevelPlaceholder") || "Select skill level"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
+                      <SelectItem value="beginner">{t("aiMealCreatorStepper.skillLevel.beginner") || "Beginner"}</SelectItem>
+                      <SelectItem value="intermediate">{t("aiMealCreatorStepper.skillLevel.intermediate") || "Intermediate"}</SelectItem>
+                      <SelectItem value="advanced">{t("aiMealCreatorStepper.skillLevel.advanced") || "Advanced"}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -210,27 +250,27 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
               <div>
                 <label className="flex items-center space-x-2 text-sm font-medium mb-2">
                   <DollarSign className="h-4 w-4" />
-                  <span>Budget Range</span>
+                  <span>{t("aiMealCreatorStepper.budgetLabel") || "Budget Range"}</span>
                 </label>
                 <Select 
                   value={mealData.budgetRange} 
                   onValueChange={(value) => handleStepData({ budgetRange: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select budget" />
+                    <SelectValue placeholder={t("aiMealCreatorStepper.budgetPlaceholder") || "Select budget"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low Budget</SelectItem>
-                    <SelectItem value="medium">Medium Budget</SelectItem>
-                    <SelectItem value="high">High Budget</SelectItem>
+                    <SelectItem value="low">{t("aiMealCreatorStepper.budget.low") || "Low Budget"}</SelectItem>
+                    <SelectItem value="medium">{t("aiMealCreatorStepper.budget.medium") || "Medium Budget"}</SelectItem>
+                    <SelectItem value="high">{t("aiMealCreatorStepper.budget.high") || "High Budget"}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Special Requests (Optional)</label>
+                <label className="block text-sm font-medium mb-2">{t("aiMealCreatorStepper.specialRequestsLabel") || "Special Requests (Optional)"}</label>
                 <Textarea 
-                  placeholder="Any specific requests or inspirations for your meal?"
+                  placeholder={t("aiMealCreatorStepper.specialRequestsPlaceholder") || "Any specific requests or inspirations for your meal?"}
                   value={mealData.specialRequests}
                   onChange={(e) => handleStepData({ specialRequests: e.target.value })}
                 />
@@ -245,54 +285,54 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Heart className="h-5 w-5 text-purple-600" />
-                <span>Preferences & Goals</span>
+                <span>{t("aiMealCreatorStepper.preferencesTitle") || "Preferences & Goals"}</span>
               </CardTitle>
               <CardDescription>
-                Help us customize your meal to your dietary needs and health goals
+                {t("aiMealCreatorStepper.preferencesDesc") || "Help us customize your meal to your dietary needs and health goals"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-3">Dietary Restrictions</label>
+                <label className="block text-sm font-medium mb-3">{t("aiMealCreatorStepper.dietaryRestrictionsLabel") || "Dietary Restrictions"}</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {dietaryOptions.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
+                    <div key={option.key} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`dietary-${option}`}
-                        checked={mealData.dietaryRestrictions?.includes(option)}
+                        id={`dietary-${option.key}`}
+                        checked={mealData.dietaryRestrictions?.includes(option.key)}
                         onCheckedChange={(checked) => {
                           const current = mealData.dietaryRestrictions || [];
                           if (checked) {
-                            handleStepData({ dietaryRestrictions: [...current, option] });
+                            handleStepData({ dietaryRestrictions: [...current, option.key] });
                           } else {
-                            handleStepData({ dietaryRestrictions: current.filter((item: string) => item !== option) });
+                            handleStepData({ dietaryRestrictions: current.filter((item: string) => item !== option.key) });
                           }
                         }}
                       />
-                      <label htmlFor={`dietary-${option}`} className="text-sm">{option}</label>
+                      <label htmlFor={`dietary-${option.key}`} className="text-sm">{option.label}</label>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3">Cuisine Preferences</label>
+                <label className="block text-sm font-medium mb-3">{t("aiMealCreatorStepper.cuisinePreferencesLabel") || "Cuisine Preferences"}</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {cuisineOptions.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
+                    <div key={option.key} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`cuisine-${option}`}
-                        checked={mealData.cuisinePreferences?.includes(option)}
+                        id={`cuisine-${option.key}`}
+                        checked={mealData.cuisinePreferences?.includes(option.key)}
                         onCheckedChange={(checked) => {
                           const current = mealData.cuisinePreferences || [];
                           if (checked) {
-                            handleStepData({ cuisinePreferences: [...current, option] });
+                            handleStepData({ cuisinePreferences: [...current, option.key] });
                           } else {
-                            handleStepData({ cuisinePreferences: current.filter((item: string) => item !== option) });
+                            handleStepData({ cuisinePreferences: current.filter((item: string) => item !== option.key) });
                           }
                         }}
                       />
-                      <label htmlFor={`cuisine-${option}`} className="text-sm">{option}</label>
+                      <label htmlFor={`cuisine-${option.key}`} className="text-sm">{option.label}</label>
                     </div>
                   ))}
                 </div>
@@ -301,24 +341,24 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
               <div>
                 <label className="flex items-center space-x-2 text-sm font-medium mb-3">
                   <Target className="h-4 w-4" />
-                  <span>Health Goals</span>
+                  <span>{t("aiMealCreatorStepper.healthGoalsLabel") || "Health Goals"}</span>
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {healthGoalsOptions.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
+                    <div key={option.key} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`health-${option}`}
-                        checked={mealData.healthGoals?.includes(option)}
+                        id={`health-${option.key}`}
+                        checked={mealData.healthGoals?.includes(option.key)}
                         onCheckedChange={(checked) => {
                           const current = mealData.healthGoals || [];
                           if (checked) {
-                            handleStepData({ healthGoals: [...current, option] });
+                            handleStepData({ healthGoals: [...current, option.key] });
                           } else {
-                            handleStepData({ healthGoals: current.filter((item: string) => item !== option) });
+                            handleStepData({ healthGoals: current.filter((item: string) => item !== option.key) });
                           }
                         }}
                       />
-                      <label htmlFor={`health-${option}`} className="text-sm">{option}</label>
+                      <label htmlFor={`health-${option.key}`} className="text-sm">{option.label}</label>
                     </div>
                   ))}
                 </div>
@@ -327,42 +367,42 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
               <div>
                 <label className="flex items-center space-x-2 text-sm font-medium mb-3">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>Allergies & Intolerances</span>
+                  <span>{t("aiMealCreatorStepper.allergiesLabel") || "Allergies & Intolerances"}</span>
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {allergiesOptions.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
+                    <div key={option.key} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`allergy-${option}`}
-                        checked={mealData.allergiesIntolerances?.includes(option)}
+                        id={`allergy-${option.key}`}
+                        checked={mealData.allergiesIntolerances?.includes(option.key)}
                         onCheckedChange={(checked) => {
                           const current = mealData.allergiesIntolerances || [];
                           if (checked) {
-                            handleStepData({ allergiesIntolerances: [...current, option] });
+                            handleStepData({ allergiesIntolerances: [...current, option.key] });
                           } else {
-                            handleStepData({ allergiesIntolerances: current.filter((item: string) => item !== option) });
+                            handleStepData({ allergiesIntolerances: current.filter((item: string) => item !== option.key) });
                           }
                         }}
                       />
-                      <label htmlFor={`allergy-${option}`} className="text-sm">{option}</label>
+                      <label htmlFor={`allergy-${option.key}`} className="text-sm">{option.label}</label>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Custom Allergies/Intolerances (Optional)</label>
+                <label className="block text-sm font-medium mb-2">{t("aiMealCreatorStepper.customAllergiesLabel") || "Custom Allergies/Intolerances (Optional)"}</label>
                 <Textarea 
-                  placeholder="List any other ingredients or foods you're allergic to or intolerant of..."
+                  placeholder={t("aiMealCreatorStepper.customAllergiesPlaceholder") || "List any other ingredients or foods you're allergic to or intolerant of..."}
                   value={mealData.customAllergies}
                   onChange={(e) => handleStepData({ customAllergies: e.target.value })}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Dislikes (Optional)</label>
+                <label className="block text-sm font-medium mb-2">{t("aiMealCreatorStepper.dislikesLabel") || "Dislikes (Optional)"}</label>
                 <Textarea 
-                  placeholder="List any ingredients or foods you dislike..."
+                  placeholder={t("aiMealCreatorStepper.dislikesPlaceholder") || "List any ingredients or foods you dislike..."}
                   value={mealData.dislikes}
                   onChange={(e) => handleStepData({ dislikes: e.target.value })}
                 />
@@ -377,33 +417,33 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Eye className="h-5 w-5 text-purple-600" />
-                <span>Review Your Selections</span>
+                <span>{t("aiMealCreatorStepper.reviewTitle") || "Review Your Selections"}</span>
               </CardTitle>
               <CardDescription>
-                Please review all your preferences before generating your meal
+                {t("aiMealCreatorStepper.reviewDesc") || "Please review all your preferences before generating your meal"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-3 text-purple-700">Basic Information</h3>
+                  <h3 className="font-semibold mb-3 text-purple-700">{t("aiMealCreatorStepper.review.basicInfo") || "Basic Information"}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                     <div className="flex items-center gap-1">
                       <Globe className="h-3 w-3" />
-                      <strong>Language:</strong> {getLanguageDisplayName()}
+                      <strong>{t("aiMealCreatorStepper.review.language") || "Language"}:</strong> {getLanguageDisplayName()}
                     </div>
-                    <div><strong>Meal Name:</strong> {mealData.mealName || "Not specified"}</div>
-                    <div><strong>Meal Type:</strong> {mealData.mealType || "Not selected"}</div>
-                    <div><strong>Servings:</strong> {mealData.servings}</div>
-                    <div><strong>Max Cooking Time:</strong> {mealData.cookingTime} minutes</div>
-                    <div><strong>Skill Level:</strong> {mealData.cookingSkillLevel}</div>
-                    <div><strong>Budget:</strong> {mealData.budgetRange}</div>
+                    <div><strong>{t("aiMealCreatorStepper.review.mealName") || "Meal Name"}:</strong> {mealData.mealName || t("aiMealCreatorStepper.review.notSpecified") || "Not specified"}</div>
+                    <div><strong>{t("aiMealCreatorStepper.review.mealType") || "Meal Type"}:</strong> {mealData.mealType || t("aiMealCreatorStepper.review.notSelected") || "Not selected"}</div>
+                    <div><strong>{t("aiMealCreatorStepper.review.servings") || "Servings"}:</strong> {mealData.servings}</div>
+                    <div><strong>{t("aiMealCreatorStepper.review.cookingTime") || "Max Cooking Time"}:</strong> {mealData.cookingTime} {t("aiMealCreatorStepper.review.minutes") || "minutes"}</div>
+                    <div><strong>{t("aiMealCreatorStepper.review.skillLevel") || "Skill Level"}:</strong> {mealData.cookingSkillLevel}</div>
+                    <div><strong>{t("aiMealCreatorStepper.review.budget") || "Budget"}:</strong> {mealData.budgetRange}</div>
                   </div>
                 </div>
 
                 {mealData.dietaryRestrictions?.length > 0 && (
                   <div className="bg-green-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-green-700">Dietary Restrictions</h3>
+                    <h3 className="font-semibold mb-2 text-green-700">{t("aiMealCreatorStepper.review.dietaryRestrictions") || "Dietary Restrictions"}</h3>
                     <div className="flex flex-wrap gap-2">
                       {mealData.dietaryRestrictions.map((restriction: string) => (
                         <span key={restriction} className="bg-green-200 text-green-800 px-2 py-1 rounded-full text-xs">
@@ -416,7 +456,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
                 {mealData.cuisinePreferences?.length > 0 && (
                   <div className="bg-blue-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-blue-700">Cuisine Preferences</h3>
+                    <h3 className="font-semibold mb-2 text-blue-700">{t("aiMealCreatorStepper.review.cuisinePreferences") || "Cuisine Preferences"}</h3>
                     <div className="flex flex-wrap gap-2">
                       {mealData.cuisinePreferences.map((cuisine: string) => (
                         <span key={cuisine} className="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-xs">
@@ -429,7 +469,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
                 {mealData.healthGoals?.length > 0 && (
                   <div className="bg-orange-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-orange-700">Health Goals</h3>
+                    <h3 className="font-semibold mb-2 text-orange-700">{t("aiMealCreatorStepper.review.healthGoals") || "Health Goals"}</h3>
                     <div className="flex flex-wrap gap-2">
                       {mealData.healthGoals.map((goal: string) => (
                         <span key={goal} className="bg-orange-200 text-orange-800 px-2 py-1 rounded-full text-xs">
@@ -442,7 +482,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
                 {mealData.allergiesIntolerances?.length > 0 && (
                   <div className="bg-red-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-red-700">Allergies & Intolerances</h3>
+                    <h3 className="font-semibold mb-2 text-red-700">{t("aiMealCreatorStepper.review.allergies") || "Allergies & Intolerances"}</h3>
                     <div className="flex flex-wrap gap-2">
                       {mealData.allergiesIntolerances.map((allergy: string) => (
                         <span key={allergy} className="bg-red-200 text-red-800 px-2 py-1 rounded-full text-xs">
@@ -455,21 +495,21 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
                 {mealData.customAllergies && (
                   <div className="bg-red-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-red-700">Custom Allergies/Intolerances</h3>
+                    <h3 className="font-semibold mb-2 text-red-700">{t("aiMealCreatorStepper.review.customAllergies") || "Custom Allergies/Intolerances"}</h3>
                     <p className="text-sm text-red-600">{mealData.customAllergies}</p>
                   </div>
                 )}
 
                 {mealData.dislikes && (
                   <div className="bg-yellow-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-yellow-700">Dislikes</h3>
+                    <h3 className="font-semibold mb-2 text-yellow-700">{t("aiMealCreatorStepper.review.dislikes") || "Dislikes"}</h3>
                     <p className="text-sm text-yellow-600">{mealData.dislikes}</p>
                   </div>
                 )}
 
                 {mealData.specialRequests && (
                   <div className="bg-purple-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2 text-purple-700">Special Requests</h3>
+                    <h3 className="font-semibold mb-2 text-purple-700">{t("aiMealCreatorStepper.review.specialRequests") || "Special Requests"}</h3>
                     <p className="text-sm text-purple-600">{mealData.specialRequests}</p>
                   </div>
                 )}
@@ -494,11 +534,13 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to AI Meals</span>
+          <span>{t("aiMealCreatorStepper.backToMeals") || "Back to AI Meals"}</span>
         </Button>
         <div className="flex items-center space-x-2">
           <Sparkles className="h-5 w-5 text-purple-600" />
-          <h1 className="text-xl font-semibold">Create AI Meal</h1>
+          <h1 className="text-xl font-semibold">
+            {t("aiMealCreatorStepper.createAIMealTitle") || "Create AI Meal"}
+          </h1>
         </div>
       </div>
 
@@ -543,14 +585,14 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
             disabled={currentStep === 1}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Previous
+            {t("aiMealCreatorStepper.previousBtn") || "Previous"}
           </Button>
           <Button 
             onClick={handleNext}
             disabled={currentStep === 1 && !mealData.mealType}
             className="bg-purple-600 hover:bg-purple-700"
           >
-            Next
+            {t("aiMealCreatorStepper.nextBtn") || "Next"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChefHat, Utensils, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CookingLoaderProps {
   isVisible: boolean;
@@ -9,6 +10,7 @@ interface CookingLoaderProps {
 }
 
 const CookingLoaderOverlay = ({ isVisible, message = "Cooking up something delicious..." }: CookingLoaderProps) => {
+  const { t } = useLanguage();
   if (!isVisible) return null;
 
   return createPortal(
@@ -34,7 +36,7 @@ const CookingLoaderOverlay = ({ isVisible, message = "Cooking up something delic
         </div>
 
         {/* Loading Message */}
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">Creating Your Meal Plan</h3>
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">{t("useCooking.creatingYourMealPlan") || "Creating Your Meal Plan"}</h3>
         <p className="text-gray-600 text-sm">{message}</p>
 
         {/* Progress Bar */}

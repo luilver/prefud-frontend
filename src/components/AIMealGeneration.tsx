@@ -39,15 +39,14 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   
   const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
   const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     generateMeal();
   }, []);
 
   const generateMeal = async () => {
-    showLoader("Creating your personalized meal with AI...");
-    
+    showLoader(t("aiMealGenerator.loaderMessage") || "Creating your personalized meal with AI...");
     try {
       // Map the mealData to match the API expected format
       const apiPayload = {
@@ -107,17 +106,15 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
 
       setMeal(generatedMeal);
       hideLoader();
-      toast.success("Your AI-generated meal is ready!");
+      toast.success(t("aiMealGenerator.createAIMealTitle") || "Your AI-generated meal is ready!");
     } catch (error) {
       console.error("Error generating meal:", error);
       hideLoader();
-      toast.error("Failed to generate meal. Please try again.");
-      
-      // Fallback to mock data if API fails
+      toast.error(t("aiMealGenerator.error") || "Failed to generate meal. Please try again.");
       const fallbackMeal = {
         id: Date.now().toString(),
-        name: "Healthy Veggie Bowl",
-        description: "A delightful fusion of flavors that will satisfy your taste buds.",
+        name: t("aiMealGenerator.mealNamePlaceholder") || "Healthy Veggie Bowl",
+        description: t("aiMealGenerator.mealDetailsDesc") || "A delightful fusion of flavors that will satisfy your taste buds.",
         cookingTime: Math.floor(Math.random() * 40) + 20,
         servings: mealData.servings || 2,
         difficulty: mealData.cookingSkillLevel || "Medium",
@@ -148,30 +145,28 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
 
   const generateIngredients = () => {
     const baseIngredients = [
-      { name: "quinoa", quantity: "1", unit: "cup" },
-      { name: "mixed vegetables", quantity: "2", unit: "cups" },
-      { name: "olive oil", quantity: "2", unit: "tbsp" },
-      { name: "garlic", quantity: "2", unit: "cloves" },
-      { name: "onion", quantity: "1", unit: "medium" },
-      { name: "bell pepper", quantity: "1", unit: "large" },
-      { name: "salt", quantity: "1", unit: "tsp" },
-      { name: "black pepper", quantity: "1/2", unit: "tsp" }
+      { name: t("aiMealGenerator.quinoa") || "quinoa", quantity: "1", unit: "cup" },
+      { name: t("aiMealGenerator.mixedVegetables") || "mixed vegetables", quantity: "2", unit: "cups" },
+      { name: t("aiMealGenerator.oliveOil") || "olive oil", quantity: "2", unit: "tbsp" },
+      { name: t("aiMealGenerator.garlic") || "garlic", quantity: "2", unit: "cloves" },
+      { name: t("aiMealGenerator.onion") || "onion", quantity: "1", unit: "medium" },
+      { name: t("aiMealGenerator.bellPepper") || "bell pepper", quantity: "1", unit: "large" },
+      { name: t("aiMealGenerator.salt") || "salt", quantity: "1", unit: "tsp" },
+      { name: t("aiMealGenerator.blackPepper") || "black pepper", quantity: "1/2", unit: "tsp" }
     ];
     return baseIngredients.slice(0, Math.floor(Math.random() * 3) + 6);
   };
 
-  const generateInstructions = () => {
-    return [
-      "Prepare all ingredients by washing and chopping as needed.",
-      "Heat oil in a large pan over medium-high heat.",
-      "Add aromatics and cook until fragrant, about 2-3 minutes.",
-      "Add main ingredients and cook according to type and preference.",
-      "Season with salt, pepper, and selected spices.",
-      "Combine all elements and cook until heated through.",
-      "Taste and adjust seasoning as needed.",
-      "Serve hot and enjoy!"
-    ];
-  };
+  const generateInstructions = () => [
+    t("aiMealGenerator.prepareIngredients") || "Prepare all ingredients by washing and chopping as needed.",
+    t("aiMealGenerator.heatOil") || "Heat oil in a large pan over medium-high heat.",
+    t("aiMealGenerator.addAromatics") || "Add aromatics and cook until fragrant, about 2-3 minutes.",
+    t("aiMealGenerator.addMainIngredients") || "Add main ingredients and cook according to type and preference.",
+    t("aiMealGenerator.season") || "Season with salt, pepper, and selected spices.",
+    t("aiMealGenerator.combine") || "Combine all elements and cook until heated through.",
+    t("aiMealGenerator.tasteAdjust") || "Taste and adjust seasoning as needed.",
+    t("aiMealGenerator.serve") || "Serve hot and enjoy!"
+  ];
 
   const generateNutritionalInfo = () => {
     const calories = meal?.calories || 400;
@@ -188,15 +183,13 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     const tags = [];
     if (prefs.healthGoals) tags.push(...prefs.healthGoals.slice(0, 2));
     if (prefs.dietaryRestrictions) tags.push(...prefs.dietaryRestrictions.slice(0, 2));
-    tags.push("AI Generated", "Healthy");
+    tags.push(t("aiMealGenerator.review.specialRequests") || "AI Generated", t("aiMealGenerator.review.healthGoals") || "Healthy");
     return [...new Set(tags)].slice(0, 4);
   };
 
   const generateShoppingList = () => {
     if (!meal) return;
-    
-    showLoader("Generating your shopping list...");
-    
+    showLoader(t("aiMealGenerator.shoppingListTitle") || "Generating your shopping list...");
     setTimeout(() => {
       // Use the actual ingredients from the API response if available
       const ingredientsToUse = meal.ingredientsList || meal.ingredients;
@@ -216,7 +209,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       setShowShoppingList(true);
       setCheckedIngredients(new Set());
       hideLoader();
-      toast.success("Shopping list generated!");
+      toast.success(t("aiMealGenerator.shoppingListTitle") || "Shopping list generated!");
     }, 1500);
   };
 
@@ -266,7 +259,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     const selectedItems = shoppingList.filter(item => checkedIngredients.has(item.id));
     
     if (selectedItems.length === 0) {
-      toast.error("Please select ingredients to add to pantry");
+      toast.error(t("aiMealGenerator.selectIngredients") || "Please select ingredients to add to pantry");
       return;
     }
 
@@ -290,7 +283,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     const selectedItems = shoppingList.filter(item => checkedIngredients.has(item.id));
     
     if (selectedItems.length === 0) {
-      toast.error("Please select ingredients to order online");
+      toast.error(t("aiMealGenerator.selectIngredients") || "Please select ingredients to order online");
       return;
     }
 
@@ -302,12 +295,12 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     const selectedItems = shoppingList.filter(item => checkedIngredients.has(item.id));
     
     if (!deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.state || !deliveryAddress.zipCode) {
-      toast.error("Please fill in all delivery address fields");
+      toast.error(t("aiMealGenerator.deliveryPrompt") || "Please fill in all delivery address fields");
       return;
     }
 
     if (!selectedPaymentMethod) {
-      toast.error("Please select a payment method");
+      toast.error(t("aiMealGenerator.chooseDeliveryTime") || "Please select a payment method");
       return;
     }
 
@@ -344,7 +337,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const handleSaveMeal = () => {
     if (meal) {
       onMealCreated(meal);
-      toast.success("Meal saved successfully!");
+      toast.success(t("aiMealGenerator.save") || "Meal saved successfully!");
     }
   };
 
@@ -352,14 +345,14 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     if (!meal) return [];
     
     const cookingTips = [
-      "🔥 Heat your pan to medium-high heat",
-      "⏱️ Don't rush this step - patience makes perfect!",
-      "👨‍🍳 Pro tip: Taste as you go",
-      "🌟 This is where the magic happens",
-      "💡 Keep stirring to prevent sticking",
-      "🎯 Almost there - you're doing great!",
-      "✨ The aroma should be amazing now",
-      "🏆 Final stretch - you've got this!"
+      t("aiMealGenerator.heatPan") || "🔥 Heat your pan to medium-high heat",
+      t("aiMealGenerator.patience") || "⏱️ Don't rush this step - patience makes perfect!",
+      t("aiMealGenerator.taste") || "👨‍🍳 Pro tip: Taste as you go",
+      t("aiMealGenerator.magic") || "🌟 This is where the magic happens",
+      t("aiMealGenerator.stir") || "💡 Keep stirring to prevent sticking",
+      t("aiMealGenerator.almost") || "🎯 Almost there - you're doing great!",
+      t("aiMealGenerator.aroma") || "✨ The aroma should be amazing now",
+      t("aiMealGenerator.final") || "🏆 Final stretch - you've got this!"
     ];
     
     return meal.instructions.map((instruction: string, index: number) => ({
@@ -396,12 +389,12 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => setShowShoppingList(false)} className="p-2">
-              ← Back to Recipe
+              ← {t("aiMealGenerator.back") || "Back to Recipe"}
             </Button>
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Shopping List</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{t("aiMealGenerator.shoppingListTitle") || "Shopping List"}</h1>
               <p className="text-sm sm:text-base text-gray-600 mt-1">
-                For {meal.name} • {shoppingList.length} items
+                {t("aiMealGenerator.for") || "For"} {meal.name} • {shoppingList.length} {t("aiMealGenerator.ingredientCount") || "items"}
               </p>
             </div>
           </div>
@@ -419,8 +412,8 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Ingredients</span>
-              <Badge variant="secondary">{selectedCount} of {shoppingList.length} selected</Badge>
+              <span>{t("aiMealGenerator.ingredientsTitle") || "Ingredients"}</span>
+              <Badge variant="secondary">{selectedCount} {t("aiMealGenerator.of") || "seleofcted"} {shoppingList.length} {t("aiMealGenerator.selected") || "selected"}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -462,9 +455,9 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
             <CardContent className="p-4">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <p className="font-semibold">Selected Items: {selectedCount}</p>
+                  <p className="font-semibold">{t('mealShopping.selectedItems') || 'Selected Items'}: {selectedCount}</p>
                   <p className="text-sm text-gray-600">
-                    Total Cost: ${totalCost.toFixed(2)}
+                    {t('mealShopping.totalCost') || 'Total Cost'}: ${totalCost.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -476,7 +469,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   className="flex-1"
                 >
                   <Package className="h-4 w-4 mr-2" />
-                  Add to Pantry
+                  {t("aiMealGenerator.addToPantry") || "Add to Pantry"}
                 </Button>
                 <Button
                   onClick={handleOrderOnline}
@@ -484,7 +477,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   className="flex-1"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  Order Online
+                  {t("aiMealGenerator.orderOnline") || "Order Online"}
                 </Button>
               </div>
             </CardContent>
@@ -495,12 +488,12 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Complete Your Order</DialogTitle>
+              <DialogTitle>{t("aiMealGenerator.completeOrder") || "Complete Your Order"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-6">
               {/* Selected Items */}
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium mb-2">Selected Items ({selectedCount})</h3>
+                <h3 className="font-medium mb-2">{t('mealShopping.selectedItems') || 'Selected Items'} ({selectedCount})</h3>
                 <div className="text-sm text-gray-600">
                   {shoppingList
                     .filter(item => checkedIngredients.has(item.id))
@@ -508,7 +501,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                     .join(', ')}
                 </div>
                 <div className="text-lg font-semibold text-green-600 mt-2">
-                  Total: ${totalCost.toFixed(2)}
+                  {t('mealShopping.total') || 'Total'}: ${totalCost.toFixed(2)}
                 </div>
               </div>
 
@@ -516,11 +509,11 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
               <div className="space-y-4">
                 <h3 className="font-medium flex items-center gap-2">
                   <CreditCard className="h-4 w-4" />
-                  Payment Method
+                  {t("aiMealGenerator.paymentMethod") || "Payment Method"}
                 </h3>
                 <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a payment method..." />
+                    <SelectValue placeholder={t("aiMealGenerator.choosePaymentMethod") || "Choose a payment method..."} />
                   </SelectTrigger>
                   <SelectContent>
                     {paymentMethods.map((method) => (
@@ -529,7 +522,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                           <CreditCard className="h-4 w-4" />
                           <span className="capitalize">{method.brand}</span>
                           <span>****{method.last4}</span>
-                          {method.isDefault && <Badge variant="secondary" className="text-xs">Default</Badge>}
+                          {method.isDefault && <Badge variant="secondary" className="text-xs">{t("aiMealGenerator.default") || "Default"}</Badge>}
                         </div>
                       </SelectItem>
                     ))}
@@ -541,38 +534,38 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
               <div className="space-y-4">
                 <h3 className="font-medium flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Delivery Address
+                  {t("aiMealGenerator.deliveryAddress") || "Delivery Address"}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <Label htmlFor="street">Street Address</Label>
+                    <Label htmlFor="street">{t("aiMealGenerator.street") || "Street Address"}</Label>
                     <Input
                       id="street"
                       value={deliveryAddress.street}
                       onChange={(e) => setDeliveryAddress(prev => ({ ...prev, street: e.target.value }))}
-                      placeholder="123 Main Street"
+                      placeholder={t("aiMealGenerator.streetPlaceholder") || "123 Main Street"}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city">{t("aiMealGenerator.city") || "City"}</Label>
                     <Input
                       id="city"
                       value={deliveryAddress.city}
                       onChange={(e) => setDeliveryAddress(prev => ({ ...prev, city: e.target.value }))}
-                      placeholder="New York"
+                      placeholder={t("aiMealGenerator.cityPlaceholder") || "New York"}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="state">State</Label>
+                    <Label htmlFor="state">{t("aiMealGenerator.state") || "State"}</Label>
                     <Input
                       id="state"
                       value={deliveryAddress.state}
                       onChange={(e) => setDeliveryAddress(prev => ({ ...prev, state: e.target.value }))}
-                      placeholder="NY"
+                      placeholder={t("aiMealGenerator.statePlaceholder") || "NY"}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="zipCode">ZIP Code</Label>
+                    <Label htmlFor="zipCode">{t("aiMealGenerator.zipCode") || "ZIP Code"}</Label>
                     <Input
                       id="zipCode"
                       value={deliveryAddress.zipCode}
@@ -581,12 +574,12 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                     />
                   </div>
                   <div>
-                    <Label htmlFor="country">Country</Label>
+                    <Label htmlFor="country">{t("aiMealGenerator.country") || "Country"}</Label>
                     <Input
                       id="country"
                       value={deliveryAddress.country}
                       onChange={(e) => setDeliveryAddress(prev => ({ ...prev, country: e.target.value }))}
-                      placeholder="United States"
+                      placeholder={t("aiMealGenerator.countryPlaceholder") || "United States"}
                     />
                   </div>
                 </div>
@@ -598,14 +591,14 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   className="flex-1 bg-blue-500 hover:bg-blue-600"
                 >
                   <Package className="h-4 w-4 mr-2" />
-                  Place Order
+                  {t("aiMealGenerator.placeOrder") || "Place Order"}
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setShowOrderDialog(false)}
                   className="flex-1"
                 >
-                  Cancel
+                  {t("aiMealGenerator.cancel") || "Cancel"}
                 </Button>
               </div>
             </div>
@@ -628,7 +621,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
               className="flex-shrink-0"
             >
               <ShoppingCart className="h-4 w-4 mr-1" />
-              Generate Shopping List
+              {t("aiMealGenerator.generateShoppingList") || "Generate Shopping List"}
             </Button>
           </div>
         </div>
@@ -649,7 +642,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                 {meal.benefits && (
                   <div className="mb-4 p-3 bg-green-50 rounded-lg">
                     <p className="text-sm text-green-700">
-                      <strong>Benefits:</strong> {meal.benefits}
+                      <strong>{t("aiMealGenerator.benefits") || "Benefits"}:</strong> {meal.benefits}
                     </p>
                   </div>
                 )}
@@ -657,7 +650,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                 {meal.prepTip && (
                   <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-blue-700">
-                      <strong>Prep Tip:</strong> {meal.prepTip}
+                      <strong>{t("aiMealGenerator.prepTip") || "Prep Tip"}:</strong> {meal.prepTip}
                     </p>
                   </div>
                 )}
@@ -675,11 +668,11 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{meal.cookingTime} mins</span>
+                    <span className="font-medium text-sm sm:text-base">{meal.cookingTime} {t("aiMealGenerator.review.minutes") || "mins"}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{meal.servings} servings</span>
+                    <span className="font-medium text-sm sm:text-base">{meal.servings} {t("aiMealGenerator.review.servings") || "servings"}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
@@ -705,8 +698,8 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="recipe">Recipe</TabsTrigger>
-                <TabsTrigger value="video">Video Tutorial</TabsTrigger>
+                <TabsTrigger value="recipe">{t("mealTabs.recipe") || "Recipe"}</TabsTrigger>
+                <TabsTrigger value="video">{t("mealTabs.video") || "Video Tutorial"}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="recipe" className="space-y-6">
@@ -715,9 +708,9 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <BookOpen className="h-5 w-5 text-purple-600" />
-                      <span>Ingredients</span>
+                      <span>{t("aiMealGenerator.ingredientsTitle") || "Ingredients"}</span>
                     </CardTitle>
-                    <CardDescription>Everything you need for this recipe</CardDescription>
+                    <CardDescription>{t("aiMealGenerator.ingredientsDesc") || "Everything you need for this recipe"}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3">
@@ -741,9 +734,9 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Flame className="h-5 w-5 text-orange-600" />
-                      <span>Cooking Instructions</span>
+                      <span>{t("mealTabs.instructions") || "Cooking Instructions"}</span>
                     </CardTitle>
-                    <CardDescription>Follow these steps for the perfect result</CardDescription>
+                    <CardDescription>{t("mealTabs.instructionsDesc") || "Follow these steps for the perfect result"}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -812,10 +805,10 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Play className="h-5 w-5 text-red-600" />
-                      <span>Video Tutorial</span>
+                      <span>{t("mealTabs.video") || "Video Tutorial"}</span>
                     </CardTitle>
                     <CardDescription>
-                      Watch step-by-step preparation for {meal.name}
+                      {t("mealTabs.videoDesc") || "Watch step-by-step preparation for"} {meal.name}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -828,7 +821,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                             className="bg-red-600 hover:bg-red-700 rounded-full"
                           >
                             <Play className="h-6 w-6 mr-2" />
-                            Play Video
+                            {t("mealTabs.playVideo") || "Play Video"}
                           </Button>
                           <Button
                             onClick={openFullscreenVideo}
@@ -836,7 +829,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                             className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                           >
                             <Maximize className="h-4 w-4 mr-2" />
-                            Fullscreen
+                            {t("mealTabs.fullscreen") || "Fullscreen"}
                           </Button>
                         </div>
                       ) : (
@@ -857,7 +850,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                               variant="ghost"
                               className="text-white hover:bg-white/20"
                             >
-                              Close Video
+                              {t("mealTabs.closeVideo") || "Close Video"}
                             </Button>
                             <Button
                               onClick={openFullscreenVideo}
@@ -865,7 +858,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                               className="text-white hover:bg-white/20"
                             >
                               <Maximize className="h-4 w-4 mr-2" />
-                              Fullscreen
+                              {t("mealTabs.fullscreen") || "Fullscreen"}
                             </Button>
                           </div>
                         </div>
@@ -882,33 +875,33 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
             {/* Nutrition */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Nutrition (per serving)</CardTitle>
+                <CardTitle className="text-lg">{t("mealSidebar.nutrition") || "Nutrition (per serving)"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">Calories</span>
+                    <span className="font-medium">{t("mealSidebar.calories") || "Calories"}</span>
                     <span>{nutrition?.calories}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Protein</span>
+                    <span>{t("mealSidebar.protein") || "Protein"}</span>
                     <span>{nutrition?.protein}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Carbs</span>
+                    <span>{t("mealSidebar.carbs") || "Carbs"}</span>
                     <span>{nutrition?.carbohydrates || nutrition?.carbs}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Fat</span>
+                    <span>{t("mealSidebar.fat") || "Fat"}</span>
                     <span>{nutrition?.fat}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Fiber</span>
+                    <span>{t("mealSidebar.fiber") || "Fiber"}</span>
                     <span>{nutrition?.fiber}g</span>
                   </div>
                   {nutrition?.vitamins && (
                     <div className="pt-2 border-t">
-                      <p className="text-sm font-medium mb-1">Vitamins:</p>
+                      <p className="text-sm font-medium mb-1">{t("mealSidebar.vitamins") || "Vitamins"}:</p>
                       <p className="text-xs text-gray-600">{nutrition.vitamins.join(', ')}</p>
                     </div>
                   )}
@@ -919,7 +912,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
             {/* Cooking Progress */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Cooking Progress</CardTitle>
+                <CardTitle className="text-lg">{t("mealSidebar.progress") || "Cooking Progress"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center">
@@ -927,7 +920,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                     {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
                   </div>
                   <p className="text-sm text-gray-600">
-                    {completedSteps.length} of {enhancedInstructions.length} steps completed
+                    {completedSteps.length} {t("mealSidebar.of") || "of"} {enhancedInstructions.length} {t("mealSidebar.stepsCompleted") || "steps completed"}
                   </p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div
@@ -937,7 +930,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                   </div>
                   {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
                     <div className="mt-3 p-2 bg-purple-100 rounded-lg">
-                      <p className="text-sm text-purple-700 font-medium">🎉 Recipe completed!</p>
+                      <p className="text-sm text-purple-700 font-medium">🎉 {t("mealSidebar.recipeCompleted") || "Recipe completed!"}</p>
                     </div>
                   )}
                 </div>
@@ -950,7 +943,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
               size="lg"
             >
-              Save This Meal
+              {t("mealSidebar.saveMeal") || "Save This Meal"}
             </Button>
           </div>
         </div>

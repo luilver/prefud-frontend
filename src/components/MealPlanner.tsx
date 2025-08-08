@@ -18,6 +18,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const MealPlanner = () => {
   const [showCreator, setShowCreator] = useState(false);
@@ -34,6 +35,7 @@ const MealPlanner = () => {
   const isNavigatingBack = useRef(false);
   const { user, mealPlans, addMealPlan, getMealPlanById, fetchMealPlansFromAPI } = useUser();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   // Load meal plans when component mounts, page changes, or page size changes
   useEffect(() => {
@@ -196,8 +198,8 @@ const MealPlanner = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Meal Planner</h1>
-          <p className="text-gray-600 mt-1">Create and manage your weekly meal plans</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{t('mealPlanner.title') || 'Meal Planner'}</h1>
+          <p className="text-gray-600 mt-1">{t('mealPlanner.description') || 'Create and manage your weekly meal plans'}</p>
         </div>
         <Button 
           onClick={() => {
@@ -210,7 +212,7 @@ const MealPlanner = () => {
           className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Create AI Meal Plan
+          {t('mealPlanner.aiMeal') || 'Create AI Meal Plan'}
         </Button>
       </div>
 
@@ -222,7 +224,7 @@ const MealPlanner = () => {
             onPageSizeChange={handlePageSizeChange}
           />
           <div className="text-sm text-gray-600">
-            Showing page {currentPage} of {totalPages} ({currentPagePlans.length} plans)
+            {t('mealPlanner.showingPage') || 'Showing page'} {currentPage} {t('mealPlanner.of') || 'of'} {totalPages} ({currentPagePlans.length} {t('mealPlanner.plans') || 'plans'})
           </div>
         </div>
       )}
@@ -232,7 +234,7 @@ const MealPlanner = () => {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-500" />
-            <p className="text-gray-600">Loading your meal plans...</p>
+            <p className="text-gray-600">{t('mealPlanner.loadingPlans') || 'Loading your meal plans...'}</p>
           </div>
         </div>
       )}
@@ -267,43 +269,43 @@ const MealPlanner = () => {
                     <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        <span>{daysCount} day{daysCount > 1 ? 's' : ''}</span>
+                        <span>{daysCount} {t('mealPlanner.day') || 'day'}{daysCount > 1 ? 's' : ''}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4" />
-                        <span>For {peopleCount} people</span>
+                        <span>{t('mealPlanner.for') || 'For'} {peopleCount} {t('mealPlanner.people') || 'people'}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        <span>{mealsCount} meals per day</span>
+                        <span>{mealsCount} {t('mealPlanner.mealsPDay') || 'meals per day'}</span>
                       </div>
                       
                       {/* Additional plan details from API */}
                       {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
                         <div className="text-xs text-purple-600">
-                          Cuisine: {plan.preferences.cuisinePreferences.join(', ')}
+                          {t('mealPlanner.cuisine') || 'Cuisine'}: {plan.preferences.cuisinePreferences.join(', ')}
                         </div>
                       )}
                       
                       {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
                         <div className="text-xs text-green-600">
-                          Diet: {plan.preferences.dietaryRestrictions.join(', ')}
+                          {t('mealPlanner.diet') || 'Diet'}: {plan.preferences.dietaryRestrictions.join(', ')}
                         </div>
                       )}
                       
                       {plan.preferences?.cookingSkillLevel && (
                         <div className="text-xs text-blue-600">
-                          Skill Level: {plan.preferences.cookingSkillLevel}
+                          {t('mealPlanner.skillLevel') || 'Skill Level'}: {plan.preferences.cookingSkillLevel}
                         </div>
                       )}
                       
                       <div className="mt-3 text-xs text-gray-500">
-                        {plan.meals?.length || 0} total meals planned
+                        {plan.meals?.length || 0} {t('mealPlanner.totalMealsPlanned') || 'total meals planned'}
                       </div>
                       
                       {plan.shoppingList && plan.shoppingList.length > 0 && (
                         <div className="text-xs text-orange-600">
-                          {plan.shoppingList.length} ingredients needed
+                          {plan.shoppingList.length} {t('mealPlanner.ingreNeeded') || 'ingredients needed'}
                         </div>
                       )}
                     </div>
@@ -376,11 +378,11 @@ const MealPlanner = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    Welcome to AI Meal Planning, {user?.name?.split(' ')[0] || 'Chef'}!
+                    {t('mealPlanner.welcomeToAIMeal') || 'Welcome to AI Meal Planning'}, {user?.name?.split(' ')[0] || 'Chef'}!
                   </h3>
                   <p className="text-gray-600 max-w-md mx-auto">
-                    Create your first personalized meal plan with our AI assistant. 
-                    Get customized recipes based on your preferences, dietary needs, and cooking skills.
+                    {t('mealPlanner.createYourPersonalized') || 'Create your first personalized meal plan with our AI assistant'}. 
+                    {t('mealPlanner.getCustomizedRecipes') || 'Get customized recipes based on your preferences, dietary needs, and cooking skills'}.
                   </p>
                 </div>
                 <Button 
@@ -395,7 +397,7 @@ const MealPlanner = () => {
                   size="lg"
                 >
                   <Sparkles className="h-5 w-5 mr-2" />
-                  Create Your First AI Meal Plan
+                  {t('mealPlanner.createYourFirstAIMeal') || 'Create Your First AI Meal Plan'}
                 </Button>
               </div>
             </CardContent>

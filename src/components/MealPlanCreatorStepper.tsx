@@ -48,13 +48,14 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
   const { language } = useLanguage();
   const { toast } = useToast();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { t } = useLanguage();
 
   const steps = [
-    { id: 1, title: "Plan Details", description: "Basic information about your meal plan" },
-    { id: 2, title: "Dietary Preferences", description: "Your dietary needs and restrictions" },
-    { id: 3, title: "Cuisine & Cooking", description: "Cuisine preferences and cooking constraints" },
-    { id: 4, title: "Food Preferences", description: "Foods you like and dislike (optional)" },
-    { id: 5, title: "Generate Plan", description: "Review and create your meal plan" }
+    { id: 1, title: t('mealPlanCreator.planDetails') || 'Plan Details', description: t('mealPlanCreator.planDetails.desc') || 'Basic information about your meal plan' },
+    { id: 2, title: t('mealPlanCreator.dietary.title') || 'Dietary Preferences', description: t('mealPlanCreator.dietary.desc') || 'Tell us about your dietary needs and restrictions' },
+    { id: 3, title: t('mealPlanCreator.cuisine.label') || 'Cuisine & Cooking', description: t('mealPlanCreator.cuisine.label.desc') || 'Cuisine preferences and cooking constraints' },
+    { id: 4, title: t('mealPlanCreator.foodPref') || 'Food Preferences', description: t('mealPlanCreator.foodPref.desc') || 'Foods you like and dislike (optional)' },
+    { id: 5, title: t('mealPlanCreator.generatePlan') || 'Generate Plan', description: t('mealPlanCreator.generatePlan.desc') || 'Review and create your meal plan' }
   ];
 
   const getLanguageDisplayName = (languageCode: string) => {
@@ -147,17 +148,17 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-purple-600" />
-                <span>Plan Details</span>
+                <span>{t('mealPlanCreator.planDetails') || 'Plan Details'}</span>
               </CardTitle>
               <CardDescription>
-                Basic information about your meal plan
+                {t('mealPlanCreator.planDetails.desc') || 'Basic information about your meal plan'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Plan Name */}
               <div>
                 <label htmlFor="planName" className="block text-sm font-medium text-gray-700">
-                  Plan Name <span className="text-red-500">*</span>
+                  {t('mealPlanCreator.planName') || 'Plan Name'} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -165,21 +166,21 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.planName}
                   onChange={(e) => handleDataChange({ planName: e.target.value })}
-                  placeholder="e.g., Weekly Family Meal Plan"
+                  placeholder={t('mealPlanCreator.planNamePlaceholder') || 'e.g., Weekly Healthy Meals'}
                 />
               </div>
 
               {/* Plan Description */}
               <div>
                 <label htmlFor="planDescription" className="block text-sm font-medium text-gray-700">
-                  Plan Description <span className="text-red-500">*</span>
+                  {t('mealPlanCreator.planDescription') || 'Plan Description'} <span className="text-red-500">*</span>
                 </label>
                 <Textarea
                   id="planDescription"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.planDescription}
                   onChange={(e) => handleDataChange({ planDescription: e.target.value })}
-                  placeholder="Describe your meal plan goals and preferences..."
+                  placeholder={t('mealPlanCreator.planDescriptionPlaceholder') || 'Describe your meal plan goals or preferences...'}
                   rows={3}
                 />
               </div>
@@ -187,7 +188,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
               {/* Start Date */}
               <div>
                 <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-                  Start Date <span className="text-red-500">*</span>
+                  {t('mealPlanCreator.startDate') || 'Start Date'} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -201,7 +202,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
               {/* Number of Days */}
               <div>
                 <label htmlFor="numberOfDays" className="block text-sm font-medium text-gray-700">
-                  Number of Days <span className="text-red-500">*</span>
+                  {t('mealPlanCreator.numberOfDays') || 'Number of Days'} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -216,7 +217,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
               {/* Number of Persons */}
               <div>
                 <label htmlFor="numberOfPersons" className="block text-sm font-medium text-gray-700">
-                  Number of Persons <span className="text-red-500">*</span>
+                  {t('mealPlanCreator.numberOfPersons') || 'Number of Persons'} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -231,7 +232,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
               {/* Meals Per Day */}
               <div>
                 <label htmlFor="mealsPerDay" className="block text-sm font-medium text-gray-700">
-                  Meals Per Day <span className="text-red-500">*</span>
+                  {t('mealPlanCreator.mealsPerDay') || 'Meals per Day'} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -252,33 +253,39 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <ChefHat className="h-5 w-5 text-green-600" />
-                <span>Dietary Preferences</span>
+                <span>{t('mealPlanCreator.dietary.title') || 'Dietary Preferences'}</span>
               </CardTitle>
               <CardDescription>
-                Your dietary needs and restrictions
+                {t('mealPlanCreator.dietary.desc') || 'Tell us about your dietary needs and restrictions'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Dietary Restrictions */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Dietary Restrictions</label>
+                <label className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.dietary.restrictions') || 'Dietary Restrictions'}</label>
                 <div className="mt-2 space-y-2">
-                  {["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Keto", "Paleo"].map((option) => (
-                    <div key={option} className="flex items-center">
+                  {[{ key: "Vegetarian", label: t('mealPlanCreator.dietary.vegetarian') || 'Vegetarian' },
+                    { key: "Vegan", label: t('mealPlanCreator.dietary.vegan') || 'Vegan' },
+                    { key: "Gluten-Free", label: t('mealPlanCreator.dietary.glutenFree') || 'Gluten-Free' },
+                    { key: "Dairy-Free", label: t('mealPlanCreator.dietary.dairyFree') || 'Dairy-Free' },
+                    { key: "Keto", label: t('mealPlanCreator.dietary.keto') || 'Keto' },
+                    { key: "Paleo", label: t('mealPlanCreator.dietary.paleo') || 'Paleo' },
+                  ].map((option) => (
+                    <div key={option.key} className="flex items-center">
                       <input
-                        id={`dietary-${option}`}
+                        id={`dietary-${option.key}`}
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.dietaryRestrictions.includes(option)}
+                        checked={planData.dietaryRestrictions.includes(option.key)}
                         onChange={(e) => {
                           const updatedRestrictions = e.target.checked
-                            ? [...planData.dietaryRestrictions, option]
-                            : planData.dietaryRestrictions.filter((item) => item !== option);
+                            ? [...planData.dietaryRestrictions, option.key]
+                            : planData.dietaryRestrictions.filter((item) => item !== option.key);
                           handleDataChange({ dietaryRestrictions: updatedRestrictions });
                         }}
                       />
-                      <label htmlFor={`dietary-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
+                      <label htmlFor={`dietary-${option.key}`} className="ml-3 block text-sm text-gray-700">
+                        {option.label}
                       </label>
                     </div>
                   ))}
@@ -287,24 +294,30 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
               {/* Allergies Intolerances */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Allergies & Intolerances</label>
+                <label className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.dietary.allergies') || 'Allergies & Intolerances'}</label>
                 <div className="mt-2 space-y-2">
-                  {["Nuts", "Shellfish", "Soy", "Eggs", "Fish"].map((option) => (
-                    <div key={option} className="flex items-center">
+                  {[
+                    { key: "Nuts", label: t('mealPlanCreator.dietary.allergy.nuts') || 'Nuts' },
+                    { key: "Shellfish", label: t('mealPlanCreator.dietary.allergy.shellfish') || 'Shellfish' },
+                    { key: "Soy", label: t('mealPlanCreator.dietary.allergy.soy') || 'Soy' },
+                    { key: "Eggs", label: t('mealPlanCreator.dietary.allergy.eggs') || 'Eggs' },
+                    { key: "Fish", label: t('mealPlanCreator.dietary.allergy.fish') || 'Fish' },
+                  ].map((option) => (
+                    <div key={option.key} className="flex items-center">
                       <input
-                        id={`allergy-${option}`}
+                        id={`allergy-${option.key}`}
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.allergiesIntolerances.includes(option)}
+                        checked={planData.allergiesIntolerances.includes(option.key)}
                         onChange={(e) => {
                           const updatedAllergies = e.target.checked
-                            ? [...planData.allergiesIntolerances, option]
-                            : planData.allergiesIntolerances.filter((item) => item !== option);
+                            ? [...planData.allergiesIntolerances, option.key]
+                            : planData.allergiesIntolerances.filter((item) => item !== option.key);
                           handleDataChange({ allergiesIntolerances: updatedAllergies });
                         }}
                       />
-                      <label htmlFor={`allergy-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
+                      <label htmlFor={`allergy-${option.key}`} className="ml-3 block text-sm text-gray-700">
+                        {option.label}
                       </label>
                     </div>
                   ))}
@@ -320,33 +333,39 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Clock className="h-5 w-5 text-blue-600" />
-                <span>Cuisine & Cooking</span>
+                <span>{t('mealPlanCreator.cuisine.label') || 'Cuisine & Cooking'}</span>
               </CardTitle>
               <CardDescription>
-                Cuisine preferences and cooking constraints
+                {t('mealPlanCreator.cuisine.label.desc') || 'Cuisine preferences and cooking constraints'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Cuisine Preferences */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Cuisine Preferences</label>
+                <label className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.cuisine.title') || 'Cuisine Preferences'}</label>
                 <div className="mt-2 space-y-2">
-                  {["Italian", "Mexican", "Asian", "American", "Indian"].map((option) => (
-                    <div key={option} className="flex items-center">
+                  {[
+                    { key: "Italian", label: t('mealPlanCreator.cuisine.italian') || 'Italian' },
+                    { key: "Mexican", label: t('mealPlanCreator.cuisine.mexican') || 'Mexican' },
+                    { key: "Asian", label: t('mealPlanCreator.cuisine.asian') || 'Asian' },
+                    { key: "American", label: t('mealPlanCreator.cuisine.american') || 'American' },
+                    { key: "Indian", label: t('mealPlanCreator.cuisine.indian') || 'Indian' },
+                  ].map((option) => (
+                    <div key={option.key} className="flex items-center">
                       <input
-                        id={`cuisine-${option}`}
+                        id={`cuisine-${option.key}`}
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.cuisinePreferences.includes(option)}
+                        checked={planData.cuisinePreferences.includes(option.key)}
                         onChange={(e) => {
                           const updatedCuisines = e.target.checked
-                            ? [...planData.cuisinePreferences, option]
-                            : planData.cuisinePreferences.filter((item) => item !== option);
+                            ? [...planData.cuisinePreferences, option.key]
+                            : planData.cuisinePreferences.filter((item) => item !== option.key);
                           handleDataChange({ cuisinePreferences: updatedCuisines });
                         }}
                       />
-                      <label htmlFor={`cuisine-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
+                      <label htmlFor={`cuisine-${option.key}`} className="ml-3 block text-sm text-gray-700">
+                        {option.label}
                       </label>
                     </div>
                   ))}
@@ -355,7 +374,7 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
               {/* Max Cook Time */}
               <div>
-                <label htmlFor="maxCookTime" className="block text-sm font-medium text-gray-700">Max Cook Time (minutes)</label>
+                <label htmlFor="maxCookTime" className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.cooking.maxCook') || 'Max Cook Time (minutes)'}</label>
                 <input
                   type="number"
                   id="maxCookTime"
@@ -367,33 +386,33 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
               {/* Cooking Skill Level */}
               <div>
-                <label htmlFor="cookingSkillLevel" className="block text-sm font-medium text-gray-700">Cooking Skill Level</label>
+                <label htmlFor="cookingSkillLevel" className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.cooking.skillLevel') || 'Cooking Skill Level'}</label>
                 <select
                   id="cookingSkillLevel"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.cookingSkillLevel}
                   onChange={(e) => handleDataChange({ cookingSkillLevel: e.target.value })}
                 >
-                  <option value="">Select Skill Level</option>
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
+                  <option value="">{t('mealPlanCreator.cooking.skillLevel.select') || 'Select Skill Level'}</option>
+                  <option value="Beginner">{t('mealPlanCreator.cooking.skillLevel.beginner') || 'Beginner'}</option>
+                  <option value="Intermediate">{t('mealPlanCreator.cooking.skillLevel.inter') || 'Intermediate'}</option>
+                  <option value="Advanced">{t('mealPlanCreator.cooking.skillLevel.adv') || 'Advanced'}</option>
                 </select>
               </div>
 
               {/* Budget Range */}
               <div>
-                <label htmlFor="budgetRange" className="block text-sm font-medium text-gray-700">Budget Range</label>
+                <label htmlFor="budgetRange" className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.cooking.budget') || 'Budget Range'}</label>
                 <select
                   id="budgetRange"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                   value={planData.budgetRange}
                   onChange={(e) => handleDataChange({ budgetRange: e.target.value })}
                 >
-                  <option value="">Select Budget Range</option>
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
+                  <option value="">{t('mealPlanCreator.cooking.budget.select') || 'Select Budget Range'}</option>
+                  <option value="Low">{t('mealPlanCreator.cooking.budget.low') || 'Low'}</option>
+                  <option value="Medium">{t('mealPlanCreator.cooking.budget.medium') || 'Medium'}</option>
+                  <option value="High">{t('mealPlanCreator.cooking.budget.high') || 'High'}</option>
                 </select>
               </div>
             </CardContent>
@@ -406,16 +425,16 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Sparkles className="h-5 w-5 text-orange-600" />
-                <span>Food Preferences</span>
+                <span>{t('mealPlanCreator.foodPref') || 'Food Preferences'}</span>
               </CardTitle>
               <CardDescription>
-                Foods you like and dislike (optional)
+                {t('mealPlanCreator.foodPref.desc') || 'Foods you like and dislike (optional)'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Dislikes */}
               <div>
-                <label htmlFor="dislikes" className="block text-sm font-medium text-gray-700">Dislikes (comma-separated)</label>
+                <label htmlFor="dislikes" className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.dislikes') || 'Dislikes (comma-separated)'}</label>
                 <input
                   type="text"
                   id="dislikes"
@@ -427,24 +446,29 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
 
               {/* Health Goals */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">Health Goals</label>
+                <label className="block text-sm font-medium text-gray-700">{t('mealPlanCreator.dietary.healthGoals') || 'Health Goals'}</label>
                 <div className="mt-2 space-y-2">
-                  {["Weight Loss", "Muscle Gain", "Heart Health", "Diabetes Friendly"].map((option) => (
-                    <div key={option} className="flex items-center">
+                  {[
+                    { key: "Weight Loss", label: t('mealPlanCreator.healthGoals.weightLoss') || 'Weight Loss' },
+                    { key: "Muscle Gain", label: t('mealPlanCreator.healthGoals.muscleGain') || 'Muscle Gain' },
+                    { key: "Heart Health", label: t('mealPlanCreator.healthGoals.heartHealth') || 'Heart Health' },
+                    { key: "Diabetes Friendly", label: t('mealPlanCreator.healthGoals.diabetesFriendly') || 'Diabetes Friendly' },
+                  ].map((option) => (
+                    <div key={option.key} className="flex items-center">
                       <input
-                        id={`health-${option}`}
+                        id={`health-${option.key}`}
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.healthGoals.includes(option)}
+                        checked={planData.healthGoals.includes(option.key)}
                         onChange={(e) => {
                           const updatedGoals = e.target.checked
-                            ? [...planData.healthGoals, option]
-                            : planData.healthGoals.filter((item) => item !== option);
+                            ? [...planData.healthGoals, option.key]
+                            : planData.healthGoals.filter((item) => item !== option.key);
                           handleDataChange({ healthGoals: updatedGoals });
                         }}
                       />
-                      <label htmlFor={`health-${option}`} className="ml-3 block text-sm text-gray-700">
-                        {option}
+                      <label htmlFor={`health-${option.key}`} className="ml-3 block text-sm text-gray-700">
+                        {option.label}
                       </label>
                     </div>
                   ))}
@@ -460,30 +484,30 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Sparkles className="h-5 w-5 text-purple-600" />
-                <span>Generate Your Plan</span>
+                <span>{t('mealPlanCreator.generate.title') || 'Generate Your Plan'}</span>
               </CardTitle>
               <CardDescription>
-                Review your preferences and create your personalized meal plan
+                {t('mealPlanCreator.generate.desc.alt') || 'Review your preferences and create your personalized meal plan'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-3">Plan Summary:</h3>
+                <h3 className="font-semibold text-lg mb-3">{t('mealPlanCreator.generate.planSummary') || 'Plan Summary'}:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p><strong>Name:</strong> {planData.planName}</p>
-                    <p><strong>Description:</strong> {planData.planDescription}</p>
-                    <p><strong>People:</strong> {planData.numberOfPersons} persons</p>
-                    <p><strong>Duration:</strong> {planData.numberOfDays} days</p>
-                    <p><strong>Meals per day:</strong> {planData.mealsPerDay}</p>
+                    <p><strong>{t('mealPlanCreator.name') || 'Name'}:</strong> {planData.planName}</p>
+                    <p><strong>{t('mealPlanCreator.description') || 'Description'}:</strong> {planData.planDescription}</p>
+                    <p><strong>{t('mealPlanCreator.people') || 'People'}:</strong> {planData.numberOfPersons} {t('mealPlanCreator.persons') || 'persons'}</p>
+                    <p><strong>{t('mealPlanCreator.duration') || 'Duration'}:</strong> {planData.numberOfDays} {t('mealPlanCreator.days') || 'days'}</p>
+                    <p><strong>{t('mealPlanCreator.mealsPerDay') || 'Meals per Day'}:</strong> {planData.mealsPerDay}</p>
                   </div>
                   <div>
-                    <p><strong>Skill level:</strong> {planData.cookingSkillLevel}</p>
-                    <p><strong>Budget:</strong> {planData.budgetRange}</p>
-                    <p><strong>Dietary restrictions:</strong> {planData.dietaryRestrictions.length > 0 ? planData.dietaryRestrictions.join(', ') : 'None'}</p>
+                    <p><strong>{t('mealPlanner.skillLevel') || 'Skill Level'}:</strong> {planData.cookingSkillLevel}</p>
+                    <p><strong>{t('mealPlanCreator.budget') || 'Budget'}:</strong> {planData.budgetRange}</p>
+                    <p><strong>{t('mealPlanCreator.dietary.restrictions') || 'Dietary Restrictions'}:</strong> {planData.dietaryRestrictions.length > 0 ? planData.dietaryRestrictions.join(', ') : 'None'}</p>
                     <p className="flex items-center gap-1">
                       <Globe className="h-3 w-3" />
-                      <strong>Language:</strong> {getLanguageDisplayName(language)}
+                      <strong>{t('mealPlanCreator.language') || 'Language'}:</strong> {getLanguageDisplayName(language)}
                     </p>
                   </div>
                 </div>
@@ -502,10 +526,10 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
-                    <span>Analyzing your preferences...</span>
+                    <span>{t('mealPlanCreator.generate.analyzing') || 'Analyzing your preferences...'}</span>
                   </div>
                   <div className="text-xs text-gray-500">
-                    This may take a few moments while we create your personalized meal plan.
+                    {t('mealPlanCreator.generate.takeAFewMoments') || 'This may take a few moments while we create your personalized meal plan.'}
                   </div>
                 </div>
               )}
@@ -715,11 +739,11 @@ const MealPlanCreatorStepper = ({ onPlanCreated, onBack, initialData, isEditing 
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Meal Planner</span>
+          <span>{t('mealPlanCreator.backToMeal') || 'Back to Meal Planner'}</span>
         </Button>
         <div className="flex items-center space-x-2">
           <Sparkles className="h-5 w-5 text-purple-600" />
-          <h1 className="text-xl font-semibold">{isEditing ? 'Edit' : 'Create'} AI Meal Plan</h1>
+          <h1 className="text-xl font-semibold">{isEditing ? 'Edit' : 'Create'} {t('mealPlanCreator.aiMealPlan') || 'AI Meal Plan'}</h1>
         </div>
       </div>
 
