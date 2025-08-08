@@ -8,7 +8,7 @@ import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star, Sparkles } 
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import UserProfileForm from "./UserProfileForm";
 import OTPVerification from "./OTPVerification";
 import PaymentForm from "./PaymentForm";
@@ -133,6 +133,7 @@ const SignupSteps = () => {
 
       // Check if response indicates success
       if (response.data.message && response.data.message.includes('OTP code has been sent')) {
+        console.log('Showing success toast');
         toast({
           title: "✅ Account Created Successfully!",
           description: "An OTP code has been sent to your email address.",
@@ -140,6 +141,7 @@ const SignupSteps = () => {
         });
         setCurrentStep(2);
       } else {
+        console.log('Unexpected response format, throwing error');
         throw new Error('Unexpected response format');
       }
     } catch (error: any) {
@@ -151,6 +153,7 @@ const SignupSteps = () => {
           ? error.response.data.message 
           : error.response.data.message.message || 'Signup failed';
         
+        console.log('Showing error toast with message:', errorMessage);
         toast({
           title: "❌ Signup Failed",
           description: errorMessage,
@@ -158,6 +161,7 @@ const SignupSteps = () => {
           duration: 5000,
         });
       } else {
+        console.log('Showing generic error toast');
         toast({
           title: "❌ Signup Failed",
           description: "Unable to create account. Please try again.",
