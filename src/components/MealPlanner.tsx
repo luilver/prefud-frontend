@@ -71,20 +71,22 @@ const MealPlanner = () => {
   };
 
   const handlePlanCreated = (newPlan: any) => {
-    console.log('New plan created:', newPlan);
+    console.log('New plan created - full object:', newPlan);
     addMealPlan(newPlan);
     setShowCreator(false);
     setIsEditing(false);
     isNavigatingBack.current = false;
     
-    // Show success modal with correct plan data
+    // Extract success modal data from the actual plan structure
+    // The newPlan should have the transformed structure from the service
     const successPlanData = {
-      name: newPlan.name || 'AI Generated Meal Plan',
-      numberOfDays: newPlan.preferences?.numberOfWeeks 
-        ? newPlan.preferences.numberOfWeeks * 7 
-        : (newPlan.duration ? parseInt(newPlan.duration.replace(' days', '')) : 7),
-      numberOfPersons: newPlan.preferences?.numberOfPersons || newPlan.preferences?.people || 1,
-      mealsPerDay: newPlan.preferences?.mealsPerDay || 3
+      name: newPlan.name || newPlan.plan_name || 'AI Generated Meal Plan',
+      numberOfDays: newPlan.duration ? parseInt(newPlan.duration.replace(' days', '')) : 
+                   (newPlan.preferences?.numberOfWeeks ? newPlan.preferences.numberOfWeeks * 7 : 7),
+      numberOfPersons: newPlan.preferences?.numberOfPersons || 
+                      newPlan.preferences?.people || 
+                      newPlan.numberPeople || 1,
+      mealsPerDay: newPlan.preferences?.mealsPerDay || newPlan.mealsPerDay || 3
     };
     
     console.log('Setting success plan data:', successPlanData);
@@ -94,7 +96,7 @@ const MealPlanner = () => {
     // Show success toast
     toast({
       title: "🎉 Meal Plan Created Successfully!",
-      description: `Your meal plan "${newPlan.name}" is ready to explore.`,
+      description: `Your meal plan "${successPlanData.name}" is ready to explore.`,
       duration: 8000,
     });
     
