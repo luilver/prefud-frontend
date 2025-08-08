@@ -45,6 +45,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { t } = useLanguage();
 
   const availableDiets = [
     "vegetarian", "vegan", "keto", "paleo", "mediterranean", 
@@ -328,9 +329,9 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack}>
-          ← Back to Meal Planner
+          ← {t('mealPlanCreator.backToMeal') || 'Back to Meal Planner'}
         </Button>
-        <h2 className="text-2xl font-bold text-gray-800">Create AI Meal Plan</h2>
+        <h2 className="text-2xl font-bold text-gray-800">{t('mealPlanCreator.title') || 'Create AI Meal Plan'}</h2>
         <div></div>
       </div>
 
@@ -338,17 +339,17 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         {/* Plan Details */}
         <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
           <CardHeader>
-            <CardTitle className="text-purple-700">Plan Details</CardTitle>
+            <CardTitle className="text-purple-700">{t('mealPlanCreator.planDetails') || 'Plan Details'}</CardTitle>
             <CardDescription>
-              Set up your meal planning preferences
+              {t('mealPlanCreator.setUpYourMeal') || 'Set up your meal planning preferences'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="planName">Plan Name *</Label>
+              <Label htmlFor="planName">{t('mealPlanCreator.planName') || 'Plan Name'} *</Label>
               <Input
                 id="planName"
-                placeholder="e.g., Weekly Healthy Meals"
+                placeholder={t('mealPlanCreator.planNamePlaceholder') || 'e.g., Weekly Healthy Meals'}
                 value={planName}
                 onChange={(e) => setPlanName(e.target.value)}
                 className="border-purple-200 focus:border-purple-400"
@@ -356,10 +357,10 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
-              <Label htmlFor="planDescription">Plan Description (Optional)</Label>
+              <Label htmlFor="planDescription">{t('mealPlanCreator.planDescription') || 'Plan Description (Optional)'}</Label>
               <Textarea
                 id="planDescription"
-                placeholder="Describe your meal plan goals or preferences..."
+                placeholder={t('mealPlanCreator.planDescriptionPlaceholder') || 'Describe your meal plan goals or preferences...'}
                 value={planDescription}
                 onChange={(e) => setPlanDescription(e.target.value)}
                 className="border-purple-200 focus:border-purple-400"
@@ -368,7 +369,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
-              <Label htmlFor="startDate">Start Date *</Label>
+              <Label htmlFor="startDate">{t('mealPlanCreator.startDate') || 'Start Date'} *</Label>
               <Input
                 id="startDate"
                 type="date"
@@ -380,7 +381,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="numberOfDays">Number of Days *</Label>
+                <Label htmlFor="numberOfDays">{t('mealPlanCreator.numberOfDays') || 'Number of Days'} *</Label>
                 <Input
                   id="numberOfDays"
                   type="number"
@@ -392,7 +393,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="numberOfPersons">Number of Persons *</Label>
+                <Label htmlFor="numberOfPersons">{t('mealPlanCreator.numberOfPersons') || 'Number of Persons'} *</Label>
                 <Input
                   id="numberOfPersons"
                   type="number"
@@ -404,7 +405,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="mealsPerDay">Meals per Day *</Label>
+                <Label htmlFor="mealsPerDay">{t('mealPlanCreator.mealsPerDay') || 'Meals per Day'} *</Label>
                 <Input
                   id="mealsPerDay"
                   type="number"
@@ -420,14 +421,14 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             {startDate && (
               <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
                 <p className="text-sm text-purple-700">
-                  <strong>Plan Duration:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(calculateEndDate(startDate, numberOfDays)).toLocaleDateString()}
+                  <strong>{t('mealPlanCreator.planDuration') || 'Plan Duration'}:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(calculateEndDate(startDate, numberOfDays)).toLocaleDateString()}
                 </p>
                 <p className="text-xs text-purple-600 mt-1">
-                  {numberOfDays} day{numberOfDays > 1 ? 's' : ''} • {numberOfPersons} person{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} meal{mealsPerDay > 1 ? 's' : ''} per day
+                  {numberOfDays} {t('mealPlanner.day') || 'day'}{numberOfDays > 1 ? 's' : ''} • {numberOfPersons} {t('mealPlanCreator.person') || 'person'}{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} {t('mealPlanCreator.meal') || 'meal'}{mealsPerDay > 1 ? 's' : ''} {t('mealPlanCreator.perDay') || 'per day'}
                 </p>
                 <p className="text-xs text-purple-600 mt-1 flex items-center gap-1">
                   <Globe className="h-3 w-3" />
-                  <strong>Language:</strong> {getLanguageDisplayName(language)}
+                  <strong>{t('mealPlanCreator.language') || 'Language'}:</strong> {getLanguageDisplayName(language)}
                 </p>
               </div>
             )}
@@ -437,14 +438,14 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         {/* Dietary Preferences */}
         <Card className="bg-white/70 backdrop-blur-sm border-green-200">
           <CardHeader>
-            <CardTitle className="text-green-700">Dietary Preferences</CardTitle>
+            <CardTitle className="text-green-700">{t('mealPlanCreator.dietary.title') || 'Dietary Preferences'}</CardTitle>
             <CardDescription>
-              Tell us about your dietary needs and restrictions
+              {t('mealPlanCreator.dietary.desc') || 'Tell us about your dietary needs and restrictions'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Dietary Restrictions</Label>
+              <Label>{t('mealPlanCreator.dietary.restrictions') || 'Dietary Restrictions'}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {availableDiets.map((diet) => (
                   <Badge
@@ -464,7 +465,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
-              <Label>Allergies & Intolerances</Label>
+              <Label>{t('mealPlanCreator.dietary.allergies') || 'Allergies & Intolerances'}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {availableAllergies.map((allergy) => (
                   <Badge
@@ -484,10 +485,10 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
-              <Label htmlFor="additionalAllergies">Additional Allergies</Label>
+              <Label htmlFor="additionalAllergies">{t('mealPlanCreator.dietary.additionalAllergies') || 'Additional Allergies'}</Label>
               <Textarea
                 id="additionalAllergies"
-                placeholder="Please specify any other allergies or intolerances not listed above..."
+                placeholder={t('mealPlanCreator.dietary.placeholder') || 'Please specify any other allergies or intolerances not listed above...'}
                 value={additionalAllergies}
                 onChange={(e) => setAdditionalAllergies(e.target.value)}
                 className="border-red-200 focus:border-red-400 mt-2"
@@ -496,7 +497,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
-              <Label>Health Goals</Label>
+              <Label>{t('mealPlanCreator.dietary.healthGoals') || 'Health Goals'}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {availableGoals.map((goal) => (
                   <Badge
@@ -522,10 +523,10 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
           <CardHeader>
             <CardTitle className="text-orange-700 flex items-center gap-2">
               <ChefHat className="h-5 w-5" />
-              Cuisine Preferences
+              {t('mealPlanCreator.cuisine.title') || 'Cuisine Preferences'}
             </CardTitle>
             <CardDescription>
-              Select your favorite cuisines
+              {t('mealPlanCreator.cuisine.desc') || 'Select your favorite cuisines'}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -553,15 +554,15 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
           <CardHeader>
             <CardTitle className="text-blue-700 flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Cooking Preferences
+              {t('mealPlanCreator.cooking.title') || 'Cooking Preferences'}
             </CardTitle>
             <CardDescription>
-              Set your cooking constraints and skill level
+              {t('mealPlanCreator.cooking.desc') || 'Set your cooking constraints and skill level'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Max Cook Time</Label>
+              <Label>{t('mealPlanCreator.cooking.maxCook') || 'Max Cook Time'}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {cookTimesOptions.map((time) => (
                   <Badge
@@ -581,7 +582,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             </div>
 
             <div>
-              <Label>Cooking Skill Level</Label>
+              <Label>{t('mealPlanCreator.cooking.skillLevel') || 'Cooking Skill Level'}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {cookingSkillLevels.map((level) => (
                   <Badge
@@ -603,7 +604,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
             <div>
               <Label className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
-                Budget Range
+                {t('mealPlanCreator.cooking.budget') || 'Budget Range'}
               </Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {budgetRanges.map((range) => (
@@ -628,9 +629,9 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         {/* Food Dislikes */}
         <Card className="bg-white/70 backdrop-blur-sm border-red-200">
           <CardHeader>
-            <CardTitle className="text-red-700">Food Dislikes</CardTitle>
+            <CardTitle className="text-red-700">{t('mealPlanCreator.dislike.title') || 'Food Dislikes'}</CardTitle>
             <CardDescription>
-              Add foods you want to avoid in your meal plan
+              {t('mealPlanCreator.dislike.desc') || 'Add foods you want to avoid in your meal plan'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -653,7 +654,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
 
             {dislikes.length > 0 && (
               <div>
-                <Label className="text-sm text-gray-600">Your dislikes:</Label>
+                <Label className="text-sm text-gray-600">{t('mealPlanCreator.dislike.yourDislike') || 'Your dislikes'}:</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {dislikes.map((dislike) => (
                     <Badge
@@ -668,7 +669,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   ))}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Click on any item to remove it
+                  {t('mealPlanCreator.dislike.clickToRemove') || 'Click on any item to remove it'}
                 </p>
               </div>
             )}
@@ -678,9 +679,9 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         {/* Generate Button */}
         <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
           <CardHeader>
-            <CardTitle className="text-orange-700">Generate Your Plan</CardTitle>
+            <CardTitle className="text-orange-700">{t('mealPlanCreator.generate.title') || 'Generate Your Plan'}</CardTitle>
             <CardDescription>
-              Create a personalized meal plan with AI
+              {t('mealPlanCreator.generate.desc') || 'Create a personalized meal plan with AI'}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -689,7 +690,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
               className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg py-6"
             >
               <Sparkles className="h-5 w-5 mr-2" />
-              Generate AI Meal Plan
+              {t('mealPlanCreator.generate.button') || 'Generate AI Meal Plan'}
             </Button>
           </CardContent>
         </Card>

@@ -2,6 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Sparkles, Calendar, Users, Clock, Eye } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MealPlanSuccessModalProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ interface MealPlanSuccessModalProps {
 }
 
 const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPlanSuccessModalProps) => {
+  const { t } = useLanguage();
+  console.log('this is the meal plan received ', mealPlan)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -29,13 +32,13 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPla
             </div>
           </div>
           <DialogTitle className="text-center text-2xl font-bold text-gray-800">
-            Meal Plan Created Successfully! 🎉
+            {t('mealPlanSuccess.title') || 'Meal Plan Created Successfully! 🎉'}
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 text-center">
           <p className="text-gray-600">
-            Your personalized AI meal plan <strong>"{mealPlan?.name}"</strong> has been generated and is ready to use!
+            {t('mealPlanSuccess.yourPersonalized') || 'Your personalized AI meal plan'} <strong>"{mealPlan?.name}"</strong> {t('mealPlanSuccess.readyToUse') || 'has been generated and is ready to use!'}
           </p>
           
           {mealPlan && (
@@ -43,30 +46,30 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPla
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div className="flex flex-col items-center space-y-1">
                   <Calendar className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium">{mealPlan.numberOfDays} Days</span>
+                  <span className="font-medium">{mealPlan.numberOfDays} {t('mealPlanSuccess.days') || 'Days'}</span>
                 </div>
                 <div className="flex flex-col items-center space-y-1">
                   <Users className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium">{mealPlan.numberOfPersons} Person{mealPlan.numberOfPersons > 1 ? 's' : ''}</span>
+                  <span className="font-medium">{mealPlan.numberOfPersons} {t('mealPlanSuccess.person') || 'Person'}{mealPlan.numberOfPersons > 1 ? 's' : ''}</span>
                 </div>
                 <div className="flex flex-col items-center space-y-1">
                   <Clock className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium">{mealPlan.mealsPerDay} Meals/Day</span>
+                  <span className="font-medium">{mealPlan.mealsPerDay} {t('mealPlanSuccess.mealsPerDay') || 'Meals/Day'}</span>
                 </div>
               </div>
             </div>
           )}
           
           <div className="pt-4 space-y-3">
-            {onViewPlan && (
+            {/* {onViewPlan && (
               <Button 
                 onClick={onViewPlan}
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
               >
                 <Eye className="h-4 w-4 mr-2" />
-                View Meal Plan Details
+                {t('mealPlanSuccess.viewDetails') || 'View Meal Plan Details'}
               </Button>
-            )}
+            )} */}
             
             <Button 
               onClick={onClose}
@@ -74,7 +77,7 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPla
               className="w-full"
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              Back to Meal Plans
+              {t('mealPlanSuccess.backToPlans') || 'Back to Meal Plans'}
             </Button>
           </div>
         </div>

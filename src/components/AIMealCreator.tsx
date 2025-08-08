@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
 import { getSpecialMealsByUser } from "@/services/userMealPlansService";
+import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this line
 
 const AIMealCreator = () => {
   const [showCreator, setShowCreator] = useState(false);
@@ -28,6 +29,7 @@ const AIMealCreator = () => {
   const [pageSize, setPageSize] = useState(5);
   const { aiMeals, addAIMeal, user } = useUser();
   const { toast } = useToast();
+  const { t } = useLanguage(); // <-- Add this line
 
   // Fetch meals from API when component mounts or when pagination changes
   useEffect(() => {
@@ -166,11 +168,11 @@ const AIMealCreator = () => {
             <Salad className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Create a Meal
+            {t("aiMealCreator.createMealTitle") || "Create a Meal"}
           </h1>
         </div>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Create unique, personalized meals with AI based on your preferences, dietary needs, and available ingredients.
+          {t("aiMealCreator.createMealDesc") || "Create unique, personalized meals with AI based on your preferences, dietary needs, and available ingredients."}
         </p>
       </div>
 
@@ -181,7 +183,7 @@ const AIMealCreator = () => {
           className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3"
         >
           <Wand2 className="mr-2 h-5 w-5" />
-          Create AI Meal
+          {t("aiMealCreator.createAIMealBtn") || "Create AI Meal"}
         </Button>
       </div>
 
@@ -192,7 +194,7 @@ const AIMealCreator = () => {
             onPageSizeChange={handlePageSizeChange}
           />
           <div className="text-sm text-gray-600">
-            Showing page {currentPage} of {maxTotalPages} ({currentPageMealsCount} meals)
+            {t("aiMealCreator.showingPage") || "Showing page"} {currentPage} {t("aiMealCreator.of") || "of"} {maxTotalPages} ({currentPageMealsCount} {t("aiMealCreator.meals") || "meals"})
           </div>
         </div>
       )}
@@ -201,14 +203,14 @@ const AIMealCreator = () => {
         <div className="flex items-center justify-center py-8">
           <div className="text-center">
             <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-purple-500" />
-            <p className="text-gray-600">Loading your meals...</p>
+            <p className="text-gray-600">{t("aiMealCreator.loadingMeals") || "Loading your meals..."}</p>
           </div>
         </div>
       )}
 
       {!isLoadingMeals && totalMealsCount > 0 && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-center">Your AI Created Meals</h2>
+          <h2 className="text-2xl font-semibold text-center">{t("aiMealCreator.yourAIMealsTitle") || "Your AI Created Meals"}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Local AI Meals */}
             {currentPageLocalMeals.map((meal, index) => (
@@ -241,7 +243,7 @@ const AIMealCreator = () => {
                     onClick={() => handleViewMeal(meal)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    View Recipe
+                    {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                   </Button>
                 </CardContent>
               </Card>
@@ -255,11 +257,11 @@ const AIMealCreator = () => {
                     <ChefHat className="h-5 w-5 text-green-600" />
                     <CardTitle className="text-lg">{meal.specialMeal.specialMeal.name}</CardTitle>
                     <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                      Saved
+                      {t("aiMealCreator.savedLabel") || "Saved"}
                     </span>
                   </div>
                   <CardDescription>
-                    {meal.cuisinePreferences?.[0] || 'Various'} • {meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime} mins • {meal.cookingSkillLevel}
+                    {meal.cuisinePreferences?.[0] || 'Various'} • {meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime} {t("aiMealCreator.mins") || "mins"} • {meal.cookingSkillLevel}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -278,7 +280,7 @@ const AIMealCreator = () => {
                     ))}
                   </div>
                   <div className="text-xs text-gray-500 mb-2">
-                    {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} people
+                    {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} {t("aiMealCreator.peopleLabel") || "people"}
                   </div>
                   <Button 
                     variant="outline" 
@@ -287,7 +289,7 @@ const AIMealCreator = () => {
                     onClick={() => handleViewApiMeal(meal)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    View Recipe
+                    {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                   </Button>
                 </CardContent>
               </Card>
@@ -356,9 +358,9 @@ const AIMealCreator = () => {
                 <Salad className="h-8 w-8 text-purple-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">No Meals created yet</h3>
+                <h3 className="text-lg font-semibold mb-2">{t("aiMealCreator.noMealsTitle") || "No Meals created yet"}</h3>
                 <p className="text-gray-600 mb-4">
-                  Start creating your first AI-powered meal based on your preferences and ingredients.
+                  {t("aiMealCreator.noMealsDesc") || "Start creating your first AI-powered meal based on your preferences and ingredients."}
                 </p>
               </div>
             </div>

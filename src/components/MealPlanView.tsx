@@ -8,6 +8,7 @@ import { useUser } from "@/contexts/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
 import OrderOnlineModal from "./OrderOnlineModal";
+import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this import
 
 interface MealPlanViewProps {
   plan: any;
@@ -23,6 +24,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [selectAll, setSelectAll] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderItems, setOrderItems] = useState<any[]>([]);
+  const { t } = useLanguage(); // <-- Add this line
 
   // Meal type order for sorting
   const mealTypeOrder = {
@@ -38,7 +40,15 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + dayIndex);
     
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayNames = [
+      t('days.sunday') || 'Sunday',
+      t('days.monday') || 'Monday',
+      t('days.tuesday') || 'Tuesday',
+      t('days.wednesday') || 'Wednesday',
+      t('days.thursday') || 'Thursday',
+      t('days.friday') || 'Friday',
+      t('days.saturday') || 'Saturday'
+    ];
     const dayName = dayNames[currentDate.getDay()];
     const dateString = currentDate.toLocaleDateString('en-US', { 
       month: 'short', 
@@ -62,7 +72,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   };
 
   const handleDeleteMeal = (mealId: string) => {
-    if (window.confirm('Are you sure you want to delete this meal?')) {
+    if (window.confirm(t('mealPlanView.confirmDelete') || 'Are you sure you want to delete this meal?')) {
       deleteMealFromPlan(plan.id, mealId);
     }
   };
@@ -234,7 +244,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         <div className="flex gap-2">
           <Button onClick={onEdit} variant="outline" size="sm">
             <Edit className="h-4 w-4 mr-2" />
-            Edit Plan
+            {t('mealPlanView.editPlan') || 'Edit Plan'}
           </Button>
         </div>
       </div>
@@ -246,7 +256,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 mb-2 sm:mb-0 sm:mr-3" />
             <div className="text-center sm:text-left">
               <p className="text-lg sm:text-2xl font-bold">{totalDays}</p>
-              <p className="text-xs sm:text-sm text-gray-600">Days</p>
+              <p className="text-xs sm:text-sm text-gray-600">{t('mealPlanView.days') || 'Days'}</p>
             </div>
           </CardContent>
         </Card>
@@ -255,7 +265,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             <Users className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 mb-2 sm:mb-0 sm:mr-3" />
             <div className="text-center sm:text-left">
               <p className="text-lg sm:text-2xl font-bold">{peopleCount}</p>
-              <p className="text-xs sm:text-sm text-gray-600">Persons</p>
+              <p className="text-xs sm:text-sm text-gray-600">{t('mealPlanView.persons') || 'Persons'}</p>
             </div>
           </CardContent>
         </Card>
@@ -264,7 +274,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             <ChefHat className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 mb-2 sm:mb-0 sm:mr-3" />
             <div className="text-center sm:text-left">
               <p className="text-lg sm:text-2xl font-bold">{mealsPerDay}</p>
-              <p className="text-xs sm:text-sm text-gray-600">Meals/Day</p>
+              <p className="text-xs sm:text-sm text-gray-600">{t('mealPlanView.mealsPerDay') || 'Meals/Day'}</p>
             </div>
           </CardContent>
         </Card>
@@ -273,10 +283,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="overview">Meal Schedule</TabsTrigger>
+          <TabsTrigger value="overview">{t('mealPlanView.mealSchedule') || 'Meal Schedule'}</TabsTrigger>
           <TabsTrigger value="shopping">
             <ShoppingCart className="h-4 w-4 mr-2" />
-            Shopping List ({totalItems})
+            {t('mealPlanView.shoppingList') || 'Shopping List'} ({totalItems})
           </TabsTrigger>
         </TabsList>
 
@@ -298,7 +308,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                     </div>
                   </CardTitle>
                   <CardDescription>
-                    {dayMeals.length} meal{dayMeals.length !== 1 ? 's' : ''} planned
+                    {dayMeals.length} {t('mealPlanView.meal') || 'meal'}{dayMeals.length !== 1 ? 's' : ''} {t('mealPlanView.planned') || 'planned'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -359,7 +369,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 {meal.prepTime && (
                                   <div className="flex items-center gap-2">
                                     <Clock className="h-4 w-4" />
-                                    <span>{meal.prepTime} min</span>
+                                    <span>{meal.prepTime} {t('mealPlanView.min') || 'min'}</span>
                                   </div>
                                 )}
                                 {meal.difficulty && (
@@ -370,7 +380,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 )}
                                 {meal.calories && (
                                   <div className="text-xs text-orange-600">
-                                    {meal.calories} calories
+                                    {meal.calories} {t('mealPlanView.calories') || 'calories'}
                                   </div>
                                 )}
                               </div>
@@ -398,12 +408,12 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                   {isCompleted ? (
                                     <>
                                       <CheckCircle className="h-3 w-3 mr-1" />
-                                      Completed
+                                      {t('mealPlanView.completed') || 'Completed'}
                                     </>
                                   ) : (
                                     <>
                                       <Circle className="h-3 w-3 mr-1" />
-                                      Mark as Done
+                                      {t('mealPlanView.markAsDone') || 'Mark as Done'}
                                     </>
                                   )}
                                 </Button>
@@ -416,7 +426,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                   ) : (
                     <div className="text-center py-8 text-gray-500">
                       <ChefHat className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No meals planned for this day</p>
+                      <p>{t('mealPlanView.noMealsPlanned') || 'No meals planned for this day'}</p>
                     </div>
                   )}
                 </CardContent>
@@ -435,11 +445,11 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         <ShoppingCart className="h-5 w-5 text-blue-500" />
-                        Shopping Summary
+                        {t('mealPlanView.shoppingSummary') || 'Shopping Summary'}
                       </CardTitle>
                       <CardDescription>
-                        {totalItems} items • {checkedCount} selected
-                        {totalEstimatedCost > 0 && ` • $${totalEstimatedCost.toFixed(2)} estimated`}
+                        {totalItems} {t('mealPlanView.items') || 'items'} • {checkedCount} {t('mealPlanView.selected') || 'selected'}
+                        {totalEstimatedCost > 0 && ` • $${totalEstimatedCost.toFixed(2)} ${t('mealPlanView.estimated') || 'estimated'}`}
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
@@ -449,7 +459,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                         onCheckedChange={handleSelectAll}
                       />
                       <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                        Select All
+                        {t('mealPlanView.selectAll') || 'Select All'}
                       </label>
                     </div>
                   </div>
@@ -463,14 +473,14 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                         variant="outline"
                       >
                         <Package className="h-4 w-4" />
-                        Add to Pantry ({checkedCount})
+                        {t('mealPlanView.addToPantry')|| 'Add to Pantry'} ({checkedCount})
                       </Button>
                       <Button
                         onClick={() => handleOrderOnline()}
                         className="flex items-center gap-2"
                       >
                         <ShoppingCart className="h-4 w-4" />
-                        Order Online ({checkedCount})
+                        {t('mealPlanView.orderOnline') || 'Order Online'} ({checkedCount})
                       </Button>
                     </div>
                   </CardContent>
@@ -490,7 +500,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                   <CardHeader>
                     <CardTitle className="text-lg capitalize flex items-center justify-between">
                       <span>{category}</span>
-                      <Badge variant="secondary">{items.length} items</Badge>
+                      <Badge variant="secondary">{items.length} {t('mealPlanView.items') || 'items'}</Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -537,7 +547,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 size="sm"
                                 onClick={() => handleAddToPantry([item])}
                                 className="h-8 w-8 p-0"
-                                title="Add to Pantry"
+                                title={t('mealPlanView.addToPantryOne') || "Add to Pantry"}
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
@@ -546,7 +556,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 size="sm"
                                 onClick={() => handleOrderOnline([item])}
                                 className="h-8 w-8 p-0"
-                                title="Order Online"
+                                title={t('mealPlanView.orderOnlineOne') || "Order Online"}
                               >
                                 <ShoppingCart className="h-4 w-4" />
                               </Button>
@@ -563,7 +573,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             <Card>
               <CardContent className="text-center py-12">
                 <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600">No shopping list available for this meal plan</p>
+                <p className="text-gray-600">{t('mealPlanView.noShoppingList') || 'No shopping list available for this meal plan'}</p>
               </CardContent>
             </Card>
           )}

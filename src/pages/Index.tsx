@@ -144,7 +144,7 @@ const Index = () => {
           <img 
             src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
             alt="Fresh vegetables and healthy ingredients" 
-            className="w-full h-full object-cover opacity-10"
+            className="w-full h-full object-cover opacity-55"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/90"></div>
         </div>

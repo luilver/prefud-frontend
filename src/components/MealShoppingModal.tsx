@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, Package, Truck, Check, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MealShoppingModalProps {
   meal: any;
@@ -18,6 +19,7 @@ interface MealShoppingModalProps {
 const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) => {
   const { addPantryItem } = useUser();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [showDeliveryOptions, setShowDeliveryOptions] = useState(false);
 
@@ -129,28 +131,30 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-orange-800">
-            Shopping List - {meal.name}
+            {t("mealShopping.shoppingListTitle") || "Shopping List"} - {meal.name}
           </DialogTitle>
         </DialogHeader>
 
         {!showDeliveryOptions ? (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <p className="text-gray-600">Select ingredients to add to pantry or request delivery</p>
+              <p className="text-gray-600">
+                {t("mealShopping.selectIngredients") || "Select ingredients to add to pantry or request delivery"}
+              </p>
               <div className="flex space-x-2">
                 <Button
                   variant="outline"
                   onClick={() => setSelectedIngredients(ingredients.map(ing => ing.name))}
                   size="sm"
                 >
-                  Select All
+                  {t("mealShopping.selectAll") || "Select All"}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setSelectedIngredients([])}
                   size="sm"
                 >
-                  Clear All
+                  {t("mealShopping.clearAll") || "Clear All"}
                 </Button>
               </div>
             </div>
@@ -208,7 +212,7 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
                 className="flex-1 bg-orange-600 hover:bg-orange-700"
               >
                 <Package className="h-4 w-4 mr-2" />
-                Add to Pantry ({selectedIngredients.length})
+                {t("mealShopping.addToPantry") || 'Add to Pantry'} ({selectedIngredients.length})
               </Button>
               <Button
                 onClick={requestDelivery}
@@ -217,23 +221,27 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
                 className="flex-1"
               >
                 <Truck className="h-4 w-4 mr-2" />
-                Request Delivery ({selectedIngredients.length})
+                {t("mealShopping.requestDelivery") || 'Request Delivery'}  ({selectedIngredients.length})
               </Button>
             </div>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Choose Delivery Time</h3>
-              <p className="text-gray-600">When would you like your ingredients delivered?</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {t("mealShopping.chooseDeliveryTime") || "Choose Delivery Time"}
+              </h3>
+              <p className="text-gray-600">
+                {t("mealShopping.deliveryPrompt") || "When would you like your ingredients delivered?"}
+              </p>
             </div>
 
             <div className="grid gap-3">
               {[
-                { label: "Same Day (2-4 hours)", time: "today", price: "$12.99" },
-                { label: "Next Day", time: "tomorrow", price: "$7.99" },
-                { label: "Within 2-3 Days", time: "in 2-3 days", price: "$4.99" },
-                { label: "Within a Week", time: "within a week", price: "FREE" }
+                { label: t("mealShopping.sameDay") || "Same Day (2-4 hours)", time: "today", price: "$12.99" },
+                { label: t("mealShopping.nextDay") || "Next Day", time: "tomorrow", price: "$7.99" },
+                { label: t("mealShopping.in2to3Days") || "Within 2-3 Days", time: "in 2-3 days", price: "$4.99" },
+                { label: t("mealShopping.withinWeek") || "Within a Week", time: "within a week", price: "FREE" }
               ].map((option) => (
                 <Card 
                   key={option.time}
@@ -245,7 +253,7 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
                       <div>
                         <h4 className="font-medium">{option.label}</h4>
                         <p className="text-sm text-gray-500">
-                          {selectedIngredients.length} ingredients
+                          {selectedIngredients.length} {t("mealShopping.ingredientCount") || 'ingredients'}
                         </p>
                       </div>
                       <div className="text-right">
@@ -264,7 +272,7 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
                 className="flex-1"
               >
                 <X className="h-4 w-4 mr-2" />
-                Back to Ingredients
+                {t("mealShopping.backToIngredients") || "Back to Ingredients"}
               </Button>
             </div>
           </div>
