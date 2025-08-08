@@ -18,6 +18,7 @@ import axios from "axios";
 interface SignupData {
   email: string;
   password: string;
+  userId?: string;
   wantsSubscription: boolean;
   selectedPlan?: string;
   profile?: {
@@ -131,14 +132,17 @@ const SignupSteps = () => {
       const response = await axios.request(config);
       console.log('Signup API response:', response.data);
 
-      // Check if response indicates success
-      if (response.data.message && response.data.message.includes('OTP code has been sent')) {
+      // Check if response indicates success with the correct structure
+      if (response.data.message && response.data.message.includes('OTP code has been sent') && response.data.response?.userId) {
         console.log('Showing success toast');
         toast({
           title: "✅ Account Created Successfully!",
           description: "An OTP code has been sent to your email address.",
           duration: 5000,
         });
+        
+        // Store userId for OTP verification
+        setSignupData(prev => ({ ...prev, userId: response.data.response.userId }));
         setCurrentStep(2);
       } else {
         console.log('Unexpected response format, throwing error');
@@ -175,7 +179,7 @@ const SignupSteps = () => {
   };
 
   const handleOTPVerified = () => {
-    console.log('Mock: OTP verified successfully');
+    console.log('OTP verified successfully');
     setCurrentStep(3);
   };
 
@@ -394,6 +398,7 @@ const SignupSteps = () => {
       {currentStep === 2 && (
         <OTPVerification 
           email={signupData.email}
+          userId={signupData.userId || ''}
           onVerified={handleOTPVerified}
           onBack={() => setCurrentStep(1)}
         />

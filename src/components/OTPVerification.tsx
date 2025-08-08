@@ -4,35 +4,83 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, Mail, RefreshCw } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import axios from "axios";
 
 interface OTPVerificationProps {
   email: string;
+  userId: string;
   onVerified: () => void;
   onBack: () => void;
 }
 
-const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) => {
+const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationProps) => {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
   const handleVerify = async () => {
-    if (otp.length !== 6) return;
+    if (otp.length !== 6 || !userId) return;
     
     setIsLoading(true);
     try {
-      // In a real app, this would verify the OTP with the backend
-      console.log('Verifying OTP:', otp, 'for email:', email);
+      console.log('Verifying OTP:', otp, 'for userId:', userId);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any 6-digit code
-      if (otp.length === 6) {
+      const requestData = {
+        user_id: userId,
+        otpCode: otp
+      };
+
+      const config = {
+        method: 'post',
+        url: 'https://pantry-auth-1.onrender.com/security/verify-otp',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data: requestData
+      };
+
+      const response = await axios.request(config);
+      console.log('OTP verification API response:', response.data);
+
+      // Check if response indicates success
+      if (response.data.success && response.data.message === 'OTP successfully verified') {
+        console.log('Showing success toast');
+        toast({
+          title: "✅ Email Verified Successfully!",
+          description: "Your email has been verified. Continue to complete your profile.",
+          duration: 5000,
+        });
         onVerified();
+      } else {
+        console.log('Unexpected response format, throwing error');
+        throw new Error('Unexpected response format');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('OTP verification failed:', error);
+      
+      // Handle API error responses
+      if (error.response?.data?.message) {
+        const errorMessage = typeof error.response.data.message === 'string' 
+          ? error.response.data.message 
+          : error.response.data.message.message || 'OTP verification failed';
+        
+        console.log('Showing error toast with message:', errorMessage);
+        toast({
+          title: "❌ Verification Failed",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 5000,
+        });
+      } else {
+        console.log('Showing generic error toast');
+        toast({
+          title: "❌ Verification Failed",
+          description: "Unable to verify OTP. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -44,8 +92,20 @@ const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) =>
       // In a real app, this would resend the OTP
       console.log('Resending OTP to:', email);
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "📧 OTP Resent",
+        description: "A new verification code has been sent to your email.",
+        duration: 5000,
+      });
     } catch (error) {
       console.error('Failed to resend OTP:', error);
+      toast({
+        title: "❌ Resend Failed",
+        description: "Unable to resend OTP. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsResending(false);
     }
@@ -94,7 +154,7 @@ const OTPVerification = ({ email, onVerified, onBack }: OTPVerificationProps) =>
 
           <Button 
             onClick={handleVerify}
-            disabled={otp.length !== 6 || isLoading}
+            disabled={otp.length !== 6 || isLoading || !userId}
             className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 mb-4"
           >
             {isLoading ? 'Verifying...' : 'Verify Email'}
