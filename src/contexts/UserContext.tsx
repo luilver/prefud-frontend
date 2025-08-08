@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
+import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlanService';
 
 interface User {
   id: string;
   name: string;
   email: string;
   phone?: string;
+  country?: string;
+  language?: 'en' | 'es' | 'pt';
   preferences: {
     dietaryRestrictions: string[];
     allergies: string[];
@@ -160,6 +164,12 @@ interface UserContextType {
   setActiveMealPlan: (plan: MealPlan | null) => void;
   refreshMealPlans: () => void;
   getMealPlanById: (id: string) => MealPlan | null;
+  fetchMealPlansFromAPI: (userId: string, page?: number, limit?: number) => Promise<{
+    data: MealPlan[];
+    totalPages: number;
+    currentPage: number;
+    totalCount: number;
+  }>;
   getBillingHistory: () => Promise<void>;
   getPaymentMethods: () => Promise<void>;
   addPaymentMethod: (method: any) => Promise<void>;
@@ -188,6 +198,7 @@ export const useUser = () => {
 };
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user: authUser, login: authLogin, logout: authLogout, isAuthenticated: authIsAuthenticated } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
@@ -203,7 +214,107 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Computed properties
   const ingredients = pantryItems;
-  const isAuthenticated = user !== null;
+  const isAuthenticated = authIsAuthenticated || user !== null;
+
+  // Function to fetch meal plans from API - now callable from meal planner
+  const fetchMealPlansFromAPI = useCallback(async (userId: string, page: number = 1, limit: number = 10) => {
+    try {
+      console.log('Fetching meal plans from API for user:', userId, 'page:', page);
+      
+      const response = await getMealPlans(userId, page, limit);
+      
+      if (response.data && response.data.length > 0) {
+        const transformedPlans = response.data.map(transformApiMealPlanToLocal);
+        console.log('Transformed meal plans from API:', transformedPlans);
+        
+        return {
+          data: transformedPlans,
+          totalPages: response.totalPages || Math.ceil((response.total || transformedPlans.length) / limit),
+          currentPage: page,
+          totalCount: response.total || transformedPlans.length
+        };
+      }
+      
+      return {
+        data: [],
+        totalPages: 1,
+        currentPage: 1,
+        totalCount: 0
+      };
+    } catch (error) {
+      console.error('Failed to fetch meal plans from API:', error);
+      throw error;
+    }
+  }, []);
+
+  // Listen for pantry sync events from AuthContext
+  useEffect(() => {
+    const handlePantrySync = (event: CustomEvent) => {
+      const { pantry } = event.detail;
+      console.log('Syncing pantry from auth:', pantry);
+      
+      if (pantry && Array.isArray(pantry)) {
+        // Transform pantry items from API format to UserContext format
+        const transformedPantryItems: PantryItem[] = pantry.map((item: any) => ({
+          id: item._id,
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          category: item.category,
+          expiryDate: new Date(item.expiryDate),
+          purchaseDate: new Date(item.purchaseDate),
+          location: item.location,
+          notes: item.notes
+        }));
+        
+        setPantryItems(transformedPantryItems);
+        console.log('Pantry items updated from API:', transformedPantryItems);
+      }
+    };
+
+    window.addEventListener('pantry-sync', handlePantrySync as EventListener);
+    
+    return () => {
+      window.removeEventListener('pantry-sync', handlePantrySync as EventListener);
+    };
+  }, []);
+
+  // Sync with AuthContext user - removed automatic meal plans fetching
+  useEffect(() => {
+    if (authUser && !user) {
+      // Create user profile from auth user
+      const userProfile: User = {
+        id: authUser.userId,
+        name: authUser.profile?.name || authUser.email.split('@')[0],
+        email: authUser.email,
+        phone: authUser.profile?.phone,
+        language: 'en',
+        preferences: {
+          dietaryRestrictions: authUser.profile?.dietTypes || [],
+          allergies: authUser.profile?.alergies || [],
+          cuisinePreferences: [],
+          cookingSkillLevel: 'beginner',
+          mealPrepTime: 30,
+          budgetRange: 'medium'
+        },
+        subscription: {
+          plan: 'free',
+          isSubscribed: false,
+          planLimits: {
+            plansPerMonth: 1,
+            usedPlans: 0,
+            mealCreations: 3,
+            usedMealCreations: 0,
+            deliveryCommissions: 0,
+            usedDeliveryCommissions: 0
+          }
+        }
+      };
+      setUser(userProfile);
+    } else if (!authUser && user) {
+      setUser(null);
+    }
+  }, [authUser, user]);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -338,45 +449,38 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [shoppingItems]);
 
-  // Authentication methods
+  // Authentication methods - now using AuthContext
   const login = async (email: string, password: string) => {
-    // Mock login implementation
-    const mockUser: User = {
-      id: '1',
-      name: 'John Doe',
-      email: email,
-      phone: '+1234567890',
-      preferences: {
-        dietaryRestrictions: [],
-        allergies: [],
-        cuisinePreferences: ['Italian', 'Mexican'],
-        cookingSkillLevel: 'intermediate',
-        mealPrepTime: 30,
-        budgetRange: 'medium'
-      },
-      subscription: {
-        plan: 'free',
-        isSubscribed: false,
-        planLimits: {
-          plansPerMonth: 1,
-          usedPlans: 0,
-          mealCreations: 3,
-          usedMealCreations: 0,
-          deliveryCommissions: 0,
-          usedDeliveryCommissions: 0
-        }
-      }
-    };
-    setUser(mockUser);
-    // Check subscription after login
+    await authLogin(email, password);
+    // User profile will be created in the useEffect above
     await checkSubscription();
   };
 
   const logout = () => {
+    authLogout();
     setUser(null);
     setSubscriptionInfo(null);
+    // Clear all user-related state including meal plans
+    setPantryItems([]);
+    setMealPlans([]);
+    setShoppingItems([]);
+    setCompletedMeals({});
+    setActiveShoppingList([]);
+    setActiveMealPlan(null);
+    setAIMeals([]);
+    setAIDrinks([]);
+    setBillingHistory([]);
+    setPaymentMethods([]);
+    
+    // Clear localStorage for user data
     localStorage.removeItem('user');
     localStorage.removeItem('subscriptionInfo');
+    localStorage.removeItem('mealPlans');
+    localStorage.removeItem('shoppingItems');
+    localStorage.removeItem('completedMeals');
+    localStorage.removeItem('aiMeals');
+    localStorage.removeItem('aiDrinks');
+    
     window.dispatchEvent(new CustomEvent('user-logout'));
   };
 
@@ -387,6 +491,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       name: userData.name,
       email: userData.email,
       phone: userData.phone,
+      country: userData.country,
+      language: userData.language || 'en',
       preferences: userData.preferences || {
         dietaryRestrictions: [],
         allergies: [],
@@ -562,19 +668,20 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const refreshMealPlans = () => {
-    const savedMealPlans = localStorage.getItem('mealPlans');
-    if (savedMealPlans) {
-      const plans = JSON.parse(savedMealPlans);
-      console.log('Refreshing meal plans from localStorage:', plans);
-      setMealPlans(plans);
-      
-      if (activeMealPlan) {
-        const updatedActivePlan = plans.find((plan: MealPlan) => plan.id === activeMealPlan.id);
-        if (updatedActivePlan) {
-          setActiveMealPlan(updatedActivePlan);
-        }
-      }
+  const refreshMealPlans = async () => {
+    if (!user?.id) {
+      console.log('No user ID available for refreshing meal plans');
+      return;
+    }
+
+    try {
+      console.log('Refreshing meal plans for user:', user.id);
+      // Fetch first page of meal plans
+      const response = await fetchMealPlansFromAPI(user.id, 1, 50);
+      setMealPlans(response.data || []);
+      console.log('Meal plans refreshed:', response.data);
+    } catch (error) {
+      console.error('Error refreshing meal plans:', error);
     }
   };
 
@@ -846,6 +953,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setActiveMealPlan: setActiveMealPlanUpdated,
     refreshMealPlans,
     getMealPlanById,
+    fetchMealPlansFromAPI,
     getBillingHistory,
     getPaymentMethods,
     addPaymentMethod,

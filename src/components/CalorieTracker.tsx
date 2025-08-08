@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Search, TrendingUp, Target, Zap } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FoodItem {
   id: string;
@@ -25,6 +26,7 @@ interface CalorieGoals {
 }
 
 const CalorieTracker = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [todaysFoods, setTodaysFoods] = useState<FoodItem[]>([
     {
@@ -147,7 +149,7 @@ const CalorieTracker = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <Zap className="h-5 w-5 text-orange-500" />
-                <span className="font-semibold">Calories</span>
+                <span className="font-semibold">{t('calories.calories')}</span>
               </div>
               <Target className="h-4 w-4 text-gray-400" />
             </div>
@@ -163,7 +165,7 @@ const CalorieTracker = () => {
                 />
               </div>
               <div className="text-xs text-gray-500">
-                {goals.daily - totalCalories} calories remaining
+                {goals.daily - totalCalories} {t('calories.calories-remaining')}
               </div>
             </div>
           </CardContent>
@@ -174,7 +176,7 @@ const CalorieTracker = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-blue-500 rounded-full" />
-                <span className="font-semibold">Protein</span>
+                <span className="font-semibold">{t('calories.protein')}</span>
               </div>
             </div>
             <div className="space-y-2">
@@ -197,7 +199,7 @@ const CalorieTracker = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-500 rounded-full" />
-                <span className="font-semibold">Carbs</span>
+                <span className="font-semibold">{t('calories.carbs')}</span>
               </div>
             </div>
             <div className="space-y-2">
@@ -220,7 +222,7 @@ const CalorieTracker = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-purple-500 rounded-full" />
-                <span className="font-semibold">Fat</span>
+                <span className="font-semibold">{t('calories.fat')}</span>
               </div>
             </div>
             <div className="space-y-2">
@@ -245,10 +247,10 @@ const CalorieTracker = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <TrendingUp className="h-5 w-5 text-green-600" />
-              <span>Today's Foods</span>
+              <span>{t('calories.todays-foods')}</span>
             </CardTitle>
             <CardDescription>
-              Track your daily nutrition intake
+              {t('calories.track-nutrition')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -272,7 +274,7 @@ const CalorieTracker = () => {
                     onClick={() => removeFood(food.id)}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
-                    Remove
+                    {t('calories.remove')}
                   </Button>
                 </div>
               ))}
@@ -280,8 +282,8 @@ const CalorieTracker = () => {
               {todaysFoods.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                   <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No foods logged today</p>
-                  <p className="text-sm">Start tracking by adding foods from the database</p>
+                  <p>{t('calories.no-foods')}</p>
+                  <p className="text-sm">{t('calories.start-tracking')}</p>
                 </div>
               )}
             </div>
@@ -293,10 +295,10 @@ const CalorieTracker = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Search className="h-5 w-5 text-orange-600" />
-              <span>Food Database</span>
+              <span>{t('calories.food-database')}</span>
             </CardTitle>
             <CardDescription>
-              Search and add foods to your daily log
+              {t('calories.search-add')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -304,7 +306,7 @@ const CalorieTracker = () => {
               <div className="relative">
                 <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
-                  placeholder="Search foods..."
+                  placeholder={t('calories.search-foods')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 border-orange-200 focus:border-orange-400"
@@ -338,8 +340,8 @@ const CalorieTracker = () => {
                 {filteredFoods.length === 0 && searchTerm && (
                   <div className="text-center py-8 text-gray-500">
                     <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No foods found</p>
-                    <p className="text-sm">Try a different search term</p>
+                    <p>{t('calories.no-foods-found')}</p>
+                    <p className="text-sm">{t('calories.try-different')}</p>
                   </div>
                 )}
               </div>

@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star } from "lucide-react";
+import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star, Sparkles } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import UserProfileForm from "./UserProfileForm";
 import OTPVerification from "./OTPVerification";
 import PaymentForm from "./PaymentForm";
@@ -42,8 +44,10 @@ const SignupSteps = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
+  const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
-  // Updated subscription plans to match pricing page
+  // Updated subscription plans to match pricing page with brand colors
   const subscriptionPlans = [
     {
       id: "free",
@@ -58,7 +62,8 @@ const SignupSteps = () => {
         "Pantry Management",
         "Email Support"
       ],
-      popular: false
+      popular: false,
+      gradient: "from-muted to-muted-foreground"
     },
     {
       id: "family",
@@ -75,7 +80,8 @@ const SignupSteps = () => {
         "Nutritional Analysis",
         "Priority Support"
       ],
-      popular: true
+      popular: true,
+      gradient: "from-primary to-accent"
     },
     {
       id: "professional",
@@ -95,7 +101,8 @@ const SignupSteps = () => {
         "Phone Support",
         "Priority Processing"
       ],
-      popular: false
+      popular: false,
+      gradient: "from-secondary to-muted"
     }
   ];
 
@@ -182,11 +189,11 @@ const SignupSteps = () => {
   };
 
   const stepItems = [
-    { step: 1, title: "Basic Info", icon: User },
-    { step: 2, title: "Verify Email", icon: Mail },
-    { step: 3, title: "Profile", icon: User },
-    { step: 4, title: "Subscription", icon: Crown },
-    { step: 5, title: "Payment", icon: CreditCard },
+    { step: 1, title: "Account", icon: User, color: "from-primary to-accent" },
+    { step: 2, title: "Verify", icon: Mail, color: "from-primary to-secondary" },
+    { step: 3, title: "Profile", icon: User, color: "from-accent to-primary" },
+    { step: 4, title: "Plan", icon: Crown, color: "from-primary to-accent" },
+    { step: 5, title: "Payment", icon: CreditCard, color: "from-secondary to-primary" },
   ];
 
   if (showWelcome) {
@@ -194,99 +201,146 @@ const SignupSteps = () => {
   }
 
   return (
-    <div className="max-w-full sm:max-w-4xl mx-auto space-y-4 sm:space-y-6">
-      {/* Progress Steps - Mobile Responsive */}
-      <div className="flex justify-center mb-6 sm:mb-8 overflow-x-auto">
-        <div className="flex items-center space-x-2 sm:space-x-4 px-4 sm:px-0 min-w-max">
-          {stepItems.map(({ step, title, icon: Icon }) => (
-            <div key={step} className="flex items-center">
-              <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${
-                currentStep >= step 
-                  ? 'bg-green-500 border-green-500 text-white' 
-                  : 'border-gray-300 text-gray-400'
-              }`}>
-                {currentStep > step ? (
-                  <Check className="h-3 w-3 sm:h-5 sm:w-5" />
-                ) : (
-                  <Icon className="h-3 w-3 sm:h-5 sm:w-5" />
+    <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
+      {/* Enhanced Progress Steps with better mobile design */}
+      <div className="relative mb-6 sm:mb-8">
+        <div className="flex justify-center">
+          <div className={`flex items-center ${isMobile ? 'space-x-2' : 'space-x-4 sm:space-x-6'} px-2 sm:px-0`}>
+            {stepItems.map(({ step, title, icon: Icon, color }, index) => (
+              <div key={step} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className={`relative flex items-center justify-center ${isMobile ? 'w-10 h-10' : 'w-12 h-12 sm:w-14 sm:h-14'} rounded-full transition-all duration-500 ${
+                    currentStep >= step 
+                      ? `bg-gradient-to-r ${color} text-white shadow-lg border-2 border-primary/20 ${isMobile ? 'scale-105' : 'scale-110'}` 
+                      : 'bg-background border-2 border-border text-muted-foreground shadow-md'
+                  }`}>
+                    {currentStep > step ? (
+                      <Check className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5 sm:h-6 sm:w-6'}`} />
+                    ) : (
+                      <Icon className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5 sm:h-6 sm:w-6'}`} />
+                    )}
+                    
+                    {/* Animated ring for current step */}
+                    {currentStep === step && (
+                      <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${color} opacity-20 animate-pulse scale-125`}></div>
+                    )}
+                  </div>
+                  
+                  <span className={`mt-2 text-xs font-medium transition-all duration-300 ${isMobile ? 'text-center max-w-[60px] leading-tight' : ''} ${
+                    currentStep >= step 
+                      ? 'text-foreground font-semibold' 
+                      : 'text-muted-foreground'
+                  }`}>
+                    {isMobile && title.length > 6 ? title.slice(0, 6) : title}
+                  </span>
+                </div>
+                
+                {index < stepItems.length - 1 && (
+                  <div className={`${isMobile ? 'w-4 h-0.5' : 'w-8 sm:w-16 h-1'} mx-2 sm:mx-4 rounded-full transition-all duration-500 ${
+                    currentStep > step 
+                      ? `bg-gradient-to-r ${stepItems[index + 1].color}` 
+                      : 'bg-border'
+                  }`} />
                 )}
               </div>
-              <span className={`ml-1 sm:ml-2 text-xs sm:text-sm font-medium ${
-                currentStep >= step ? 'text-green-600' : 'text-gray-400'
-              }`}>
-                {title}
-              </span>
-              {step < stepItems.length && (
-                <div className={`w-4 sm:w-8 h-0.5 ml-2 sm:ml-4 ${
-                  currentStep > step ? 'bg-green-500' : 'bg-gray-300'
-                }`} />
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Step 1: Basic Info - Removed phone fields */}
+      {/* Step 1: Basic Info - Enhanced with better mobile optimization */}
       {currentStep === 1 && (
-        <Card className="max-w-full sm:max-w-md mx-auto bg-white/90 backdrop-blur-sm">
-          <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-            <CardTitle className="text-lg sm:text-xl">Create Your Account</CardTitle>
-            <CardDescription className="text-sm sm:text-base">Enter your email and password to get started</CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            <form onSubmit={handleBasicInfoSubmit} className="space-y-3 sm:space-y-4">
-              <div>
-                <Label htmlFor="email" className="text-sm sm:text-base">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={signupData.email}
-                  onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
-                <div className="relative mt-1">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={signupData.password}
-                    onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
-                    required
-                    className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </Button>
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl blur-xl"></div>
+          <Card className="relative max-w-full sm:max-w-lg mx-auto bg-card/95 backdrop-blur-sm border-border shadow-xl rounded-2xl overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent"></div>
+            
+            <CardHeader className="px-4 sm:px-6 py-4 sm:py-6 text-center">
+              <div className="flex justify-center mb-3">
+                <div className="p-2.5 bg-gradient-to-r from-primary to-accent rounded-xl shadow-lg">
+                  <User className="h-6 w-6 text-primary-foreground" />
                 </div>
               </div>
+              <CardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                {t('signup.account.title')}
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base text-muted-foreground">
+                {t('signup.account.description')}
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <form onSubmit={handleBasicInfoSubmit} className="space-y-4 sm:space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                    {t('signup.account.email')}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      type="email"
+                      value={signupData.email}
+                      onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
+                      required
+                      className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background"
+                      placeholder="Enter your email address"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground">
+                    {t('signup.account.password')}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={signupData.password}
+                      onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
+                      required
+                      className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background pr-12"
+                      placeholder="Create a secure password"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0 hover:bg-muted rounded-lg"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
 
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Sending Verification...' : 'Continue'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                      <span>{t('signup.account.sending')}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <span>{t('signup.account.continue')}</span>
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
-      {/* Step 2: OTP Verification */}
       {currentStep === 2 && (
         <OTPVerification 
           email={signupData.email}
@@ -295,7 +349,6 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 3: User Profile - Now includes phone fields and name fields */}
       {currentStep === 3 && (
         <UserProfileForm 
           onComplete={handleProfileComplete}
@@ -303,74 +356,106 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 4: Subscription Choice - Updated layout and pricing */}
+      {/* Step 4: Subscription Choice - Enhanced mobile layout */}
       {currentStep === 4 && (
-        <div className="space-y-4 sm:space-y-6">
-          <div className="text-center mb-6 sm:mb-8 px-4 sm:px-0">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Choose Your Plan</h2>
-            <p className="text-gray-600 text-sm sm:text-base">Select the plan that works best for you</p>
+        <div className="space-y-6 sm:space-y-8">
+          {/* Compact header for mobile */}
+          <div className="text-center space-y-3 px-2 sm:px-0">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-lg">
+                <Crown className="h-8 w-8 text-primary-foreground" />
+              </div>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+              Choose Your Plan
+            </h2>
+            <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto">
+              Select the perfect plan to start your personalized meal planning journey
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
-            {subscriptionPlans.map((plan) => (
-              <Card 
-                key={plan.id} 
-                className={`relative border-2 cursor-pointer transition-all h-full ${
-                  plan.popular 
-                    ? 'border-green-500 ring-2 ring-green-200 shadow-lg' 
-                    : 'border-gray-200 hover:border-green-500 hover:shadow-md'
-                }`}
-                onClick={() => handleSubscriptionChoice(plan.id)}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                      <Star className="h-3 w-3" />
-                      <span>Most Popular</span>
-                    </div>
-                  </div>
-                )}
+          {/* Enhanced plan cards with better mobile layout */}
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 lg:grid-cols-3 gap-6'} px-1 sm:px-0`}>
+            {subscriptionPlans.map((plan, index) => (
+              <div key={plan.id} className="relative group">
+                <div className={`absolute inset-0 bg-gradient-to-r ${plan.gradient} opacity-0 group-hover:opacity-10 rounded-2xl blur-xl transition-all duration-500`}></div>
                 
-                <CardHeader className="text-center pb-4 px-4 sm:px-6 py-4 sm:py-6">
-                  <div className="flex justify-center mb-4">
-                    <Crown className={`h-8 w-8 ${plan.popular ? 'text-green-500' : 'text-gray-400'}`} />
-                  </div>
-                  <CardTitle className="text-xl sm:text-2xl mb-2">{plan.name}</CardTitle>
-                  <CardDescription className="text-sm mb-4 min-h-[3rem] flex items-center justify-center">
-                    {plan.description}
-                  </CardDescription>
-                  <div className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
-                    {plan.price === 0 ? 'Free' : `$${plan.price}`}
-                    {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
-                  </div>
-                </CardHeader>
-
-                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col justify-between flex-1">
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-800 mb-3">Features</h4>
-                    <ul className="space-y-2">
-                      {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start space-x-3">
-                          <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-gray-700">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <Card 
+                  className={`relative cursor-pointer transition-all duration-500 border-2 rounded-2xl overflow-hidden h-full transform group-hover:scale-[1.02] group-hover:shadow-xl ${
+                    plan.popular 
+                      ? 'border-primary shadow-xl bg-gradient-to-b from-card to-primary/5' 
+                      : 'border-border hover:border-primary/50 bg-card shadow-lg'
+                  }`}
+                  onClick={() => handleSubscriptionChoice(plan.id)}
+                >
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${plan.gradient}`}></div>
                   
-                  <Button 
-                    className={`w-full h-12 text-sm sm:text-base font-medium ${
-                      plan.id === 'free' 
-                        ? 'bg-gray-600 hover:bg-gray-700 text-white' 
-                        : plan.id === 'family'
-                        ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-white'
-                        : 'bg-gray-800 hover:bg-gray-700 text-white'
-                    }`}
-                  >
-                    Choose {plan.name}
-                  </Button>
-                </CardContent>
-              </Card>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center space-x-1">
+                        <Star className="h-3 w-3 fill-current" />
+                        <span>Most Popular</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <CardHeader className="text-center pb-3 px-4 sm:px-6 py-4 sm:py-6">
+                    <div className="flex justify-center mb-3">
+                      <div className={`p-2.5 bg-gradient-to-r ${plan.gradient} rounded-xl shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                        <Crown className="h-6 w-6 text-primary-foreground" />
+                      </div>
+                    </div>
+                    
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-foreground mb-2">
+                      {plan.name}
+                    </CardTitle>
+                    
+                    <div className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+                      {plan.price === 0 ? (
+                        <span className="bg-gradient-to-r from-muted-foreground to-foreground bg-clip-text text-transparent">Free</span>
+                      ) : (
+                        <span className={`bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}>
+                          ${plan.price}
+                        </span>
+                      )}
+                      {plan.price > 0 && <span className="text-sm font-normal text-muted-foreground">/{plan.interval}</span>}
+                    </div>
+                    
+                    <CardDescription className="text-sm text-muted-foreground min-h-[2.5rem] flex items-center justify-center px-2">
+                      {plan.description}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col justify-between flex-1">
+                    <div className="mb-4">
+                      <h4 className="font-bold text-foreground mb-3 text-center">What's included</h4>
+                      <ul className="space-y-2">
+                        {plan.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-start space-x-2">
+                            <div className={`flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-r ${plan.gradient} flex items-center justify-center mt-0.5`}>
+                              <Check className="h-3 w-3 text-primary-foreground font-bold" />
+                            </div>
+                            <span className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <Button 
+                      className={`w-full h-11 sm:h-12 text-sm font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${
+                        plan.id === 'free' 
+                          ? 'bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground' 
+                          : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>Choose {plan.name}</span>
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             ))}
           </div>
         </div>

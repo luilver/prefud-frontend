@@ -1,11 +1,14 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { User, ArrowLeft, Languages, ExternalLink } from "lucide-react";
+import CountrySelect, { countries } from "./CountrySelect";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
@@ -13,217 +16,243 @@ interface UserProfileFormProps {
 }
 
 const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
+  const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
-    phonePrefix: "+1",
+    country: "",
     phone: "",
     weight: "",
     heightFeet: "",
     heightInches: "",
     birthday: "",
+    selectedLanguage: language,
     healthGoals: [] as string[],
     dietTypes: [] as string[],
     allergies: [] as string[],
+    acceptedTerms: false
   });
 
-  const healthGoalOptions = [
-    "Weight Loss",
-    "Muscle Gain",
-    "Maintain Weight",
-    "Improve Energy",
-    "Better Sleep",
-    "Heart Health",
+  const healthGoalsOptions = [
+    "Lose weight", "Gain muscle", "Maintain weight", "Improve energy",
+    "Better digestion", "Heart health", "Lower cholesterol", "Manage diabetes"
   ];
 
-  const dietTypeOptions = [
-    "Vegetarian",
-    "Vegan",
-    "Keto",
-    "Paleo",
-    "Mediterranean",
-    "Low Carb",
-    "Gluten Free",
+  const dietTypesOptions = [
+    "Vegetarian", "Vegan", "Pescatarian", "Keto", "Paleo", "Mediterranean",
+    "Low-carb", "Gluten-free", "Dairy-free", "No restrictions"
   ];
 
-  const allergyOptions = [
-    "Nuts",
-    "Dairy",
-    "Eggs",
-    "Soy",
-    "Shellfish",
-    "Fish",
-    "Wheat",
+  const allergiesOptions = [
+    "Nuts", "Shellfish", "Dairy", "Eggs", "Soy", "Gluten", "Fish", "Sesame", "None"
   ];
 
-  const handleCheckboxChange = (category: string, value: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [category]: checked 
-        ? [...prev[category as keyof typeof prev] as string[], value]
-        : (prev[category as keyof typeof prev] as string[]).filter(item => item !== value)
-    }));
-  };
+  const languageOptions = [
+    { value: 'en', label: t('language.english'), flag: '🇺🇸' },
+    { value: 'es', label: t('language.spanish'), flag: '🇪🇸' },
+    { value: 'pt', label: t('language.portuguese'), flag: '🇵🇹' }
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const profileData = {
-      name: formData.name,
-      lastName: formData.lastName,
-      phonePrefix: formData.phonePrefix,
-      phone: formData.phone,
-      weight: parseInt(formData.weight),
-      heightFeet: parseInt(formData.heightFeet),
-      heightInches: parseInt(formData.heightInches),
-      birthday: formData.birthday,
-      healthGoals: formData.healthGoals,
-      dietTypes: formData.dietTypes,
-      allergies: formData.allergies,
-    };
+    if (!formData.acceptedTerms) {
+      return; // Prevent submission if terms not accepted
+    }
     
-    onComplete(profileData);
+    // Update global language when form is submitted
+    setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
+    
+    const selectedCountry = countries.find(c => c.code === formData.country);
+    const phoneWithPrefix = selectedCountry ? `${selectedCountry.prefix}${formData.phone}` : formData.phone;
+    
+    onComplete({
+      ...formData,
+      phone: phoneWithPrefix,
+      weight: parseFloat(formData.weight) || 0,
+      heightFeet: parseInt(formData.heightFeet) || 0,
+      heightInches: parseInt(formData.heightInches) || 0,
+      language: formData.selectedLanguage
+    });
   };
+
+  const handleCheckboxChange = (category: 'healthGoals' | 'dietTypes' | 'allergies', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [category]: prev[category].includes(value)
+        ? prev[category].filter(item => item !== value)
+        : [...prev[category], value]
+    }));
+  };
+
+  const selectedCountry = countries.find(c => c.code === formData.country);
 
   return (
     <Card className="max-w-full sm:max-w-2xl mx-auto bg-white/90 backdrop-blur-sm">
       <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-        <CardTitle className="text-lg sm:text-xl">Tell Us About Yourself</CardTitle>
+        <div className="flex items-center space-x-2 mb-2">
+          <User className="h-5 w-5 text-green-600" />
+          <CardTitle className="text-lg sm:text-xl">Tell us about yourself</CardTitle>
+        </div>
         <CardDescription className="text-sm sm:text-base">
           Help us personalize your meal planning experience
         </CardDescription>
       </CardHeader>
       <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          {/* Name and Last Name */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="name" className="text-sm sm:text-base">First Name *</Label>
-              <Input
-                id="name"
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                required
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                placeholder="John"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="lastName" className="text-sm sm:text-base">Last Name *</Label>
-              <Input
-                id="lastName"
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                required
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                placeholder="Doe"
-              />
-            </div>
-          </div>
-
-          {/* Phone Number */}
-          <div>
-            <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number *</Label>
-            <div className="flex space-x-2 mt-1">
-              <Select value={formData.phonePrefix} onValueChange={(value) => setFormData(prev => ({ ...prev, phonePrefix: value }))}>
-                <SelectTrigger className="w-24 border-green-200 focus:border-green-400 h-10 sm:h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="+1">+1</SelectItem>
-                  <SelectItem value="+44">+44</SelectItem>
-                  <SelectItem value="+49">+49</SelectItem>
-                  <SelectItem value="+33">+33</SelectItem>
-                  <SelectItem value="+34">+34</SelectItem>
-                  <SelectItem value="+39">+39</SelectItem>
-                  <SelectItem value="+52">+52</SelectItem>
-                  <SelectItem value="+55">+55</SelectItem>
-                  <SelectItem value="+86">+86</SelectItem>
-                  <SelectItem value="+91">+91</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                id="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value.replace(/\D/g, '') }))}
-                required
-                className="flex-1 border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base"
-                placeholder="555 123 4567"
-              />
-            </div>
-          </div>
-
-          {/* Weight and Height */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="weight" className="text-sm sm:text-base">Weight (lbs)</Label>
-              <Input
-                id="weight"
-                type="number"
-                value={formData.weight}
-                onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
-                required
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                placeholder="150"
-              />
-            </div>
-            
-            <div>
-              <Label className="text-sm sm:text-base">Height</Label>
-              <div className="flex space-x-2 mt-1">
+          {/* Personal Information */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Personal Information</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <Label htmlFor="name" className="text-sm sm:text-base">First Name</Label>
                 <Input
-                  type="number"
-                  value={formData.heightFeet}
-                  onChange={(e) => setFormData(prev => ({ ...prev, heightFeet: e.target.value }))}
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base"
-                  placeholder="5"
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName" className="text-sm sm:text-base">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                  required
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="country" className="text-sm sm:text-base">Country</Label>
+              <CountrySelect
+                value={formData.country}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, country: value }))}
+                placeholder="Select your country"
+                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number</Label>
+              <div className="flex space-x-2 mt-1">
+                <div className="w-20 sm:w-24">
+                  <Input
+                    value={selectedCountry ? selectedCountry.prefix : ''}
+                    disabled
+                    className="border-green-200 bg-gray-50 h-10 sm:h-12 text-sm sm:text-base text-center"
+                  />
+                </div>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Enter phone number"
+                  required
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="birthday" className="text-sm sm:text-base">Birthday</Label>
+              <Input
+                id="birthday"
+                type="date"
+                value={formData.birthday}
+                onChange={(e) => setFormData(prev => ({ ...prev, birthday: e.target.value }))}
+                required
+                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+              />
+            </div>
+          </div>
+
+          {/* Language Preference */}
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center space-x-2">
+              <Languages className="h-4 w-4 text-green-600" />
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t('signup.language.title')}</h3>
+            </div>
+            <p className="text-sm text-gray-600">{t('signup.language.description')}</p>
+            <Select
+              value={formData.selectedLanguage}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, selectedLanguage: value as Language }))}
+            >
+              <SelectTrigger className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base">
+                <SelectValue placeholder={t('signup.language.select')} />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {languageOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">{option.flag}</span>
+                      <span>{option.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Physical Information */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Physical Information</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div>
+                <Label htmlFor="weight" className="text-sm sm:text-base">Weight (lbs)</Label>
+                <Input
+                  id="weight"
+                  type="number"
+                  value={formData.weight}
+                  onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="heightFeet" className="text-sm sm:text-base">Height (feet)</Label>
+                <Input
+                  id="heightFeet"
+                  type="number"
                   min="0"
                   max="8"
+                  value={formData.heightFeet}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heightFeet: e.target.value }))}
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                 />
-                <span className="flex items-center text-sm text-gray-600">ft</span>
+              </div>
+              <div>
+                <Label htmlFor="heightInches" className="text-sm sm:text-base">Height (inches)</Label>
                 <Input
+                  id="heightInches"
                   type="number"
-                  value={formData.heightInches}
-                  onChange={(e) => setFormData(prev => ({ ...prev, heightInches: e.target.value }))}
-                  required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base"
-                  placeholder="10"
                   min="0"
                   max="11"
+                  value={formData.heightInches}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heightInches: e.target.value }))}
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                 />
-                <span className="flex items-center text-sm text-gray-600">in</span>
               </div>
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="birthday" className="text-sm sm:text-base">Birthday</Label>
-            <Input
-              id="birthday"
-              type="date"
-              value={formData.birthday}
-              onChange={(e) => setFormData(prev => ({ ...prev, birthday: e.target.value }))}
-              required
-              className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-            />
-          </div>
-
-          <div>
-            <Label className="text-sm sm:text-base">Health Goals</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
-              {healthGoalOptions.map(goal => (
+          {/* Health Goals */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Health Goals</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {healthGoalsOptions.map((goal) => (
                 <div key={goal} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`health-goal-${goal}`}
+                    id={`goal-${goal}`}
                     checked={formData.healthGoals.includes(goal)}
-                    onCheckedChange={(checked) => handleCheckboxChange("healthGoals", goal, checked === true)}
+                    onCheckedChange={() => handleCheckboxChange('healthGoals', goal)}
+                    className="border-green-300 data-[state=checked]:bg-green-500"
                   />
-                  <Label htmlFor={`health-goal-${goal}`} className="text-sm sm:text-base font-normal">
+                  <Label htmlFor={`goal-${goal}`} className="text-sm sm:text-base cursor-pointer">
                     {goal}
                   </Label>
                 </div>
@@ -231,35 +260,39 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
             </div>
           </div>
 
-          <div>
-            <Label className="text-sm sm:text-base">Diet Types</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
-              {dietTypeOptions.map(type => (
-                <div key={type} className="flex items-center space-x-2">
+          {/* Diet Types */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Dietary Preferences</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {dietTypesOptions.map((diet) => (
+                <div key={diet} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`diet-type-${type}`}
-                    checked={formData.dietTypes.includes(type)}
-                    onCheckedChange={(checked) => handleCheckboxChange("dietTypes", type, checked === true)}
+                    id={`diet-${diet}`}
+                    checked={formData.dietTypes.includes(diet)}
+                    onCheckedChange={() => handleCheckboxChange('dietTypes', diet)}
+                    className="border-green-300 data-[state=checked]:bg-green-500"
                   />
-                  <Label htmlFor={`diet-type-${type}`} className="text-sm sm:text-base font-normal">
-                    {type}
+                  <Label htmlFor={`diet-${diet}`} className="text-sm sm:text-base cursor-pointer">
+                    {diet}
                   </Label>
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
-            <Label className="text-sm sm:text-base">Allergies</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
-              {allergyOptions.map(allergy => (
+          {/* Allergies */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Allergies & Restrictions</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {allergiesOptions.map((allergy) => (
                 <div key={allergy} className="flex items-center space-x-2">
                   <Checkbox
                     id={`allergy-${allergy}`}
                     checked={formData.allergies.includes(allergy)}
-                    onCheckedChange={(checked) => handleCheckboxChange("allergies", allergy, checked === true)}
+                    onCheckedChange={() => handleCheckboxChange('allergies', allergy)}
+                    className="border-green-300 data-[state=checked]:bg-green-500"
                   />
-                  <Label htmlFor={`allergy-${allergy}`} className="text-sm sm:text-base font-normal">
+                  <Label htmlFor={`allergy-${allergy}`} className="text-sm sm:text-base cursor-pointer">
                     {allergy}
                   </Label>
                 </div>
@@ -267,20 +300,51 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+          {/* Terms and Conditions */}
+          <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Agreement</h3>
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="terms"
+                checked={formData.acceptedTerms}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, acceptedTerms: !!checked }))}
+                className="border-green-300 data-[state=checked]:bg-green-500 mt-1"
+              />
+              <div className="space-y-1">
+                <Label htmlFor="terms" className="text-sm sm:text-base cursor-pointer leading-relaxed">
+                  I agree to the{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/terms-and-conditions')}
+                    className="text-green-600 hover:text-green-700 underline inline-flex items-center gap-1"
+                  >
+                    Terms and Conditions
+                    <ExternalLink className="h-3 w-3" />
+                  </button>
+                </Label>
+                <p className="text-xs text-gray-500">
+                  By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={onBack}
-              className="flex-1 h-10 sm:h-12 text-sm sm:text-base"
+              className="flex-1 border-green-500 text-green-600 hover:bg-green-50 h-10 sm:h-12 text-sm sm:text-base"
             >
-              Back
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t('common.back')}
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 h-10 sm:h-12 text-sm sm:text-base"
+              disabled={!formData.acceptedTerms}
+              className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed h-10 sm:h-12 text-sm sm:text-base"
             >
-              Continue
+              {t('common.continue')}
             </Button>
           </div>
         </form>

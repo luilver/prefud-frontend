@@ -2,7 +2,10 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X } from "lucide-react";
+import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X, ShoppingCart } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
+import MealShoppingModal from "./MealShoppingModal";
 
 interface RecipeViewProps {
   meal: any;
@@ -13,6 +16,9 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const { addShoppingItem } = useUser();
+  const { toast } = useToast();
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -32,6 +38,72 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
     setIsVideoPlaying(false);
   };
 
+  const openShoppingModal = () => {
+    setShowShoppingModal(true);
+  };
+
+  const handleCreateShoppingList = () => {
+    try {
+      const ingredients = getIngredientsForShopping();
+      ingredients.forEach((ingredient) => {
+        addShoppingItem({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || 'ingredient',
+          priority: 'medium',
+          purchased: false,
+          notes: `From meal: ${meal.name}`
+        });
+      });
+
+      toast({
+        title: "Shopping List Created!",
+        description: `Added ${ingredients.length} ingredients to your shopping list.`,
+      });
+    } catch (error) {
+      console.error('Error creating shopping list:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create shopping list. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getIngredientsForShopping = () => {
+    if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
+      return meal.ingredientsData.map((ingredient: any) => ({
+        name: ingredient.name || ingredient,
+        quantity: ingredient.quantity || 1,
+        unit: ingredient.unit || 'unit',
+        classification: ingredient.classification || 'ingredient'
+      }));
+    }
+    
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      return meal.ingredients.map((ingredient: string) => {
+        const match = ingredient.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
+        if (match) {
+          return {
+            name: match[3],
+            quantity: parseFloat(match[1]),
+            unit: match[2],
+            classification: 'ingredient'
+          };
+        }
+        return {
+          name: ingredient,
+          quantity: 1,
+          unit: 'unit',
+          classification: 'ingredient'
+        };
+      });
+    }
+    
+    return [];
+  };
+
   const nutrition = useMemo(() => ({
     calories: meal.calories,
     protein: Math.floor(meal.calories * 0.2 / 4),
@@ -41,42 +113,59 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
     sodium: Math.floor(Math.random() * 800) + 200
   }), [meal.calories]);
 
-  const getIngredientsWithQuantities = (ingredients: string[]) => {
-    return ingredients.map(ingredient => {
-      if (/^\d/.test(ingredient)) {
-        return ingredient;
-      }
-      
-      const quantities = {
-        'chicken': '2 lbs',
-        'vegetables': '1 cup',
-        'oil': '2 tbsp',
-        'salt': '1 tsp',
-        'pepper': '1/2 tsp',
-        'garlic': '2 cloves',
-        'onion': '1 medium',
-        'tomato': '2 medium',
-        'rice': '1 cup',
-        'pasta': '8 oz',
-        'cheese': '1/2 cup',
-        'milk': '1 cup',
-        'flour': '2 cups',
-        'sugar': '1/4 cup',
-        'butter': '2 tbsp'
-      };
-      
-      const ingredientLower = ingredient.toLowerCase();
-      for (const [key, quantity] of Object.entries(quantities)) {
-        if (ingredientLower.includes(key)) {
-          return `${quantity} ${ingredient}`;
+  const getIngredientsDisplay = () => {
+    // Check if meal has structured ingredient data (from API)
+    if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
+      return meal.ingredientsData.map((ingredient: any) => {
+        if (ingredient.name && ingredient.quantity && ingredient.unit) {
+          return `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`;
         }
-      }
-      
-      return `1 unit ${ingredient}`;
-    });
+        return ingredient.name || ingredient;
+      });
+    }
+    
+    // Check if ingredients are already formatted strings with quantities
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      return meal.ingredients.map((ingredient: string) => {
+        // If ingredient already has quantity/unit format, return as is
+        if (/^\d/.test(ingredient) || ingredient.includes('cup') || ingredient.includes('tbsp') || ingredient.includes('tsp') || ingredient.includes('lb') || ingredient.includes('oz')) {
+          return ingredient;
+        }
+        
+        // Generic fallback for unformatted ingredients
+        const quantities = {
+          'chicken': '2 lbs',
+          'vegetables': '1 cup',
+          'oil': '2 tbsp',
+          'salt': '1 tsp',
+          'pepper': '1/2 tsp',
+          'garlic': '2 cloves',
+          'onion': '1 medium',
+          'tomato': '2 medium',
+          'rice': '1 cup',
+          'pasta': '8 oz',
+          'cheese': '1/2 cup',
+          'milk': '1 cup',
+          'flour': '2 cups',
+          'sugar': '1/4 cup',
+          'butter': '2 tbsp'
+        };
+        
+        const ingredientLower = ingredient.toLowerCase();
+        for (const [key, quantity] of Object.entries(quantities)) {
+          if (ingredientLower.includes(key)) {
+            return `${quantity} ${ingredient}`;
+          }
+        }
+        
+        return `1 unit ${ingredient}`;
+      });
+    }
+    
+    return [];
   };
 
-  const enhancedIngredients = useMemo(() => getIngredientsWithQuantities(meal.ingredients), [meal.ingredients]);
+  const enhancedIngredients = useMemo(() => getIngredientsDisplay(), [meal]);
 
   const enhancedInstructions = useMemo(() => {
     const cookingTips = [
@@ -90,12 +179,15 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
       "🏆 Final stretch - you've got this!"
     ];
     
-    return meal.instructions.map((instruction: string, index: number) => ({
+    // Use instructions from the meal data
+    const instructions = meal.instructions || meal.steps || [];
+    
+    return instructions.map((instruction: string, index: number) => ({
       text: instruction,
       tip: cookingTips[index % cookingTips.length],
       estimatedTime: 2 + (index % 5) // Fixed time based on step index instead of random
     }));
-  }, [meal.instructions]);
+  }, [meal.instructions, meal.steps]);
 
   return (
     <>
@@ -105,13 +197,13 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
             ← Back to Plan
           </Button>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Heart className="h-4 w-4 mr-1" />
-              Save
-            </Button>
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Share2 className="h-4 w-4 mr-1" />
-              Share
+            <Button 
+              onClick={openShoppingModal}
+              className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
+              size="sm"
+            >
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Shopping List
             </Button>
           </div>
         </div>
@@ -124,17 +216,17 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                   {meal.name}
                 </CardTitle>
                 <CardDescription className="text-base sm:text-lg break-words">
-                  A delicious {meal.type} perfect for any time of day
+                  {meal.description || `A delicious ${meal.type} perfect for any time of day`}
                 </CardDescription>
                 
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{meal.prepTime} minutes</span>
+                    <span className="font-medium text-sm sm:text-base">{meal.prepTime || meal.cookingTime || 30} minutes</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">2 servings</span>
+                    <span className="font-medium text-sm sm:text-base">{meal.servings || 2} servings</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
@@ -373,12 +465,16 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Add to Shopping List
+                <Button 
+                  onClick={handleCreateShoppingList}
+                  className="w-full justify-start" 
+                  variant="outline"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add to Quick Shopping
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
-                  <Heart className="h-4 w-4 mr-2" />
+                  <BookOpen className="h-4 w-4 mr-2" />
                   Mark as Favorite
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
@@ -440,6 +536,12 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
           </div>
         </div>
       )}
+
+      <MealShoppingModal
+        meal={meal}
+        isOpen={showShoppingModal}
+        onClose={() => setShowShoppingModal(false)}
+      />
     </>
   );
 };

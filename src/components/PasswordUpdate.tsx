@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PasswordFormData {
   currentPassword: string;
@@ -22,6 +23,7 @@ const PasswordUpdate = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const form = useForm<PasswordFormData>({
     defaultValues: {
@@ -34,8 +36,8 @@ const PasswordUpdate = () => {
   const onSubmit = async (data: PasswordFormData) => {
     if (data.newPassword !== data.confirmPassword) {
       toast({
-        title: "Password Mismatch",
-        description: "New password and confirmation password do not match.",
+        title: t('password.mismatch.title'),
+        description: t('password.mismatch.description'),
         variant: "destructive"
       });
       return;
@@ -43,8 +45,8 @@ const PasswordUpdate = () => {
 
     if (data.newPassword.length < 6) {
       toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long.",
+        title: t('password.tooShort.title'),
+        description: t('password.tooShort.description'),
         variant: "destructive"
       });
       return;
@@ -56,16 +58,16 @@ const PasswordUpdate = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: "Password Updated",
-        description: "Your password has been successfully updated.",
+        title: t('password.updated.title'),
+        description: t('password.updated.description'),
       });
       
       form.reset();
       setOpen(false);
     } catch (error) {
       toast({
-        title: "Update Failed",
-        description: "Failed to update password. Please try again.",
+        title: t('password.updateFailed.title'),
+        description: t('password.updateFailed.description'),
         variant: "destructive"
       });
     } finally {
@@ -78,29 +80,29 @@ const PasswordUpdate = () => {
       <CardHeader>
         <CardTitle className="flex items-center space-x-2 text-orange-700">
           <Lock className="h-5 w-5" />
-          <span>Password Security</span>
+          <span>{t('password.security.title')}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Keep your account secure by updating your password regularly.
+            {t('password.security.description')}
           </p>
           
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-                Change Password
+                {t('password.changePassword')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle className="flex items-center space-x-2">
                   <Lock className="h-5 w-5" />
-                  <span>Change Password</span>
+                  <span>{t('password.changePassword')}</span>
                 </DialogTitle>
                 <DialogDescription>
-                  Enter your current password and choose a new one to update your account security.
+                  {t('password.dialog.description')}
                 </DialogDescription>
               </DialogHeader>
               
@@ -111,12 +113,12 @@ const PasswordUpdate = () => {
                     name="currentPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Current Password</FormLabel>
+                        <FormLabel>{t('password.currentPassword')}</FormLabel>
                         <div className="relative">
                           <FormControl>
                             <Input
                               type={showCurrentPassword ? "text" : "password"}
-                              placeholder="Enter current password"
+                              placeholder={t('password.currentPassword.placeholder')}
                               className="border-orange-200 focus:border-orange-400 pr-12"
                               {...field}
                             />
@@ -145,12 +147,12 @@ const PasswordUpdate = () => {
                     name="newPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>New Password</FormLabel>
+                        <FormLabel>{t('password.newPassword')}</FormLabel>
                         <div className="relative">
                           <FormControl>
                             <Input
                               type={showNewPassword ? "text" : "password"}
-                              placeholder="Enter new password"
+                              placeholder={t('password.newPassword.placeholder')}
                               className="border-orange-200 focus:border-orange-400 pr-12"
                               {...field}
                             />
@@ -179,12 +181,12 @@ const PasswordUpdate = () => {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirm New Password</FormLabel>
+                        <FormLabel>{t('password.confirmPassword')}</FormLabel>
                         <div className="relative">
                           <FormControl>
                             <Input
                               type={showConfirmPassword ? "text" : "password"}
-                              placeholder="Confirm new password"
+                              placeholder={t('password.confirmPassword.placeholder')}
                               className="border-orange-200 focus:border-orange-400 pr-12"
                               {...field}
                             />
@@ -214,7 +216,7 @@ const PasswordUpdate = () => {
                       className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
                       disabled={isLoading}
                     >
-                      {isLoading ? 'Updating...' : 'Update Password'}
+                      {isLoading ? t('password.updating') : t('password.updatePassword')}
                     </Button>
                     <Button 
                       type="button" 
@@ -222,7 +224,7 @@ const PasswordUpdate = () => {
                       onClick={() => setOpen(false)}
                       disabled={isLoading}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                   </div>
                 </form>

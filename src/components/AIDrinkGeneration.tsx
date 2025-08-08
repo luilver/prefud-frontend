@@ -1,9 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Clock, Users, Zap, Droplets, RefreshCw, Save } from "lucide-react";
+import { Clock, Users, Zap, Droplets, RefreshCw, Save, ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
+import CocktailAnimation from "./CocktailAnimation";
+import { createHealthyDrink, ApiDrinkPlan } from "@/services/drinkService";
+import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIDrinkGenerationProps {
   data: any;
@@ -12,69 +17,114 @@ interface AIDrinkGenerationProps {
 }
 
 const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => {
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDrink, setGeneratedDrink] = useState<any>(null);
+  const [shoppingList, setShoppingList] = useState<any[]>([]);
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  
+  const { user } = useUser();
+  const { language } = useLanguage();
 
   useEffect(() => {
-    generateDrink();
+    // Don't auto-generate on mount, wait for user to trigger
   }, []);
 
-  const generateDrink = () => {
+  const getLanguageName = (languageCode: string) => {
+    const languageMap: { [key: string]: string } = {
+      'en': 'english',
+      'es': 'spanish',
+      'pt': 'portuguese',
+      'fr': 'french',
+      'de': 'german',
+      'it': 'italian'
+    };
+    return languageMap[languageCode.toLowerCase()] || 'english';
+  };
+
+  const generateDrink = async () => {
+    if (!user?.id) {
+      toast.error("Please log in to generate a drink");
+      return;
+    }
+
     setIsGenerating(true);
     
-    // Simulate AI generation
-    setTimeout(() => {
-      const drinkTypes = {
-        smoothie: "Smoothie",
-        juice: "Fresh Juice",
-        tea: "Wellness Tea",
-        protein: "Protein Shake",
-        detox: "Detox Drink",
-        energy: "Energy Boost"
+    try {
+      const requestData = {
+        user_id: user.id,
+        drink_name: data.drink_name || `Healthy ${data.type || 'Drink'}`,
+        numberPeople: data.numberPeople || 1,
+        dietaryRestrictions: data.dietaryRestrictions || [],
+        cuisinePreferences: data.cuisinePreferences || [],
+        allergiesIntolerance: data.allergiesIntolerance || [],
+        dislikes: data.dislikes || "",
+        maxCookingTime: data.maxCookingTime || 30,
+        cookingSkillLevel: data.cookingSkillLevel || "intermediate",
+        budgetRange: data.budgetRange || "medium",
+        drinkType: data.type || "smoothie",
+        language: getLanguageName(language),
+        healthGoals: data.healthGoals || []
       };
 
-      const mockDrink = {
-        name: `Healthy ${drinkTypes[data.type as keyof typeof drinkTypes] || 'Drink'}`,
-        type: data.type,
-        description: "A nutritious and delicious drink crafted specifically for your health goals and ingredient preferences.",
-        prepTime: "5-10 minutes",
-        servings: 1,
-        calories: Math.floor(Math.random() * 200) + 100,
-        ingredients: data.ingredients.map((ingredient: string) => ({
-          name: ingredient,
-          amount: ingredient.includes('Powder') || ingredient.includes('Seeds') ? '1 tbsp' : 
-                 ingredient.includes('Milk') || ingredient === 'Water' ? '1 cup' : '1/2 cup'
+      console.log('Generating drink with request data:', requestData);
+      
+      const apiResponse = await createHealthyDrink(requestData);
+      
+      // Transform API response to match our local format
+      const transformedDrink = {
+        name: apiResponse.healthyDrink.name,
+        type: apiResponse.healthyDrink.drinkType,
+        description: apiResponse.healthyDrink.description,
+        prepTime: `${apiResponse.healthyDrink.cookingTime} minutes`,
+        servings: data.numberPeople || 1,
+        calories: apiResponse.healthyDrink.calories,
+        ingredients: apiResponse.healthyDrink.ingredients.map(ing => ({
+          name: ing.name,
+          amount: `${ing.quantity} ${ing.unit}`,
+          category: apiResponse.ingredientsList.find(item => item.name === ing.name)?.classification || 'Other',
+          price: `$${(Math.random() * 5 + 1).toFixed(2)}` // Mock price for shopping list
         })),
-        instructions: [
-          "Add all ingredients to a blender",
-          "Blend on high speed for 60-90 seconds until smooth",
-          "Taste and adjust sweetness if needed",
-          "Pour into a glass and serve immediately",
-          "Garnish with fresh ingredients if desired"
+        instructions: apiResponse.healthyDrink.steps,
+        nutritionHighlights: [
+          apiResponse.healthyDrink.benefits,
+          `Rich in vitamins: ${apiResponse.healthyDrink.nutritionalInfo.vitamins.join(', ')}`,
+          `${apiResponse.healthyDrink.nutritionalInfo.protein}g protein, ${apiResponse.healthyDrink.nutritionalInfo.fiber}g fiber`
         ],
-        nutritionHighlights: data.goals.map((goal: string) => {
-          const benefits: Record<string, string> = {
-            'weight-loss': 'Low in calories, high in fiber for satiety',
-            'energy': 'Natural sugars and B-vitamins for sustained energy',
-            'immunity': 'Rich in vitamin C and antioxidants',
-            'digestion': 'Contains fiber and digestive enzymes',
-            'skin': 'Antioxidants and vitamins for skin health',
-            'detox': 'Natural detoxifying compounds',
-            'muscle': 'High protein content for muscle support',
-            'stress': 'Adaptogens and calming nutrients'
-          };
-          return benefits[goal] || 'Supports overall health and wellness';
-        }),
         tips: [
-          "For best results, use fresh ingredients when possible",
-          "Adjust liquid amount for desired consistency",
-          "Can be stored in refrigerator for up to 24 hours"
-        ]
+          apiResponse.healthyDrink.prepTip,
+          apiResponse.healthyDrink.instructions,
+          "Store in refrigerator and consume within 24 hours",
+          "Add ice for a refreshing cold drink"
+        ],
+        healthGoals: data.healthGoals || [],
+        dietaryRestrictions: data.dietaryRestrictions || [],
+        servingSize: data.numberPeople || 1,
+        apiData: apiResponse // Store original API data
       };
 
-      setGeneratedDrink(mockDrink);
+      setGeneratedDrink(transformedDrink);
+      setShoppingList(transformedDrink.ingredients);
       setIsGenerating(false);
-    }, 3000);
+      
+      toast.success("Healthy drink was created successfully!");
+      
+    } catch (error) {
+      console.error('Error generating drink:', error);
+      setIsGenerating(false);
+      toast.error("Failed to generate drink. Please try again.");
+    }
+  };
+
+  const toggleShoppingItem = (ingredientName: string) => {
+    setCheckedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(ingredientName)) {
+        newSet.delete(ingredientName);
+      } else {
+        newSet.add(ingredientName);
+      }
+      return newSet;
+    });
   };
 
   const saveDrink = () => {
@@ -86,14 +136,33 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
     }
   };
 
-  if (isGenerating) {
+  // Show generation interface if no drink has been generated yet
+  if (!isGenerating && !generatedDrink) {
     return (
       <div className="text-center space-y-6">
-        <div className="animate-spin mx-auto w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full"></div>
+        <div>
+          <h2 className="text-2xl font-bold text-green-800 mb-2">Ready to Generate Your Drink</h2>
+          <p className="text-green-600">Click below to create your personalized healthy drink</p>
+        </div>
+        <Button
+          onClick={generateDrink}
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+        >
+          <Zap className="h-5 w-5 mr-2" />
+          Generate AI Drink
+        </Button>
+      </div>
+    );
+  }
+
+  if (isGenerating) {
+    return (
+      <div className="text-center space-y-8">
         <div>
           <h2 className="text-2xl font-bold text-green-800 mb-2">AI is Creating Your Drink</h2>
-          <p className="text-green-600">Analyzing your preferences and ingredients to create the perfect healthy drink...</p>
+          <p className="text-green-600">Analyzing your preferences to create the perfect healthy drink...</p>
         </div>
+        <CocktailAnimation />
       </div>
     );
   }
@@ -128,7 +197,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         <Card className="border-green-200 text-center">
           <CardContent className="p-4">
             <Users className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">{generatedDrink.servings} serving</p>
+            <p className="text-sm text-green-700 font-medium">{generatedDrink.servings} serving{generatedDrink.servings > 1 ? 's' : ''}</p>
             <p className="text-xs text-green-600">Servings</p>
           </CardContent>
         </Card>
@@ -148,19 +217,57 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         </Card>
       </div>
 
-      {/* Ingredients */}
+      {/* Shopping List */}
       <Card className="border-green-200">
         <CardHeader>
-          <CardTitle className="text-green-800">Ingredients</CardTitle>
+          <CardTitle className="text-green-800 flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5" />
+            Shopping List
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {generatedDrink.ingredients.map((ingredient: any, index: number) => (
-              <div key={index} className="flex justify-between items-center">
-                <span className="text-green-700">{ingredient.name}</span>
-                <span className="text-green-600 font-medium">{ingredient.amount}</span>
+          <div className="space-y-3">
+            {shoppingList.map((ingredient, index) => (
+              <div 
+                key={index} 
+                className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer ${
+                  checkedItems.has(ingredient.name)
+                    ? 'bg-green-50 border-green-200 text-green-700'
+                    : 'bg-white border-gray-200 hover:border-green-300'
+                }`}
+                onClick={() => toggleShoppingItem(ingredient.name)}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                    checkedItems.has(ingredient.name)
+                      ? 'bg-green-500 border-green-500'
+                      : 'border-gray-300'
+                  }`}>
+                    {checkedItems.has(ingredient.name) && (
+                      <Check className="h-3 w-3 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <span className={`font-medium ${
+                      checkedItems.has(ingredient.name) ? 'line-through text-green-600' : 'text-green-700'
+                    }`}>
+                      {ingredient.name}
+                    </span>
+                    <p className="text-sm text-gray-500">{ingredient.amount} • {ingredient.category}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-green-600 font-medium">{ingredient.price}</span>
+                </div>
               </div>
             ))}
+          </div>
+          <Separator className="my-4" />
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-semibold text-green-800">Total Estimated Cost:</span>
+            <span className="text-lg font-bold text-green-600">
+              ${shoppingList.reduce((total, item) => total + parseFloat(item.price.replace('$', '')), 0).toFixed(2)}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -171,7 +278,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           <CardTitle className="text-green-800">Instructions</CardTitle>
         </CardHeader>
         <CardContent>
-          <ol className="space-y-2">
+          <ol className="space-y-3">
             {generatedDrink.instructions.map((step: string, index: number) => (
               <li key={index} className="flex items-start space-x-3">
                 <span className="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
@@ -184,7 +291,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         </CardContent>
       </Card>
 
-      {/* Nutrition Highlights */}
+      {/* Health Benefits */}
       <Card className="border-green-200">
         <CardHeader>
           <CardTitle className="text-green-800">Health Benefits</CardTitle>
@@ -201,7 +308,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         </CardContent>
       </Card>
 
-      {/* Tips */}
+      {/* Pro Tips */}
       <Card className="border-green-200">
         <CardHeader>
           <CardTitle className="text-green-800">Pro Tips</CardTitle>

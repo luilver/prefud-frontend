@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Camera, Video, Award, Upload, Plus, Leaf, Star } from "lucide-react";
 import CarbonSavingsTracker from "./CarbonSavingsTracker";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface UserAction {
   id: string;
@@ -21,6 +21,7 @@ interface UserAction {
 }
 
 const Environment = () => {
+  const { t } = useLanguage();
   const [userActions, setUserActions] = useState<UserAction[]>([
     {
       id: '1',
@@ -109,18 +110,18 @@ const Environment = () => {
       <div className="text-center mb-6">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 flex items-center justify-center space-x-2">
           <Leaf className="h-6 w-6 text-green-600" />
-          <span>Environment Dashboard</span>
+          <span>{t('environment.title')}</span>
         </h2>
         <p className="text-gray-600">
-          Track your carbon impact and share your eco-friendly actions
+          {t('environment.subtitle')}
         </p>
       </div>
 
       <Tabs defaultValue="tracker" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="tracker">Carbon Tracker</TabsTrigger>
-          <TabsTrigger value="actions">My Actions</TabsTrigger>
-          <TabsTrigger value="rewards">Rewards</TabsTrigger>
+          <TabsTrigger value="tracker">{t('environment.tabs.tracker')}</TabsTrigger>
+          <TabsTrigger value="actions">{t('environment.tabs.actions')}</TabsTrigger>
+          <TabsTrigger value="rewards">{t('environment.tabs.rewards')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="tracker" className="mt-6">
@@ -129,15 +130,14 @@ const Environment = () => {
 
         <TabsContent value="actions" className="mt-6">
           <div className="grid lg:grid-cols-2 gap-6">
-            {/* Add New Action */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Plus className="h-5 w-5 text-green-600" />
-                  <span>Add Eco Action</span>
+                  <span>{t('environment.add.title')}</span>
                 </CardTitle>
                 <CardDescription>
-                  Share what you're doing to reduce your carbon footprint
+                  {t('environment.add.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -151,26 +151,26 @@ const Environment = () => {
                       className="flex items-center space-x-1"
                     >
                       {type.icon}
-                      <span className="hidden sm:inline">{type.label}</span>
+                      <span className="hidden sm:inline">{t(`environment.actions.${type.value}`)}</span>
                     </Button>
                   ))}
                 </div>
 
                 <Input
-                  placeholder="Action title"
+                  placeholder={t('environment.form.title')}
                   value={newAction.title}
                   onChange={(e) => setNewAction(prev => ({ ...prev, title: e.target.value }))}
                 />
 
                 <Input
-                  placeholder="Brief description"
+                  placeholder={t('environment.form.description')}
                   value={newAction.description}
                   onChange={(e) => setNewAction(prev => ({ ...prev, description: e.target.value }))}
                 />
 
                 {newAction.type === 'text' && (
                   <Textarea
-                    placeholder="Describe your eco-friendly action in detail..."
+                    placeholder={t('environment.form.content')}
                     value={newAction.content}
                     onChange={(e) => setNewAction(prev => ({ ...prev, content: e.target.value }))}
                     rows={3}
@@ -180,14 +180,14 @@ const Environment = () => {
                 {newAction.type === 'photo' && (
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                     <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">Click to upload a photo</p>
+                    <p className="text-sm text-gray-600">{t('environment.form.upload.photo')}</p>
                     <Input type="file" accept="image/*" className="mt-2" />
                   </div>
                 )}
 
                 {newAction.type === 'video' && (
                   <Input
-                    placeholder="YouTube video URL"
+                    placeholder={t('environment.form.youtube')}
                     value={newAction.youtubeUrl}
                     onChange={(e) => setNewAction(prev => ({ ...prev, youtubeUrl: e.target.value }))}
                   />
@@ -195,17 +195,16 @@ const Environment = () => {
 
                 <Button onClick={handleSubmitAction} className="w-full">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Action & Earn Points
+                  {t('environment.form.submit')}
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Recent Actions */}
             <Card>
               <CardHeader>
-                <CardTitle>Recent Actions</CardTitle>
+                <CardTitle>{t('environment.recent.title')}</CardTitle>
                 <CardDescription>
-                  Your latest eco-friendly activities
+                  {t('environment.recent.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -236,19 +235,18 @@ const Environment = () => {
 
         <TabsContent value="rewards" className="mt-6">
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Points Summary */}
             <Card className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Award className="h-5 w-5" />
-                  <span>Your Eco Points</span>
+                  <span>{t('environment.rewards.points.title')}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold mb-2">{totalPoints}</div>
-                <p className="text-green-100">Total points earned</p>
+                <p className="text-green-100">{t('environment.rewards.points.total')}</p>
                 <div className="mt-4 p-3 bg-white/10 rounded-lg">
-                  <p className="text-sm">Next reward at 500 points</p>
+                  <p className="text-sm">{t('environment.rewards.points.next')}</p>
                   <div className="w-full bg-white/20 rounded-full h-2 mt-2">
                     <div 
                       className="bg-white h-2 rounded-full transition-all duration-300"
@@ -259,37 +257,28 @@ const Environment = () => {
               </CardContent>
             </Card>
 
-            {/* Available Rewards */}
             <Card>
               <CardHeader>
-                <CardTitle>Available Rewards</CardTitle>
+                <CardTitle>{t('environment.rewards.available.title')}</CardTitle>
                 <CardDescription>
-                  Redeem your points for eco-friendly rewards
+                  {t('environment.rewards.available.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium">Plant a Tree</p>
-                      <p className="text-sm text-gray-600">Help reforest our planet</p>
+                  {[
+                    { title: t('environment.rewards.items.tree.title'), description: t('environment.rewards.items.tree.description'), points: 100 },
+                    { title: t('environment.rewards.items.badge.title'), description: t('environment.rewards.items.badge.description'), points: 250 },
+                    { title: t('environment.rewards.items.offset.title'), description: t('environment.rewards.items.offset.description'), points: 500 }
+                  ].map((reward) => (
+                    <div key={reward.title} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">{reward.title}</p>
+                        <p className="text-sm text-gray-600">{reward.description}</p>
+                      </div>
+                      <Badge variant="outline">{reward.points} pts</Badge>
                     </div>
-                    <Badge variant="outline">100 pts</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium">Eco Badge</p>
-                      <p className="text-sm text-gray-600">Special profile badge</p>
-                    </div>
-                    <Badge variant="outline">250 pts</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium">Carbon Offset</p>
-                      <p className="text-sm text-gray-600">Offset 10kg CO₂</p>
-                    </div>
-                    <Badge variant="outline">500 pts</Badge>
-                  </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

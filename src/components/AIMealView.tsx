@@ -2,9 +2,11 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, Trash2 } from "lucide-react";
+import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X, ShoppingCart } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
+import MealShoppingModal from "./MealShoppingModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIMealViewProps {
   meal: any;
@@ -15,7 +17,9 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const { deleteAIMeal } = useUser();
+  const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const { deleteAIMeal, addShoppingItem } = useUser();
+  const { t } = useLanguage();
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -41,6 +45,66 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     onBack();
   };
 
+  const openShoppingModal = () => {
+    setShowShoppingModal(true);
+  };
+
+  const handleCreateShoppingList = () => {
+    try {
+      const ingredients = getIngredientsForShopping();
+      ingredients.forEach((ingredient) => {
+        addShoppingItem({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || 'ingredient',
+          priority: 'medium',
+          purchased: false,
+          notes: `From AI meal: ${meal.name}`
+        });
+      });
+
+      toast.success(`Shopping List Created! Added ${ingredients.length} ingredients to your shopping list.`);
+    } catch (error) {
+      console.error('Error creating shopping list:', error);
+      toast.error("Failed to create shopping list. Please try again.");
+    }
+  };
+
+  const getIngredientsForShopping = () => {
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      return meal.ingredients.map((ingredient: any) => {
+        if (typeof ingredient === 'object' && ingredient.name) {
+          return {
+            name: ingredient.name,
+            quantity: ingredient.quantity || 1,
+            unit: ingredient.unit || 'unit',
+            classification: ingredient.classification || 'ingredient'
+          };
+        }
+        
+        const ingredientStr = String(ingredient);
+        const match = ingredientStr.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
+        if (match) {
+          return {
+            name: match[3],
+            quantity: parseFloat(match[1]),
+            unit: match[2],
+            classification: 'ingredient'
+          };
+        }
+        return {
+          name: ingredientStr,
+          quantity: 1,
+          unit: 'unit',
+          classification: 'ingredient'
+        };
+      });
+    }
+    
+    return [];
+  };
+
   const nutrition = useMemo(() => ({
     calories: meal.calories || 300,
     protein: Math.floor((meal.calories || 300) * 0.2 / 4),
@@ -50,10 +114,15 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     sodium: Math.floor(Math.random() * 800) + 200
   }), [meal.calories]);
 
-  const getIngredientsWithQuantities = (ingredients: string[]) => {
+  const getIngredientsWithQuantities = (ingredients: any[]) => {
     return ingredients.map(ingredient => {
-      if (/^\d/.test(ingredient)) {
-        return ingredient;
+      // Ensure ingredient is a string, handle objects or other types
+      const ingredientStr = typeof ingredient === 'string' ? ingredient : 
+                           typeof ingredient === 'object' && ingredient?.name ? ingredient.name :
+                           String(ingredient);
+      
+      if (/^\d/.test(ingredientStr)) {
+        return ingredientStr;
       }
       
       const quantities = {
@@ -74,32 +143,32 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         'butter': '2 tbsp'
       };
       
-      const ingredientLower = ingredient.toLowerCase();
+      const ingredientLower = ingredientStr.toLowerCase();
       for (const [key, quantity] of Object.entries(quantities)) {
         if (ingredientLower.includes(key)) {
-          return `${quantity} ${ingredient}`;
+          return `${quantity} ${ingredientStr}`;
         }
       }
       
-      return `1 unit ${ingredient}`;
+      return `1 unit ${ingredientStr}`;
     });
   };
 
-  const enhancedIngredients = useMemo(() => getIngredientsWithQuantities(meal.ingredients), [meal.ingredients]);
+  const enhancedIngredients = useMemo(() => getIngredientsWithQuantities(meal.ingredients || []), [meal.ingredients]);
 
   const enhancedInstructions = useMemo(() => {
     const cookingTips = [
-      "🔥 Heat your pan to medium-high heat",
-      "⏱️ Don't rush this step - patience makes perfect!",
-      "👨‍🍳 Pro tip: Taste as you go",
-      "🌟 This is where the magic happens",
-      "💡 Keep stirring to prevent sticking",
-      "🎯 Almost there - you're doing great!",
-      "✨ The aroma should be amazing now",
-      "🏆 Final stretch - you've got this!"
+      t("aiMealGenerator.heatPan") || "🔥 Heat your pan to medium-high heat",
+      t("aiMealGenerator.patience") || "⏱️ Don't rush this step - patience makes perfect!",
+      t("aiMealGenerator.taste") || "👨‍🍳 Pro tip: Taste as you go",
+      t("aiMealGenerator.magic") || "🌟 This is where the magic happens",
+      t("aiMealGenerator.stir") || "💡 Keep stirring to prevent sticking",
+      t("aiMealGenerator.almost") || "🎯 Almost there - you're doing great!",
+      t("aiMealGenerator.aroma") || "✨ The aroma should be amazing now",
+      t("aiMealGenerator.final") || "🏆 Final stretch - you've got this!"
     ];
     
-    return meal.instructions.map((instruction: string, index: number) => ({
+    return (meal.instructions || []).map((instruction: string, index: number) => ({
       text: instruction,
       tip: cookingTips[index % cookingTips.length],
       estimatedTime: 2 + (index % 5) // Fixed time based on step index instead of random
@@ -111,25 +180,16 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
       <div className="max-w-4xl mx-auto space-y-6 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <Button variant="ghost" onClick={onBack} className="self-start">
-            ← Back to AI Meals
+            ← {t("aiMealView.backToAiMeals") || "Back to AI Meals"}
           </Button>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Heart className="h-4 w-4 mr-1" />
-              Save
-            </Button>
-            <Button variant="outline" size="sm" className="flex-shrink-0">
-              <Share2 className="h-4 w-4 mr-1" />
-              Share
-            </Button>
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-shrink-0 text-red-600 hover:text-red-700"
-              onClick={handleDelete}
+              onClick={openShoppingModal}
+              className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
+              size="sm"
             >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Delete
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              {t("aiMealView.shoppingList") || "Shopping List"}
             </Button>
           </div>
         </div>
@@ -148,11 +208,11 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{meal.cookingTime || meal.prepTime} minutes</span>
+                    <span className="font-medium text-sm sm:text-base">{meal.cookingTime || meal.prepTime} {t("aiMealView.minutes") || "minutes"}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">2 servings</span>
+                    <span className="font-medium text-sm sm:text-base">2 {t("aiMealView.servings") || "servings"}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
@@ -172,8 +232,8 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="recipe">Recipe</TabsTrigger>
-                <TabsTrigger value="video">Video Tutorial</TabsTrigger>
+                <TabsTrigger value="recipe">{t("aiMealView.recipeTab") || "Recipe"}</TabsTrigger>
+                <TabsTrigger value="video">{t("aiMealView.videoTab") || "Video Tutorial"}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="recipe" className="space-y-6">
@@ -181,9 +241,9 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <BookOpen className="h-5 w-5 text-purple-600" />
-                      <span>Ingredients</span>
+                      <span>{t("aiMealView.ingredientsTitle") || "Ingredients"}</span>
                     </CardTitle>
-                    <CardDescription>Everything you need for this recipe</CardDescription>
+                    <CardDescription>{t("aiMealView.ingredientsDesc") || "Everything you need for this recipe"}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3">
@@ -201,9 +261,9 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Flame className="h-5 w-5 text-orange-600" />
-                      <span>Cooking Instructions</span>
+                      <span>{t("aiMealView.instructionsTitle") || "Cooking Instructions"}</span>
                     </CardTitle>
-                    <CardDescription>Follow these steps for the perfect result</CardDescription>
+                    <CardDescription>{t("aiMealView.instructionsDesc") || "Follow these steps for the perfect result"}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -272,10 +332,10 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Play className="h-5 w-5 text-red-600" />
-                      <span>Video Tutorial</span>
+                      <span>{t("aiMealView.videoTitle") || "Video Tutorial"}</span>
                     </CardTitle>
                     <CardDescription>
-                      Watch step-by-step preparation
+                      {t("aiMealView.videoDesc") || "Watch step-by-step preparation"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -288,7 +348,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                             className="bg-red-600 hover:bg-red-700 rounded-full"
                           >
                             <Play className="h-6 w-6 mr-2" />
-                            Play Video
+                            {t("aiMealView.playVideo") || "Play Video"}
                           </Button>
                           <Button
                             onClick={openFullscreenVideo}
@@ -296,7 +356,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                             className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                           >
                             <Maximize className="h-4 w-4 mr-2" />
-                            Fullscreen
+                            {t("aiMealView.fullscreen") || "Fullscreen"}
                           </Button>
                         </div>
                       ) : (
@@ -317,7 +377,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                               variant="ghost"
                               className="text-white hover:bg-white/20"
                             >
-                              Close Video
+                              {t("aiMealView.closeVideo") || "Close Video"}
                             </Button>
                             <Button
                               onClick={openFullscreenVideo}
@@ -325,7 +385,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                               className="text-white hover:bg-white/20"
                             >
                               <Maximize className="h-4 w-4 mr-2" />
-                              Fullscreen
+                              {t("aiMealView.fullscreen") || "Fullscreen"}
                             </Button>
                           </div>
                         </div>
@@ -340,33 +400,33 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Nutrition Facts</CardTitle>
-                <CardDescription>Per serving</CardDescription>
+                <CardTitle className="text-lg">{t("aiMealView.nutritionFacts") || "Nutrition Facts"}</CardTitle>
+                <CardDescription>{t("aiMealView.perServing") || "Per serving"}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">Calories</span>
+                    <span className="font-medium">{t("aiMealView.calories") || "Calories"}</span>
                     <span>{nutrition.calories}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Protein</span>
+                    <span>{t("aiMealView.protein") || "Protein"}</span>
                     <span>{nutrition.protein}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Carbs</span>
+                    <span>{t("aiMealView.carbs") || "Carbs"}</span>
                     <span>{nutrition.carbs}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Fat</span>
+                    <span>{t("aiMealView.fat") || "Fat"}</span>
                     <span>{nutrition.fat}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Fiber</span>
+                    <span>{t("aiMealView.fiber") || "Fiber"}</span>
                     <span>{nutrition.fiber}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Sodium</span>
+                    <span>{t("aiMealView.sodium") || "Sodium"}</span>
                     <span>{nutrition.sodium}mg</span>
                   </div>
                 </div>
@@ -375,7 +435,31 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Cooking Progress</CardTitle>
+                <CardTitle className="text-lg">{t("aiMealView.quickActions") || "Quick Actions"}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  onClick={handleCreateShoppingList}
+                  className="w-full justify-start" 
+                  variant="outline"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  {t("aiMealView.addToQuickShopping") || "Add to Quick Shopping"}
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  {t("aiMealView.markAsFavorite") || "Mark as Favorite"}
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <ChefHat className="h-4 w-4 mr-2" />
+                  {t("aiMealView.markAsCooked") || "Mark as Cooked"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t("aiMealView.cookingProgress") || "Cooking Progress"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center">
@@ -383,7 +467,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                     {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
                   </div>
                   <p className="text-sm text-gray-600">
-                    {completedSteps.length} of {enhancedInstructions.length} steps completed
+                    {completedSteps.length} {t("aiMealView.of") || "of"} {enhancedInstructions.length} {t("aiMealView.stepsCompleted") || "steps completed"}
                   </p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div
@@ -393,7 +477,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   </div>
                   {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
                     <div className="mt-3 p-2 bg-purple-100 rounded-lg">
-                      <p className="text-sm text-purple-700 font-medium">🎉 Congratulations! Recipe completed!</p>
+                      <p className="text-sm text-purple-700 font-medium">🎉 {t("aiMealView.recipeCompleted") || "Congratulations! Recipe completed!"}</p>
                     </div>
                   )}
                 </div>
@@ -425,6 +509,12 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
           </div>
         </div>
       )}
+
+      <MealShoppingModal
+        meal={meal}
+        isOpen={showShoppingModal}
+        onClose={() => setShowShoppingModal(false)}
+      />
     </>
   );
 };
