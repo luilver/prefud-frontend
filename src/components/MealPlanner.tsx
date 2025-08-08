@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,8 +77,18 @@ const MealPlanner = () => {
     setIsEditing(false);
     isNavigatingBack.current = false;
     
-    // Show success modal and toast
-    setSuccessPlan(newPlan);
+    // Show success modal with correct plan data
+    const successPlanData = {
+      name: newPlan.name || 'AI Generated Meal Plan',
+      numberOfDays: newPlan.preferences?.numberOfWeeks 
+        ? newPlan.preferences.numberOfWeeks * 7 
+        : (newPlan.duration ? parseInt(newPlan.duration.replace(' days', '')) : 7),
+      numberOfPersons: newPlan.preferences?.numberOfPersons || newPlan.preferences?.people || 1,
+      mealsPerDay: newPlan.preferences?.mealsPerDay || 3
+    };
+    
+    console.log('Setting success plan data:', successPlanData);
+    setSuccessPlan(successPlanData);
     setShowSuccessModal(true);
     
     // Show success toast
@@ -185,13 +194,7 @@ const MealPlanner = () => {
           isOpen={showSuccessModal}
           onClose={handleCloseSuccessModal}
           onViewPlan={handleViewSuccessPlan}
-          mealPlan={{
-            name: successPlan.name,
-            numberOfDays: successPlan.duration ? parseInt(successPlan.duration.replace(' days', '')) : 
-                         (successPlan.preferences?.numberOfWeeks ? successPlan.preferences.numberOfWeeks * 7 : 7),
-            numberOfPersons: successPlan.preferences?.numberOfPersons || successPlan.preferences?.people || 1,
-            mealsPerDay: successPlan.preferences?.mealsPerDay || 3
-          }}
+          mealPlan={successPlan}
         />
       )}
 
