@@ -8,10 +8,12 @@ import { Crown, Check, X, User, Mail, CreditCard, Eye, EyeOff, Star, Sparkles } 
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "@/components/ui/use-toast";
 import UserProfileForm from "./UserProfileForm";
 import OTPVerification from "./OTPVerification";
 import PaymentForm from "./PaymentForm";
 import WelcomeModal from "./WelcomeModal";
+import axios from "axios";
 
 interface SignupData {
   email: string;
@@ -47,7 +49,6 @@ const SignupSteps = () => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
 
-  // Updated subscription plans to match pricing page with brand colors
   const subscriptionPlans = [
     {
       id: "free",
@@ -111,11 +112,59 @@ const SignupSteps = () => {
     setIsLoading(true);
     
     try {
-      console.log('Mock: Sending OTP to:', signupData.email);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setCurrentStep(2);
-    } catch (error) {
-      console.error('Failed to send OTP:', error);
+      console.log('Sending signup request to API:', signupData.email);
+      
+      const requestData = {
+        email: signupData.email,
+        password: signupData.password
+      };
+
+      const config = {
+        method: 'post',
+        url: 'https://pantry-auth-1.onrender.com/security/signup',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data: requestData
+      };
+
+      const response = await axios.request(config);
+      console.log('Signup API response:', response.data);
+
+      // Check if response indicates success
+      if (response.data.message && response.data.message.includes('OTP code has been sent')) {
+        toast({
+          title: "✅ Account Created Successfully!",
+          description: "An OTP code has been sent to your email address.",
+          duration: 5000,
+        });
+        setCurrentStep(2);
+      } else {
+        throw new Error('Unexpected response format');
+      }
+    } catch (error: any) {
+      console.error('Signup failed:', error);
+      
+      // Handle API error responses
+      if (error.response?.data?.message) {
+        const errorMessage = typeof error.response.data.message === 'string' 
+          ? error.response.data.message 
+          : error.response.data.message.message || 'Signup failed';
+        
+        toast({
+          title: "❌ Signup Failed",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 5000,
+        });
+      } else {
+        toast({
+          title: "❌ Signup Failed",
+          description: "Unable to create account. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -202,7 +251,6 @@ const SignupSteps = () => {
 
   return (
     <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
-      {/* Enhanced Progress Steps with better mobile design */}
       <div className="relative mb-6 sm:mb-8">
         <div className="flex justify-center">
           <div className={`flex items-center ${isMobile ? 'space-x-2' : 'space-x-4 sm:space-x-6'} px-2 sm:px-0`}>
@@ -220,7 +268,6 @@ const SignupSteps = () => {
                       <Icon className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5 sm:h-6 sm:w-6'}`} />
                     )}
                     
-                    {/* Animated ring for current step */}
                     {currentStep === step && (
                       <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${color} opacity-20 animate-pulse scale-125`}></div>
                     )}
@@ -248,7 +295,6 @@ const SignupSteps = () => {
         </div>
       </div>
 
-      {/* Step 1: Basic Info - Enhanced with better mobile optimization */}
       {currentStep === 1 && (
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl blur-xl"></div>
@@ -356,10 +402,8 @@ const SignupSteps = () => {
         />
       )}
 
-      {/* Step 4: Subscription Choice - Enhanced mobile layout */}
       {currentStep === 4 && (
         <div className="space-y-6 sm:space-y-8">
-          {/* Compact header for mobile */}
           <div className="text-center space-y-3 px-2 sm:px-0">
             <div className="flex justify-center mb-4">
               <div className="p-3 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-lg">
@@ -374,7 +418,6 @@ const SignupSteps = () => {
             </p>
           </div>
 
-          {/* Enhanced plan cards with better mobile layout */}
           <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 lg:grid-cols-3 gap-6'} px-1 sm:px-0`}>
             {subscriptionPlans.map((plan, index) => (
               <div key={plan.id} className="relative group">
@@ -461,7 +504,6 @@ const SignupSteps = () => {
         </div>
       )}
 
-      {/* Step 5: Payment */}
       {currentStep === 5 && (
         <PaymentForm
           onSuccess={handlePaymentSuccess}
