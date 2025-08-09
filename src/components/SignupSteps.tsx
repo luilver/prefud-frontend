@@ -184,7 +184,7 @@ const SignupSteps = () => {
   };
 
   const handleProfileComplete = (profileData: any) => {
-    console.log('Mock: Profile data saved:', profileData);
+    console.log('Profile data saved:', profileData);
     setSignupData(prev => ({ ...prev, profile: profileData }));
     setCurrentStep(4);
   };
@@ -408,6 +408,7 @@ const SignupSteps = () => {
         <UserProfileForm 
           onComplete={handleProfileComplete}
           onBack={() => setCurrentStep(2)}
+          userId={signupData.userId}
         />
       )}
 

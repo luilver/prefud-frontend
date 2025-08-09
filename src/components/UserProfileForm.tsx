@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,15 +10,19 @@ import { User, ArrowLeft, Languages, ExternalLink } from "lucide-react";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import axios from "axios";
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
   onBack: () => void;
+  userId?: string;
 }
 
-const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
+const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) => {
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -54,27 +59,119 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
     { value: 'pt', label: t('language.portuguese'), flag: '🇵🇹' }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.acceptedTerms) {
-      return; // Prevent submission if terms not accepted
+      toast({
+        title: "❌ Terms Required",
+        description: "Please accept the Terms and Conditions to continue.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
     }
-    
-    // Update global language when form is submitted
-    setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
-    
-    const selectedCountry = countries.find(c => c.code === formData.country);
-    const phoneWithPrefix = selectedCountry ? `${selectedCountry.prefix}${formData.phone}` : formData.phone;
-    
-    onComplete({
-      ...formData,
-      phone: phoneWithPrefix,
-      weight: parseFloat(formData.weight) || 0,
-      heightMeters: parseFloat(formData.heightMeters) || 0,
-      dailyCalories: parseInt(formData.dailyCalories) || 0,
-      language: formData.selectedLanguage
-    });
+
+    if (!userId) {
+      toast({
+        title: "❌ Error",
+        description: "User ID is missing. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Update global language when form is submitted
+      setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
+      
+      const selectedCountry = countries.find(c => c.code === formData.country);
+      const phoneWithoutPrefix = formData.phone;
+      const phonePrefix = selectedCountry?.prefix || '';
+
+      // Prepare data for API
+      const profileData = {
+        name: formData.name,
+        lastName: formData.lastName,
+        weight: parseFloat(formData.weight) || 0,
+        height: parseFloat(formData.heightMeters) || 0,
+        birthday: formData.birthday,
+        healthGoals: {
+          dailyCaloriesGoal: parseInt(formData.dailyCalories) || 0,
+          goals: formData.healthGoals
+        },
+        dietTypes: formData.dietTypes,
+        alergies: formData.allergies, // Note: API uses 'alergies' (typo in API)
+        language: formData.selectedLanguage,
+        phone: phoneWithoutPrefix,
+        phonePrefix: phonePrefix,
+        country: selectedCountry?.name || formData.country,
+        addressId: ""
+      };
+
+      console.log('Sending profile data to API:', profileData);
+
+      const config = {
+        method: 'post',
+        url: `https://pantry-auth-1.onrender.com/user-profile/${userId}`,
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data: profileData
+      };
+
+      const response = await axios.request(config);
+      console.log('Profile API response:', response.data);
+
+      if (response.data.responseCode === "01" && response.data.profile) {
+        toast({
+          title: "✅ Profile Created Successfully!",
+          description: "Your profile has been saved.",
+          duration: 5000,
+        });
+
+        // Pass the complete profile data to the parent component
+        onComplete({
+          ...formData,
+          phone: phoneWithoutPrefix,
+          phonePrefix: phonePrefix,
+          weight: parseFloat(formData.weight) || 0,
+          heightMeters: parseFloat(formData.heightMeters) || 0,
+          dailyCalories: parseInt(formData.dailyCalories) || 0,
+          language: formData.selectedLanguage,
+          apiResponse: response.data.profile
+        });
+      } else {
+        throw new Error('Unexpected response format');
+      }
+    } catch (error: any) {
+      console.error('Profile creation failed:', error);
+      
+      if (error.response?.data?.message) {
+        const errorMessage = typeof error.response.data.message === 'string' 
+          ? error.response.data.message 
+          : error.response.data.message.message || 'Profile creation failed';
+        
+        toast({
+          title: "❌ Profile Creation Failed",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 5000,
+        });
+      } else {
+        toast({
+          title: "❌ Profile Creation Failed",
+          description: "Unable to save profile. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCheckboxChange = (category: 'healthGoals' | 'dietTypes' | 'allergies', value: string) => {
@@ -342,6 +439,7 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
               type="button"
               variant="outline"
               onClick={onBack}
+              disabled={isLoading}
               className="flex-1 border-green-500 text-green-600 hover:bg-green-50 h-10 sm:h-12 text-sm sm:text-base"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -349,10 +447,17 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
             </Button>
             <Button
               type="submit"
-              disabled={!formData.acceptedTerms}
+              disabled={!formData.acceptedTerms || isLoading}
               className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed h-10 sm:h-12 text-sm sm:text-base"
             >
-              {t('common.continue')}
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Creating Profile...</span>
+                </div>
+              ) : (
+                t('common.continue')
+              )}
             </Button>
           </div>
         </form>
