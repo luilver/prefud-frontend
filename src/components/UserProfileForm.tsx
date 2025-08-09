@@ -24,11 +24,11 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
     country: "",
     phone: "",
     weight: "",
-    heightFeet: "",
-    heightInches: "",
+    heightMeters: "",
     birthday: "",
     selectedLanguage: language,
     healthGoals: [] as string[],
+    dailyCalories: "",
     dietTypes: [] as string[],
     allergies: [] as string[],
     acceptedTerms: false
@@ -71,8 +71,8 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
       ...formData,
       phone: phoneWithPrefix,
       weight: parseFloat(formData.weight) || 0,
-      heightFeet: parseInt(formData.heightFeet) || 0,
-      heightInches: parseInt(formData.heightInches) || 0,
+      heightMeters: parseFloat(formData.heightMeters) || 0,
+      dailyCalories: parseInt(formData.dailyCalories) || 0,
       language: formData.selectedLanguage
     });
   };
@@ -202,7 +202,7 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
           {/* Physical Information */}
           <div className="space-y-3 sm:space-y-4">
             <h3 className="text-base sm:text-lg font-semibold text-gray-800">Physical Information</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label htmlFor="weight" className="text-sm sm:text-base">Weight (lbs)</Label>
                 <Input
@@ -214,26 +214,16 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="heightFeet" className="text-sm sm:text-base">Height (feet)</Label>
+                <Label htmlFor="heightMeters" className="text-sm sm:text-base">Height (meters)</Label>
                 <Input
-                  id="heightFeet"
+                  id="heightMeters"
                   type="number"
+                  step="0.01"
                   min="0"
-                  max="8"
-                  value={formData.heightFeet}
-                  onChange={(e) => setFormData(prev => ({ ...prev, heightFeet: e.target.value }))}
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="heightInches" className="text-sm sm:text-base">Height (inches)</Label>
-                <Input
-                  id="heightInches"
-                  type="number"
-                  min="0"
-                  max="11"
-                  value={formData.heightInches}
-                  onChange={(e) => setFormData(prev => ({ ...prev, heightInches: e.target.value }))}
+                  max="3"
+                  placeholder="e.g., 1.75"
+                  value={formData.heightMeters}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heightMeters: e.target.value }))}
                   className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                 />
               </div>
@@ -257,6 +247,24 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
                   </Label>
                 </div>
               ))}
+            </div>
+            
+            {/* Daily Calories Goal */}
+            <div className="mt-4">
+              <Label htmlFor="dailyCalories" className="text-sm sm:text-base">Daily Calories Goal</Label>
+              <Input
+                id="dailyCalories"
+                type="number"
+                min="800"
+                max="5000"
+                placeholder="e.g., 2000"
+                value={formData.dailyCalories}
+                onChange={(e) => setFormData(prev => ({ ...prev, dailyCalories: e.target.value }))}
+                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Recommended range: 1200-3000 calories per day
+              </p>
             </div>
           </div>
 
