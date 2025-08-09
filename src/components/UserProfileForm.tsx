@@ -9,19 +9,15 @@ import { User, ArrowLeft, Languages, ExternalLink } from "lucide-react";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
   onBack: () => void;
-  userId?: string;
 }
 
-const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) => {
+const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -58,100 +54,27 @@ const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) =
     { value: 'pt', label: t('language.portuguese'), flag: '🇵🇹' }
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.acceptedTerms) {
-      toast({
-        variant: "destructive",
-        title: "Terms Required",
-        description: "Please accept the terms and conditions to continue."
-      });
-      return;
+      return; // Prevent submission if terms not accepted
     }
-
-    if (!userId) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "User ID not found. Please try signing up again."
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
     
-    try {
-      const selectedCountry = countries.find(c => c.code === formData.country);
-      
-      // Transform form data to match API structure
-      const profileData = {
-        name: formData.name,
-        lastName: formData.lastName,
-        weight: parseFloat(formData.weight) || 0,
-        height: parseFloat(formData.heightMeters) || 0,
-        birthday: formData.birthday,
-        healthGoals: {
-          dailyCaloriesGoal: parseInt(formData.dailyCalories) || 2000,
-          goals: formData.healthGoals
-        },
-        dietTypes: formData.dietTypes,
-        alergies: formData.allergies,
-        language: formData.selectedLanguage === 'en' ? 'english' : 
-                 formData.selectedLanguage === 'es' ? 'spanish' : 'portuguese',
-        phone: formData.phone,
-        phonePrefix: selectedCountry?.prefix || '',
-        country: selectedCountry?.name || formData.country,
-        addressId: ""
-      };
-
-      console.log('Sending profile data:', profileData);
-
-      const response = await fetch(`https://pantry-auth-1.onrender.com/user-profile/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(profileData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message?.message || 'Failed to save profile');
-      }
-
-      const result = await response.json();
-      console.log('Profile saved successfully:', result);
-
-      toast({
-        title: "Profile Saved!",
-        description: "Your profile has been created successfully."
-      });
-
-      // Update global language when form is submitted
-      setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
-      
-      // Pass the response data to the parent component
-      onComplete({
-        ...formData,
-        phone: `${selectedCountry?.prefix || ''}${formData.phone}`,
-        weight: parseFloat(formData.weight) || 0,
-        heightMeters: parseFloat(formData.heightMeters) || 0,
-        dailyCalories: parseInt(formData.dailyCalories) || 0,
-        language: formData.selectedLanguage,
-        profileResponse: result
-      });
-
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save profile. Please try again."
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Update global language when form is submitted
+    setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
+    
+    const selectedCountry = countries.find(c => c.code === formData.country);
+    const phoneWithPrefix = selectedCountry ? `${selectedCountry.prefix}${formData.phone}` : formData.phone;
+    
+    onComplete({
+      ...formData,
+      phone: phoneWithPrefix,
+      weight: parseFloat(formData.weight) || 0,
+      heightMeters: parseFloat(formData.heightMeters) || 0,
+      dailyCalories: parseInt(formData.dailyCalories) || 0,
+      language: formData.selectedLanguage
+    });
   };
 
   const handleCheckboxChange = (category: 'healthGoals' | 'dietTypes' | 'allergies', value: string) => {
@@ -419,7 +342,6 @@ const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) =
               type="button"
               variant="outline"
               onClick={onBack}
-              disabled={isSubmitting}
               className="flex-1 border-green-500 text-green-600 hover:bg-green-50 h-10 sm:h-12 text-sm sm:text-base"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -427,10 +349,10 @@ const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) =
             </Button>
             <Button
               type="submit"
-              disabled={!formData.acceptedTerms || isSubmitting}
+              disabled={!formData.acceptedTerms}
               className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed h-10 sm:h-12 text-sm sm:text-base"
             >
-              {isSubmitting ? 'Saving...' : t('common.continue')}
+              {t('common.continue')}
             </Button>
           </div>
         </form>
