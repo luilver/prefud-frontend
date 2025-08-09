@@ -1,5 +1,5 @@
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pantry-ms-brain.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
 
 export interface ApiDrinkIngredient {
   name: string;

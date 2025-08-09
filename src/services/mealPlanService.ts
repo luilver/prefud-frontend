@@ -127,11 +127,14 @@ export interface CreateMealPlanRequest {
   plan_description?: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
+
+
 export const createMealPlan = async (planData: CreateMealPlanRequest): Promise<ApiMealPlan> => {
   console.log('Service: Creating meal plan', planData);
   
   try {
-    const response = await fetch('https://pantry-ms-brain.onrender.com/meal-plan', {
+    const response = await fetch(`${API_BASE_URL}/meal-plan`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -202,7 +205,7 @@ export const getMealPlans = async (userId: string, page: number = 1, limit: numb
   console.log('Service: Fetching meal plans', { userId, page, limit });
   
   try {
-    const response = await fetch(`https://pantry-ms-brain.onrender.com/meal-plan/${userId}?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE_URL}/meal-plan/${userId}?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
