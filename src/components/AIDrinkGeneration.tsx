@@ -24,6 +24,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
   
   const { user } = useUser();
   const { language } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Don't auto-generate on mount, wait for user to trigger
@@ -141,15 +142,19 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
     return (
       <div className="text-center space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-green-800 mb-2">Ready to Generate Your Drink</h2>
-          <p className="text-green-600">Click below to create your personalized healthy drink</p>
+          <h2 className="text-2xl font-bold text-green-800 mb-2">
+            {t("aiDrinkGeneration.readyTitle") || "Ready to Generate Your Drink"}
+          </h2>
+          <p className="text-green-600">
+            {t("aiDrinkGeneration.readyDesc") || "Click below to create your personalized healthy drink"}
+          </p>
         </div>
         <Button
           onClick={generateDrink}
           className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
         >
           <Zap className="h-5 w-5 mr-2" />
-          Generate AI Drink
+          {t("aiDrinkGeneration.generateBtn") || "Generate AI Drink"}
         </Button>
       </div>
     );
@@ -159,8 +164,12 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
     return (
       <div className="text-center space-y-8">
         <div>
-          <h2 className="text-2xl font-bold text-green-800 mb-2">AI is Creating Your Drink</h2>
-          <p className="text-green-600">Analyzing your preferences to create the perfect healthy drink...</p>
+          <h2 className="text-2xl font-bold text-green-800 mb-2">
+            {t("aiDrinkGeneration.creatingTitle") || "AI is Creating Your Drink"}
+          </h2>
+          <p className="text-green-600">
+            {t("aiDrinkGeneration.creatingDesc") || "Analyzing your preferences to create the perfect healthy drink..."}
+          </p>
         </div>
         <CocktailAnimation />
       </div>
@@ -170,9 +179,11 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
   if (!generatedDrink) {
     return (
       <div className="text-center">
-        <p className="text-red-600">Failed to generate drink. Please try again.</p>
+        <p className="text-red-600">
+          {t("aiDrinkGeneration.failed") || "Failed to generate drink. Please try again."}
+        </p>
         <Button onClick={generateDrink} className="mt-4">
-          Retry Generation
+          {t("aiDrinkGeneration.retry") || "Retry Generation"}
         </Button>
       </div>
     );
@@ -191,28 +202,30 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           <CardContent className="p-4">
             <Clock className="h-6 w-6 text-green-600 mx-auto mb-2" />
             <p className="text-sm text-green-700 font-medium">{generatedDrink.prepTime}</p>
-            <p className="text-xs text-green-600">Prep Time</p>
+            <p className="text-xs text-green-600">{t("aiDrinkGeneration.prepTime") || "Prep Time"}</p>
           </CardContent>
         </Card>
         <Card className="border-green-200 text-center">
           <CardContent className="p-4">
             <Users className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">{generatedDrink.servings} serving{generatedDrink.servings > 1 ? 's' : ''}</p>
-            <p className="text-xs text-green-600">Servings</p>
+            <p className="text-sm text-green-700 font-medium">
+              {generatedDrink.servings} {t("aiDrinkGeneration.serving") || 'serving'}{generatedDrink.servings > 1 ? 's' : ''}
+            </p>
+            <p className="text-xs text-green-600">{t("aiDrinkGeneration.servings") || "Servings"}</p>
           </CardContent>
         </Card>
         <Card className="border-green-200 text-center">
           <CardContent className="p-4">
             <Zap className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">{generatedDrink.calories} cal</p>
-            <p className="text-xs text-green-600">Calories</p>
+            <p className="text-sm text-green-700 font-medium">{generatedDrink.calories} {t("aiDrinkGeneration.cal") || "cal"}</p>
+            <p className="text-xs text-green-600">{t("aiDrinkGeneration.calories") || "Calories"}</p>
           </CardContent>
         </Card>
         <Card className="border-green-200 text-center">
           <CardContent className="p-4">
             <Droplets className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-sm text-green-700 font-medium">Fresh</p>
-            <p className="text-xs text-green-600">Best Served</p>
+            <p className="text-sm text-green-700 font-medium">{t("aiDrinkGeneration.fresh") || "Fresh"}</p>
+            <p className="text-xs text-green-600">{t("aiDrinkGeneration.bestServed") || "Best Served"}</p>
           </CardContent>
         </Card>
       </div>
@@ -222,7 +235,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         <CardHeader>
           <CardTitle className="text-green-800 flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
-            Shopping List
+            {t("aiDrinkGeneration.shoppingList") || "Shopping List"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -264,7 +277,9 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           </div>
           <Separator className="my-4" />
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-green-800">Total Estimated Cost:</span>
+            <span className="text-lg font-semibold text-green-800">
+              {t("aiDrinkGeneration.totalCost") || "Total Estimated Cost:"}
+            </span>
             <span className="text-lg font-bold text-green-600">
               ${shoppingList.reduce((total, item) => total + parseFloat(item.price.replace('$', '')), 0).toFixed(2)}
             </span>
@@ -275,7 +290,9 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       {/* Instructions */}
       <Card className="border-green-200">
         <CardHeader>
-          <CardTitle className="text-green-800">Instructions</CardTitle>
+          <CardTitle className="text-green-800">
+            {t("aiDrinkGeneration.instructions") || "Instructions"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ol className="space-y-3">
@@ -294,7 +311,9 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       {/* Health Benefits */}
       <Card className="border-green-200">
         <CardHeader>
-          <CardTitle className="text-green-800">Health Benefits</CardTitle>
+          <CardTitle className="text-green-800">
+            {t("aiDrinkGeneration.healthBenefits") || "Health Benefits"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -311,7 +330,9 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       {/* Pro Tips */}
       <Card className="border-green-200">
         <CardHeader>
-          <CardTitle className="text-green-800">Pro Tips</CardTitle>
+          <CardTitle className="text-green-800">
+            {t("aiDrinkGeneration.proTips") || "Pro Tips"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -332,7 +353,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           className="bg-green-600 hover:bg-green-700 text-white"
         >
           <Save className="h-4 w-4 mr-2" />
-          Save Recipe
+          {t("aiDrinkGeneration.saveRecipe") || "Save Recipe"}
         </Button>
         <Button 
           onClick={generateDrink}
@@ -340,7 +361,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           className="border-green-300 text-green-700 hover:bg-green-50"
         >
           <RefreshCw className="h-4 w-4 mr-2" />
-          Generate New Version
+          {t("aiDrinkGeneration.generateNew") || "Generate New Version"}
         </Button>
       </div>
     </div>

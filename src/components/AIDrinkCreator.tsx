@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AIDrinkCreatorStepper from "./AIDrinkCreatorStepper";
 import AIDrinkView from "./AIDrinkView";
 import DrinkDetailView from "./DrinkDetailView";
@@ -30,6 +31,7 @@ const AIDrinkCreator = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const { user, aiDrinks, addAIDrink } = useUser();
+  const { t } = useLanguage();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -141,9 +143,11 @@ const AIDrinkCreator = () => {
           <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mb-4">
             <Wine className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl text-green-800">Create Your Perfect Healthy Drink</CardTitle>
+          <CardTitle className="text-2xl text-green-800">
+            {t("aiDrinkCreator.title") || "Create Your Perfect Healthy Drink"}
+          </CardTitle>
           <CardDescription className="text-green-600">
-            Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences
+            {t("aiDrinkCreator.desc") || "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences"}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
@@ -151,7 +155,7 @@ const AIDrinkCreator = () => {
             onClick={handleStartCreation}
             className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 text-lg"
           >
-            Start Creating
+            {t("aiDrinkCreator.start") || "Start Creating"}
           </Button>
         </CardContent>
       </Card>
@@ -162,13 +166,15 @@ const AIDrinkCreator = () => {
           <CardContent className="py-8 text-center">
             <div className="flex items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin mr-2 text-green-600" />
-              <p className="text-green-600">Loading your drinks...</p>
+              <p className="text-green-600">{t("aiDrinkCreator.loading") || "Loading your drinks..."}</p>
             </div>
           </CardContent>
         </Card>
       ) : hasApiDrinks ? (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-center text-green-800">Your Created Drinks</h2>
+          <h2 className="text-2xl font-semibold text-center text-green-800">
+            {t("aiDrinkCreator.yourCreatedDrinks") || "Your Created Drinks"}
+          </h2>
           
           {/* Pagination Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
@@ -177,7 +183,7 @@ const AIDrinkCreator = () => {
               onPageSizeChange={handlePageSizeChange}
             />
             <div className="text-sm text-gray-600">
-              Showing page {currentPage} of {totalPages} ({apiDrinks.length} drinks)
+              {t("aiDrinkCreator.showingPage") || 'Showing page'} {currentPage} {t("aiDrinkCreator.of") || 'of'} {totalPages} {apiDrinks.length} {t("aiDrinkCreator.drinks") || 'drinks'}
             </div>
           </div>
 
@@ -190,7 +196,7 @@ const AIDrinkCreator = () => {
                     <CardTitle className="text-lg text-green-800">{drink.drink_name}</CardTitle>
                   </div>
                   <CardDescription className="text-green-600">
-                    {drink.drinkPlan.healthyDrink.drinkType} • {drink.drinkPlan.healthyDrink.cookingTime} min • {drink.drinkPlan.healthyDrink.calories} cal
+                    {drink.drinkPlan.healthyDrink.drinkType} • {drink.drinkPlan.healthyDrink.cookingTime} {t("aiDrinkCreator.min") || "min"} • {drink.drinkPlan.healthyDrink.calories} {t("aiDrinkCreator.cal") || "cal"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -215,7 +221,7 @@ const AIDrinkCreator = () => {
                         key={index}
                         className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"
                       >
-                        Vit {vitamin}
+                        {t("aiDrinkCreator.vitamin") || "Vit"} {vitamin}
                       </span>
                     ))}
                   </div>
@@ -226,7 +232,7 @@ const AIDrinkCreator = () => {
                     onClick={() => handleViewApiDrink(drink)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    View Recipe
+                    {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
                   </Button>
                 </CardContent>
               </Card>
@@ -291,7 +297,9 @@ const AIDrinkCreator = () => {
       {/* Local AI Drinks List (from context) */}
       {aiDrinks.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-center text-green-800">Your AI Created Drinks</h2>
+          <h2 className="text-2xl font-semibold text-center text-green-800">
+            {t("aiDrinkCreator.yourAIDrinks") || "Your AI Created Drinks"}
+          </h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {aiDrinks.map((drink, index) => (
               <Card key={index} className="border-green-200 hover:shadow-lg transition-shadow">
@@ -323,7 +331,7 @@ const AIDrinkCreator = () => {
                     onClick={() => handleViewDrink(drink)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    View Recipe
+                    {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
                   </Button>
                 </CardContent>
               </Card>
@@ -338,28 +346,28 @@ const AIDrinkCreator = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border-green-200">
               <CardHeader>
-                <CardTitle className="text-green-800">🥤 Smoothies</CardTitle>
+                <CardTitle className="text-green-800">🥤 {t("aiDrinkCreator.smoothies") || "Smoothies"}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-green-600">Nutrient-packed smoothies for energy and wellness</p>
+                <p className="text-green-600">{t("aiDrinkCreator.smoothiesDesc") || "Nutrient-packed smoothies for energy and wellness"}</p>
               </CardContent>
             </Card>
 
             <Card className="border-green-200">
               <CardHeader>
-                <CardTitle className="text-green-800">🧃 Fresh Juices</CardTitle>
+                <CardTitle className="text-green-800">🧃 {t("aiDrinkCreator.juices") || "Fresh Juices"}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-green-600">Vitamin-rich fresh juices for detox and health</p>
+                <p className="text-green-600">{t("aiDrinkCreator.juicesDesc") || "Vitamin-rich fresh juices for detox and health"}</p>
               </CardContent>
             </Card>
 
             <Card className="border-green-200">
               <CardHeader>
-                <CardTitle className="text-green-800">🍵 Wellness Teas</CardTitle>
+                <CardTitle className="text-green-800">🍵 {t("aiDrinkCreator.teas") || "Wellness Teas"}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-green-600">Herbal and wellness teas for relaxation and health</p>
+                <p className="text-green-600">{t("aiDrinkCreator.teasDesc") || "Herbal and wellness teas for relaxation and health"}</p>
               </CardContent>
             </Card>
           </div>

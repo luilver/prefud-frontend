@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIDrinkTypeProps {
   data: any;
@@ -11,42 +12,68 @@ interface AIDrinkTypeProps {
 }
 
 const AIDrinkType = ({ data, onUpdate, onNext }: AIDrinkTypeProps) => {
+  const { t } = useLanguage();
+
   const drinkTypes = [
     {
       id: 'smoothie',
-      title: '🥤 Smoothie',
-      description: 'Thick, creamy blended drinks with fruits and vegetables',
-      benefits: ['High in fiber', 'Filling', 'Easy to digest']
+      title: `🥤 ${t("aiDrinkType.smoothie.title") || "Smoothie"}`,
+      description: t("aiDrinkType.smoothie.desc") || "Thick, creamy blended drinks with fruits and vegetables",
+      benefits: [
+        t("aiDrinkType.smoothie.benefit1") || "High in fiber",
+        t("aiDrinkType.smoothie.benefit2") || "Filling",
+        t("aiDrinkType.smoothie.benefit3") || "Easy to digest"
+      ]
     },
     {
       id: 'juice',
-      title: '🧃 Fresh Juice',
-      description: 'Pure liquid extracted from fruits and vegetables',
-      benefits: ['Quick absorption', 'Vitamin-rich', 'Hydrating']
+      title: `🧃 ${t("aiDrinkType.juice.title") || "Fresh Juice"}`,
+      description: t("aiDrinkType.juice.desc") || "Pure liquid extracted from fruits and vegetables",
+      benefits: [
+        t("aiDrinkType.juice.benefit1") || "Quick absorption",
+        t("aiDrinkType.juice.benefit2") || "Vitamin-rich",
+        t("aiDrinkType.juice.benefit3") || "Hydrating"
+      ]
     },
     {
       id: 'tea',
-      title: '🍵 Wellness Tea',
-      description: 'Herbal and functional teas for health benefits',
-      benefits: ['Antioxidants', 'Calming', 'Digestive support']
+      title: `🍵 ${t("aiDrinkType.tea.title") || "Wellness Tea"}`,
+      description: t("aiDrinkType.tea.desc") || "Herbal and functional teas for health benefits",
+      benefits: [
+        t("aiDrinkType.tea.benefit1") || "Antioxidants",
+        t("aiDrinkType.tea.benefit2") || "Calming",
+        t("aiDrinkType.tea.benefit3") || "Digestive support"
+      ]
     },
     {
       id: 'protein',
-      title: '💪 Protein Shake',
-      description: 'High-protein drinks for fitness and recovery',
-      benefits: ['Muscle support', 'Post-workout', 'Sustained energy']
+      title: `💪 ${t("aiDrinkType.protein.title") || "Protein Shake"}`,
+      description: t("aiDrinkType.protein.desc") || "High-protein drinks for fitness and recovery",
+      benefits: [
+        t("aiDrinkType.protein.benefit1") || "Muscle support",
+        t("aiDrinkType.protein.benefit2") || "Post-workout",
+        t("aiDrinkType.protein.benefit3") || "Sustained energy"
+      ]
     },
     {
       id: 'detox',
-      title: '🌿 Detox Drink',
-      description: 'Cleansing drinks with natural detoxifying ingredients',
-      benefits: ['Liver support', 'Cleansing', 'Anti-inflammatory']
+      title: `🌿 ${t("aiDrinkType.detox.title") || "Detox Drink"}`,
+      description: t("aiDrinkType.detox.desc") || "Cleansing drinks with natural detoxifying ingredients",
+      benefits: [
+        t("aiDrinkType.detox.benefit1") || "Liver support",
+        t("aiDrinkType.detox.benefit2") || "Cleansing",
+        t("aiDrinkType.detox.benefit3") || "Anti-inflammatory"
+      ]
     },
     {
       id: 'energy',
-      title: '⚡ Energy Boost',
-      description: 'Natural energy drinks without artificial stimulants',
-      benefits: ['Natural caffeine', 'B-vitamins', 'Sustained energy']
+      title: `⚡ ${t("aiDrinkType.energy.title") || "Energy Boost"}`,
+      description: t("aiDrinkType.energy.desc") || "Natural energy drinks without artificial stimulants",
+      benefits: [
+        t("aiDrinkType.energy.benefit1") || "Natural caffeine",
+        t("aiDrinkType.energy.benefit2") || "B-vitamins",
+        t("aiDrinkType.energy.benefit3") || "Sustained energy"
+      ]
     }
   ];
 
@@ -58,8 +85,12 @@ const AIDrinkType = ({ data, onUpdate, onNext }: AIDrinkTypeProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-green-800 mb-2">Choose Your Drink Type</h2>
-        <p className="text-green-600">Select the type of healthy drink you'd like to create</p>
+        <h2 className="text-2xl font-bold text-green-800 mb-2">
+          {t("aiDrinkType.chooseTitle") || "Choose Your Drink Type"}
+        </h2>
+        <p className="text-green-600">
+          {t("aiDrinkType.chooseDesc") || "Select the type of healthy drink you'd like to create"}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
