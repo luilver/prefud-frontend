@@ -13,6 +13,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 
+
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
+
+
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
   onBack: () => void;
@@ -116,7 +120,7 @@ const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) =
 
       const config = {
         method: 'post',
-        url: `https://pantry-auth-1.onrender.com/user-profile/${userId}`,
+        url: `${API_BASE_URL}/user-profile/${userId}`,
         headers: { 
           'Content-Type': 'application/json'
         },
