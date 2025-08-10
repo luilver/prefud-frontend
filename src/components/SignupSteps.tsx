@@ -62,7 +62,7 @@ interface SignupData {
     allergies: string[];
   };
 }
-
+const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
 const SignupSteps = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [signupData, setSignupData] = useState<SignupData>({
@@ -76,6 +76,8 @@ const SignupSteps = () => {
   const { signup } = useUser();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
+  const [customerId, setCustomerId] = useState<string>("");
+   const [userId, setUserId] = useState<string>("");
 
   const subscriptionPlans = [
     {
@@ -149,7 +151,7 @@ const SignupSteps = () => {
 
       const config = {
         method: "post",
-        url: "https://pantry-auth-1.onrender.com/security/signup",
+        url: `${BasicURL}/security/signup`,
         headers: {
           "Content-Type": "application/json",
         },
@@ -220,6 +222,7 @@ const SignupSteps = () => {
 
   const handleProfileComplete = (profileData: any) => {
     console.log("Profile data saved:", profileData);
+
     setSignupData((prev) => ({ ...prev, profile: profileData }));
     setCurrentStep(4);
   };
@@ -503,6 +506,8 @@ const SignupSteps = () => {
           onComplete={handleProfileComplete}
           onBack={() => setCurrentStep(2)}
           userId={signupData.userId}
+          setCustomer={setCustomerId}
+          setUserId={setUserId}
         />
       )}
 
@@ -646,6 +651,8 @@ const SignupSteps = () => {
             userInfo={{
               email: signupData.email,
               phone: signupData.profile?.phone || "",
+              customerId:customerId,
+              userId: userId
             }}
             selectedPlan={
               subscriptionPlans.find(

@@ -21,9 +21,11 @@ interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
   onBack: () => void;
   userId?: string;
+  setCustomer: (customerId:string) => void;
+  setUserId: (userId:string) => void; 
 }
 
-const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) => {
+const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }: UserProfileFormProps) => {
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -129,6 +131,10 @@ const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) =
 
       const response = await axios.request(config);
       console.log('Profile API response:', response.data);
+
+      //setCustomerId
+      setCustomer(response.data.profile.ruku_client_id);
+      setUserId(response.data.profile.userId);
 
       if (response.data.responseCode === "01" && response.data.profile) {
         toast({

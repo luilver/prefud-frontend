@@ -1,9 +1,23 @@
 import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { CreditCard, Lock, ArrowLeft } from "lucide-react";
+import {
+  attachPaymentMethod,
+  createPaymentMethod,
+  createStripePrice,
+  createStripeProduct,
+  createStripeSubscription,
+  persistUserSubscription,
+} from "@/services/payments";
 
 interface SubscriptionPlan {
   id: string;
@@ -20,11 +34,18 @@ interface PaymentFormProps {
   userInfo: {
     email: string;
     phone: string;
+    customerId: string;
+    userId: string;
   };
   selectedPlan: SubscriptionPlan;
 }
 
-const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormProps) => {
+const PaymentForm = ({
+  onSuccess,
+  onBack,
+  userInfo,
+  selectedPlan,
+}: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -55,27 +76,83 @@ const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormP
       }
 
       console.log("Ruku token received:", token);
+      //0. create a payment method with the card token
 
-      //1. attach payment method to client
+      try {
+        const responsePaymentMethod = await createPaymentMethod(token.id);
+        console.log("response create payment method ", responsePaymentMethod);
 
-      //2. create a price
+        //1. attach payment method to client
+        try {
+          const responseAttach = await attachPaymentMethod(
+            responsePaymentMethod.id,
+            userInfo.customerId
+          );
+          console.log("responseAttach ", responseAttach);
+          if (responseAttach) {
+            console.log("response attach id ", responseAttach.id);
+            //2. create product
+            try {
+              const responseCreateProduct = await createStripeProduct(
+                selectedPlan.name,
+                selectedPlan.price.toString()
+              );
+              console.log("response product ", responseCreateProduct);
+              if (responseCreateProduct) {
+                // 3. create a price
+                const responseCreatePrice = await createStripePrice(
+                  responseCreateProduct.id,
+                  selectedPlan.price,
+                  "usd",
+                  "month"
+                );
+                console.log("create price response ", responseCreatePrice);
+                if (responseCreatePrice) {
+                  //4. subscribe
+                  const responseCreateSubscription =
+                    await createStripeSubscription(
+                      userInfo.customerId,
+                      responseCreatePrice.id
+                    );
+                  console.log(
+                    "response create subscription ",
+                    responseCreateSubscription
+                  );
 
-      //3. subscribe
+                  //5. Persist user subscription
+                  const responsePersistSubscription = await persistUserSubscription(userInfo.userId, selectedPlan.id);
 
-      // You can now send this token to your backend for further processing
-      const paymentData = {
-        tokenId: token.id,
-        billingCycle,
-        amount: billingCycle === "monthly" ? selectedPlan.price : selectedPlan.price * 12,
-        email: userInfo.email,
-        phone: userInfo.phone,
-        planId: selectedPlan.id,
-        planName: selectedPlan.name,
-      };
 
-      console.log("Payment data to send:", paymentData);
 
-      onSuccess(paymentData);
+                  // You can now send this token to your backend for further processing
+                  const paymentData = {
+                    tokenId: token.id,
+                    billingCycle,
+                    amount:
+                      billingCycle === "monthly"
+                        ? selectedPlan.price
+                        : selectedPlan.price * 12,
+                    email: userInfo.email,
+                    phone: userInfo.phone,
+                    planId: selectedPlan.id,
+                    planName: selectedPlan.name,
+                  };
+
+                  console.log("Payment data to send:", paymentData);
+
+                  onSuccess(paymentData);
+                }
+              }
+            } catch (error) {
+              console.log("error creating product ", error);
+            }
+          }
+        } catch (error) {
+          console.log("errror attaching payment ", error);
+        }
+      } catch (error) {
+        console.log("error creating payment method");
+      }
     } catch (err) {
       console.error("Payment error:", err);
     } finally {
@@ -85,7 +162,10 @@ const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormP
 
   const monthlyPrice = selectedPlan.price;
   const yearlyPrice = selectedPlan.price * 12 * 0.83;
-  const yearlyDiscount = ((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12) * 100).toFixed(0);
+  const yearlyDiscount = (
+    ((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12)) *
+    100
+  ).toFixed(0);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -94,8 +174,12 @@ const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormP
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Complete Your Subscription</h2>
-          <p className="text-gray-600">Secure payment processing for {selectedPlan.name}</p>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Complete Your Subscription
+          </h2>
+          <p className="text-gray-600">
+            Secure payment processing for {selectedPlan.name}
+          </p>
         </div>
       </div>
 
@@ -108,18 +192,28 @@ const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormP
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             <div
-              className={`p-4 border-2 rounded-lg cursor-pointer ${billingCycle === "monthly" ? "border-green-500 bg-green-50" : "border-gray-200"}`}
+              className={`p-4 border-2 rounded-lg cursor-pointer ${
+                billingCycle === "monthly"
+                  ? "border-green-500 bg-green-50"
+                  : "border-gray-200"
+              }`}
               onClick={() => setBillingCycle("monthly")}
             >
               <h4 className="font-semibold">Monthly</h4>
               <span className="text-2xl font-bold">${monthlyPrice}</span>
             </div>
             <div
-              className={`p-4 border-2 rounded-lg cursor-pointer ${billingCycle === "yearly" ? "border-green-500 bg-green-50" : "border-gray-200"}`}
+              className={`p-4 border-2 rounded-lg cursor-pointer ${
+                billingCycle === "yearly"
+                  ? "border-green-500 bg-green-50"
+                  : "border-gray-200"
+              }`}
               onClick={() => setBillingCycle("yearly")}
             >
               <h4 className="font-semibold">Yearly</h4>
-              <span className="text-2xl font-bold">${yearlyPrice.toFixed(2)}</span>
+              <span className="text-2xl font-bold">
+                ${yearlyPrice.toFixed(2)}
+              </span>
               <p className="text-sm text-green-600">Save {yearlyDiscount}%</p>
             </div>
           </div>
@@ -138,7 +232,9 @@ const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormP
           <form onSubmit={handleSubmit} className="space-y-4">
             <Label>Card Details</Label>
             <div className="p-3 border rounded-md bg-white">
-              <CardElement options={{ style: { base: { fontSize: "16px" } } }} />
+              <CardElement
+                options={{ style: { base: { fontSize: "16px" } } }}
+              />
             </div>
 
             <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -151,7 +247,13 @@ const PaymentForm = ({ onSuccess, onBack, userInfo, selectedPlan }: PaymentFormP
               className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
               disabled={isProcessing || !stripe}
             >
-              {isProcessing ? "Processing..." : `Subscribe for $${billingCycle === "monthly" ? monthlyPrice : yearlyPrice.toFixed(2)}`}
+              {isProcessing
+                ? "Processing..."
+                : `Subscribe for $${
+                    billingCycle === "monthly"
+                      ? monthlyPrice
+                      : yearlyPrice.toFixed(2)
+                  }`}
             </Button>
           </form>
         </CardContent>
