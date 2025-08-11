@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,26 +10,36 @@ import { User, ArrowLeft, Languages, ExternalLink } from "lucide-react";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import axios from "axios";
+
+
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
+
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
   onBack: () => void;
+  userId?: string;
+  setCustomer: (customerId:string) => void;
+  setUserId: (userId:string) => void; 
 }
 
-const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
+const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }: UserProfileFormProps) => {
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
     country: "",
     phone: "",
     weight: "",
-    heightFeet: "",
-    heightInches: "",
+    heightMeters: "",
     birthday: "",
     selectedLanguage: language,
     healthGoals: [] as string[],
+    dailyCalories: "",
     dietTypes: [] as string[],
     allergies: [] as string[],
     acceptedTerms: false
@@ -54,27 +65,123 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
     { value: 'pt', label: t('language.portuguese'), flag: '🇵🇹' }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.acceptedTerms) {
-      return; // Prevent submission if terms not accepted
+      toast({
+        title: "❌ Terms Required",
+        description: "Please accept the Terms and Conditions to continue.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
     }
-    
-    // Update global language when form is submitted
-    setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
-    
-    const selectedCountry = countries.find(c => c.code === formData.country);
-    const phoneWithPrefix = selectedCountry ? `${selectedCountry.prefix}${formData.phone}` : formData.phone;
-    
-    onComplete({
-      ...formData,
-      phone: phoneWithPrefix,
-      weight: parseFloat(formData.weight) || 0,
-      heightFeet: parseInt(formData.heightFeet) || 0,
-      heightInches: parseInt(formData.heightInches) || 0,
-      language: formData.selectedLanguage
-    });
+
+    if (!userId) {
+      toast({
+        title: "❌ Error",
+        description: "User ID is missing. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Update global language when form is submitted
+      setLanguage(formData.selectedLanguage as 'en' | 'es' | 'pt');
+      
+      const selectedCountry = countries.find(c => c.code === formData.country);
+      const phoneWithoutPrefix = formData.phone;
+      const phonePrefix = selectedCountry?.prefix || '';
+
+      // Prepare data for API
+      const profileData = {
+        name: formData.name,
+        lastName: formData.lastName,
+        weight: parseFloat(formData.weight) || 0,
+        height: parseFloat(formData.heightMeters) || 0,
+        birthday: formData.birthday,
+        healthGoals: {
+          dailyCaloriesGoal: parseInt(formData.dailyCalories) || 0,
+          goals: formData.healthGoals
+        },
+        dietTypes: formData.dietTypes,
+        alergies: formData.allergies, // Note: API uses 'alergies' (typo in API)
+        language: formData.selectedLanguage,
+        phone: phoneWithoutPrefix,
+        phonePrefix: phonePrefix,
+        country: selectedCountry?.name || formData.country,
+        addressId: ""
+      };
+
+      console.log('Sending profile data to API:', profileData);
+
+      const config = {
+        method: 'post',
+        url: `${API_BASE_URL}/user-profile/${userId}`,
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data: profileData
+      };
+
+      const response = await axios.request(config);
+      console.log('Profile API response:', response.data);
+
+      //setCustomerId
+      setCustomer(response.data.profile.ruku_client_id);
+      setUserId(response.data.profile.userId);
+
+      if (response.data.responseCode === "01" && response.data.profile) {
+        toast({
+          title: "✅ Profile Created Successfully!",
+          description: "Your profile has been saved.",
+          duration: 5000,
+        });
+
+        // Pass the complete profile data to the parent component
+        onComplete({
+          ...formData,
+          phone: phoneWithoutPrefix,
+          phonePrefix: phonePrefix,
+          weight: parseFloat(formData.weight) || 0,
+          heightMeters: parseFloat(formData.heightMeters) || 0,
+          dailyCalories: parseInt(formData.dailyCalories) || 0,
+          language: formData.selectedLanguage,
+          apiResponse: response.data.profile
+        });
+      } else {
+        throw new Error('Unexpected response format');
+      }
+    } catch (error: any) {
+      console.error('Profile creation failed:', error);
+      
+      if (error.response?.data?.message) {
+        const errorMessage = typeof error.response.data.message === 'string' 
+          ? error.response.data.message 
+          : error.response.data.message.message || 'Profile creation failed';
+        
+        toast({
+          title: "❌ Profile Creation Failed",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 5000,
+        });
+      } else {
+        toast({
+          title: "❌ Profile Creation Failed",
+          description: "Unable to save profile. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCheckboxChange = (category: 'healthGoals' | 'dietTypes' | 'allergies', value: string) => {
@@ -202,7 +309,7 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
           {/* Physical Information */}
           <div className="space-y-3 sm:space-y-4">
             <h3 className="text-base sm:text-lg font-semibold text-gray-800">Physical Information</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label htmlFor="weight" className="text-sm sm:text-base">Weight (lbs)</Label>
                 <Input
@@ -214,26 +321,16 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="heightFeet" className="text-sm sm:text-base">Height (feet)</Label>
+                <Label htmlFor="heightMeters" className="text-sm sm:text-base">Height (meters)</Label>
                 <Input
-                  id="heightFeet"
+                  id="heightMeters"
                   type="number"
+                  step="0.01"
                   min="0"
-                  max="8"
-                  value={formData.heightFeet}
-                  onChange={(e) => setFormData(prev => ({ ...prev, heightFeet: e.target.value }))}
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="heightInches" className="text-sm sm:text-base">Height (inches)</Label>
-                <Input
-                  id="heightInches"
-                  type="number"
-                  min="0"
-                  max="11"
-                  value={formData.heightInches}
-                  onChange={(e) => setFormData(prev => ({ ...prev, heightInches: e.target.value }))}
+                  max="3"
+                  placeholder="e.g., 1.75"
+                  value={formData.heightMeters}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heightMeters: e.target.value }))}
                   className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
                 />
               </div>
@@ -257,6 +354,24 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
                   </Label>
                 </div>
               ))}
+            </div>
+            
+            {/* Daily Calories Goal */}
+            <div className="mt-4">
+              <Label htmlFor="dailyCalories" className="text-sm sm:text-base">Daily Calories Goal</Label>
+              <Input
+                id="dailyCalories"
+                type="number"
+                min="800"
+                max="5000"
+                placeholder="e.g., 2000"
+                value={formData.dailyCalories}
+                onChange={(e) => setFormData(prev => ({ ...prev, dailyCalories: e.target.value }))}
+                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Recommended range: 1200-3000 calories per day
+              </p>
             </div>
           </div>
 
@@ -334,6 +449,7 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
               type="button"
               variant="outline"
               onClick={onBack}
+              disabled={isLoading}
               className="flex-1 border-green-500 text-green-600 hover:bg-green-50 h-10 sm:h-12 text-sm sm:text-base"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -341,10 +457,17 @@ const UserProfileForm = ({ onComplete, onBack }: UserProfileFormProps) => {
             </Button>
             <Button
               type="submit"
-              disabled={!formData.acceptedTerms}
+              disabled={!formData.acceptedTerms || isLoading}
               className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed h-10 sm:h-12 text-sm sm:text-base"
             >
-              {t('common.continue')}
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Creating Profile...</span>
+                </div>
+              ) : (
+                t('common.continue')
+              )}
             </Button>
           </div>
         </form>
