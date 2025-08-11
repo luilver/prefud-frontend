@@ -9,6 +9,7 @@ import { Plus, Package, Truck, Check, X } from "lucide-react";
 import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DrinkShoppingModalProps {
   drink: ApiDrink;
@@ -19,6 +20,7 @@ interface DrinkShoppingModalProps {
 const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps) => {
   const { addPantryItem } = useUser();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [showDeliveryOptions, setShowDeliveryOptions] = useState(false);
 
@@ -35,8 +37,8 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
   const addSelectedToPantry = () => {
     if (selectedIngredients.length === 0) {
       toast({
-        title: "No ingredients selected",
-        description: "Please select ingredients to add to pantry.",
+        title: t("drinkShoppingModal.noIngredientsTitle") || "No ingredients selected",
+        description: t("drinkShoppingModal.noIngredientsDesc") || "Please select ingredients to add to pantry.",
         variant: "destructive"
       });
       return;
@@ -58,8 +60,8 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
     });
 
     toast({
-      title: "Added to Pantry!",
-      description: `Added ${selectedIngredients.length} ingredients to your pantry.`,
+      title: t("drinkShoppingModal.addedToPantryTitle") || "Added to Pantry!",
+      description: `${t("drinkShoppingModal.added") || 'Added'} ${selectedIngredients.length} ${t("drinkShoppingModal.ingredientsToPantry") || 'ingredients to your pantry.'}`,
     });
 
     setSelectedIngredients([]);
@@ -68,8 +70,8 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
   const requestDelivery = () => {
     if (selectedIngredients.length === 0) {
       toast({
-        title: "No ingredients selected",
-        description: "Please select ingredients for delivery.",
+        title: t("drinkShoppingModal.noIngredientsTitle") || "No ingredients selected",
+        description: t("drinkShoppingModal.noDeliveryDesc") || "Please select ingredients for delivery.",
         variant: "destructive"
       });
       return;
@@ -80,8 +82,8 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
 
   const confirmDelivery = (deliveryTime: string) => {
     toast({
-      title: "Delivery Requested!",
-      description: `Your ingredients will be delivered ${deliveryTime}. You'll receive a confirmation email shortly.`,
+      title: t("drinkShoppingModal.deliveryRequestedTitle") || "Delivery Requested!",
+      description: `${t("drinkShoppingModal.yourIngreWill") || 'Your ingredients will be delivered'} ${deliveryTime}. ${t("drinkShoppingModal.youWillReceive") || 'You will receive a confirmation email shortly.'}`,
     });
     setShowDeliveryOptions(false);
     setSelectedIngredients([]);
@@ -92,28 +94,30 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-green-800">
-            Shopping List - {drink.drink_name}
+            {t("drinkShoppingModal.shoppingList") || "Shopping List"} - {drink.drink_name}
           </DialogTitle>
         </DialogHeader>
 
         {!showDeliveryOptions ? (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <p className="text-gray-600">Select ingredients to add to pantry or request delivery</p>
+              <p className="text-gray-600">
+                {t("drinkShoppingModal.selectIngredients") || "Select ingredients to add to pantry or request delivery"}
+              </p>
               <div className="flex space-x-2">
                 <Button
                   variant="outline"
                   onClick={() => setSelectedIngredients(ingredients.map(ing => ing.name))}
                   size="sm"
                 >
-                  Select All
+                  {t("drinkShoppingModal.selectAll") || "Select All"}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setSelectedIngredients([])}
                   size="sm"
                 >
-                  Clear All
+                  {t("drinkShoppingModal.clearAll") || "Clear All"}
                 </Button>
               </div>
             </div>
@@ -171,7 +175,7 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
                 className="flex-1 bg-green-600 hover:bg-green-700"
               >
                 <Package className="h-4 w-4 mr-2" />
-                Add to Pantry ({selectedIngredients.length})
+                {t("drinkShoppingModal.addToPantry") || 'Add to Pantry'} ({selectedIngredients.length})
               </Button>
               <Button
                 onClick={requestDelivery}
@@ -180,23 +184,27 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
                 className="flex-1"
               >
                 <Truck className="h-4 w-4 mr-2" />
-                Request Delivery ({selectedIngredients.length})
+                {t("drinkShoppingModal.requestDelivery") || 'Request Delivery'} ({selectedIngredients.length})
               </Button>
             </div>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Choose Delivery Time</h3>
-              <p className="text-gray-600">When would you like your ingredients delivered?</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {t("drinkShoppingModal.chooseDeliveryTime") || "Choose Delivery Time"}
+              </h3>
+              <p className="text-gray-600">
+                {t("drinkShoppingModal.whenDelivery") || "When would you like your ingredients delivered?"}
+              </p>
             </div>
 
             <div className="grid gap-3">
               {[
-                { label: "Same Day (2-4 hours)", time: "today", price: "$12.99" },
-                { label: "Next Day", time: "tomorrow", price: "$7.99" },
-                { label: "Within 2-3 Days", time: "in 2-3 days", price: "$4.99" },
-                { label: "Within a Week", time: "within a week", price: "FREE" }
+                { label: t("drinkShoppingModal.sameDay") || "Same Day (2-4 hours)", time: "today", price: "$12.99" },
+                { label: t("drinkShoppingModal.nextDay") || "Next Day", time: "tomorrow", price: "$7.99" },
+                { label: t("drinkShoppingModal.within2to3Days") || "Within 2-3 Days", time: "in 2-3 days", price: "$4.99" },
+                { label: t("drinkShoppingModal.withinAWeek") || "Within a Week", time: "within a week", price: "FREE" }
               ].map((option) => (
                 <Card 
                   key={option.time}
@@ -208,7 +216,7 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
                       <div>
                         <h4 className="font-medium">{option.label}</h4>
                         <p className="text-sm text-gray-500">
-                          {selectedIngredients.length} ingredients
+                          {selectedIngredients.length} {t("drinkShoppingModal.ingredients") || "ingredients"}
                         </p>
                       </div>
                       <div className="text-right">
@@ -227,7 +235,7 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
                 className="flex-1"
               >
                 <X className="h-4 w-4 mr-2" />
-                Back to Ingredients
+                {t("drinkShoppingModal.backToIngredients") || "Back to Ingredients"}
               </Button>
             </div>
           </div>

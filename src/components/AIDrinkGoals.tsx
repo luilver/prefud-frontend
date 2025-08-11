@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Users, Clock, DollarSign, ChefHat } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIDrinkGoalsProps {
   data: any;
@@ -19,6 +20,8 @@ interface AIDrinkGoalsProps {
 }
 
 const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
+  const { t } = useLanguage();
+
   const [drinkName, setDrinkName] = useState(data.drink_name || "");
   const [numberPeople, setNumberPeople] = useState(data.numberPeople || 1);
   const [maxCookingTime, setMaxCookingTime] = useState(data.maxCookingTime || 30);
@@ -29,65 +32,92 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
   const healthGoals = [
     {
       id: 'energy-boost',
-      title: 'Energy Boost',
-      description: 'Natural ingredients for sustained energy',
+      title: t("aiDrinkGoals.energyBoost.title") || 'Energy Boost',
+      description: t("aiDrinkGoals.energyBoost.desc") || 'Natural ingredients for sustained energy',
       icon: '⚡'
     },
     {
       id: 'weight-loss',
-      title: 'Weight Management',
-      description: 'Low-calorie, metabolism-boosting ingredients',
+      title: t("aiDrinkGoals.weightLoss.title") || 'Weight Management',
+      description: t("aiDrinkGoals.weightLoss.desc") || 'Low-calorie, metabolism-boosting ingredients',
       icon: '⚖️'
     },
     {
       id: 'immunity',
-      title: 'Immune Support',
-      description: 'Vitamin C, antioxidants, and immune-boosting nutrients',
+      title: t("aiDrinkGoals.immunity.title") || 'Immune Support',
+      description: t("aiDrinkGoals.immunity.desc") || 'Vitamin C, antioxidants, and immune-boosting nutrients',
       icon: '🛡️'
     },
     {
       id: 'digestive-health',
-      title: 'Digestive Health',
-      description: 'Fiber, probiotics, and gut-friendly ingredients',
+      title: t("aiDrinkGoals.digestiveHealth.title") || 'Digestive Health',
+      description: t("aiDrinkGoals.digestiveHealth.desc") || 'Fiber, probiotics, and gut-friendly ingredients',
       icon: '🌱'
     },
     {
       id: 'skin-health',
-      title: 'Skin Health',
-      description: 'Antioxidants and vitamins for glowing skin',
+      title: t("aiDrinkGoals.skinHealth.title") || 'Skin Health',
+      description: t("aiDrinkGoals.skinHealth.desc") || 'Antioxidants and vitamins for glowing skin',
       icon: '✨'
     },
     {
       id: 'detox',
-      title: 'Detoxification',
-      description: 'Cleansing ingredients to support natural detox',
+      title: t("aiDrinkGoals.detox.title") || 'Detoxification',
+      description: t("aiDrinkGoals.detox.desc") || 'Cleansing ingredients to support natural detox',
       icon: '🌿'
     }
   ];
 
   const dietaryRestrictions = [
-    { id: 'keto', label: 'Keto', color: 'bg-purple-500' },
-    { id: 'paleo', label: 'Paleo', color: 'bg-orange-500' },
-    { id: 'vegan', label: 'Vegan', color: 'bg-green-500' },
-    { id: 'vegetarian', label: 'Vegetarian', color: 'bg-green-400' },
-    { id: 'gluten-free', label: 'Gluten Free', color: 'bg-yellow-500' },
-    { id: 'dairy-free', label: 'Dairy Free', color: 'bg-blue-500' },
-    { id: 'low-carb', label: 'Low Carb', color: 'bg-red-500' },
-    { id: 'diabetic-friendly', label: 'Diabetic Friendly', color: 'bg-teal-500' }
+    { id: 'keto', label: t("aiDrinkGoals.diet.keto") || 'Keto', color: 'bg-purple-500' },
+    { id: 'paleo', label: t("aiDrinkGoals.diet.paleo") || 'Paleo', color: 'bg-orange-500' },
+    { id: 'vegan', label: t("aiDrinkGoals.diet.vegan") || 'Vegan', color: 'bg-green-500' },
+    { id: 'vegetarian', label: t("aiDrinkGoals.diet.vegetarian") || 'Vegetarian', color: 'bg-green-400' },
+    { id: 'gluten-free', label: t("aiDrinkGoals.diet.glutenFree") || 'Gluten Free', color: 'bg-yellow-500' },
+    { id: 'dairy-free', label: t("aiDrinkGoals.diet.dairyFree") || 'Dairy Free', color: 'bg-blue-500' },
+    { id: 'low-carb', label: t("aiDrinkGoals.diet.lowCarb") || 'Low Carb', color: 'bg-red-500' },
+    { id: 'diabetic-friendly', label: t("aiDrinkGoals.diet.diabeticFriendly") || 'Diabetic Friendly', color: 'bg-teal-500' }
   ];
 
   const cuisinePreferences = [
-    'ecuadorian', 'american', 'japanese', 'mexican', 'italian', 'indian', 
-    'thai', 'chinese', 'mediterranean', 'french', 'korean', 'brazilian'
-  ];
+    { id: "ecuadorian", label: t("aiDrinkGoals.cuisine.ecuadorian") || "Ecuadorian" },
+    { id: "american", label: t("aiDrinkGoals.cuisine.american") || "American" },
+    { id: "japanese", label: t("aiDrinkGoals.cuisine.japanese") || "Japanese" },
+    { id: "mexican", label: t("aiDrinkGoals.cuisine.mexican") || "Mexican" },
+    { id: "italian", label: t("aiDrinkGoals.cuisine.italian") || "Italian" },
+    { id: "indian", label: t("aiDrinkGoals.cuisine.indian") || "Indian" },
+    { id: "thai", label: t("aiDrinkGoals.cuisine.thai") || "Thai" },
+    { id: "chinese", label: t("aiDrinkGoals.cuisine.chinese") || "Chinese" },
+    { id: "mediterranean", label: t("aiDrinkGoals.cuisine.mediterranean") || "Mediterranean" },
+    { id: "french", label: t("aiDrinkGoals.cuisine.french") || "French" },
+    { id: "korean", label: t("aiDrinkGoals.cuisine.korean") || "Korean" },
+    { id: "brazilian", label: t("aiDrinkGoals.cuisine.brazilian") || "Brazilian" }
+    ];
 
   const allergiesOptions = [
-    'peanuts', 'tree nuts', 'dairy', 'eggs', 'soy', 'shellfish', 
-    'fish', 'wheat', 'sesame', 'sulfites'
+    { id: "peanuts", label: t("aiDrinkGoals.allergy.peanuts") || "Peanuts" },
+    { id: "tree-nuts", label: t("aiDrinkGoals.allergy.treeNuts") || "Tree Nuts" },
+    { id: "dairy", label: t("aiDrinkGoals.allergy.dairy") || "Dairy" },
+    { id: "eggs", label: t("aiDrinkGoals.allergy.eggs") || "Eggs" },
+    { id: "soy", label: t("aiDrinkGoals.allergy.soy") || "Soy" },
+    { id: "shellfish", label: t("aiDrinkGoals.allergy.shellfish") || "Shellfish" },
+    { id: "fish", label: t("aiDrinkGoals.allergy.fish") || "Fish" },
+    { id: "wheat", label: t("aiDrinkGoals.allergy.wheat") || "Wheat" },
+    { id: "sesame", label: t("aiDrinkGoals.allergy.sesame") || "Sesame" },
+    { id: "sulfites", label: t("aiDrinkGoals.allergy.sulfites") || "Sulfites" }
   ];
 
-  const cookingSkillLevels = ['beginner', 'intermediate', 'advanced', 'expert'];
-  const budgetRanges = ['low', 'medium', 'high'];
+  const cookingSkillLevels = [
+    { id: "beginner", label: t("aiDrinkGoals.cookingSkill.beginner") || "Beginner" },
+    { id: "intermediate", label: t("aiDrinkGoals.cookingSkill.intermediate") || "Intermediate" },
+    { id: "advanced", label: t("aiDrinkGoals.cookingSkill.advanced") || "Advanced" },
+    { id: "expert", label: t("aiDrinkGoals.cookingSkill.expert") || "Expert" }
+  ];
+  const budgetRanges = [
+    { id: "low", label: t("aiDrinkGoals.budget.low") || "Low" },
+    { id: "medium", label: t("aiDrinkGoals.budget.medium") || "Medium" },
+    { id: "high", label: t("aiDrinkGoals.budget.high") || "High" }
+  ];
   const cookingTimes = [15, 30, 45, 60];
 
   const toggleSelection = (key: string, value: string) => {
@@ -121,8 +151,12 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-green-800 mb-2">Customize Your Healthy Drink</h2>
-        <p className="text-green-600">Tell us about your preferences to create the perfect drink</p>
+        <h2 className="text-3xl font-bold text-green-800 mb-2">
+          {t("aiDrinkGoals.customizeTitle") || "Customize Your Healthy Drink"}
+        </h2>
+        <p className="text-green-600">
+          {t("aiDrinkGoals.customizeDesc") || "Tell us about your preferences to create the perfect drink"}
+        </p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -131,15 +165,17 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
           <CardHeader>
             <CardTitle className="text-green-800 flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Basic Information
+              {t("aiDrinkGoals.basicInfo") || "Basic Information"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="drinkName" className="text-green-700">Drink Name *</Label>
+              <Label htmlFor="drinkName" className="text-green-700">
+                {t("aiDrinkGoals.drinkName") || "Drink Name"} *
+              </Label>
               <Input
                 id="drinkName"
-                placeholder="e.g., Morning Energy Smoothie"
+                placeholder={t("aiDrinkGoals.drinkNamePlaceholder") || "e.g., Morning Energy Smoothie"}
                 value={drinkName}
                 onChange={(e) => setDrinkName(e.target.value)}
                 className="border-green-300 focus:border-green-500"
@@ -147,7 +183,9 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
             </div>
 
             <div>
-              <Label htmlFor="numberPeople" className="text-green-700">Number of People</Label>
+              <Label htmlFor="numberPeople" className="text-green-700">
+                {t("aiDrinkGoals.numberPeople") || "Number of People"}
+              </Label>
               <Input
                 id="numberPeople"
                 type="number"
@@ -162,7 +200,7 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
             <div>
               <Label className="text-green-700 flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                Max Preparation Time
+                {t("aiDrinkGoals.maxPrepTime") || "Max Preparation Time"}
               </Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {cookingTimes.map((time) => (
@@ -185,21 +223,21 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
             <div>
               <Label className="text-green-700 flex items-center gap-2">
                 <ChefHat className="h-4 w-4" />
-                Cooking Skill Level
+                {t("aiDrinkGoals.cookingSkillLevel") || "Cooking Skill Level"}
               </Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {cookingSkillLevels.map((level) => (
                   <Badge
-                    key={level}
-                    variant={cookingSkillLevel === level ? "default" : "outline"}
+                    key={level.id}
+                    variant={cookingSkillLevel === level.id ? "default" : "outline"}
                     className={`cursor-pointer ${
-                      cookingSkillLevel === level
+                      cookingSkillLevel === level.id
                         ? 'bg-green-500 text-white'
                         : 'border-green-300 text-green-700 hover:bg-green-50'
                     }`}
-                    onClick={() => setCookingSkillLevel(level)}
+                    onClick={() => setCookingSkillLevel(level.id)}
                   >
-                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                    {level.label.charAt(0).toUpperCase() + level.label.slice(1)}
                   </Badge>
                 ))}
               </div>
@@ -208,21 +246,21 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
             <div>
               <Label className="text-green-700 flex items-center gap-2">
                 <DollarSign className="h-4 w-4" />
-                Budget Range
+                {t("aiDrinkGoals.budgetRange") || "Budget Range"}
               </Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {budgetRanges.map((range) => (
                   <Badge
-                    key={range}
-                    variant={budgetRange === range ? "default" : "outline"}
+                    key={range.id}
+                    variant={budgetRange === range.id ? "default" : "outline"}
                     className={`cursor-pointer ${
-                      budgetRange === range
+                      budgetRange === range.id
                         ? 'bg-green-500 text-white'
                         : 'border-green-300 text-green-700 hover:bg-green-50'
                     }`}
-                    onClick={() => setBudgetRange(range)}
+                    onClick={() => setBudgetRange(range.id)}
                   >
-                    {range.charAt(0).toUpperCase() + range.slice(1)}
+                    {range.label.charAt(0).toUpperCase() + range.label.slice(1)}
                   </Badge>
                 ))}
               </div>
@@ -233,7 +271,9 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
         {/* Health Goals */}
         <Card className="border-green-200">
           <CardHeader>
-            <CardTitle className="text-green-800">Health Goals *</CardTitle>
+            <CardTitle className="text-green-800">
+              {t("aiDrinkGoals.healthGoals") || "Health Goals"} *
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-3">
@@ -269,7 +309,9 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
         {/* Dietary Restrictions */}
         <Card className="border-green-200">
           <CardHeader>
-            <CardTitle className="text-green-800">Dietary Restrictions</CardTitle>
+            <CardTitle className="text-green-800">
+              {t("aiDrinkGoals.dietaryRestrictions") || "Dietary Restrictions"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -294,22 +336,24 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
         {/* Cuisine Preferences */}
         <Card className="border-green-200">
           <CardHeader>
-            <CardTitle className="text-green-800">Cuisine Preferences</CardTitle>
+            <CardTitle className="text-green-800">
+              {t("aiDrinkGoals.cuisinePreferences") || "Cuisine Preferences"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {cuisinePreferences.map((cuisine) => (
                 <Badge
-                  key={cuisine}
-                  variant={(data.cuisinePreferences || []).includes(cuisine) ? "default" : "outline"}
+                  key={cuisine.id}
+                  variant={(data.cuisinePreferences || []).includes(cuisine.id) ? "default" : "outline"}
                   className={`cursor-pointer ${
-                    (data.cuisinePreferences || []).includes(cuisine)
+                    (data.cuisinePreferences || []).includes(cuisine.id)
                       ? 'bg-blue-500 text-white'
                       : 'border-blue-300 text-blue-700 hover:bg-blue-50'
                   }`}
-                  onClick={() => toggleSelection('cuisinePreferences', cuisine)}
+                  onClick={() => toggleSelection('cuisinePreferences', cuisine.id)}
                 >
-                  {cuisine.charAt(0).toUpperCase() + cuisine.slice(1)}
+                  {cuisine.label.charAt(0).toUpperCase() + cuisine.label.slice(1)}
                 </Badge>
               ))}
             </div>
@@ -319,22 +363,24 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
         {/* Allergies & Intolerances */}
         <Card className="border-green-200">
           <CardHeader>
-            <CardTitle className="text-green-800">Allergies & Intolerances</CardTitle>
+            <CardTitle className="text-green-800">
+              {t("aiDrinkGoals.allergies") || "Allergies & Intolerances"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {allergiesOptions.map((allergy) => (
                 <Badge
-                  key={allergy}
-                  variant={(data.allergiesIntolerance || []).includes(allergy) ? "default" : "outline"}
+                  key={allergy.id}
+                  variant={(data.allergiesIntolerance || []).includes(allergy.id) ? "default" : "outline"}
                   className={`cursor-pointer ${
-                    (data.allergiesIntolerance || []).includes(allergy)
+                    (data.allergiesIntolerance || []).includes(allergy.id)
                       ? 'bg-red-500 text-white'
                       : 'border-red-300 text-red-700 hover:bg-red-50'
                   }`}
-                  onClick={() => toggleSelection('allergiesIntolerance', allergy)}
+                  onClick={() => toggleSelection('allergiesIntolerance', allergy.id)}
                 >
-                  {allergy.charAt(0).toUpperCase() + allergy.slice(1)}
+                  {allergy.label.charAt(0).toUpperCase() + allergy.label.slice(1)}
                 </Badge>
               ))}
             </div>
@@ -344,14 +390,18 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
         {/* Dislikes */}
         <Card className="border-green-200">
           <CardHeader>
-            <CardTitle className="text-green-800">Food Dislikes</CardTitle>
+            <CardTitle className="text-green-800">
+              {t("aiDrinkGoals.foodDislikes") || "Food Dislikes"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div>
-              <Label htmlFor="dislikes" className="text-green-700">What foods would you like to avoid?</Label>
+              <Label htmlFor="dislikes" className="text-green-700">
+                {t("aiDrinkGoals.foodDislikesLabel") || "What foods would you like to avoid?"}
+              </Label>
               <Textarea
                 id="dislikes"
-                placeholder="e.g., cabbage, spicy foods, bitter ingredients..."
+                placeholder={t("aiDrinkGoals.foodDislikesPlaceholder") || "e.g., cabbage, spicy foods, bitter ingredients..."}
                 value={dislikes}
                 onChange={(e) => setDislikes(e.target.value)}
                 className="border-green-300 focus:border-green-500 mt-2"
@@ -368,11 +418,11 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
           disabled={!isValid}
           className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
         >
-          Next
+          {t("aiDrinkGoals.next") || "Next"}
         </Button>
         {!isValid && (
           <p className="text-red-500 text-sm mt-2">
-            Please select at least one health goal and provide a drink name
+            {t("aiDrinkGoals.validation") || "Please select at least one health goal and provide a drink name"}
           </p>
         )}
       </div>

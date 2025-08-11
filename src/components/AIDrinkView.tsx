@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Clock, Users, Droplets, Play, BookOpen, Heart, Share2, Check, Timer, Maximize, X, Trash2, Zap } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIDrinkViewProps {
   drink: any;
@@ -12,6 +13,7 @@ interface AIDrinkViewProps {
 }
 
 const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
+  const { t } = useLanguage();
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -65,16 +67,16 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
       <div className="max-w-4xl mx-auto space-y-6 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <Button variant="ghost" onClick={onBack} className="self-start">
-            ← Back to AI Drinks
+            ← {t("aiDrinkView.back") || "Back to AI Drinks"}
           </Button>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="flex-shrink-0">
               <Heart className="h-4 w-4 mr-1" />
-              Save
+              {t("aiDrinkView.save") || "Save"}
             </Button>
             <Button variant="outline" size="sm" className="flex-shrink-0">
               <Share2 className="h-4 w-4 mr-1" />
-              Share
+              {t("aiDrinkView.share") || "Share"}
             </Button>
             <Button 
               variant="outline" 
@@ -83,7 +85,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
               onClick={handleDelete}
             >
               <Trash2 className="h-4 w-4 mr-1" />
-              Delete
+              {t("aiDrinkView.delete") || "Delete"}
             </Button>
           </div>
         </div>
@@ -106,11 +108,11 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">1 serving</span>
+                    <span className="font-medium text-sm sm:text-base">{t("aiDrinkView.serving") || "1 serving"}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{drink.calories} cal</span>
+                    <span className="font-medium text-sm sm:text-base">{drink.calories} {t("aiDrinkView.cal") || "cal"}</span>
                   </div>
                 </div>
               </div>
@@ -126,8 +128,8 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="recipe">Recipe</TabsTrigger>
-                <TabsTrigger value="video">Video Tutorial</TabsTrigger>
+                <TabsTrigger value="recipe">{t("aiDrinkView.recipeTab") || "Recipe"}</TabsTrigger>
+                <TabsTrigger value="video">{t("aiDrinkView.videoTab") || "Video Tutorial"}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="recipe" className="space-y-6">
@@ -135,9 +137,9 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <BookOpen className="h-5 w-5 text-green-600" />
-                      <span>Ingredients</span>
+                      <span>{t("aiDrinkView.ingredients") || "Ingredients"}</span>
                     </CardTitle>
-                    <CardDescription>Everything you need for this drink</CardDescription>
+                    <CardDescription>{t("aiDrinkView.ingredientsDesc") || "Everything you need for this drink"}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
@@ -155,9 +157,9 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Droplets className="h-5 w-5 text-green-600" />
-                      <span>Instructions</span>
+                      <span>{t("aiDrinkView.instructions") || "Instructions"}</span>
                     </CardTitle>
-                    <CardDescription>Follow these steps for the perfect drink</CardDescription>
+                    <CardDescription>{t("aiDrinkView.instructionsDesc") || "Follow these steps for the perfect drink"}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -197,7 +199,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                                 <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
                                   <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-700">
                                     <Timer className="h-3 w-3 mr-1" />
-                                    ~{instruction.estimatedTime} min
+                                    ~{instruction.estimatedTime} {t("aiDrinkView.min") || "min"}
                                   </span>
                                   <span className="text-gray-600 italic">
                                     {instruction.tip}
@@ -224,7 +226,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Heart className="h-5 w-5 text-green-600" />
-                      <span>Health Benefits</span>
+                      <span>{t("aiDrinkView.healthBenefits") || "Health Benefits"}</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -244,7 +246,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
                         <Zap className="h-5 w-5 text-green-600" />
-                        <span>Pro Tips</span>
+                        <span>{t("aiDrinkView.proTips") || "Pro Tips"}</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -266,10 +268,10 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Play className="h-5 w-5 text-red-600" />
-                      <span>Video Tutorial</span>
+                      <span>{t("aiDrinkView.videoTutorial") || "Video Tutorial"}</span>
                     </CardTitle>
                     <CardDescription>
-                      Watch step-by-step preparation
+                      {t("aiDrinkView.videoDesc") || "Watch step-by-step preparation"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -282,7 +284,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                             className="bg-red-600 hover:bg-red-700 rounded-full"
                           >
                             <Play className="h-6 w-6 mr-2" />
-                            Play Video
+                            {t("aiDrinkView.playVideo") || "Play Video"}
                           </Button>
                           <Button
                             onClick={openFullscreenVideo}
@@ -290,7 +292,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                             className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                           >
                             <Maximize className="h-4 w-4 mr-2" />
-                            Fullscreen
+                            {t("aiDrinkView.fullscreen") || "Fullscreen"}
                           </Button>
                         </div>
                       ) : (
@@ -299,7 +301,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                             width="100%"
                             height="315"
                             src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            title="Drink Video Tutorial"
+                            title={t("aiDrinkView.videoTitle") || "Drink Video Tutorial"}
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
@@ -311,7 +313,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                               variant="ghost"
                               className="text-white hover:bg-white/20"
                             >
-                              Close Video
+                              {t("aiDrinkView.closeVideo") || "Close Video"}
                             </Button>
                             <Button
                               onClick={openFullscreenVideo}
@@ -319,7 +321,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                               className="text-white hover:bg-white/20"
                             >
                               <Maximize className="h-4 w-4 mr-2" />
-                              Fullscreen
+                              {t("aiDrinkView.fullscreen") || "Fullscreen"}
                             </Button>
                           </div>
                         </div>
@@ -334,30 +336,30 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Nutrition Info</CardTitle>
-                <CardDescription>Per serving</CardDescription>
+                <CardTitle className="text-lg">{t("aiDrinkView.nutritionInfo") || "Nutrition Info"}</CardTitle>
+                <CardDescription>{t("aiDrinkView.perServing") || "Per serving"}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">Calories</span>
+                    <span className="font-medium">{t("aiDrinkView.calories") || "Calories"}</span>
                     <span>{drink.calories}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Natural Sugars</span>
+                    <span>{t("aiDrinkView.naturalSugars") || "Natural Sugars"}</span>
                     <span>{Math.floor(drink.calories * 0.6 / 4)}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Vitamin C</span>
+                    <span>{t("aiDrinkView.vitaminC") || "Vitamin C"}</span>
                     <span>{Math.floor(Math.random() * 50) + 20}mg</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Fiber</span>
+                    <span>{t("aiDrinkView.fiber") || "Fiber"}</span>
                     <span>{Math.floor(Math.random() * 5) + 1}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Antioxidants</span>
-                    <span>High</span>
+                    <span>{t("aiDrinkView.antioxidants") || "Antioxidants"}</span>
+                    <span>{t("aiDrinkView.high") || "High"}</span>
                   </div>
                 </div>
               </CardContent>
@@ -365,7 +367,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Preparation Progress</CardTitle>
+                <CardTitle className="text-lg">{t("aiDrinkView.prepProgress") || "Preparation Progress"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center">
@@ -373,7 +375,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                     {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
                   </div>
                   <p className="text-sm text-gray-600">
-                    {completedSteps.length} of {enhancedInstructions.length} steps completed
+                    {completedSteps.length} {t("aiDrinkView.of") || 'of'} {enhancedInstructions.length} {t("aiDrinkView.stepsCompleted") || 'steps completed'}
                   </p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div
@@ -383,7 +385,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   </div>
                   {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
                     <div className="mt-3 p-2 bg-green-100 rounded-lg">
-                      <p className="text-sm text-green-700 font-medium">🎉 Enjoy your healthy drink!</p>
+                      <p className="text-sm text-green-700 font-medium">{t("aiDrinkView.enjoy") || "🎉 Enjoy your healthy drink!"}</p>
                     </div>
                   )}
                 </div>
@@ -406,7 +408,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
               width="100%"
               height="100%"
               src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-              title="Drink Video Tutorial - Fullscreen"
+              title={t("aiDrinkView.videoTitleFullscreen") || "Drink Video Tutorial - Fullscreen"}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

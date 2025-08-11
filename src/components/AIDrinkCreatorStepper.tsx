@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import AIDrinkType from "./AIDrinkType";
 import AIDrinkGoals from "./AIDrinkGoals";
 import AIDrinkGeneration from "./AIDrinkGeneration";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIDrinkCreatorStepperProps {
   onBack: () => void;
@@ -30,10 +31,12 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     preferences: {} as any
   });
 
+  const { t } = useLanguage();
+
   const steps = [
-    { number: 1, title: "Drink Type", component: AIDrinkType },
-    { number: 2, title: "Preferences & Goals", component: AIDrinkGoals },
-    { number: 3, title: "AI Generation", component: AIDrinkGeneration },
+    { number: 1, title: t("aiDrinkCreatorStepper.stepType") || "Drink Type", component: AIDrinkType },
+    { number: 2, title: t("aiDrinkCreatorStepper.stepGoals") || "Preferences & Goals", component: AIDrinkGoals },
+    { number: 3, title: t("aiDrinkCreatorStepper.stepGeneration") || "AI Generation", component: AIDrinkGeneration },
   ];
 
   const handleNext = () => {
@@ -69,11 +72,15 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
       <div className="flex items-center space-x-4">
         <Button variant="ghost" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to AI Drinks
+          {t("aiDrinkCreatorStepper.back") || "Back to AI Drinks"}
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-green-800">Create Healthy Drink</h1>
-          <p className="text-green-600">Step {currentStep} of {steps.length}: {steps[currentStep - 1].title}</p>
+          <h1 className="text-2xl font-bold text-green-800">
+            {t("aiDrinkCreatorStepper.title") || "Create Healthy Drink"}
+          </h1>
+          <p className="text-green-600">
+            {t("aiDrinkCreatorStepper.step") || 'Step'} {currentStep} {t("aiDrinkCreatorStepper.of") || 'of'} {steps.length}: {steps[currentStep - 1].title}
+          </p>
         </div>
       </div>
 
@@ -110,13 +117,13 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
             className="border-green-300 text-green-700 hover:bg-green-50"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Previous
+            {t("aiDrinkCreatorStepper.previous") || "Previous"}
           </Button>
           <Button 
             onClick={handleNext}
             className="bg-green-600 hover:bg-green-700 text-white"
           >
-            Next
+            {t("aiDrinkCreatorStepper.next") || "Next"}
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>

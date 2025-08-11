@@ -10,6 +10,7 @@ import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import DrinkShoppingModal from "./DrinkShoppingModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DrinkDetailViewProps {
   drink: ApiDrink;
@@ -17,6 +18,7 @@ interface DrinkDetailViewProps {
 }
 
 const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
+  const { t } = useLanguage();
   const { addShoppingItem } = useUser();
   const { toast } = useToast();
   const [showIngredients, setShowIngredients] = useState(false);
@@ -40,14 +42,15 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
       });
 
       toast({
-        title: "Shopping List Created!",
-        description: `Added ${drink.drinkPlan.ingredientsList.length} ingredients to your shopping list.`,
+        title: t("drinkDetailView.shoppingListCreated") || "Shopping List Created!",
+        description:
+          `${t("drinkDetailView.added") || 'Added'} ${drink.drinkPlan.ingredientsList.length} ${t("drinkDetailView.toShoppingList") || 'ingredients to your shopping list'}`,
       });
     } catch (error) {
       console.error('Error creating shopping list:', error);
       toast({
-        title: "Error",
-        description: "Failed to create shopping list. Please try again.",
+        title: t("drinkDetailView.error") || "Error",
+        description: t("drinkDetailView.shoppingListFailed") || "Failed to create shopping list. Please try again.",
         variant: "destructive"
       });
     }
@@ -98,7 +101,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mb-1 sm:mb-2" />
               <div className="text-center">
                 <p className="text-sm sm:text-lg font-bold">{healthyDrink.cookingTime}</p>
-                <p className="text-xs text-gray-600">min</p>
+                <p className="text-xs text-gray-600">{t("drinkDetailView.min") || "min"}</p>
               </div>
             </CardContent>
           </Card>
@@ -107,7 +110,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               <Users className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 mb-1 sm:mb-2" />
               <div className="text-center">
                 <p className="text-sm sm:text-lg font-bold">{drink.numberPeople}</p>
-                <p className="text-xs text-gray-600">Servings</p>
+                <p className="text-xs text-gray-600">{t("drinkDetailView.servings") || "Servings"}</p>
               </div>
             </CardContent>
           </Card>
@@ -116,7 +119,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               <Droplets className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 mb-1 sm:mb-2" />
               <div className="text-center">
                 <p className="text-sm sm:text-lg font-bold">{healthyDrink.calories}</p>
-                <p className="text-xs text-gray-600">Cal</p>
+                <p className="text-xs text-gray-600">{t("drinkDetailView.cal") || "Cal"}</p>
               </div>
             </CardContent>
           </Card>
@@ -125,7 +128,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 mb-1 sm:mb-2" />
               <div className="text-center">
                 <p className="text-sm sm:text-lg font-bold">{drink.drinkPlan.totalCarbonFootprint}</p>
-                <p className="text-xs text-gray-600">kg CO₂</p>
+                <p className="text-xs text-gray-600">{t("drinkDetailView.co2") || "kg CO₂"}</p>
               </div>
             </CardContent>
           </Card>
@@ -138,19 +141,19 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             {/* Description & Benefits Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-green-800">Description & Benefits</CardTitle>
+                <CardTitle className="text-green-800">{t("drinkDetailView.descBenefits") || "Description & Benefits"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-green-700 mb-2">Description</h4>
+                  <h4 className="font-medium text-green-700 mb-2">{t("drinkDetailView.description") || "Description"}</h4>
                   <p className="text-gray-700">{healthyDrink.description}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-green-700 mb-2">Health Benefits</h4>
+                  <h4 className="font-medium text-green-700 mb-2">{t("drinkDetailView.healthBenefits") || "Health Benefits"}</h4>
                   <p className="text-gray-700">{healthyDrink.benefits}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-green-700 mb-2">Instructions</h4>
+                  <h4 className="font-medium text-green-700 mb-2">{t("drinkDetailView.instructions") || "Instructions"}</h4>
                   <p className="text-gray-700">{healthyDrink.instructions}</p>
                 </div>
               </CardContent>
@@ -159,8 +162,8 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             {/* Recipe and Video Tabs */}
             <Tabs defaultValue="recipe" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="recipe">Recipe</TabsTrigger>
-                <TabsTrigger value="video">Video Tutorial</TabsTrigger>
+                <TabsTrigger value="recipe">{t("drinkDetailView.recipeTab") || "Recipe"}</TabsTrigger>
+                <TabsTrigger value="video">{t("drinkDetailView.videoTab") || "Video Tutorial"}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="recipe" className="space-y-6">
@@ -168,9 +171,9 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                 <Card>
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <CardTitle className="text-green-800">Preparation Steps</CardTitle>
+                      <CardTitle className="text-green-800">{t("drinkDetailView.prepSteps") || "Preparation Steps"}</CardTitle>
                       <span className="text-sm text-gray-500 self-center">
-                        {completedSteps.length}/{healthyDrink.steps.length} completed
+                        {completedSteps.length}/{healthyDrink.steps.length} {t("drinkDetailView.stepsCompleted") || 'completed'}
                       </span>
                     </div>
                   </CardHeader>
@@ -191,7 +194,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                           <p className={`text-sm sm:text-base text-gray-700 ${
                             completedSteps.includes(index) ? 'line-through text-gray-400' : ''
                           }`}>
-                            <span className="font-medium text-green-600 mr-2">Step {index + 1}:</span>
+                            <span className="font-medium text-green-600 mr-2">{t("drinkDetailView.step") || "Step"} {index + 1}:</span>
                             {step}
                           </p>
                         </div>
@@ -206,7 +209,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Play className="h-5 w-5 text-red-600" />
-                      <span>Video Tutorial</span>
+                      <span>{t("drinkDetailView.videoTutorial") || "Video Tutorial"}</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -219,7 +222,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                             className="bg-red-600 hover:bg-red-700 rounded-full"
                           >
                             <Play className="h-6 w-6 mr-2" />
-                            Play Video
+                            {t("drinkDetailView.playVideo") || "Play Video"}
                           </Button>
                           <Button
                             onClick={openFullscreenVideo}
@@ -227,7 +230,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                             className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                           >
                             <Maximize className="h-4 w-4 mr-2" />
-                            Fullscreen
+                            {t("drinkDetailView.fullscreen") || "Fullscreen"}
                           </Button>
                         </div>
                       ) : (
@@ -248,7 +251,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                               variant="ghost"
                               className="text-white hover:bg-white/20"
                             >
-                              Close Video
+                              {t("drinkDetailView.closeVideo") || "Close Video"}
                             </Button>
                             <Button
                               onClick={openFullscreenVideo}
@@ -275,19 +278,19 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               <CardHeader>
                 <CardTitle className="text-green-800 flex items-center space-x-2">
                   <Eye className="h-5 w-5" />
-                  <span>Drink Info</span>
+                  <span>{t("drinkDetailView.drinkInfo") || "Drink Info"}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-green-700 mb-2">Drink Type</p>
+                  <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.drinkType") || "Drink Type"}</p>
                   <Badge variant="secondary" className="capitalize">{healthyDrink.drinkType}</Badge>
                 </div>
                 <Separator />
                 <div className="space-y-2">
                   {drink.healthGoals && drink.healthGoals.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium text-green-700 mb-2">Health Goals</p>
+                      <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.healthGoals") || "Health Goals"}</p>
                       <div className="flex flex-wrap gap-1">
                         {drink.healthGoals.map((goal, index) => (
                           <Badge key={index} variant="outline" className="text-xs capitalize">
@@ -299,7 +302,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                   )}
                   {drink.dietaryRestrictions && drink.dietaryRestrictions.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium text-green-700 mb-2">Dietary</p>
+                      <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.dietary") || "Dietary"}</p>
                       <div className="flex flex-wrap gap-1">
                         {drink.dietaryRestrictions.map((restriction, index) => (
                           <Badge key={index} variant="outline" className="text-xs capitalize">
@@ -316,34 +319,34 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             {/* Nutritional Info */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-green-800">Nutritional Info</CardTitle>
+                <CardTitle className="text-green-800">{t("drinkDetailView.nutritionalInfo") || "Nutritional Info"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Protein</span>
+                    <span className="text-gray-600">{t("drinkDetailView.protein") || "Protein"}</span>
                     <span className="font-medium">{healthyDrink.nutritionalInfo.protein}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Fat</span>
+                    <span className="text-gray-600">{t("drinkDetailView.fat") || "Fat"}</span>
                     <span className="font-medium">{healthyDrink.nutritionalInfo.fat}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Carbs</span>
+                    <span className="text-gray-600">{t("drinkDetailView.carbs") || "Carbs"}</span>
                     <span className="font-medium">{healthyDrink.nutritionalInfo.carbohydrates}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Fiber</span>
+                    <span className="text-gray-600">{t("drinkDetailView.fiber") || "Fiber"}</span>
                     <span className="font-medium">{healthyDrink.nutritionalInfo.fiber}g</span>
                   </div>
                 </div>
                 <Separator />
                 <div>
-                  <p className="text-sm font-medium text-green-700 mb-2">Vitamins</p>
+                  <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.vitamins") || "Vitamins"}</p>
                   <div className="flex flex-wrap gap-1">
                     {healthyDrink.nutritionalInfo.vitamins.map((vitamin, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
-                        Vitamin {vitamin}
+                        {t("drinkDetailView.vitamin") || "Vitamin"} {vitamin}
                       </Badge>
                     ))}
                   </div>
@@ -355,13 +358,13 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-green-800 flex items-center justify-between">
-                  <span>Ingredients</span>
+                  <span>{t("drinkDetailView.ingredients") || "Ingredients"}</span>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => setShowIngredients(!showIngredients)}
                   >
-                    {showIngredients ? 'Hide' : 'Show'} ({healthyDrink.ingredients.length})
+                    {showIngredients ? t("drinkDetailView.hide") || "Hide" : t("drinkDetailView.show") || "Show"} ({healthyDrink.ingredients.length})
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -388,14 +391,14 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                 className="w-full bg-green-600 hover:bg-green-700 text-white"
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
-                Create Shopping List
+                {t("drinkDetailView.createShoppingList") || "Create Shopping List"}
               </Button>
               <Button 
                 onClick={handleCreateShoppingList}
                 variant="outline"
                 className="w-full"
               >
-                Add to Quick Shopping
+                {t("drinkDetailView.addToQuickShopping") || "Add to Quick Shopping"}
               </Button>
             </div>
           </div>
@@ -410,7 +413,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                   <Droplets className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-blue-800 mb-1">Pro Tip</h4>
+                  <h4 className="font-medium text-blue-800 mb-1">{t("drinkDetailView.proTip") || "Pro Tip"}</h4>
                   <p className="text-sm sm:text-base text-blue-700">{healthyDrink.prepTip}</p>
                 </div>
               </div>
@@ -439,7 +442,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               width="100%"
               height="100%"
               src={`https://www.youtube.com/embed/results?search_query=${encodeURIComponent(drink.drink_name + ' recipe')}&autoplay=1`}
-              title="Drink Video Tutorial - Fullscreen"
+              title={t("drinkDetailView.videoTitleFullscreen") || "Drink Video Tutorial - Fullscreen"}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
