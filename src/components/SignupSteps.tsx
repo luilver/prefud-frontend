@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,6 +39,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import PaymentForm from "./PaymentForm";
 import WelcomeModal from "./WelcomeModal";
 import axios from "axios";
+import { getAllSubscriptionTypes } from "@/services/payments";
+import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
 
@@ -62,7 +64,8 @@ interface SignupData {
     allergies: string[];
   };
 }
-const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
+const BasicURL =
+  import.meta.env.VITE_BASE_URL || "https://pantry-auth-1.onrender.com";
 const SignupSteps = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [signupData, setSignupData] = useState<SignupData>({
@@ -77,65 +80,82 @@ const SignupSteps = () => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const [customerId, setCustomerId] = useState<string>("");
-   const [userId, setUserId] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
+  const [subscriptionTypes, setSubscriptionTypes] = useState<Plan[]>([]);
 
-  const subscriptionPlans = [
-    {
-      id: "free",
-      name: "Free",
-      price: 0,
-      interval: "month",
-      description: "Perfect for getting started with meal planning",
-      features: [
-        "1 Meal Plan per month",
-        "Basic Recipe Collection",
-        "Shopping List Generator",
-        "Pantry Management",
-        "Email Support",
-      ],
-      popular: false,
-      gradient: "from-muted to-muted-foreground",
-    },
-    {
-      id: "family",
-      name: "Family",
-      price: 40,
-      interval: "month",
-      description: "Ideal for families looking to optimize meal planning",
-      features: [
-        "5 Meal Plans per month",
-        "10 Meal Creations with pantry ingredients",
-        "AI Meal Recommendations",
-        "Advanced Recipe Collection",
-        "3 Free Delivery Commissions",
-        "Nutritional Analysis",
-        "Priority Support",
-      ],
-      popular: true,
-      gradient: "from-primary to-accent",
-    },
-    {
-      id: "professional",
-      name: "Professional",
-      price: 120,
-      interval: "month",
-      description: "For meal planning professionals and large households",
-      features: [
-        "12 Meal Plans per month",
-        "Unlimited Meal Creations",
-        "10 Free Delivery Commissions",
-        "3 Free Home Deliveries",
-        "Advanced AI Recommendations",
-        "Custom Dietary Plans",
-        "Bulk Shopping Lists",
-        "Professional Analytics",
-        "Phone Support",
-        "Priority Processing",
-      ],
-      popular: false,
-      gradient: "from-secondary to-muted",
-    },
-  ];
+  // const subscriptionTypes = [
+  //   {
+  //     id: "free",
+  //     name: "Free",
+  //     price: 0,
+  //     interval: "month",
+  //     description: "Perfect for getting started with meal planning",
+  //     features: [
+  //       "1 Meal Plan per month",
+  //       "Basic Recipe Collection",
+  //       "Shopping List Generator",
+  //       "Pantry Management",
+  //       "Email Support",
+  //     ],
+  //     popular: false,
+  //     gradient: "from-muted to-muted-foreground",
+  //   },
+  //   {
+  //     id: "family",
+  //     name: "Family",
+  //     price: 40,
+  //     interval: "month",
+  //     description: "Ideal for families looking to optimize meal planning",
+  //     features: [
+  //       "5 Meal Plans per month",
+  //       "10 Meal Creations with pantry ingredients",
+  //       "AI Meal Recommendations",
+  //       "Advanced Recipe Collection",
+  //       "3 Free Delivery Commissions",
+  //       "Nutritional Analysis",
+  //       "Priority Support",
+  //     ],
+  //     popular: true,
+  //     gradient: "from-primary to-accent",
+  //   },
+  //   {
+  //     id: "professional",
+  //     name: "Professional",
+  //     price: 120,
+  //     interval: "month",
+  //     description: "For meal planning professionals and large households",
+  //     features: [
+  //       "12 Meal Plans per month",
+  //       "Unlimited Meal Creations",
+  //       "10 Free Delivery Commissions",
+  //       "3 Free Home Deliveries",
+  //       "Advanced AI Recommendations",
+  //       "Custom Dietary Plans",
+  //       "Bulk Shopping Lists",
+  //       "Professional Analytics",
+  //       "Phone Support",
+  //       "Priority Processing",
+  //     ],
+  //     popular: false,
+  //     gradient: "from-secondary to-muted",
+  //   },
+  // ];
+
+  useEffect(() => {
+    const fetchSubscriptionTypes = async () => {
+      try {
+        const responseSubscriptionTypes = await getAllSubscriptionTypes();
+        console.log("this a response ", responseSubscriptionTypes);
+        //setSubscriptionTypes(responseSubscriptionTypes);
+        console.log('plan formatted', mapApiToPlan(responseSubscriptionTypes));
+        setSubscriptionTypes(mapApiToPlan(responseSubscriptionTypes));
+      } catch (err: any) {
+        console.log("error getting subscription types");
+      }
+    };
+
+    fetchSubscriptionTypes();
+  }, []);
 
   const handleBasicInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,14 +249,16 @@ const SignupSteps = () => {
 
   const handleSubscriptionChoice = (planId: string) => {
     console.log("Mock: Subscription choice:", planId);
-    const selectedPlan = subscriptionPlans.find((plan) => plan.id === planId);
+    const selectedPlan = subscriptionTypes.find((plan) => plan.id === planId);
     setSignupData((prev) => ({
       ...prev,
-      wantsSubscription: planId !== "free",
+      wantsSubscription: selectedPlan.name !== "Free",
       selectedPlan: planId,
     }));
 
-    if (planId === "free") {
+    if (planId === "Free") {
+      //here subscribe to free plan
+      //integrate the same endpoint to do it
       completeSignup();
     } else {
       setCurrentStep(5);
@@ -520,7 +542,7 @@ const SignupSteps = () => {
               </div>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-              Choose Your Plan
+              Choose your plan
             </h2>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto">
               Select the perfect plan to start your personalized meal planning
@@ -535,7 +557,7 @@ const SignupSteps = () => {
                 : "grid-cols-1 lg:grid-cols-3 gap-6"
             } px-1 sm:px-0`}
           >
-            {subscriptionPlans.map((plan, index) => (
+            {subscriptionTypes.map((plan, index) => (
               <div key={plan.id} className="relative group">
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${plan.gradient} opacity-0 group-hover:opacity-10 rounded-2xl blur-xl transition-all duration-500`}
@@ -584,7 +606,7 @@ const SignupSteps = () => {
                         <span
                           className={`bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}
                         >
-                          ${plan.price}
+                          ${plan.price/100}
                         </span>
                       )}
                       {plan.price > 0 && (
@@ -651,13 +673,13 @@ const SignupSteps = () => {
             userInfo={{
               email: signupData.email,
               phone: signupData.profile?.phone || "",
-              customerId:customerId,
-              userId: userId
+              customerId: customerId,
+              userId: userId,
             }}
             selectedPlan={
-              subscriptionPlans.find(
+              subscriptionTypes.find(
                 (plan) => plan.id === signupData.selectedPlan
-              ) || subscriptionPlans[1]
+              ) || subscriptionTypes[1]
             }
           />
         </Elements>

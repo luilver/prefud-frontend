@@ -332,6 +332,90 @@ export async function createStripeSubscription(
   return data;
 }
 
+//get all of the subscriptions
+
+export interface ApiSubscriptionType {
+  _id: string;
+  name: string;
+  price: number;
+  mealPlans: number;
+  healthyDrinks: number;
+  specialMeals: number;
+  generatedMeals: number;
+  updatedAt?: string;
+  description:string;
+}
+
+export async function getAllSubscriptionTypes(): Promise<ApiSubscriptionType[]> {
+  const config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: `${BASE_URL}/subscriptionType/all`,
+    headers: {},
+  };
+
+  try {
+    const response = await axios.request<ApiSubscriptionType[]>(config);
+    console.log('Subscription types:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching subscription types:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+//set default payment method
+
+interface SetDefaultPaymentMethodResponse {
+  id: string;
+  object: string;
+  email: string | null;
+  name: string | null;
+  invoice_settings: {
+    default_payment_method: string | null;
+  };
+  // Puedes agregar más campos según la respuesta esperada
+}
+
+
+
+
+export async function setDefaultPaymentMethod(
+  paymentMethodId: string,
+  customerId: string
+): Promise<SetDefaultPaymentMethodResponse | null> {
+  const data = JSON.stringify({
+    paymentMethodId,
+    customerId,
+  });
+
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${API_PAYMENTS}/stripe/customer/set-default-payment-method`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data,
+  };
+
+  try {
+    const response = await axios.request<SetDefaultPaymentMethodResponse>(config);
+    console.log("Customer updated:", response.data);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error("Error response:", error.response.data);
+    } else {
+      console.error("Error:", error.message);
+    }
+    return null;
+  }
+}
+
+
+
+
 //persist subscription in Pantry DB
 
 interface SubscriptionResponse {

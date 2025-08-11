@@ -17,6 +17,7 @@ import {
   createStripeProduct,
   createStripeSubscription,
   persistUserSubscription,
+  setDefaultPaymentMethod,
 } from "@/services/payments";
 
 interface SubscriptionPlan {
@@ -91,6 +92,17 @@ const PaymentForm = ({
           console.log("responseAttach ", responseAttach);
           if (responseAttach) {
             console.log("response attach id ", responseAttach.id);
+            // 1.5. set default payment method
+            const responseDefaultPaymentMethod = await setDefaultPaymentMethod(
+              responsePaymentMethod.id,
+              userInfo.customerId
+            );
+
+            console.log(
+              "set default payment method ",
+              responseDefaultPaymentMethod
+            );
+
             //2. create product
             try {
               const responseCreateProduct = await createStripeProduct(
@@ -120,9 +132,11 @@ const PaymentForm = ({
                   );
 
                   //5. Persist user subscription
-                  const responsePersistSubscription = await persistUserSubscription(userInfo.userId, selectedPlan.id);
-
-
+                  const responsePersistSubscription =
+                    await persistUserSubscription(
+                      userInfo.userId,
+                      selectedPlan.id
+                    );
 
                   // You can now send this token to your backend for further processing
                   const paymentData = {
@@ -186,7 +200,7 @@ const PaymentForm = ({
       {/* Billing Cycle Selection */}
       <Card>
         <CardHeader>
-          <CardTitle>Choose Your Billing Cycle</CardTitle>
+          <CardTitle>Choose your billing cycle</CardTitle>
           <CardDescription>Select how you'd like to be billed</CardDescription>
         </CardHeader>
         <CardContent>
@@ -200,7 +214,7 @@ const PaymentForm = ({
               onClick={() => setBillingCycle("monthly")}
             >
               <h4 className="font-semibold">Monthly</h4>
-              <span className="text-2xl font-bold">${monthlyPrice}</span>
+              <span className="text-2xl font-bold">${monthlyPrice / 100}</span>
             </div>
             <div
               className={`p-4 border-2 rounded-lg cursor-pointer ${
@@ -212,7 +226,7 @@ const PaymentForm = ({
             >
               <h4 className="font-semibold">Yearly</h4>
               <span className="text-2xl font-bold">
-                ${yearlyPrice.toFixed(2)}
+                ${yearlyPrice.toFixed(2) / 100}
               </span>
               <p className="text-sm text-green-600">Save {yearlyDiscount}%</p>
             </div>
@@ -251,8 +265,8 @@ const PaymentForm = ({
                 ? "Processing..."
                 : `Subscribe for $${
                     billingCycle === "monthly"
-                      ? monthlyPrice
-                      : yearlyPrice.toFixed(2)
+                      ? monthlyPrice/100
+                      : yearlyPrice.toFixed(2)/100
                   }`}
             </Button>
           </form>
