@@ -13,13 +13,19 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 
+
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
+
+
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
   onBack: () => void;
   userId?: string;
+  setCustomer: (customerId:string) => void;
+  setUserId: (userId:string) => void; 
 }
 
-const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) => {
+const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }: UserProfileFormProps) => {
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -116,7 +122,7 @@ const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) =
 
       const config = {
         method: 'post',
-        url: `https://pantry-auth-1.onrender.com/user-profile/${userId}`,
+        url: `${API_BASE_URL}/user-profile/${userId}`,
         headers: { 
           'Content-Type': 'application/json'
         },
@@ -125,6 +131,10 @@ const UserProfileForm = ({ onComplete, onBack, userId }: UserProfileFormProps) =
 
       const response = await axios.request(config);
       console.log('Profile API response:', response.data);
+
+      //setCustomerId
+      setCustomer(response.data.profile.ruku_client_id);
+      setUserId(response.data.profile.userId);
 
       if (response.data.responseCode === "01" && response.data.profile) {
         toast({

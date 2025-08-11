@@ -13,6 +13,8 @@ interface OTPVerificationProps {
   onVerified: () => void;
   onBack: () => void;
 }
+const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
+
 
 const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationProps) => {
   const [otp, setOtp] = useState("");
@@ -33,7 +35,7 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
 
       const config = {
         method: 'post',
-        url: 'https://pantry-auth-1.onrender.com/security/verify-otp',
+        url: `${BasicURL}/security/verify-otp`,
         headers: { 
           'Content-Type': 'application/json'
         },
