@@ -123,20 +123,19 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         selectedIngredients.includes(ingredient.name)
       );
 
-      ingredientsToAdd.forEach((ingredient) => {
-        const newPantryItem = {
-          id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          name: ingredient.name,
-          quantity: ingredient.quantity,
-          unit: ingredient.unit,
-          category: ingredient.classification || 'ingredient',
-          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          addedDate: new Date().toISOString(),
-          lowStockThreshold: 1,
-          notes: `Added from AI meal: ${meal.name}`
-        };
-        setPantryItems(prev => [...prev, newPantryItem]);
-      });
+      const newPantryItems = ingredientsToAdd.map((ingredient) => ({
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || 'ingredient',
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        purchaseDate: new Date(),
+        location: '',
+        notes: `Added from AI meal: ${meal.name}`
+      }));
+
+      setPantryItems([...pantryItems, ...newPantryItems]);
 
       toast.success(`Added ${ingredientsToAdd.length} ingredients to pantry!`);
       setSelectedIngredients([]);
