@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,9 +63,9 @@ const IngredientTracker = () => {
         });
         
         console.log('Transformed pantry items:', transformedPantryItems);
-        // Update pantry items in context
+        // Update pantry items in context with original response
         if (setPantryItems) {
-          setPantryItems(transformedPantryItems);
+          setPantryItems(transformedPantryItems, response);
         }
         
         toast({

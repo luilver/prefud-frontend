@@ -185,7 +185,10 @@ interface UserContextType {
   addAIDrink: (drink: AIDrink) => void;
   deleteAIMeal: (id: string) => void;
   deleteAIDrink: (id: string) => void;
-  setPantryItems: (items: PantryItem[]) => void;
+  setPantryItems: (items: PantryItem[], originalResponse?: any) => void;
+  convertPantryItemsToApiFormat: (items: PantryItem[]) => any[];
+  updatePantryInAPI: (updatedItems: PantryItem[]) => Promise<void>;
+  originalPantryResponse: any;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -282,6 +285,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       window.removeEventListener('pantry-sync', handlePantrySync as EventListener);
     };
+  }, []);
+
+  // Enhanced setPantryItems function that also stores original response
+  const setPantryItemsWithOriginal = useCallback((items: PantryItem[], originalResponse?: any) => {
+    setPantryItems(items);
+    if (originalResponse) {
+      setOriginalPantryResponse(originalResponse);
+    }
   }, []);
 
   // Sync with AuthContext user - removed automatic meal plans fetching
@@ -1023,7 +1034,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     addAIDrink,
     deleteAIMeal,
     deleteAIDrink,
-    setPantryItems,
+    setPantryItems: setPantryItemsWithOriginal,
     // Expose methods for pantry API operations
     convertPantryItemsToApiFormat,
     updatePantryInAPI,
