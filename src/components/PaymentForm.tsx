@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -226,7 +227,7 @@ const PaymentForm = ({
             >
               <h4 className="font-semibold">Yearly</h4>
               <span className="text-2xl font-bold">
-                ${yearlyPrice.toFixed(2) / 100}
+                ${(yearlyPrice / 100).toFixed(2)}
               </span>
               <p className="text-sm text-green-600">Save {yearlyDiscount}%</p>
             </div>
@@ -265,8 +266,8 @@ const PaymentForm = ({
                 ? "Processing..."
                 : `Subscribe for $${
                     billingCycle === "monthly"
-                      ? monthlyPrice/100
-                      : yearlyPrice.toFixed(2)/100
+                      ? (monthlyPrice / 100).toFixed(2)
+                      : (yearlyPrice / 100).toFixed(2)
                   }`}
             </Button>
           </form>

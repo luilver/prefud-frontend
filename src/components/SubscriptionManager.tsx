@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Crown, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import PaymentForm from "./PaymentForm";
 
 interface SubscriptionPlan {
@@ -89,6 +90,7 @@ const SubscriptionManager = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSelectPlan = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
@@ -115,8 +117,10 @@ const SubscriptionManager = () => {
         onSuccess={handlePaymentSuccess}
         onBack={handlePaymentBack}
         userInfo={{
-          email: "user@example.com", // This would come from user context
-          phone: "+1234567890"
+          email: user?.email || "user@example.com",
+          phone: user?.profile?.phone || "+1234567890",
+          customerId: user?.profile?.ruku_client_id || "",
+          userId: user?.userId || ""
         }}
         selectedPlan={selectedPlan}
       />

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Plus, CreditCard, ArrowLeft, Check, Crown } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import PaymentForm from "./PaymentForm";
 
@@ -75,6 +77,7 @@ interface SubscriptionPurchaseProps {
 
 const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
   const { paymentMethods, getPaymentMethods, createCheckoutWithPaymentMethod, acceptSubscription } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(plans[0]); // Default to family
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
@@ -149,8 +152,10 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
         onSuccess={handleAddPaymentMethodSuccess}
         onBack={() => setShowAddPaymentMethod(false)}
         userInfo={{
-          email: "user@example.com",
-          phone: "+1234567890"
+          email: user?.email || "user@example.com",
+          phone: user?.profile?.phone || "+1234567890",
+          customerId: user?.profile?.ruku_client_id || "",
+          userId: user?.userId || ""
         }}
         selectedPlan={selectedPlan}
       />
