@@ -529,23 +529,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               )}
             </Card>
 
-            {/* Action Buttons - Made responsive */}
-            <div className="space-y-3">
-              <Button 
-                onClick={openShoppingModal}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                {t("drinkDetailView.createShoppingList") || "Create Shopping List"}
-              </Button>
-              <Button 
-                onClick={handleCreateShoppingList}
-                variant="outline"
-                className="w-full"
-              >
-                {t("drinkDetailView.addToQuickShopping") || "Add to Quick Shopping"}
-              </Button>
-            </div>
+            
           </div>
         </div>
 
