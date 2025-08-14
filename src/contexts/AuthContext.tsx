@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
 
@@ -119,7 +120,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // Trigger pantry sync event for UserContext
             if (parsedUser.pantry) {
               window.dispatchEvent(new CustomEvent('pantry-sync', { 
-                detail: { pantry: parsedUser.pantry } 
+                detail: { 
+                  pantry: parsedUser.pantry,
+                  originalPantryResponse: parsedUser.originalPantryResponse
+                } 
               }));
             }
 

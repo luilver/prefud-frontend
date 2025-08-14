@@ -97,7 +97,10 @@ interface SubscriptionInfo {
 
 interface CompleteLoginResponse extends LoginResponse {
   profile: UserProfile;
-  pantry: PantryItem[];
+  pantry: {
+    originalResponse: PantryApiResponse;
+    transformedItems: PantryItem[];
+  };
   subscription: SubscriptionInfo | null;
 }
 
