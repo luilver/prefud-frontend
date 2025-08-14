@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this import
-import { useAuth } from "@/contexts/AuthContext";
+import { updatePantry } from "@/services/pantryService";
 
 interface MealPlanViewProps {
   plan: any;
@@ -26,7 +26,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const { t } = useLanguage(); // <-- Add this line
-const { pantryItems } = useUser();
+const { pantryItems, user } = useUser();
   // Meal type order for sorting
   const mealTypeOrder = {
     breakfast: 1,
@@ -115,7 +115,7 @@ const { pantryItems } = useUser();
     }
   };
 
-  const handleAddToPantry = (items?: any[]) => {
+  const handleAddToPantry = async (items?: any[]) => {
     const itemsToAdd = items || plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) || [];
     
     itemsToAdd.forEach(item => {
@@ -134,6 +134,13 @@ const { pantryItems } = useUser();
     console.log("Items added to pantry:", itemsToAdd);
     console.log('items in the actual pantry:', pantryItems);
     console.log('new patry with added items:', [...pantryItems, ...itemsToAdd]);
+
+    try {
+      const responseUpdatePantry = await updatePantry(user.id,[...pantryItems, ...itemsToAdd] );
+      console.log('first response from update pantry:', responseUpdatePantry);  
+    } catch (error) {
+      console.log('error updating pantry:', error);
+    }
 
 
 
