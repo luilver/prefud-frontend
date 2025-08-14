@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this import
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MealPlanViewProps {
   plan: any;
@@ -25,7 +26,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const { t } = useLanguage(); // <-- Add this line
-
+const { pantryItems } = useUser();
   // Meal type order for sorting
   const mealTypeOrder = {
     breakfast: 1,
@@ -128,6 +129,13 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         notes: `Added from meal plan: ${plan.name}`
       });
     });
+
+    //add to the pantry to persiste the information in the database
+    console.log("Items added to pantry:", itemsToAdd);
+    console.log('items in the actual pantry:', pantryItems);
+    console.log('new patry with added items:', [...pantryItems, ...itemsToAdd]);
+
+
 
     // Clear checked items after adding
     setCheckedItems(new Set());
