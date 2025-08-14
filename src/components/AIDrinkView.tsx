@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Glass, Clock, Users, Zap, ShoppingCart, Package, ArrowLeft } from "lucide-react";
+import { Wine, Clock, Users, Zap, ShoppingCart, Package, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { updatePantry } from "@/services/pantryService";
@@ -164,7 +164,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
           <Card>
             <CardContent className="p-0">
               <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-lg flex items-center justify-center">
-                <Glass className="h-24 w-24 text-blue-600" />
+                <Wine className="h-24 w-24 text-blue-600" />
               </div>
               <div className="p-6">
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">{drink.name}</h1>
@@ -193,7 +193,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   <p className="font-semibold">{drink.calories || '120'}/serving</p>
                 </div>
                 <div className="text-center">
-                  <Glass className="h-6 w-6 mx-auto mb-2 text-purple-600" />
+                  <Wine className="h-6 w-6 mx-auto mb-2 text-purple-600" />
                   <p className="text-sm text-gray-600">Difficulty</p>
                   <Badge variant="outline" className={getDifficultyColor(drink.difficulty || 'Easy')}>
                     {drink.difficulty || 'Easy'}

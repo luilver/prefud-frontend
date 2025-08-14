@@ -331,14 +331,31 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   <CardTitle>Nutritional Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {meal.nutrition && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {Object.entries(meal.nutrition).map(([key, value]) => (
-                        <div key={key} className="p-4 rounded-lg bg-gray-50">
-                          <h4 className="font-semibold text-gray-800 capitalize">{key}</h4>
-                          <p className="text-gray-600">{value}</p>
-                        </div>
-                      ))}
+                  {meal.nutritionalInfo && (
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-3">Nutrition per serving</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {Object.entries(meal.nutritionalInfo).map(([key, value]) => (
+                          <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
+                            <p className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1')}</p>
+                            <p className="font-semibold text-gray-800">{String(value)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {meal.healthBenefits && (
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-3">Health benefits</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {Object.entries(meal.healthBenefits).map(([key, value]) => (
+                          <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
+                            <p className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1')}</p>
+                            <p className="font-semibold text-gray-800">{String(value)}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </CardContent>
