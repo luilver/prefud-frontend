@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
@@ -21,22 +22,24 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <AuthProvider>
-        <UserProvider>
-          <TooltipProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/why-pantry" element={<WhyPantry />} />
-                <Route path="/terms" element={<TermsAndConditions />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-            <Toaster />
-          </TooltipProvider>
-        </UserProvider>
+        <SubscriptionProvider>
+          <UserProvider>
+            <TooltipProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/signin" element={<SignIn />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/why-pantry" element={<WhyPantry />} />
+                  <Route path="/terms" element={<TermsAndConditions />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+              <Toaster />
+            </TooltipProvider>
+          </UserProvider>
+        </SubscriptionProvider>
       </AuthProvider>
     </LanguageProvider>
   </QueryClientProvider>

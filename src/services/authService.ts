@@ -1,3 +1,4 @@
+
 interface LoginResponse {
   email: string;
   isActive: boolean;
@@ -75,9 +76,26 @@ interface PantryItem {
   notes?: string;
 }
 
+interface SubscriptionInfo {
+  userId: string;
+  subscriptionTypeId: string;
+  dayOfTheMonth: number;
+  dateStarted: string;
+  status: boolean;
+  mealPlans: number;
+  specialMeals: number;
+  healthyDrinks: number;
+  generateMeals: number;
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
 interface CompleteLoginResponse extends LoginResponse {
   profile: UserProfile;
   pantry: PantryItem[];
+  subscription: SubscriptionInfo | null;
 }
 
 class AuthService {
@@ -108,10 +126,14 @@ class AuthService {
       // Fetch user pantry after successful login
       const pantry = await this.getPantry(loginData.userId);
       
+      // Fetch user subscription after successful login
+      const subscription = await this.getSubscription(loginData.userId);
+      
       return {
         ...loginData,
         profile,
-        pantry
+        pantry,
+        subscription
       };
     } catch (error) {
       console.error('Login error:', error);
@@ -184,6 +206,32 @@ class AuthService {
       // Return empty array if pantry fetch fails to not break the login flow
       console.log('Returning empty pantry due to error');
       return [];
+    }
+  }
+
+  async getSubscription(userId: string): Promise<SubscriptionInfo | null> {
+    try {
+      const response = await fetch(`${this.baseURL}/subscription/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        console.error('Subscription API error:', errorData);
+        // Return null if subscription fetch fails to not break the login flow
+        return null;
+      }
+
+      const subscriptionData: SubscriptionInfo = await response.json();
+      console.log('Subscription data:', subscriptionData);
+      return subscriptionData;
+    } catch (error) {
+      console.error('Get subscription error:', error);
+      // Return null if subscription fetch fails to not break the login flow
+      return null;
     }
   }
 

@@ -45,6 +45,21 @@ interface AuthUser {
     location?: string;
     notes?: string;
   }[];
+  subscription?: {
+    userId: string;
+    subscriptionTypeId: string;
+    dayOfTheMonth: number;
+    dateStarted: string;
+    status: boolean;
+    mealPlans: number;
+    specialMeals: number;
+    healthyDrinks: number;
+    generateMeals: number;
+    _id: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  } | null;
 }
 
 interface AuthContextType {
@@ -96,6 +111,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 detail: { pantry: parsedUser.pantry } 
               }));
             }
+
+            // Trigger subscription sync event for SubscriptionContext
+            if (parsedUser.subscription) {
+              window.dispatchEvent(new CustomEvent('subscription-sync', { 
+                detail: { subscription: parsedUser.subscription } 
+              }));
+            }
           }
         }
       } catch (error) {
@@ -125,7 +147,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         token: response.token,
         userId: response.userId,
         profile: response.profile,
-        pantry: response.pantry
+        pantry: response.pantry,
+        subscription: response.subscription
       };
 
       // Store user data and token for session persistence
@@ -139,6 +162,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (response.pantry) {
         window.dispatchEvent(new CustomEvent('pantry-sync', { 
           detail: { pantry: response.pantry } 
+        }));
+      }
+
+      // Trigger subscription sync event for SubscriptionContext
+      if (response.subscription) {
+        window.dispatchEvent(new CustomEvent('subscription-sync', { 
+          detail: { subscription: response.subscription } 
         }));
       }
     } catch (error) {
