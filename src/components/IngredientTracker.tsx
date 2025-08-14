@@ -18,12 +18,28 @@ const IngredientTracker = () => {
   const { 
     ingredients, 
     deleteIngredient, 
-    updatePantryFromIngredients,
     addIngredient,
     user,
     setPantryItems
   } = useUser();
   const { toast } = useToast();
+
+  // Helper function to map classification to category
+  const mapClassificationToCategory = (classification: string): string => {
+    const categoryMap: Record<string, string> = {
+      'dairy': 'Dairy',
+      'nut': 'Pantry',
+      'protein': 'Meat',
+      'vegetable': 'Vegetables',
+      'fruit': 'Fruits',
+      'grain': 'Grains',
+      'spice': 'Pantry',
+      'herb': 'Pantry',
+      'other': 'Pantry'
+    };
+    
+    return categoryMap[classification.toLowerCase()] || 'Pantry';
+  };
 
   // Function to fetch pantry items from API
   const fetchPantryItems = async () => {
@@ -46,7 +62,7 @@ const IngredientTracker = () => {
           expiryDate.setDate(expiryDate.getDate() + ingredient.daysToExpire);
           
           return {
-            id: `${response._id}_${ingredient.name}_${index}`, // Create unique ID with index
+            id: `pantry_${Date.now()}_${index}`, // Simpler ID generation
             name: ingredient.name,
             quantity: ingredient.quantity,
             unit: ingredient.unit,
@@ -54,6 +70,7 @@ const IngredientTracker = () => {
             expiryDate: expiryDate,
             purchaseDate: dayAdded,
             notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste}kg CO2`,
+            location: 'Pantry', // Default location
             // Preserve original API fields for updates
             classification: ingredient.classification,
             carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
@@ -73,7 +90,7 @@ const IngredientTracker = () => {
         });
       } else {
         console.log('No ingredients found in response or invalid response structure');
-        setPantryItems([], response);
+        setPantryItems([]);
         toast({
           title: "No Items Found",
           description: "Your pantry appears to be empty or no data was returned.",
@@ -91,26 +108,9 @@ const IngredientTracker = () => {
     }
   };
 
-  // Helper function to map classification to category
-  const mapClassificationToCategory = (classification: string): string => {
-    const categoryMap: Record<string, string> = {
-      'dairy': 'Dairy',
-      'nut': 'Pantry',
-      'protein': 'Meat',
-      'vegetable': 'Vegetables',
-      'fruit': 'Fruits',
-      'grain': 'Grains',
-      'spice': 'Pantry',
-      'herb': 'Pantry',
-      'other': 'Pantry'
-    };
-    
-    return categoryMap[classification.toLowerCase()] || 'Pantry';
-  };
-
   // Fetch pantry items on component mount
   useEffect(() => {
-    console.log('IngredientTracker mounted, current ingredients:', ingredients);
+    console.log('IngredientTracker mounted, fetching pantry items...');
     fetchPantryItems();
   }, [user?.id]);
 
@@ -138,6 +138,8 @@ const IngredientTracker = () => {
 
   const getDaysUntilExpiry = (expiryDate: Date) => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time for accurate day calculation
+    expiryDate.setHours(0, 0, 0, 0);
     const diffTime = expiryDate.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
@@ -271,7 +273,7 @@ const IngredientTracker = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Low Stock</p>
-                <p className="text-2xl font-bold text-red-700">2</p>
+                <p className="text-2xl font-bold text-red-700">{ingredients.filter(i => i.quantity <= 1).length}</p>
               </div>
               <Bell className="h-8 w-8 text-red-500" />
             </div>
