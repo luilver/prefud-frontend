@@ -1,16 +1,11 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Wine, Clock, Users, Zap, ShoppingCart, Package, ArrowLeft } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Clock, Users, Droplets, Play, BookOpen, Heart, Share2, Check, Timer, Maximize, X, Trash2, Zap } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { updatePantry } from "@/services/pantryService";
-import OrderOnlineModal from "./OrderOnlineModal";
+import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AIDrinkViewProps {
   drink: any;
@@ -18,378 +13,411 @@ interface AIDrinkViewProps {
 }
 
 const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
-  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const [showOrderModal, setShowOrderModal] = useState(false);
-  const [isAddingToPantry, setIsAddingToPantry] = useState(false);
-  const { toast } = useToast();
-  const { pantryItems, setPantryItems, user } = useUser();
+  const { t } = useLanguage();
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { deleteAIDrink } = useUser();
 
-  const handleIngredientSelect = (ingredientName: string, checked: boolean) => {
-    if (checked) {
-      setSelectedIngredients(prev => [...prev, ingredientName]);
+  const toggleStep = (stepIndex: number) => {
+    if (completedSteps.includes(stepIndex)) {
+      setCompletedSteps(completedSteps.filter(i => i !== stepIndex));
     } else {
-      setSelectedIngredients(prev => prev.filter(name => name !== ingredientName));
+      setCompletedSteps([...completedSteps, stepIndex]);
     }
   };
 
-  const handleAddToPantry = async () => {
-    if (selectedIngredients.length === 0) {
-      toast({
-        title: "No ingredients selected",
-        description: "Please select ingredients to add to pantry.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!user?.id) {
-      toast({
-        title: "User not found",
-        description: "Please log in to add ingredients to your pantry.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAddingToPantry(true);
-
-    try {
-      const ingredientsToAdd = drink.ingredients.filter((ingredient: any) =>
-        selectedIngredients.includes(ingredient.name)
-      );
-
-      // Create pantry items for local state
-      const newPantryItems = ingredientsToAdd.map((ingredient: any) => ({
-        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        category: 'Drinks',
-        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days for drinks
-        purchaseDate: new Date(),
-        location: '',
-        notes: `Added from AI drink: ${drink.name}`
-      }));
-
-      // Prepare ingredients for API call
-      const apiIngredients = ingredientsToAdd.map((ingredient: any) => ({
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        classification: 'other',
-        carbonFootPrintToWaste: 0.3, // Lower for drinks
-        daysToExpire: 30,
-        dayAdded: new Date().toISOString().split('T')[0]
-      }));
-
-      // Update pantry via API
-      await updatePantry(user.id, apiIngredients);
-
-      // Update local state
-      setPantryItems([...pantryItems, ...newPantryItems]);
-
-      toast({
-        title: "Success!",
-        description: `Added ${ingredientsToAdd.length} ingredients to your pantry.`
-      });
-
-      setSelectedIngredients([]);
-    } catch (error) {
-      console.error('Error adding ingredients to pantry:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add ingredients to pantry. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsAddingToPantry(false);
-    }
+  const openFullscreenVideo = () => {
+    setIsFullscreen(true);
+    setIsVideoPlaying(true);
   };
 
-  const handleOrderOnline = () => {
-    if (selectedIngredients.length === 0) {
-      toast({
-        title: "No ingredients selected",
-        description: "Please select ingredients to order online.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const itemsToOrder = drink.ingredients
-      .filter((ingredient: any) => selectedIngredients.includes(ingredient.name))
-      .map((ingredient: any) => ({
-        id: `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        estimatedPrice: 1.99, // Default estimated price for drinks
-        mealName: drink.name,
-        notes: `From AI drink: ${drink.name}`
-      }));
-
-    setShowOrderModal(true);
+  const closeFullscreenVideo = () => {
+    setIsFullscreen(false);
+    setIsVideoPlaying(false);
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty.toLowerCase()) {
-      case 'easy': return 'text-green-600 border-green-200';
-      case 'medium': return 'text-yellow-600 border-yellow-200';
-      case 'hard': return 'text-red-600 border-red-200';
-      default: return 'text-gray-600 border-gray-200';
-    }
+  const handleDelete = () => {
+    deleteAIDrink(drink.id);
+    toast.success("AI drink deleted successfully!");
+    onBack();
   };
 
-  const getPreparationTimeColor = (time: string) => {
-    const minutes = parseInt(time);
-    if (minutes <= 5) return 'text-green-600';
-    if (minutes <= 15) return 'text-yellow-600';
-    return 'text-red-600';
-  };
+  const enhancedInstructions = useMemo(() => {
+    const drinkTips = [
+      "🥤 Use fresh ingredients for best taste",
+      "⏱️ Blend slowly at first, then increase speed", 
+      "🧊 Add ice for a refreshing chill",
+      "🌟 Taste and adjust sweetness as needed",
+      "💡 Serve immediately for optimal freshness",
+      "🎯 Perfect consistency is key!",
+      "✨ Garnish for extra visual appeal",
+      "🏆 Enjoy your healthy creation!"
+    ];
+    
+    return drink.instructions.map((instruction: string, index: number) => ({
+      text: instruction,
+      tip: drinkTips[index % drinkTips.length],
+      estimatedTime: 1 + (index % 3) // Fixed time based on step index instead of random
+    }));
+  }, [drink.instructions]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4 mb-6">
-        <Button variant="ghost" onClick={onBack} className="flex items-center space-x-2">
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Drinks</span>
-        </Button>
-      </div>
-
-      {/* Main Content */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left Column - Drink Image and Basic Info */}
-        <div className="lg:col-span-1 space-y-4">
-          <Card>
-            <CardContent className="p-0">
-              <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-lg flex items-center justify-center">
-                <Wine className="h-24 w-24 text-blue-600" />
-              </div>
-              <div className="p-6">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">{drink.name}</h1>
-                <p className="text-gray-600 text-sm leading-relaxed">{drink.description}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Stats */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <Clock className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                  <p className="text-sm text-gray-600">Prep Time</p>
-                  <p className="font-semibold">{drink.preparationTime || '5 min'}</p>
-                </div>
-                <div className="text-center">
-                  <Users className="h-6 w-6 mx-auto mb-2 text-green-600" />
-                  <p className="text-sm text-gray-600">Servings</p>
-                  <p className="font-semibold">{drink.servings || '1'}</p>
-                </div>
-                <div className="text-center">
-                  <Zap className="h-6 w-6 mx-auto mb-2 text-yellow-600" />
-                  <p className="text-sm text-gray-600">Calories</p>
-                  <p className="font-semibold">{drink.calories || '120'}/serving</p>
-                </div>
-                <div className="text-center">
-                  <Wine className="h-6 w-6 mx-auto mb-2 text-purple-600" />
-                  <p className="text-sm text-gray-600">Difficulty</p>
-                  <Badge variant="outline" className={getDifficultyColor(drink.difficulty || 'Easy')}>
-                    {drink.difficulty || 'Easy'}
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <>
+      <div className="max-w-4xl mx-auto space-y-6 p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <Button variant="ghost" onClick={onBack} className="self-start">
+            ← {t("aiDrinkView.back") || "Back to AI Drinks"}
+          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" className="flex-shrink-0">
+              <Heart className="h-4 w-4 mr-1" />
+              {t("aiDrinkView.save") || "Save"}
+            </Button>
+            <Button variant="outline" size="sm" className="flex-shrink-0">
+              <Share2 className="h-4 w-4 mr-1" />
+              {t("aiDrinkView.share") || "Share"}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-shrink-0 text-red-600 hover:text-red-700"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              {t("aiDrinkView.delete") || "Delete"}
+            </Button>
+          </div>
         </div>
 
-        {/* Right Column - Detailed Information */}
-        <div className="lg:col-span-2">
-          <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
-              <TabsTrigger value="instructions">Instructions</TabsTrigger>
-              <TabsTrigger value="benefits">Benefits</TabsTrigger>
-            </TabsList>
+        <Card className="bg-white/70 backdrop-blur-sm border-green-200">
+          <CardHeader>
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 break-words">
+                  {drink.name}
+                </CardTitle>
+                <CardDescription className="text-base sm:text-lg break-words">
+                  {drink.description}
+                </CardDescription>
+                
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 flex-shrink-0" />
+                    <span className="font-medium text-sm sm:text-base">{drink.prepTime}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
+                    <span className="font-medium text-sm sm:text-base">{t("aiDrinkView.serving") || "1 serving"}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
+                    <span className="font-medium text-sm sm:text-base">{drink.calories} {t("aiDrinkView.cal") || "cal"}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="w-full sm:w-48 h-32 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Droplets className="h-12 w-12 sm:h-16 sm:w-16 text-green-600 opacity-50" />
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
 
-            <TabsContent value="overview" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>About This Drink</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-gray-600 leading-relaxed">{drink.description}</p>
-                  
-                  {drink.healthBenefits && (
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Health Benefits</h4>
-                      <ul className="list-disc list-inside text-gray-600 space-y-1">
-                        {drink.healthBenefits.map((benefit: string, index: number) => (
-                          <li key={index}>{benefit}</li>
-                        ))}
-                      </ul>
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Tabs defaultValue="recipe" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="recipe">{t("aiDrinkView.recipeTab") || "Recipe"}</TabsTrigger>
+                <TabsTrigger value="video">{t("aiDrinkView.videoTab") || "Video Tutorial"}</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="recipe" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <BookOpen className="h-5 w-5 text-green-600" />
+                      <span>{t("aiDrinkView.ingredients") || "Ingredients"}</span>
+                    </CardTitle>
+                    <CardDescription>{t("aiDrinkView.ingredientsDesc") || "Everything you need for this drink"}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {drink.ingredients.map((ingredient: any, index: number) => (
+                        <div key={index} className="flex justify-between items-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                          <span className="text-green-700">{ingredient.name}</span>
+                          <span className="text-green-600 font-medium">{ingredient.amount}</span>
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </CardContent>
+                </Card>
 
-                  {drink.tags && (
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Tags</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {drink.tags.map((tag: string, index: number) => (
-                          <Badge key={index} variant="secondary">{tag}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="ingredients" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Package className="h-5 w-5" />
-                    <span>Ingredients ({drink.ingredients?.length || 0})</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Select ingredients to add to your pantry or order online
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-3">
-                    {drink.ingredients?.map((ingredient: any, index: number) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-gray-50">
-                        <Checkbox
-                          id={`ingredient-${index}`}
-                          checked={selectedIngredients.includes(ingredient.name)}
-                          onCheckedChange={(checked) => handleIngredientSelect(ingredient.name, checked as boolean)}
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-800">{ingredient.name}</span>
-                            <span className="text-sm text-gray-600">
-                              {ingredient.quantity} {ingredient.unit}
-                            </span>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Droplets className="h-5 w-5 text-green-600" />
+                      <span>{t("aiDrinkView.instructions") || "Instructions"}</span>
+                    </CardTitle>
+                    <CardDescription>{t("aiDrinkView.instructionsDesc") || "Follow these steps for the perfect drink"}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {enhancedInstructions.map((instruction, index) => (
+                        <div
+                          key={index}
+                          className={`relative p-4 rounded-lg border transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
+                            completedSteps.includes(index)
+                              ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-md'
+                              : 'bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200 hover:border-green-200 hover:shadow-lg'
+                          }`}
+                          onClick={() => toggleStep(index)}
+                        >
+                          <div className="flex items-start space-x-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0 ${
+                              completedSteps.includes(index)
+                                ? 'bg-green-500 text-white shadow-lg scale-110'
+                                : 'bg-gradient-to-br from-green-400 to-blue-400 text-white shadow-md'
+                            }`}>
+                              {completedSteps.includes(index) ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                index + 1
+                              )}
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-base leading-relaxed transition-all duration-300 break-words ${
+                                completedSteps.includes(index) 
+                                  ? 'line-through text-gray-500' 
+                                  : 'text-gray-800'
+                              }`}>
+                                {instruction.text}
+                              </p>
+                              
+                              {!completedSteps.includes(index) && (
+                                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-700">
+                                    <Timer className="h-3 w-3 mr-1" />
+                                    ~{instruction.estimatedTime} {t("aiDrinkView.min") || "min"}
+                                  </span>
+                                  <span className="text-gray-600 italic">
+                                    {instruction.tip}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          {ingredient.notes && (
-                            <p className="text-sm text-gray-500 mt-1">{ingredient.notes}</p>
+                          
+                          {completedSteps.includes(index) && (
+                            <div className="absolute top-2 right-2">
+                              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+                                <Check className="h-3 w-3 text-white" />
+                              </div>
+                            </div>
                           )}
                         </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Heart className="h-5 w-5 text-green-600" />
+                      <span>{t("aiDrinkView.healthBenefits") || "Health Benefits"}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {drink.nutritionHighlights?.map((benefit: string, index: number) => (
+                        <div key={index} className="flex items-start space-x-2">
+                          <span className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                          <span className="text-green-700">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {drink.tips && drink.tips.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Zap className="h-5 w-5 text-green-600" />
+                        <span>{t("aiDrinkView.proTips") || "Pro Tips"}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {drink.tips.map((tip: string, index: number) => (
+                          <div key={index} className="flex items-start space-x-2">
+                            <span className="text-green-500 mt-1">💡</span>
+                            <span className="text-green-700 text-sm">{tip}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
-                  <Separator />
-
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      onClick={handleAddToPantry}
-                      disabled={selectedIngredients.length === 0 || isAddingToPantry}
-                      className="flex items-center space-x-2 bg-green-600 hover:bg-green-700"
-                    >
-                      <Package className="h-4 w-4" />
-                      <span>
-                        {isAddingToPantry ? 'Adding...' : `Add to Pantry (${selectedIngredients.length})`}
-                      </span>
-                    </Button>
-                    <Button
-                      onClick={handleOrderOnline}
-                      disabled={selectedIngredients.length === 0}
-                      variant="outline"
-                      className="flex items-center space-x-2"
-                    >
-                      <ShoppingCart className="h-4 w-4" />
-                      <span>Order Online ({selectedIngredients.length})</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="instructions" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Instructions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {drink.instructions?.map((step: string, index: number) => (
-                      <div key={index} className="flex space-x-4">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-semibold text-sm">
-                            {index + 1}
+              <TabsContent value="video">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Play className="h-5 w-5 text-red-600" />
+                      <span>{t("aiDrinkView.videoTutorial") || "Video Tutorial"}</span>
+                    </CardTitle>
+                    <CardDescription>
+                      {t("aiDrinkView.videoDesc") || "Watch step-by-step preparation"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
+                      {!isVideoPlaying ? (
+                        <div className="text-center space-y-4">
+                          <Button
+                            onClick={() => setIsVideoPlaying(true)}
+                            size="lg"
+                            className="bg-red-600 hover:bg-red-700 rounded-full"
+                          >
+                            <Play className="h-6 w-6 mr-2" />
+                            {t("aiDrinkView.playVideo") || "Play Video"}
+                          </Button>
+                          <Button
+                            onClick={openFullscreenVideo}
+                            variant="outline"
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          >
+                            <Maximize className="h-4 w-4 mr-2" />
+                            {t("aiDrinkView.fullscreen") || "Fullscreen"}
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="text-white text-center space-y-4">
+                          <iframe
+                            width="100%"
+                            height="315"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title={t("aiDrinkView.videoTitle") || "Drink Video Tutorial"}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="rounded-lg"
+                          ></iframe>
+                          <div className="flex justify-center gap-2">
+                            <Button
+                              onClick={() => setIsVideoPlaying(false)}
+                              variant="ghost"
+                              className="text-white hover:bg-white/20"
+                            >
+                              {t("aiDrinkView.closeVideo") || "Close Video"}
+                            </Button>
+                            <Button
+                              onClick={openFullscreenVideo}
+                              variant="ghost"
+                              className="text-white hover:bg-white/20"
+                            >
+                              <Maximize className="h-4 w-4 mr-2" />
+                              {t("aiDrinkView.fullscreen") || "Fullscreen"}
+                            </Button>
                           </div>
                         </div>
-                        <p className="text-gray-600 leading-relaxed pt-1">{step}</p>
-                      </div>
-                    ))}
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t("aiDrinkView.nutritionInfo") || "Nutrition Info"}</CardTitle>
+                <CardDescription>{t("aiDrinkView.perServing") || "Per serving"}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="font-medium">{t("aiDrinkView.calories") || "Calories"}</span>
+                    <span>{drink.calories}</span>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                  <div className="flex justify-between">
+                    <span>{t("aiDrinkView.naturalSugars") || "Natural Sugars"}</span>
+                    <span>{Math.floor(drink.calories * 0.6 / 4)}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("aiDrinkView.vitaminC") || "Vitamin C"}</span>
+                    <span>{Math.floor(Math.random() * 50) + 20}mg</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("aiDrinkView.fiber") || "Fiber"}</span>
+                    <span>{Math.floor(Math.random() * 5) + 1}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("aiDrinkView.antioxidants") || "Antioxidants"}</span>
+                    <span>{t("aiDrinkView.high") || "High"}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <TabsContent value="benefits" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Nutritional Information & Benefits</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {drink.nutritionalInfo && (
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-3">Nutrition per serving</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {Object.entries(drink.nutritionalInfo).map(([key, value]) => (
-                          <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1')}</p>
-                            <p className="font-semibold text-gray-800">{value as string}</p>
-                          </div>
-                        ))}
-                      </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t("aiDrinkView.prepProgress") || "Preparation Progress"}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {completedSteps.length} {t("aiDrinkView.of") || 'of'} {enhancedInstructions.length} {t("aiDrinkView.stepsCompleted") || 'steps completed'}
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div
+                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
+                    ></div>
+                  </div>
+                  {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
+                    <div className="mt-3 p-2 bg-green-100 rounded-lg">
+                      <p className="text-sm text-green-700 font-medium">{t("aiDrinkView.enjoy") || "🎉 Enjoy your healthy drink!"}</p>
                     </div>
                   )}
-
-                  {drink.healthBenefits && (
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-3">Health Benefits</h4>
-                      <div className="grid gap-3">
-                        {drink.healthBenefits.map((benefit: string, index: number) => (
-                          <div key={index} className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
-                            <Zap className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                            <p className="text-gray-700">{benefit}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
-      {/* Order Online Modal */}
-      <OrderOnlineModal
-        isOpen={showOrderModal}
-        onClose={() => setShowOrderModal(false)}
-        items={drink.ingredients
-          ?.filter((ingredient: any) => selectedIngredients.includes(ingredient.name))
-          ?.map((ingredient: any) => ({
-            id: `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            name: ingredient.name,
-            quantity: ingredient.quantity,
-            unit: ingredient.unit,
-            estimatedPrice: 1.99,
-            mealName: drink.name,
-            notes: `From AI drink: ${drink.name}`
-          })) || []
-        }
-        mealPlanName={`AI Drink: ${drink.name}`}
-      />
-    </div>
+      {isFullscreen && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="relative w-full h-full">
+            <Button
+              onClick={closeFullscreenVideo}
+              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-2"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+              title={t("aiDrinkView.videoTitleFullscreen") || "Drink Video Tutorial - Fullscreen"}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
