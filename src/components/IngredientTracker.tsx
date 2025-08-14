@@ -24,21 +24,19 @@ const IngredientTracker = () => {
   } = useUser();
   const { toast } = useToast();
 
-  // Helper function to map classification to category
-  const mapClassificationToCategory = (classification: string): string => {
+  // Helper function to map API category to UI category
+  const mapApiCategoryToUI = (category: string): string => {
     const categoryMap: Record<string, string> = {
       'dairy': 'Dairy',
-      'nut': 'Pantry',
       'protein': 'Meat',
       'vegetable': 'Vegetables',
       'fruit': 'Fruits',
       'grain': 'Grains',
-      'spice': 'Pantry',
       'herb': 'Pantry',
       'other': 'Pantry'
     };
     
-    return categoryMap[classification.toLowerCase()] || 'Pantry';
+    return categoryMap[category.toLowerCase()] || 'Pantry';
   };
 
   // Function to fetch pantry items from API
@@ -55,27 +53,30 @@ const IngredientTracker = () => {
       console.log('Pantry API response:', response);
       
       if (response && response.ingredients && Array.isArray(response.ingredients)) {
-        // Transform API response to internal format
-        const transformedPantryItems = response.ingredients.map((ingredient: any, index: number) => {
-          const dayAdded = new Date(ingredient.dayAdded);
-          const expiryDate = new Date(dayAdded);
+        // Transform API response to internal format using the actual API structure
+        const transformedPantryItems = response.ingredients.map((ingredient: any) => {
+          // Calculate expiry date from current date + daysToExpire
+          const purchaseDate = new Date(); // Use current date as purchase date since API doesn't provide it
+          const expiryDate = new Date();
           expiryDate.setDate(expiryDate.getDate() + ingredient.daysToExpire);
           
           return {
-            id: `pantry_${Date.now()}_${index}`, // Simpler ID generation
+            id: ingredient.id, // Use the ID from API
             name: ingredient.name,
             quantity: ingredient.quantity,
             unit: ingredient.unit,
-            category: mapClassificationToCategory(ingredient.classification),
+            category: mapApiCategoryToUI(ingredient.category), // Map API category to UI category
             expiryDate: expiryDate,
-            purchaseDate: dayAdded,
+            purchaseDate: purchaseDate,
             notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste}kg CO2`,
             location: 'Pantry', // Default location
             // Preserve original API fields for updates
-            classification: ingredient.classification,
+            apiCategory: ingredient.category, // Keep original category for API calls
             carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
             daysToExpire: ingredient.daysToExpire,
-            dayAdded: ingredient.dayAdded
+            priority: ingredient.priority,
+            purchased: ingredient.purchased,
+            estimatedPrice: ingredient.estimatedPrice
           };
         });
         
