@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
-import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlans';
+import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlanService';
 
 interface User {
   id: string;
