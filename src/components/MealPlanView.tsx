@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,25 +14,27 @@ import { useQuery } from "@tanstack/react-query";
 import OrderOnlineModal from "./OrderOnlineModal";
 
 interface MealPlanViewProps {
-  mealPlan: any;
+  mealPlan?: any;
+  plan?: any;
   onClose: () => void;
 }
 
-const MealPlanView = ({ mealPlan, onClose }: MealPlanViewProps) => {
+const MealPlanView = ({ mealPlan, plan, onClose }: MealPlanViewProps) => {
   const { t } = useLanguage();
   const { user, addPantryItem } = useUser();
   const { toast } = useToast();
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderItems, setOrderItems] = useState<any[]>([]);
 
-  const regularMeals = mealPlan.meals || [];
-  const { data: specialMeals = [], isLoading, isError, refetch } = useQuery(
-    ['specialMeals', user?.uid],
-    () => getSpecialMealsByUser(user?.uid || ''),
-    {
-      enabled: !!user?.uid,
-    }
-  );
+  // Use either mealPlan or plan prop
+  const activePlan = mealPlan || plan;
+  const regularMeals = activePlan?.meals || [];
+  
+  const { data: specialMeals = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['specialMeals', user?.id],
+    queryFn: () => getSpecialMealsByUser(user?.id || ''),
+    enabled: !!user?.id,
+  });
 
   const addMealToPantry = (meal: any) => {
     if (!meal.ingredients) {
@@ -87,7 +90,7 @@ const MealPlanView = ({ mealPlan, onClose }: MealPlanViewProps) => {
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-green-800">
-            {mealPlan.name}
+            {activePlan?.name}
           </DialogTitle>
         </DialogHeader>
 
@@ -98,7 +101,7 @@ const MealPlanView = ({ mealPlan, onClose }: MealPlanViewProps) => {
                 {t("mealPlanView.regularMeals") || "Regular Meals"}
               </h3>
               <div className="grid gap-4">
-                {regularMeals.map((meal, index) => (
+                {regularMeals.map((meal: any, index: number) => (
                   <Card key={index}>
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start">
@@ -135,14 +138,14 @@ const MealPlanView = ({ mealPlan, onClose }: MealPlanViewProps) => {
           )}
 
           {/* Special Meals Section */}
-          {specialMeals.length > 0 && (
+          {Array.isArray(specialMeals) && specialMeals.length > 0 && (
             <div>
               <h3 className="text-xl font-semibold text-green-800 mb-4 flex items-center">
                 <Star className="h-5 w-5 mr-2 text-yellow-500" />
                 {t("mealPlanView.specialMeals") || "Special Meals"}
               </h3>
               <div className="grid gap-4">
-                {specialMeals.map((meal, index) => (
+                {specialMeals.map((meal: any, index: number) => (
                   <Card key={index} className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-orange-50">
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start">
@@ -208,7 +211,7 @@ const MealPlanView = ({ mealPlan, onClose }: MealPlanViewProps) => {
           isOpen={showOrderModal}
           onClose={() => setShowOrderModal(false)}
           items={orderItems}
-          mealPlanName={mealPlan.name}
+          mealPlanName={activePlan?.name}
         />
       </DialogContent>
     </Dialog>
