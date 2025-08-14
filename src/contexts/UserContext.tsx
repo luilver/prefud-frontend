@@ -185,6 +185,7 @@ interface UserContextType {
   addAIDrink: (drink: AIDrink) => void;
   deleteAIMeal: (id: string) => void;
   deleteAIDrink: (id: string) => void;
+  setPantryItems: (items: PantryItem[]) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -1022,6 +1023,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     addAIDrink,
     deleteAIMeal,
     deleteAIDrink,
+    setPantryItems,
     // Expose methods for pantry API operations
     convertPantryItemsToApiFormat,
     updatePantryInAPI,

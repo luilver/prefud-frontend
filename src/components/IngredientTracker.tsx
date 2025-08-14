@@ -1,23 +1,112 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Bell, Package, Calendar, AlertTriangle, Plus, Search, Trash2 } from "lucide-react";
+import { Bell, Package, Calendar, AlertTriangle, Plus, Search, Trash2, RefreshCw } from "lucide-react";
 import AddIngredientForm from "./AddIngredientForm";
 import AIMealSuggestions from "./AIMealSuggestions";
 import { useUser } from "@/contexts/UserContext";
+import { getPantry } from "@/services/pantryService";
+import { useToast } from "@/hooks/use-toast";
 
 const IngredientTracker = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { 
     ingredients, 
     deleteIngredient, 
     updatePantryFromIngredients,
-    addIngredient 
+    addIngredient,
+    user,
+    pantryItems,
+    setPantryItems
   } = useUser();
+  const { toast } = useToast();
+
+  // Function to fetch pantry items from API
+  const fetchPantryItems = async () => {
+    if (!user?.id) {
+      console.log('No user ID available for fetching pantry');
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      console.log('Fetching pantry items for user:', user.id);
+      const response = await getPantry(user.id);
+      console.log('Pantry API response:', response);
+      
+      if (response && response.ingredients) {
+        // Transform API response to internal format
+        const transformedPantryItems = response.ingredients.map((ingredient: any) => {
+          const dayAdded = new Date(ingredient.dayAdded);
+          const expiryDate = new Date(dayAdded);
+          expiryDate.setDate(expiryDate.getDate() + ingredient.daysToExpire);
+          
+          return {
+            id: `${response._id}_${ingredient.name}`, // Create unique ID
+            name: ingredient.name,
+            quantity: ingredient.quantity,
+            unit: ingredient.unit,
+            category: mapClassificationToCategory(ingredient.classification),
+            expiryDate: expiryDate,
+            purchaseDate: dayAdded,
+            notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste}kg CO2`,
+            // Preserve original API fields for updates
+            classification: ingredient.classification,
+            carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
+            daysToExpire: ingredient.daysToExpire,
+            dayAdded: ingredient.dayAdded
+          };
+        });
+        
+        console.log('Transformed pantry items:', transformedPantryItems);
+        // Update pantry items in context
+        if (setPantryItems) {
+          setPantryItems(transformedPantryItems);
+        }
+        
+        toast({
+          title: "Pantry Updated",
+          description: `Successfully loaded ${transformedPantryItems.length} items from your pantry.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching pantry items:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch pantry items. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Helper function to map classification to category
+  const mapClassificationToCategory = (classification: string): string => {
+    const categoryMap: Record<string, string> = {
+      'dairy': 'Dairy',
+      'nut': 'Pantry',
+      'protein': 'Meat',
+      'vegetable': 'Vegetables',
+      'fruit': 'Fruits',
+      'grain': 'Grains',
+      'spice': 'Pantry',
+      'herb': 'Pantry',
+      'other': 'Pantry'
+    };
+    
+    return categoryMap[classification.toLowerCase()] || 'Pantry';
+  };
+
+  // Fetch pantry items on component mount
+  useEffect(() => {
+    fetchPantryItems();
+  }, [user?.id]);
 
   const handleAddIngredient = (newIngredient: any) => {
     addIngredient(newIngredient);
@@ -95,20 +184,31 @@ const IngredientTracker = () => {
           <h2 className="text-2xl font-bold text-gray-800">Pantry Tracker</h2>
           <p className="text-gray-600">Keep track of your ingredients and their expiration dates</p>
         </div>
-        <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Ingredient
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <AddIngredientForm 
-              onClose={() => setShowAddForm(false)}
-              onAdd={handleAddIngredient}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center space-x-2">
+          <Button
+            onClick={fetchPantryItems}
+            disabled={isRefreshing}
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </Button>
+          <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Ingredient
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <AddIngredientForm 
+                onClose={() => setShowAddForm(false)}
+                onAdd={handleAddIngredient}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* AI Suggestions */}
