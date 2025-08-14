@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Clock, Users, Droplets, Leaf, ShoppingCart, Eye, Play, CheckCircle2, Circle, Maximize, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, Clock, Users, Droplets, Leaf, ShoppingCart, Eye, Play, CheckCircle2, Circle, Maximize, X, Plus } from "lucide-react";
 import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import DrinkShoppingModal from "./DrinkShoppingModal";
+import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DrinkDetailViewProps {
@@ -19,11 +21,14 @@ interface DrinkDetailViewProps {
 
 const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   const { t } = useLanguage();
-  const { addShoppingItem } = useUser();
+  const { addShoppingItem, addPantryItem } = useUser();
   const { toast } = useToast();
   const [showIngredients, setShowIngredients] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const [showOrderOnlineModal, setShowOrderOnlineModal] = useState(false);
+  const [showIngredientsSelector, setShowIngredientsSelector] = useState(false);
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -54,6 +59,77 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleIngredientSelection = (ingredientId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIngredients(prev => [...prev, ingredientId]);
+    } else {
+      setSelectedIngredients(prev => prev.filter(id => id !== ingredientId));
+    }
+  };
+
+  const handleAddToPantry = () => {
+    const selectedIngredientsData = drink.drinkPlan.ingredientsList.filter(
+      ingredient => selectedIngredients.includes(ingredient.name)
+    );
+
+    try {
+      selectedIngredientsData.forEach((ingredient) => {
+        addPantryItem({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || 'other',
+          expiryDate: new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000),
+          purchaseDate: new Date(),
+          notes: `From drink: ${drink.drink_name}`,
+          location: 'Pantry'
+        });
+      });
+
+      toast({
+        title: t("drinkDetailView.addedToPantry") || "Added to Pantry!",
+        description: `${t("drinkDetailView.added") || 'Added'} ${selectedIngredientsData.length} ${t("drinkDetailView.ingredientsToPantry") || 'ingredients to your pantry'}`,
+      });
+
+      setSelectedIngredients([]);
+    } catch (error) {
+      console.error('Error adding to pantry:', error);
+      toast({
+        title: t("drinkDetailView.error") || "Error",
+        description: t("drinkDetailView.pantryFailed") || "Failed to add ingredients to pantry. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleOrderOnline = () => {
+    const selectedIngredientsData = drink.drinkPlan.ingredientsList
+      .filter(ingredient => selectedIngredients.includes(ingredient.name))
+      .map(ingredient => ({
+        id: ingredient.name,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || 'other',
+        priority: 'medium',
+        purchased: false,
+        notes: `From drink: ${drink.drink_name}`,
+        estimatedPrice: Math.random() * 10 + 1, // Mock price
+        mealName: drink.drink_name
+      }));
+
+    if (selectedIngredientsData.length === 0) {
+      toast({
+        title: t("drinkDetailView.noIngredientsSelected") || "No ingredients selected",
+        description: t("drinkDetailView.selectIngredientsFirst") || "Please select ingredients first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setShowOrderOnlineModal(true);
   };
 
   const toggleStepCompletion = (stepIndex: number) => {
@@ -384,6 +460,75 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               )}
             </Card>
 
+            {/* Ingredients Selector Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-green-800 flex items-center justify-between">
+                  <span>{t("drinkDetailView.createShoppingList") || "Create Shopping List"}</span>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowIngredientsSelector(!showIngredientsSelector)}
+                  >
+                    {showIngredientsSelector ? t("drinkDetailView.hide") || "Hide" : t("drinkDetailView.show") || "Show"}
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              {showIngredientsSelector && (
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    {drink.drinkPlan.ingredientsList.map((ingredient, index) => (
+                      <div key={index} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                        <Checkbox
+                          id={`ingredient-${index}`}
+                          checked={selectedIngredients.includes(ingredient.name)}
+                          onCheckedChange={(checked) => handleIngredientSelection(ingredient.name, checked as boolean)}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700 capitalize truncate">
+                              {ingredient.name}
+                            </span>
+                            <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                              {ingredient.quantity} {ingredient.unit}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {t("drinkDetailView.expires") || "Expires in"} {ingredient.daysToExpire} {t("drinkDetailView.days") || "days"}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {selectedIngredients.length > 0 && (
+                    <div className="flex flex-col gap-2 pt-3 border-t">
+                      <p className="text-sm text-gray-600 mb-2">
+                        {selectedIngredients.length} {t("drinkDetailView.ingredientsSelected") || "ingredients selected"}
+                      </p>
+                      <Button 
+                        onClick={handleAddToPantry}
+                        variant="outline"
+                        className="w-full"
+                        size="sm"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t("drinkDetailView.addToPantry") || "Add to Pantry"}
+                      </Button>
+                      <Button 
+                        onClick={handleOrderOnline}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                        size="sm"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        {t("drinkDetailView.orderOnline") || "Order Online"}
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              )}
+            </Card>
+
             {/* Action Buttons - Made responsive */}
             <div className="space-y-3">
               <Button 
@@ -425,6 +570,26 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
           drink={drink}
           isOpen={showShoppingModal}
           onClose={() => setShowShoppingModal(false)}
+        />
+
+        <OrderOnlineModal
+          isOpen={showOrderOnlineModal}
+          onClose={() => setShowOrderOnlineModal(false)}
+          items={drink.drinkPlan.ingredientsList
+            .filter(ingredient => selectedIngredients.includes(ingredient.name))
+            .map(ingredient => ({
+              id: ingredient.name,
+              name: ingredient.name,
+              quantity: ingredient.quantity,
+              unit: ingredient.unit,
+              category: ingredient.classification || 'other',
+              priority: 'medium',
+              purchased: false,
+              notes: `From drink: ${drink.drink_name}`,
+              estimatedPrice: Math.random() * 10 + 1,
+              mealName: drink.drink_name
+            }))}
+          mealPlanName={drink.drink_name}
         />
       </div>
 
