@@ -1,4 +1,3 @@
-
 interface LoginResponse {
   email: string;
   isActive: boolean;
@@ -74,6 +73,10 @@ interface PantryItem {
   purchaseDate: string;
   location?: string;
   notes?: string;
+  classification: string;
+  carbonFootPrintToWaste: number;
+  daysToExpire: number;
+  dayAdded: string;
 }
 
 interface SubscriptionInfo {
@@ -164,7 +167,7 @@ class AuthService {
     }
   }
 
-  async getPantry(userId: string): Promise<PantryItem[]> {
+  async getPantry(userId: string): Promise<{ originalResponse: PantryApiResponse; transformedItems: PantryItem[] }> {
     try {
       const response = await fetch(`${this.pantryURL}/meal-plan/pantry/${userId}`, {
         method: 'GET',
@@ -181,7 +184,7 @@ class AuthService {
       const pantryResponse: PantryApiResponse = await response.json();
       console.log('Pantry API response:', pantryResponse);
       
-      // Transform API response to internal format
+      // Transform API response to internal format while preserving original data
       const transformedPantryItems: PantryItem[] = pantryResponse.ingredients.map((ingredient) => {
         const dayAdded = new Date(ingredient.dayAdded);
         const expiryDate = new Date(dayAdded);
@@ -195,17 +198,28 @@ class AuthService {
           category: this.mapClassificationToCategory(ingredient.classification),
           expiryDate: expiryDate.toISOString(),
           purchaseDate: ingredient.dayAdded,
-          notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste}kg CO2`
+          notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste}kg CO2`,
+          // Preserve original API fields
+          classification: ingredient.classification,
+          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
+          daysToExpire: ingredient.daysToExpire,
+          dayAdded: ingredient.dayAdded
         };
       });
       
       console.log('Transformed pantry items:', transformedPantryItems);
-      return transformedPantryItems;
+      return {
+        originalResponse: pantryResponse,
+        transformedItems: transformedPantryItems
+      };
     } catch (error) {
       console.error('Get pantry error:', error);
-      // Return empty array if pantry fetch fails to not break the login flow
+      // Return empty data if pantry fetch fails to not break the login flow
       console.log('Returning empty pantry due to error');
-      return [];
+      return {
+        originalResponse: { _id: '', user_id: userId, ingredients: [], createdAt: '', updatedAt: '', __v: 0 },
+        transformedItems: []
+      };
     }
   }
 

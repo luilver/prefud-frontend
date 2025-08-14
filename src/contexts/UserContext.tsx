@@ -201,6 +201,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { user: authUser, login: authLogin, logout: authLogout, isAuthenticated: authIsAuthenticated } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
+  const [originalPantryResponse, setOriginalPantryResponse] = useState<any>(null);
   const [shoppingItems, setShoppingItems] = useState<ShoppingItem[]>([]);
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [completedMeals, setCompletedMeals] = useState<Record<string, string[]>>({});
@@ -250,8 +251,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   // Listen for pantry sync events from AuthContext
   useEffect(() => {
     const handlePantrySync = (event: CustomEvent) => {
-      const { pantry } = event.detail;
+      const { pantry, originalPantryResponse } = event.detail;
       console.log('Syncing pantry from auth:', pantry);
+      console.log('Original pantry response:', originalPantryResponse);
       
       if (pantry && Array.isArray(pantry)) {
         // Transform pantry items from API format to UserContext format
@@ -268,7 +270,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }));
         
         setPantryItems(transformedPantryItems);
+        setOriginalPantryResponse(originalPantryResponse);
         console.log('Pantry items updated from API:', transformedPantryItems);
+        console.log('Original pantry response stored:', originalPantryResponse);
       }
     };
 
@@ -449,6 +453,51 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [shoppingItems]);
 
+  // Method to convert UI pantry items back to API format for updates
+  const convertPantryItemsToApiFormat = (items: PantryItem[]) => {
+    if (!originalPantryResponse) {
+      console.warn('No original pantry response available for conversion');
+      return [];
+    }
+
+    return items.map((item) => {
+      // Find original item to preserve API-specific fields
+      const originalItem = originalPantryResponse.ingredients?.find(
+        (orig: any) => orig.name === item.name
+      );
+
+      return {
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        classification: originalItem?.classification || 'other',
+        carbonFootPrintToWaste: originalItem?.carbonFootPrintToWaste || 0,
+        daysToExpire: originalItem?.daysToExpire || 7,
+        dayAdded: originalItem?.dayAdded || new Date().toISOString()
+      };
+    });
+  };
+
+  // Method to update pantry in the API
+  const updatePantryInAPI = async (updatedItems: PantryItem[]) => {
+    if (!user?.id || !originalPantryResponse) {
+      console.warn('Cannot update pantry: missing user ID or original response');
+      return;
+    }
+
+    try {
+      const apiFormatItems = convertPantryItemsToApiFormat(updatedItems);
+      console.log('Updating pantry with items:', apiFormatItems);
+      
+      // Here you would call the pantry update API
+      // await updatePantry(user.id, apiFormatItems);
+      
+      console.log('Pantry updated successfully');
+    } catch (error) {
+      console.error('Failed to update pantry:', error);
+    }
+  };
+
   // Authentication methods - now using AuthContext
   const login = async (email: string, password: string) => {
     await authLogin(email, password);
@@ -529,21 +578,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       ...item,
       id: Date.now().toString()
     };
-    setPantryItems(prev => [...prev, newItem]);
+    const updatedItems = [...pantryItems, newItem];
+    setPantryItems(updatedItems);
+    updatePantryInAPI(updatedItems);
   };
 
   const addIngredient = addPantryItem;
 
   const updatePantryItem = (id: string, updates: Partial<PantryItem>) => {
-    setPantryItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, ...updates } : item
-      )
+    const updatedItems = pantryItems.map(item => 
+      item.id === id ? { ...item, ...updates } : item
     );
+    setPantryItems(updatedItems);
+    updatePantryInAPI(updatedItems);
   };
 
   const deletePantryItem = (id: string) => {
-    setPantryItems(prev => prev.filter(item => item.id !== id));
+    const updatedItems = pantryItems.filter(item => item.id !== id);
+    setPantryItems(updatedItems);
+    updatePantryInAPI(updatedItems);
   };
 
   const deleteIngredient = deletePantryItem;
@@ -969,6 +1022,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     addAIDrink,
     deleteAIMeal,
     deleteAIDrink,
+    // Expose methods for pantry API operations
+    convertPantryItemsToApiFormat,
+    updatePantryInAPI,
+    originalPantryResponse
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

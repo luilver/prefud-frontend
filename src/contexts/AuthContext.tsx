@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
 
@@ -44,7 +43,19 @@ interface AuthUser {
     purchaseDate: string;
     location?: string;
     notes?: string;
+    classification: string;
+    carbonFootPrintToWaste: number;
+    daysToExpire: number;
+    dayAdded: string;
   }[];
+  originalPantryResponse?: {
+    _id: string;
+    user_id: string;
+    ingredients: any[];
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
   subscription?: {
     userId: string;
     subscriptionTypeId: string;
@@ -82,7 +93,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Start with loading true for initial check
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load user from localStorage on mount to persist session
   useEffect(() => {
@@ -147,7 +158,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         token: response.token,
         userId: response.userId,
         profile: response.profile,
-        pantry: response.pantry,
+        pantry: response.pantry.transformedItems,
+        originalPantryResponse: response.pantry.originalResponse,
         subscription: response.subscription
       };
 
@@ -158,10 +170,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(userData);
       console.log('Login successful, session saved');
       
-      // Trigger pantry sync event for UserContext
-      if (response.pantry) {
+      // Trigger pantry sync event for UserContext with both formats
+      if (response.pantry.transformedItems) {
         window.dispatchEvent(new CustomEvent('pantry-sync', { 
-          detail: { pantry: response.pantry } 
+          detail: { 
+            pantry: response.pantry.transformedItems,
+            originalPantryResponse: response.pantry.originalResponse
+          } 
         }));
       }
 
