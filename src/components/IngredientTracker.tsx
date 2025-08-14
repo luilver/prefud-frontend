@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +21,6 @@ const IngredientTracker = () => {
     updatePantryFromIngredients,
     addIngredient,
     user,
-    pantryItems,
     setPantryItems
   } = useUser();
   const { toast } = useToast();
@@ -38,15 +38,15 @@ const IngredientTracker = () => {
       const response = await getPantry(user.id);
       console.log('Pantry API response:', response);
       
-      if (response && response.ingredients) {
+      if (response && response.ingredients && Array.isArray(response.ingredients)) {
         // Transform API response to internal format
-        const transformedPantryItems = response.ingredients.map((ingredient: any) => {
+        const transformedPantryItems = response.ingredients.map((ingredient: any, index: number) => {
           const dayAdded = new Date(ingredient.dayAdded);
           const expiryDate = new Date(dayAdded);
           expiryDate.setDate(expiryDate.getDate() + ingredient.daysToExpire);
           
           return {
-            id: `${response._id}_${ingredient.name}`, // Create unique ID
+            id: `${response._id}_${ingredient.name}_${index}`, // Create unique ID with index
             name: ingredient.name,
             quantity: ingredient.quantity,
             unit: ingredient.unit,
@@ -63,14 +63,20 @@ const IngredientTracker = () => {
         });
         
         console.log('Transformed pantry items:', transformedPantryItems);
+        
         // Update pantry items in context with original response
-        if (setPantryItems) {
-          setPantryItems(transformedPantryItems, response);
-        }
+        setPantryItems(transformedPantryItems, response);
         
         toast({
           title: "Pantry Updated",
           description: `Successfully loaded ${transformedPantryItems.length} items from your pantry.`,
+        });
+      } else {
+        console.log('No ingredients found in response or invalid response structure');
+        setPantryItems([], response);
+        toast({
+          title: "No Items Found",
+          description: "Your pantry appears to be empty or no data was returned.",
         });
       }
     } catch (error) {
@@ -104,8 +110,14 @@ const IngredientTracker = () => {
 
   // Fetch pantry items on component mount
   useEffect(() => {
+    console.log('IngredientTracker mounted, current ingredients:', ingredients);
     fetchPantryItems();
   }, [user?.id]);
+
+  // Log ingredients changes for debugging
+  useEffect(() => {
+    console.log('Ingredients updated in IngredientTracker:', ingredients);
+  }, [ingredients]);
 
   const handleAddIngredient = (newIngredient: any) => {
     addIngredient(newIngredient);
@@ -394,7 +406,7 @@ const IngredientTracker = () => {
                   <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
                   <p className="text-lg">No ingredients found</p>
                   <p className="text-sm">
-                    {searchTerm ? 'Try a different search term' : 'Start by adding some ingredients to your pantry'}
+                    {searchTerm ? 'Try a different search term' : ingredients.length === 0 ? 'Your pantry is empty. Try refreshing or add some ingredients.' : 'Start by adding some ingredients to your pantry'}
                   </p>
                 </div>
               )}

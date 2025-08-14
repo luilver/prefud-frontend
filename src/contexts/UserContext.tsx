@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
-import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlanService';
+import { getMealPlans, transformApiMealPlanToLocal } from '@/services/mealPlans';
 
 interface User {
   id: string;
@@ -262,7 +262,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       if (pantry && Array.isArray(pantry)) {
         // Transform pantry items from API format to UserContext format
         const transformedPantryItems: PantryItem[] = pantry.map((item: any) => ({
-          id: item._id,
+          id: item._id || item.id,
           name: item.name,
           quantity: item.quantity,
           unit: item.unit,
@@ -273,6 +273,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           notes: item.notes
         }));
         
+        console.log('Setting pantry items from auth sync:', transformedPantryItems);
         setPantryItems(transformedPantryItems);
         setOriginalPantryResponse(originalPantryResponse);
         console.log('Pantry items updated from API:', transformedPantryItems);
@@ -289,6 +290,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Enhanced setPantryItems function that also stores original response
   const setPantryItemsWithOriginal = useCallback((items: PantryItem[], originalResponse?: any) => {
+    console.log('setPantryItemsWithOriginal called with:', items, originalResponse);
     setPantryItems(items);
     if (originalResponse) {
       setOriginalPantryResponse(originalResponse);
