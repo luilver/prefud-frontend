@@ -2,11 +2,13 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X, ShoppingCart } from "lucide-react";
+import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X, ShoppingCart, Package } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import MealShoppingModal from "./MealShoppingModal";
+import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AIMealViewProps {
   meal: any;
@@ -18,7 +20,9 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
-  const { deleteAIMeal, addShoppingItem } = useUser();
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const { deleteAIMeal, addShoppingItem, pantryItems, setPantryItems } = useUser();
   const { t } = useLanguage();
 
   const toggleStep = (stepIndex: number) => {
@@ -103,6 +107,61 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     }
     
     return [];
+  };
+
+  const handleIngredientToggle = (ingredientName: string) => {
+    setSelectedIngredients(prev => 
+      prev.includes(ingredientName)
+        ? prev.filter(name => name !== ingredientName)
+        : [...prev, ingredientName]
+    );
+  };
+
+  const handleAddToPantry = () => {
+    try {
+      const ingredientsToAdd = getIngredientsForShopping().filter(ingredient => 
+        selectedIngredients.includes(ingredient.name)
+      );
+
+      ingredientsToAdd.forEach((ingredient) => {
+        const newPantryItem = {
+          id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || 'ingredient',
+          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          addedDate: new Date().toISOString(),
+          lowStockThreshold: 1,
+          notes: `Added from AI meal: ${meal.name}`
+        };
+        setPantryItems(prev => [...prev, newPantryItem]);
+      });
+
+      toast.success(`Added ${ingredientsToAdd.length} ingredients to pantry!`);
+      setSelectedIngredients([]);
+    } catch (error) {
+      console.error('Error adding to pantry:', error);
+      toast.error("Failed to add ingredients to pantry. Please try again.");
+    }
+  };
+
+  const handleOrderOnline = () => {
+    setShowOrderModal(true);
+  };
+
+  const getSelectedIngredientsForOrder = () => {
+    return getIngredientsForShopping()
+      .filter(ingredient => selectedIngredients.includes(ingredient.name))
+      .map(ingredient => ({
+        id: `ingredient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || 'ingredient',
+        estimatedPrice: Math.floor(Math.random() * 10) + 2,
+        mealName: meal.name
+      }));
   };
 
   const nutrition = useMemo(() => ({
@@ -231,8 +290,9 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="recipe">{t("aiMealView.recipeTab") || "Recipe"}</TabsTrigger>
+                <TabsTrigger value="ingredients">{t("aiMealView.ingredientsSelector") || "Ingredients"}</TabsTrigger>
                 <TabsTrigger value="video">{t("aiMealView.videoTab") || "Video Tutorial"}</TabsTrigger>
               </TabsList>
               
@@ -323,6 +383,66 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                         </div>
                       ))}
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="ingredients" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Package className="h-5 w-5 text-blue-600" />
+                        <span>Ingredients Selector</span>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {selectedIngredients.length} selected
+                      </span>
+                    </CardTitle>
+                    <CardDescription>
+                      Select ingredients to add to your pantry or order online
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-3 max-h-64 overflow-y-auto">
+                      {getIngredientsForShopping().map((ingredient, index) => (
+                        <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                          <Checkbox
+                            id={`ingredient-${index}`}
+                            checked={selectedIngredients.includes(ingredient.name)}
+                            onCheckedChange={() => handleIngredientToggle(ingredient.name)}
+                          />
+                          <label
+                            htmlFor={`ingredient-${index}`}
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="font-medium">{ingredient.name}</div>
+                            <div className="text-sm text-gray-600">
+                              {ingredient.quantity} {ingredient.unit}
+                            </div>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+
+                    {selectedIngredients.length > 0 && (
+                      <div className="flex gap-3 pt-4 border-t">
+                        <Button
+                          onClick={handleAddToPantry}
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                        >
+                          <Package className="h-4 w-4 mr-2" />
+                          Add to Pantry ({selectedIngredients.length})
+                        </Button>
+                        <Button
+                          onClick={handleOrderOnline}
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          Order Online ({selectedIngredients.length})
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -514,6 +634,13 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         meal={meal}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
+      />
+
+      <OrderOnlineModal
+        isOpen={showOrderModal}
+        onClose={() => setShowOrderModal(false)}
+        items={getSelectedIngredientsForOrder()}
+        mealPlanName={meal.name}
       />
     </>
   );
