@@ -118,25 +118,35 @@ const { pantryItems, user } = useUser();
   const handleAddToPantry = async (items?: any[]) => {
     const itemsToAdd = items || plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) || [];
     
-    itemsToAdd.forEach(item => {
-      addPantryItem({
-        name: item.name,
-        quantity: item.quantity || 1,
-        unit: item.unit || 'piece',
-        category: item.category || 'other',
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        purchaseDate: new Date(),
-        notes: `Added from meal plan: ${plan.name}`
+    const newPantryItems = [];
+    itemsToAdd.forEach((ingredient) => {
+        const newPantryItem = {
+          id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || "ingredient",
+          purchased: true,
+          purchaseDate: new Date().toISOString(),
+          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste || 0,
+          daysToExpire: ingredient.daysToExpire || 7,
+          expiryDate: new Date(
+            Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000
+          ).toISOString(),
+          notes: `Carbon footprint:: ${ingredient.carbonFootPrintToWaste}`,
+        };
+        newPantryItems.push(newPantryItem);
+        // setPantryItems(prev => [...prev, newPantryItem]);
+        // console.log('pantry items after adding', [...pantryItems, newPantryItem]);
       });
-    });
 
     //add to the pantry to persiste the information in the database
-    console.log("Items added to pantry:", itemsToAdd);
+    console.log("Items added to pantry:", newPantryItems);
     console.log('items in the actual pantry:', pantryItems);
-    console.log('new patry with added items:', [...pantryItems, ...itemsToAdd]);
+    console.log('new patry with added items:', [...pantryItems, ...newPantryItems]);
 
     try {
-      const responseUpdatePantry = await updatePantry(user.id,[...pantryItems, ...itemsToAdd] );
+      const responseUpdatePantry = await updatePantry(user.id,[...pantryItems, ...newPantryItems] );
       console.log('first response from update pantry:', responseUpdatePantry);  
     } catch (error) {
       console.log('error updating pantry:', error);

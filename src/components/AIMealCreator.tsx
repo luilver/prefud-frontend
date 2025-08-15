@@ -101,6 +101,7 @@ const AIMealCreator = () => {
   };
 
   const handleViewApiMeal = (apiMeal: any) => {
+    console.log('selected meal ',apiMeal)
     const transformedMeal = {
       id: apiMeal._id,
       name: apiMeal.specialMeal.specialMeal.name,
@@ -113,7 +114,7 @@ const AIMealCreator = () => {
         ...(apiMeal.dietaryRestrictions || []),
         ...(apiMeal.cuisinePreferences?.slice(0, 2) || [])
       ],
-      ingredients: apiMeal.specialMeal.specialMeal.ingredients?.map((ing: any) => `${ing.quantity} ${ing.unit} ${ing.name}`) || [],
+      ingredients: apiMeal.specialMeal.ingredientsList.map((ing: any) => `${ing.quantity} ${ing.unit} ${ing.name}`) || [],
       instructions: apiMeal.specialMeal.specialMeal.steps || [],
       calories: apiMeal.specialMeal.specialMeal.calories,
       prepTime: `${apiMeal.specialMeal.specialMeal.cookingTime || 30} mins`,
@@ -124,6 +125,7 @@ const AIMealCreator = () => {
       ingredientsList: apiMeal.specialMeal.ingredientsList,
       isFromApi: true
     };
+    console.log('this is the transformed meal',transformedMeal)
     setSelectedMeal(transformedMeal);
   };
 
