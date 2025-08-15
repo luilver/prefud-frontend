@@ -125,7 +125,7 @@ const { pantryItems, user } = useUser();
           name: ingredient.name,
           quantity: ingredient.quantity,
           unit: ingredient.unit,
-          category: ingredient.classification || "ingredient",
+          category: ingredient.category || "ingredient aqui",
           purchased: true,
           purchaseDate: new Date().toISOString(),
           carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste || 0,

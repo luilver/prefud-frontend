@@ -82,7 +82,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
           name: ingredient.name,
           quantity: ingredient.quantity,
           unit: ingredient.unit,
-          category: ingredient.classification || "ingredient",
+          category: ingredient.category || "ingredient aqui",
           priority: "medium",
           purchased: false,
           notes: `From AI meal: ${meal.name}`,

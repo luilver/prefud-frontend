@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import DrinkShoppingModal from "./DrinkShoppingModal";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { updatePantry } from "@/services/pantryService";
 
 interface DrinkDetailViewProps {
   drink: ApiDrink;
@@ -21,7 +22,7 @@ interface DrinkDetailViewProps {
 
 const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   const { t } = useLanguage();
-  const { addShoppingItem, addPantryItem } = useUser();
+  const { addShoppingItem, addPantryItem, pantryItems, user } = useUser();
   const { toast } = useToast();
   const [showIngredients, setShowIngredients] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -31,6 +32,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
 
   const handleCreateShoppingList = () => {
     try {
@@ -69,7 +71,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
     }
   };
 
-  const handleAddToPantry = () => {
+  const handleAddToPantry = async() => {
     const selectedIngredientsData = drink.drinkPlan.ingredientsList.filter(
       ingredient => selectedIngredients.includes(ingredient.name)
     );
@@ -87,6 +89,36 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
           location: 'Pantry'
         });
       });
+
+      ///here the same process to add to pantry
+const newPantryItems = [];
+    selectedIngredientsData.forEach((ingredient) => {
+        const newPantryItem = {
+          id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification || "ingredient",
+          purchased: true,
+          purchaseDate: new Date().toISOString(),
+          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste || 0,
+          daysToExpire: ingredient.daysToExpire || 7,
+          expiryDate: new Date(
+            Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000
+          ).toISOString(),
+          notes: `Carbon footprint:: ${ingredient.carbonFootPrintToWaste}`,
+        };
+        newPantryItems.push(newPantryItem);
+        // setPantryItems(prev => [...prev, newPantryItem]);
+        // console.log('pantry items after adding', [...pantryItems, newPantryItem]);
+      });
+
+      try {
+            const responseUpdatePantry = await updatePantry(user.id,[...pantryItems, ...newPantryItems] );
+            console.log('first response from update pantry:', responseUpdatePantry);  
+          } catch (error) {
+            console.log('error updating pantry:', error);
+          }
 
       toast({
         title: t("drinkDetailView.addedToPantry") || "Added to Pantry!",
