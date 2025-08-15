@@ -28,7 +28,6 @@ import MealShoppingModal from "./MealShoppingModal";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Checkbox } from "@/components/ui/checkbox";
-import { updatePantry, type Ingredient } from "@/services/pantryService";
 
 interface AIMealViewProps {
   meal: any;
@@ -42,10 +41,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [showShoppingModal, setShowShoppingModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const [isAddingToPantry, setIsAddingToPantry] = useState(false);
-  
-  const { deleteAIMeal, addShoppingItem, pantryItems, setPantryItems, user } =
-    useUser();
+  const { deleteAIMeal, addShoppingItem, pantryItems, setPantryItems } = useUser();
   const { t } = useLanguage();
 
   const toggleStep = (stepIndex: number) => {
@@ -78,7 +74,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
 
   const handleCreateShoppingList = () => {
     try {
-      const ingredients = getEnhancedIngredientsForShopping();
+      const ingredients = getIngredientsForShopping();
       ingredients.forEach((ingredient) => {
         addShoppingItem({
           name: ingredient.name,
@@ -100,154 +96,38 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     }
   };
 
-  const getEnhancedIngredientsForShopping = (): Ingredient[] => {
+  const getIngredientsForShopping = () => {
     if (meal.ingredients && Array.isArray(meal.ingredients)) {
-      return meal.ingredients.map((ingredient: any, index: number) => {
-        let name: string;
-        let quantity: number;
-        let unit: string;
-        let classification: string;
-
-        if (typeof ingredient === "object" && ingredient.name) {
-          name = ingredient.name;
-          quantity = ingredient.quantity || 1;
-          unit = ingredient.unit || "unit";
-          classification = ingredient.classification || "ingredient";
-        } else {
-          const ingredientStr = String(ingredient);
-          const match = ingredientStr.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
-          if (match) {
-            quantity = parseFloat(match[1]);
-            unit = match[2];
-            name = match[3];
-          } else {
-            // Try to extract quantity from beginning
-            const quantityMatch = ingredientStr.match(
-              /^(\d+(?:\.\d+)?)\s*(.+)$/
-            );
-            if (quantityMatch) {
-              quantity = parseFloat(quantityMatch[1]);
-              name = quantityMatch[2];
-              unit = "unit";
-            } else {
-              name = ingredientStr;
-              quantity = 1;
-              unit = "unit";
-            }
-          }
-
-          // Classify ingredients based on common categories
-          classification = classifyIngredient(name);
+      return meal.ingredients.map((ingredient: any) => {
+        if (typeof ingredient === 'object' && ingredient.name) {
+          return {
+            name: ingredient.name,
+            quantity: ingredient.quantity || 1,
+            unit: ingredient.unit || 'unit',
+            classification: ingredient.classification || 'ingredient'
+          };
         }
-
+        
+        const ingredientStr = String(ingredient);
+        const match = ingredientStr.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
+        if (match) {
+          return {
+            name: match[3],
+            quantity: parseFloat(match[1]),
+            unit: match[2],
+            classification: 'ingredient'
+          };
+        }
         return {
-          name,
-          quantity,
-          unit,
-          classification,
-          carbonFootPrintToWaste: calculateCarbonFootprint(
-            name,
-            classification
-          ),
-          daysToExpire: getDaysToExpire(classification),
-          dayAdded: new Date().toISOString().split("T")[0],
+          name: ingredientStr,
+          quantity: 1,
+          unit: 'unit',
+          classification: 'ingredient'
         };
       });
     }
 
     return [];
-  };
-
-  const classifyIngredient = (name: string): string => {
-    const lowerName = name.toLowerCase();
-
-    if (
-      lowerName.includes("chicken") ||
-      lowerName.includes("beef") ||
-      lowerName.includes("pork") ||
-      lowerName.includes("fish") ||
-      lowerName.includes("turkey") ||
-      lowerName.includes("meat")
-    ) {
-      return "protein";
-    }
-    if (
-      lowerName.includes("milk") ||
-      lowerName.includes("cheese") ||
-      lowerName.includes("butter") ||
-      lowerName.includes("yogurt") ||
-      lowerName.includes("cream")
-    ) {
-      return "dairy";
-    }
-    if (
-      lowerName.includes("apple") ||
-      lowerName.includes("banana") ||
-      lowerName.includes("berry") ||
-      lowerName.includes("orange") ||
-      lowerName.includes("grape") ||
-      lowerName.includes("fruit")
-    ) {
-      return "fruit";
-    }
-    if (
-      lowerName.includes("carrot") ||
-      lowerName.includes("broccoli") ||
-      lowerName.includes("spinach") ||
-      lowerName.includes("tomato") ||
-      lowerName.includes("onion") ||
-      lowerName.includes("vegetable")
-    ) {
-      return "vegetable";
-    }
-    if (
-      lowerName.includes("rice") ||
-      lowerName.includes("pasta") ||
-      lowerName.includes("bread") ||
-      lowerName.includes("flour") ||
-      lowerName.includes("grain")
-    ) {
-      return "grain";
-    }
-    if (
-      lowerName.includes("oil") ||
-      lowerName.includes("vinegar") ||
-      lowerName.includes("sauce") ||
-      lowerName.includes("spice") ||
-      lowerName.includes("herb")
-    ) {
-      return "condiment";
-    }
-    return "ingredient";
-  };
-
-  const calculateCarbonFootprint = (
-    name: string,
-    classification: string
-  ): number => {
-    const footprintMap: { [key: string]: number } = {
-      protein: 3.5,
-      dairy: 2.8,
-      fruit: 1.2,
-      vegetable: 0.8,
-      grain: 1.5,
-      condiment: 0.5,
-      ingredient: 1.0,
-    };
-    return footprintMap[classification] || 1.0;
-  };
-
-  const getDaysToExpire = (classification: string): number => {
-    const expirationMap: { [key: string]: number } = {
-      protein: 3,
-      dairy: 7,
-      fruit: 5,
-      vegetable: 7,
-      grain: 30,
-      condiment: 90,
-      ingredient: 14,
-    };
-    return expirationMap[classification] || 14;
   };
 
   const handleIngredientToggle = (ingredientName: string) => {
@@ -258,31 +138,22 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     );
   };
 
-  const handleAddToPantry = async () => {
-    if (!user?.id) {
-      toast.error("Please log in to add ingredients to pantry.");
-      return;
-    }
-
-    setIsAddingToPantry(true);
-
+  const handleAddToPantry = () => {
     try {
-      const ingredientsToAdd = getEnhancedIngredientsForShopping().filter(
-        (ingredient) => selectedIngredients.includes(ingredient.name)
+      const ingredientsToAdd = getIngredientsForShopping().filter(ingredient => 
+        selectedIngredients.includes(ingredient.name)
       );
-      //await updatePantry(user.id, ingredientsToAdd);
-
-      console.log("ingredientsToAdd:", ingredientsToAdd);
 
       const newPantryItems = ingredientsToAdd.map((ingredient) => ({
         name: ingredient.name,
         quantity: ingredient.quantity,
         unit: ingredient.unit,
-        category: ingredient.classification || "ingredient",
-        expiryDate: new Date(
-          Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000
-        ),
+        category: ingredient.classification || 'ingredient',
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         purchaseDate: new Date(),
+        location: '',
+        notes: `Added from AI meal: ${meal.name}`
+      }));
 
         notes: `Added from AI meal: ${meal.name}`,
       }));
@@ -304,8 +175,6 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     } catch (error) {
       console.error("Error adding to pantry:", error);
       toast.error("Failed to add ingredients to pantry. Please try again.");
-    } finally {
-      setIsAddingToPantry(false);
     }
   };
 
@@ -314,12 +183,10 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   };
 
   const getSelectedIngredientsForOrder = () => {
-    return getEnhancedIngredientsForShopping()
-      .filter((ingredient) => selectedIngredients.includes(ingredient.name))
-      .map((ingredient) => ({
-        id: `ingredient-${Date.now()}-${Math.random()
-          .toString(36)
-          .substr(2, 9)}`,
+    return getIngredientsForShopping()
+      .filter(ingredient => selectedIngredients.includes(ingredient.name))
+      .map(ingredient => ({
+        id: `ingredient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: ingredient.name,
         quantity: ingredient.quantity,
         unit: ingredient.unit,
@@ -342,14 +209,12 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   );
 
   const getIngredientsWithQuantities = (ingredients: any[]) => {
-    return ingredients.map((ingredient) => {
-      const ingredientStr =
-        typeof ingredient === "string"
-          ? ingredient
-          : typeof ingredient === "object" && ingredient?.name
-          ? ingredient.name
-          : String(ingredient);
-
+    return ingredients.map(ingredient => {
+      // Ensure ingredient is a string, handle objects or other types
+      const ingredientStr = typeof ingredient === 'string' ? ingredient : 
+                           typeof ingredient === 'object' && ingredient?.name ? ingredient.name :
+                           String(ingredient);
+      
       if (/^\d/.test(ingredientStr)) {
         return ingredientStr;
       }
@@ -616,54 +481,34 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid gap-3 max-h-64 overflow-y-auto">
-                      {getEnhancedIngredientsForShopping().map(
-                        (ingredient, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                      {getIngredientsForShopping().map((ingredient, index) => (
+                        <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                          <Checkbox
+                            id={`ingredient-${index}`}
+                            checked={selectedIngredients.includes(ingredient.name)}
+                            onCheckedChange={() => handleIngredientToggle(ingredient.name)}
+                          />
+                          <label
+                            htmlFor={`ingredient-${index}`}
+                            className="flex-1 cursor-pointer"
                           >
-                            <Checkbox
-                              id={`ingredient-${index}`}
-                              checked={selectedIngredients.includes(
-                                ingredient.name
-                              )}
-                              onCheckedChange={() =>
-                                handleIngredientToggle(ingredient.name)
-                              }
-                            />
-                            <label
-                              htmlFor={`ingredient-${index}`}
-                              className="flex-1 cursor-pointer"
-                            >
-                              <div className="font-medium">
-                                {ingredient.name}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {ingredient.quantity} {ingredient.unit} •{" "}
-                                {ingredient.classification}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                Expires in {ingredient.daysToExpire} days •
-                                Carbon footprint:{" "}
-                                {ingredient.carbonFootPrintToWaste}kg
-                              </div>
-                            </label>
-                          </div>
-                        )
-                      )}
+                            <div className="font-medium">{ingredient.name}</div>
+                            <div className="text-sm text-gray-600">
+                              {ingredient.quantity} {ingredient.unit}
+                            </div>
+                          </label>
+                        </div>
+                      ))}
                     </div>
 
                     {selectedIngredients.length > 0 && (
                       <div className="flex gap-3 pt-4 border-t">
                         <Button
                           onClick={handleAddToPantry}
-                          disabled={isAddingToPantry}
                           className="flex-1 bg-green-600 hover:bg-green-700"
                         >
                           <Package className="h-4 w-4 mr-2" />
-                          {isAddingToPantry
-                            ? "Adding..."
-                            : `Add to Pantry (${selectedIngredients.length})`}
+                          Add to Pantry ({selectedIngredients.length})
                         </Button>
                         <Button
                           onClick={handleOrderOnline}
