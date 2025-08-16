@@ -39,6 +39,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+  const [currentSubscriptionId, setCurrentSubscriptionId] = useState<string>("");
 
   // Convert API subscription types to UI subscription plans
   const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
@@ -100,13 +101,21 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
         
         const convertedPlans = convertApiToPlans(apiPlans);
         setPlans(convertedPlans);
+
+        // Set current subscription ID for comparison
+        const userSubId = (user?.subscription?.subscriptionTypeId ?? "").toString().trim();
+        console.log("[SubscriptionPurchase] User subscription ID:", userSubId);
+        setCurrentSubscriptionId(userSubId);
         
-        // Set default to family plan if available
+        // Set default to family plan if available and not current
         const familyPlan = convertedPlans.find(plan => plan.name.toLowerCase() === 'family');
-        if (familyPlan) {
+        if (familyPlan && familyPlan.id !== userSubId) {
           setSelectedPlan(familyPlan);
-        } else if (convertedPlans.length > 0) {
-          setSelectedPlan(convertedPlans[0]);
+        } else {
+          const availablePlan = convertedPlans.find(plan => plan.id !== userSubId);
+          if (availablePlan) {
+            setSelectedPlan(availablePlan);
+          }
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -121,7 +130,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
     };
 
     fetchData();
-  }, []);
+  }, [user?.subscription?.subscriptionTypeId]);
 
   useEffect(() => {
     // Set default payment method as selected
@@ -244,57 +253,69 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
 
       {/* Plan Selection */}
       <div className="grid md:grid-cols-2 gap-6">
-        {plans.map((plan) => (
-          <Card 
-            key={plan.id}
-            className={`relative cursor-pointer transition-all ${
-              selectedPlan?.id === plan.id
-                ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
-                : plan.popular
-                ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
-                : 'border-gray-200 hover:border-green-300'
-            }`}
-            onClick={() => setSelectedPlan(plan)}
-          >
-            {plan.popular && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                  <Crown className="h-3 w-3" />
-                  <span>Most Popular</span>
+        {plans.map((plan) => {
+          const isCurrentPlan = plan.id === currentSubscriptionId;
+          
+          return (
+            <Card 
+              key={plan.id}
+              className={`relative cursor-pointer transition-all ${
+                selectedPlan?.id === plan.id
+                  ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
+                  : plan.popular
+                  ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
+                  : 'border-gray-200 hover:border-green-300'
+              } ${isCurrentPlan ? 'opacity-50' : ''}`}
+              onClick={() => !isCurrentPlan && setSelectedPlan(plan)}
+            >
+              {isCurrentPlan && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                    Current Plan
+                  </div>
                 </div>
-              </div>
-            )}
-            
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">{plan.name}</CardTitle>
-              <CardDescription>
-                <div className="text-3xl font-bold text-gray-800 mt-2">
-                  ${plan.price}
-                  <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>
+              )}
+              
+              {plan.popular && !isCurrentPlan && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                    <Crown className="h-3 w-3" />
+                    <span>Most Popular</span>
+                  </div>
                 </div>
-              </CardDescription>
-            </CardHeader>
+              )}
+              
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl">{plan.name}</CardTitle>
+                <CardDescription>
+                  <div className="text-3xl font-bold text-gray-800 mt-2">
+                    ${plan.price}
+                    <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>
+                  </div>
+                </CardDescription>
+              </CardHeader>
 
-            <CardContent className="space-y-4">
-              <ul className="space-y-3">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start space-x-3">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            
-            {selectedPlan?.id === plan.id && (
-              <div className="absolute top-4 right-4">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <Check className="h-4 w-4 text-white" />
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start space-x-3">
+                      <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              
+              {selectedPlan?.id === plan.id && !isCurrentPlan && (
+                <div className="absolute top-4 right-4">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <Check className="h-4 w-4 text-white" />
+                  </div>
                 </div>
-              </div>
-            )}
-          </Card>
-        ))}
+              )}
+            </Card>
+          );
+        })}
       </div>
 
       {/* Payment Method Selection */}
