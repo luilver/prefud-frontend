@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,20 +7,63 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { User, Mail, Phone, Globe, MapPin, Edit2, Save, X, Languages } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/contexts/AuthContext";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
 import PasswordUpdate from "./PasswordUpdate";
+import axios from "axios";
+
+interface SubscriptionType {
+  _id: string;
+  name: string;
+  price: number;
+  mealPlans: number;
+  healthyDrinks: number;
+  specialMeals: number;
+  generatedMeals: number;
+}
 
 const UserProfile = () => {
   const { user, updateUserProfile } = useUser();
+  const { user: authUser } = useAuth();
   const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
+  const [subscriptionTypes, setSubscriptionTypes] = useState<SubscriptionType[]>([]);
+  const [currentSubscriptionName, setCurrentSubscriptionName] = useState<string>("");
   const [editData, setEditData] = useState({
     name: user?.name || "",
     email: user?.email || "",
     phone: user?.phone || "",
     country: user?.country || ""
   });
+
+  // Fetch subscription types on component mount
+  useEffect(() => {
+    const fetchSubscriptionTypes = async () => {
+      try {
+        const response = await axios.get('https://pantry-auth-1.onrender.com/subscriptionType/all');
+        setSubscriptionTypes(response.data);
+      } catch (error) {
+        console.error('Error fetching subscription types:', error);
+      }
+    };
+
+    fetchSubscriptionTypes();
+  }, []);
+
+  // Find current subscription name based on subscriptionTypeId
+  useEffect(() => {
+    if (subscriptionTypes.length > 0 && authUser?.subscription?.subscriptionTypeId) {
+      const currentSubscription = subscriptionTypes.find(
+        sub => sub._id === authUser.subscription.subscriptionTypeId
+      );
+      setCurrentSubscriptionName(currentSubscription?.name || "Unknown");
+    } else {
+      // Default to Free if no subscription found
+      const freeSubscription = subscriptionTypes.find(sub => sub.name.toLowerCase() === 'free');
+      setCurrentSubscriptionName(freeSubscription?.name || "Free");
+    }
+  }, [subscriptionTypes, authUser?.subscription?.subscriptionTypeId]);
 
   if (!user) return null;
 
@@ -225,8 +268,8 @@ const UserProfile = () => {
             <h3 className="text-lg font-medium">{t('profile.subscription') || 'Subscription'}</h3>
             <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
               <Globe className="h-4 w-4 text-gray-500" />
-              <span className="capitalize">{user.subscription.plan} {t('profile.plan') || 'Plan'}</span>
-              {user.subscription.isSubscribed && (
+              <span className="capitalize">{currentSubscriptionName} {t('profile.plan') || 'Plan'}</span>
+              {authUser?.subscription?.status && (
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full ml-auto">
                   {t('profile.active') || 'Active'}
                 </span>
