@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star } from "lucide-react";
+import { Check, Crown, Star, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAllSubscriptionTypes, ApiSubscriptionType } from "@/services/payments";
 import PaymentForm from "./PaymentForm";
+import SubscriptionCancelModal from "./SubscriptionCancelModal";
+import PaymentMethodModal from "./PaymentMethodModal";
+import SubscriptionSuccessModal from "./SubscriptionSuccessModal";
 
 interface SubscriptionPlan {
   id: string;
@@ -28,6 +31,10 @@ const SubscriptionManager = () => {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentSubscriptionId, setCurrentSubscriptionId] = useState<string>("");
+  const [currentSubscriptionName, setCurrentSubscriptionName] = useState<string>("Free");
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -113,17 +120,36 @@ const SubscriptionManager = () => {
   }, [toast, user?.subscription?.subscriptionTypeId]);
 
   const handleSelectPlan = (plan: SubscriptionPlan) => {
+    if (plan.id === currentSubscriptionId) return;
+    
     setSelectedPlan(plan);
-    setShowPaymentForm(true);
+    if (plan.price === 0) {
+      // Free plan - direct subscription without payment
+      handleSubscriptionSuccess();
+    } else {
+      // Paid plan - show payment modal
+      setShowPaymentModal(true);
+    }
+  };
+
+  const handleCancelSubscription = () => {
+    // Simulate switching to free plan
+    setCurrentSubscriptionId("");
+    setCurrentSubscriptionName("Free");
+    setShowCancelModal(false);
+  };
+
+  const handleSubscriptionSuccess = () => {
+    if (selectedPlan) {
+      setCurrentSubscriptionId(selectedPlan.id);
+      setCurrentSubscriptionName(selectedPlan.name);
+      setShowPaymentModal(false);
+      setShowSuccessModal(true);
+    }
   };
 
   const handlePaymentSuccess = (paymentData: any) => {
-    toast({
-      title: "Subscription Activated!",
-      description: `Welcome to ${selectedPlan?.name}! Your subscription is now active.`,
-    });
-    setShowPaymentForm(false);
-    setSelectedPlan(null);
+    handleSubscriptionSuccess();
   };
 
   const handlePaymentBack = () => {
@@ -184,11 +210,35 @@ const SubscriptionManager = () => {
         <p className="text-gray-600 max-w-2xl mx-auto">
           Select the perfect plan for your meal planning needs. Upgrade or downgrade anytime.
         </p>
+        
+        {/* Current Subscription Display */}
+        {currentSubscriptionName !== "Free" && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Crown className="h-5 w-5 text-green-600" />
+                <span className="font-medium text-green-800">
+                  Current: {currentSubscriptionName} Plan
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCancelModal(true)}
+                className="text-red-600 border-red-200 hover:bg-red-50"
+              >
+                <XCircle className="h-4 w-4 mr-1" />
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
         {plans.map((plan) => {
-          const isCurrentPlan = plan.id === currentSubscriptionId;
+          const isCurrentPlan = plan.id === currentSubscriptionId || 
+                               (currentSubscriptionName === "Free" && plan.price === 0);
           
           return (
             <Card 
@@ -197,13 +247,21 @@ const SubscriptionManager = () => {
                 plan.popular 
                   ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white' 
                   : 'border-gray-200'
-              }`}
+              } ${isCurrentPlan ? 'ring-2 ring-blue-500' : ''}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
                     <Star className="h-3 w-3" />
                     <span>Most Popular</span>
+                  </div>
+                </div>
+              )}
+              
+              {isCurrentPlan && (
+                <div className="absolute -top-3 right-4">
+                  <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    Current Plan
                   </div>
                 </div>
               )}
@@ -265,6 +323,28 @@ const SubscriptionManager = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <SubscriptionCancelModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelSubscription}
+        currentPlan={currentSubscriptionName}
+      />
+
+      <PaymentMethodModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onSuccess={handleSubscriptionSuccess}
+        selectedPlan={selectedPlan || { id: "", name: "", price: 0 }}
+      />
+
+      <SubscriptionSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        planName={selectedPlan?.name || ""}
+        planPrice={selectedPlan?.price || 0}
+      />
     </div>
   );
 };

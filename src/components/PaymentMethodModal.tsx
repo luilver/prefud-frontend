@@ -1,0 +1,276 @@
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { CreditCard, Plus, X, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface PaymentMethod {
+  id: string;
+  brand: string;
+  last4: string;
+  expiryMonth: number;
+  expiryYear: number;
+  isDefault: boolean;
+}
+
+interface PaymentMethodModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  selectedPlan: {
+    id: string;
+    name: string;
+    price: number;
+  };
+}
+
+const PaymentMethodModal = ({ 
+  isOpen, 
+  onClose, 
+  onSuccess,
+  selectedPlan 
+}: PaymentMethodModalProps) => {
+  const [paymentMethods] = useState<PaymentMethod[]>([
+    {
+      id: "pm_1",
+      brand: "visa",
+      last4: "4242",
+      expiryMonth: 12,
+      expiryYear: 2025,
+      isDefault: true
+    },
+    {
+      id: "pm_2",
+      brand: "mastercard",
+      last4: "8888",
+      expiryMonth: 8,
+      expiryYear: 2026,
+      isDefault: false
+    }
+  ]);
+  
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("pm_1");
+  const [showAddCard, setShowAddCard] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [cardName, setCardName] = useState("");
+  const { toast } = useToast();
+
+  const handleSubscribe = async () => {
+    setIsProcessing(true);
+    try {
+      // Simulate API call to process subscription
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      onSuccess();
+      toast({
+        title: "Subscription Successful!",
+        description: `Welcome to ${selectedPlan.name}! Your subscription is now active.`,
+      });
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Payment Failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleAddCard = async () => {
+    if (!cardNumber || !expiryDate || !cvv || !cardName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all card details.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      // Simulate API call to add card
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Card Added",
+        description: "Your payment method has been added successfully.",
+      });
+      setShowAddCard(false);
+      // Reset form
+      setCardNumber("");
+      setExpiryDate("");
+      setCvv("");
+      setCardName("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add payment method. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <div className="flex items-center justify-between">
+            <DialogTitle>Choose Payment Method</DialogTitle>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <DialogDescription>
+            Select a payment method for your {selectedPlan.name} subscription (${selectedPlan.price}/month)
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {!showAddCard ? (
+            <>
+              <div className="space-y-4">
+                <h4 className="font-medium">Saved Payment Methods</h4>
+                <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                  {paymentMethods.map((method) => (
+                    <div key={method.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                      <RadioGroupItem value={method.id} id={method.id} />
+                      <Label htmlFor={method.id} className="flex-1 cursor-pointer">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <CreditCard className="h-5 w-5 text-gray-600" />
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <span className="font-medium capitalize">{method.brand}</span>
+                                <span>•••• {method.last4}</span>
+                                {method.isDefault && (
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                                    Default
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-500">
+                                Expires {method.expiryMonth.toString().padStart(2, '0')}/{method.expiryYear}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowAddCard(true)}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Payment Method
+                </Button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <h4 className="font-semibold text-gray-800">{selectedPlan.name} Plan</h4>
+                  <p className="text-2xl font-bold text-green-600">
+                    ${selectedPlan.price}/month
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleSubscribe}
+                  disabled={isProcessing}
+                  className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                >
+                  {isProcessing ? 'Processing...' : 'Subscribe Now'}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium">Add New Card</h4>
+                <Button variant="ghost" size="sm" onClick={() => setShowAddCard(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="cardName">Cardholder Name</Label>
+                  <Input
+                    id="cardName"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                    placeholder="John Doe"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="cardNumber">Card Number</Label>
+                  <Input
+                    id="cardNumber"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value)}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={19}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="expiryDate">Expiry Date</Label>
+                    <Input
+                      id="expiryDate"
+                      value={expiryDate}
+                      onChange={(e) => setExpiryDate(e.target.value)}
+                      placeholder="MM/YY"
+                      maxLength={5}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="cvv">CVV</Label>
+                    <Input
+                      id="cvv"
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value)}
+                      placeholder="123"
+                      maxLength={3}
+                    />
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={handleAddCard}
+                  disabled={isProcessing}
+                  className="w-full"
+                >
+                  {isProcessing ? 'Adding Card...' : 'Add Card'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default PaymentMethodModal;
