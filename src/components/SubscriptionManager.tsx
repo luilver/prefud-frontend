@@ -1,10 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Crown, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { getAllSubscriptionTypes, ApiSubscriptionType } from "@/services/payments";
 import PaymentForm from "./PaymentForm";
 
 interface SubscriptionPlan {
@@ -22,75 +23,89 @@ interface SubscriptionPlan {
   popular?: boolean;
 }
 
-const plans: SubscriptionPlan[] = [
-  {
-    id: "free",
-    name: "Free",
-    price: 0,
-    interval: "month",
-    features: [
-      "1 Meal Plan per month",
-      "3 Meal Creations with pantry ingredients",
-      "Basic Recipe Collection",
-      "Shopping List Generator",
-      "Email Support"
-    ],
-    limits: {
-      plansPerMonth: 1,
-      mealCreations: 3,
-      deliveryCommissions: 0
-    }
-  },
-  {
-    id: "family",
-    name: "Family",
-    price: 40,
-    interval: "month",
-    popular: true,
-    features: [
-      "5 Meal Plans per month",
-      "10 Meal Creations with pantry ingredients",
-      "AI Meal Recommendations",
-      "Advanced Recipe Collection",
-      "3 Free Delivery Commissions",
-      "Nutritional Analysis",
-      "Priority Support"
-    ],
-    limits: {
-      plansPerMonth: 5,
-      mealCreations: 10,
-      deliveryCommissions: 3
-    }
-  },
-  {
-    id: "professional",
-    name: "Professional",
-    price: 120,
-    interval: "month",
-    features: [
-      "12 Meal Plans per month",
-      "Unlimited Meal Creations",
-      "10 Free Delivery Commissions",
-      "3 Free Home Deliveries",
-      "Advanced AI Recommendations",
-      "Custom Dietary Plans",
-      "Professional Analytics",
-      "Phone Support"
-    ],
-    limits: {
-      plansPerMonth: 12,
-      mealCreations: -1, // unlimited
-      deliveryCommissions: 10,
-      homeDeliveries: 3
-    }
-  }
-];
-
 const SubscriptionManager = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Convert API subscription types to UI subscription plans
+  const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
+    return apiPlans.map((apiPlan) => {
+      const priceInDollars = apiPlan.price / 100; // Convert cents to dollars
+      
+      // Generate features based on the plan data
+      const features = [
+        `${apiPlan.mealPlans} Meal Plans per month`,
+        `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
+        `${apiPlan.healthyDrinks} Healthy Drinks per month`,
+        `${apiPlan.specialMeals} Special Meals per month`
+      ];
+
+      // Add additional features based on plan type
+      if (apiPlan.name.toLowerCase() === 'free') {
+        features.push("Basic Recipe Collection", "Shopping List Generator", "Email Support");
+      } else if (apiPlan.name.toLowerCase() === 'family') {
+        features.push(
+          "AI Meal Recommendations",
+          "Advanced Recipe Collection", 
+          "3 Free Delivery Commissions",
+          "Nutritional Analysis",
+          "Priority Support"
+        );
+      } else if (apiPlan.name.toLowerCase() === 'professional') {
+        features.push(
+          "10 Free Delivery Commissions",
+          "3 Free Home Deliveries",
+          "Advanced AI Recommendations", 
+          "Custom Dietary Plans",
+          "Professional Analytics",
+          "Phone Support"
+        );
+      }
+
+      return {
+        id: apiPlan._id,
+        name: apiPlan.name,
+        price: priceInDollars,
+        interval: "month",
+        features,
+        limits: {
+          plansPerMonth: apiPlan.mealPlans,
+          mealCreations: apiPlan.generatedMeals,
+          deliveryCommissions: apiPlan.name.toLowerCase() === 'family' ? 3 : 
+                              apiPlan.name.toLowerCase() === 'professional' ? 10 : 0,
+          homeDeliveries: apiPlan.name.toLowerCase() === 'professional' ? 3 : undefined
+        },
+        popular: apiPlan.name.toLowerCase() === 'family'
+      };
+    });
+  };
+
+  // Fetch subscription types on component mount
+  useEffect(() => {
+    const fetchSubscriptionTypes = async () => {
+      try {
+        setIsLoading(true);
+        const apiPlans = await getAllSubscriptionTypes();
+        const convertedPlans = convertApiToPlans(apiPlans);
+        setPlans(convertedPlans);
+      } catch (error) {
+        console.error('Error fetching subscription types:', error);
+        toast({
+          title: "Error Loading Plans",
+          description: "Failed to load subscription plans. Please try again later.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSubscriptionTypes();
+  }, [toast]);
 
   const handleSelectPlan = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
@@ -124,6 +139,36 @@ const SubscriptionManager = () => {
         }}
         selectedPlan={selectedPlan}
       />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-bold text-gray-800">Choose Your Plan</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Loading subscription plans...
+          </p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="text-center">
+                <div className="h-8 bg-gray-200 rounded mb-4"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="h-4 bg-gray-200 rounded"></div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -162,8 +207,8 @@ const SubscriptionManager = () => {
               <CardTitle className="text-xl">{plan.name}</CardTitle>
               <CardDescription>
                 <div className="text-3xl font-bold text-gray-800 mt-2">
-                  ${plan.price}
-                  <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>
+                  {plan.price === 0 ? 'Free' : `$${plan.price}`}
+                  {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
                 </div>
               </CardDescription>
             </CardHeader>
@@ -185,8 +230,9 @@ const SubscriptionManager = () => {
                     ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600'
                     : 'bg-gray-800 hover:bg-gray-700'
                 }`}
+                disabled={plan.price === 0}
               >
-                Get {plan.name}
+                {plan.price === 0 ? 'Current Plan' : `Get ${plan.name}`}
               </Button>
             </CardContent>
           </Card>

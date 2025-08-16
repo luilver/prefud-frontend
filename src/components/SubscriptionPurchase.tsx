@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { Plus, CreditCard, ArrowLeft, Check, Crown } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { getAllSubscriptionTypes, ApiSubscriptionType } from "@/services/payments";
 import PaymentForm from "./PaymentForm";
 
 interface SubscriptionPlan {
@@ -25,52 +25,6 @@ interface SubscriptionPlan {
   popular?: boolean;
 }
 
-const plans: SubscriptionPlan[] = [
-  {
-    id: "family",
-    name: "Family",
-    price: 40,
-    interval: "month",
-    popular: true,
-    features: [
-      "5 Meal Plans per month",
-      "10 Meal Creations with pantry ingredients",
-      "AI Meal Recommendations",
-      "Advanced Recipe Collection",
-      "3 Free Delivery Commissions",
-      "Nutritional Analysis",
-      "Priority Support"
-    ],
-    limits: {
-      plansPerMonth: 5,
-      mealCreations: 10,
-      deliveryCommissions: 3
-    }
-  },
-  {
-    id: "professional",
-    name: "Professional",
-    price: 120,
-    interval: "month",
-    features: [
-      "12 Meal Plans per month",
-      "Unlimited Meal Creations",
-      "10 Free Delivery Commissions",
-      "3 Free Home Deliveries",
-      "Advanced AI Recommendations",
-      "Custom Dietary Plans",
-      "Professional Analytics",
-      "Phone Support"
-    ],
-    limits: {
-      plansPerMonth: 12,
-      mealCreations: -1, // unlimited
-      deliveryCommissions: 10,
-      homeDeliveries: 3
-    }
-  }
-];
-
 interface SubscriptionPurchaseProps {
   onBack: () => void;
 }
@@ -79,13 +33,94 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
   const { paymentMethods, getPaymentMethods, createCheckoutWithPaymentMethod, acceptSubscription } = useUser();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>(plans[0]); // Default to family
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+
+  // Convert API subscription types to UI subscription plans
+  const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
+    return apiPlans.filter(plan => plan.price > 0).map((apiPlan) => {
+      const priceInDollars = apiPlan.price / 100; // Convert cents to dollars
+      
+      const features = [
+        `${apiPlan.mealPlans} Meal Plans per month`,
+        `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
+        `${apiPlan.healthyDrinks} Healthy Drinks per month`,
+        `${apiPlan.specialMeals} Special Meals per month`
+      ];
+
+      if (apiPlan.name.toLowerCase() === 'family') {
+        features.push(
+          "AI Meal Recommendations",
+          "Advanced Recipe Collection", 
+          "3 Free Delivery Commissions",
+          "Nutritional Analysis",
+          "Priority Support"
+        );
+      } else if (apiPlan.name.toLowerCase() === 'professional') {
+        features.push(
+          "10 Free Delivery Commissions",
+          "3 Free Home Deliveries",
+          "Advanced AI Recommendations", 
+          "Custom Dietary Plans",
+          "Professional Analytics",
+          "Phone Support"
+        );
+      }
+
+      return {
+        id: apiPlan._id,
+        name: apiPlan.name,
+        price: priceInDollars,
+        interval: "month",
+        features,
+        limits: {
+          plansPerMonth: apiPlan.mealPlans,
+          mealCreations: apiPlan.generatedMeals,
+          deliveryCommissions: apiPlan.name.toLowerCase() === 'family' ? 3 : 
+                              apiPlan.name.toLowerCase() === 'professional' ? 10 : 0,
+          homeDeliveries: apiPlan.name.toLowerCase() === 'professional' ? 3 : undefined
+        },
+        popular: apiPlan.name.toLowerCase() === 'family'
+      };
+    });
+  };
 
   useEffect(() => {
-    getPaymentMethods();
+    const fetchData = async () => {
+      try {
+        setIsLoadingPlans(true);
+        const [apiPlans] = await Promise.all([
+          getAllSubscriptionTypes(),
+          getPaymentMethods()
+        ]);
+        
+        const convertedPlans = convertApiToPlans(apiPlans);
+        setPlans(convertedPlans);
+        
+        // Set default to family plan if available
+        const familyPlan = convertedPlans.find(plan => plan.name.toLowerCase() === 'family');
+        if (familyPlan) {
+          setSelectedPlan(familyPlan);
+        } else if (convertedPlans.length > 0) {
+          setSelectedPlan(convertedPlans[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast({
+          title: "Error Loading Data",
+          description: "Failed to load subscription plans and payment methods.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoadingPlans(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -146,7 +181,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
     });
   };
 
-  if (showAddPaymentMethod) {
+  if (showAddPaymentMethod && selectedPlan) {
     return (
       <PaymentForm
         onSuccess={handleAddPaymentMethodSuccess}
@@ -159,6 +194,39 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
         }}
         selectedPlan={selectedPlan}
       />
+    );
+  }
+
+  if (isLoadingPlans) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Choose Your Plan</h2>
+            <p className="text-gray-600">Loading subscription plans...</p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {[1, 2].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader>
+                <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="h-4 bg-gray-200 rounded"></div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -180,7 +248,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
           <Card 
             key={plan.id}
             className={`relative cursor-pointer transition-all ${
-              selectedPlan.id === plan.id
+              selectedPlan?.id === plan.id
                 ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
                 : plan.popular
                 ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
@@ -218,7 +286,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
               </ul>
             </CardContent>
             
-            {selectedPlan.id === plan.id && (
+            {selectedPlan?.id === plan.id && (
               <div className="absolute top-4 right-4">
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                   <Check className="h-4 w-4 text-white" />
@@ -292,21 +360,23 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
       </Card>
 
       {/* Purchase Button */}
-      <div className="flex items-center justify-between p-6 bg-gray-50 rounded-lg">
-        <div>
-          <h3 className="font-semibold text-gray-800">{selectedPlan.name} Plan</h3>
-          <p className="text-2xl font-bold text-green-600">
-            ${selectedPlan.price}/{selectedPlan.interval}
-          </p>
+      {selectedPlan && (
+        <div className="flex items-center justify-between p-6 bg-gray-50 rounded-lg">
+          <div>
+            <h3 className="font-semibold text-gray-800">{selectedPlan.name} Plan</h3>
+            <p className="text-2xl font-bold text-green-600">
+              ${selectedPlan.price}/{selectedPlan.interval}
+            </p>
+          </div>
+          <Button 
+            onClick={handlePurchaseSubscription}
+            disabled={isLoading || (!selectedPaymentMethod && paymentMethods.length > 0)}
+            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+          >
+            {isLoading ? 'Processing...' : 'Subscribe Now'}
+          </Button>
         </div>
-        <Button 
-          onClick={handlePurchaseSubscription}
-          disabled={isLoading || (!selectedPaymentMethod && paymentMethods.length > 0)}
-          className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
-        >
-          {isLoading ? 'Processing...' : 'Subscribe Now'}
-        </Button>
-      </div>
+      )}
     </div>
   );
 };
