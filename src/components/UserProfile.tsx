@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,18 +50,26 @@ const UserProfile = () => {
     fetchSubscriptionTypes();
   }, []);
 
-  // Find current subscription name based on subscriptionTypeId
+  // Find current subscription name based on subscriptionTypeId (hardened match + logs)
   useEffect(() => {
-    if (subscriptionTypes.length > 0 && authUser?.subscription?.subscriptionTypeId) {
+    const subId = (authUser?.subscription?.subscriptionTypeId ?? "").toString().trim();
+    console.log("[UserProfile] authUser.subscription.subscriptionTypeId:", subId);
+    console.log("[UserProfile] fetched subscriptionTypes:", subscriptionTypes);
+
+    if (subscriptionTypes.length > 0 && subId) {
       const currentSubscription = subscriptionTypes.find(
-        sub => sub._id === authUser.subscription.subscriptionTypeId
+        (sub) => (sub._id ?? "").toString().trim() === subId
       );
+      console.log("[UserProfile] matched subscription:", currentSubscription);
       setCurrentSubscriptionName(currentSubscription?.name || "Unknown");
-    } else {
-      // Default to Free if no subscription found
-      const freeSubscription = subscriptionTypes.find(sub => sub.name.toLowerCase() === 'free');
-      setCurrentSubscriptionName(freeSubscription?.name || "Free");
+      return;
     }
+
+    // Default to Free if no subscription found or missing id
+    const freeSubscription = subscriptionTypes.find(
+      (sub) => sub.name?.toLowerCase().trim() === "free"
+    );
+    setCurrentSubscriptionName(freeSubscription?.name || "Free");
   }, [subscriptionTypes, authUser?.subscription?.subscriptionTypeId]);
 
   if (!user) return null;
@@ -268,7 +275,9 @@ const UserProfile = () => {
             <h3 className="text-lg font-medium">{t('profile.subscription') || 'Subscription'}</h3>
             <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
               <Globe className="h-4 w-4 text-gray-500" />
-              <span className="capitalize">{currentSubscriptionName} {t('profile.plan') || 'Plan'}</span>
+              <span className="capitalize">
+                {currentSubscriptionName} {t('profile.subscription') || 'subscription'}
+              </span>
               {authUser?.subscription?.status && (
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full ml-auto">
                   {t('profile.active') || 'Active'}
