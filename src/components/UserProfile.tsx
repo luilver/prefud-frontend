@@ -4,12 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Phone, Globe, MapPin, Edit2, Save, X, Languages } from "lucide-react";
+import { User, Mail, Phone, Globe, MapPin, Edit2, Save, X, Languages, XCircle } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
 import PasswordUpdate from "./PasswordUpdate";
+import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import axios from "axios";
 
 interface SubscriptionType {
@@ -29,6 +30,7 @@ const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [subscriptionTypes, setSubscriptionTypes] = useState<SubscriptionType[]>([]);
   const [currentSubscriptionName, setCurrentSubscriptionName] = useState<string>("");
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -89,6 +91,12 @@ const UserProfile = () => {
     setIsEditing(false);
   };
 
+  const handleCancelSubscription = () => {
+    // Simulate switching to free plan
+    setCurrentSubscriptionName("Free");
+    setShowCancelModal(false);
+  };
+
   const getLanguageDisplay = (langCode?: string) => {
     switch (langCode) {
       case 'es':
@@ -107,6 +115,11 @@ const UserProfile = () => {
 
   const languageDisplay = getLanguageDisplay(user.language);
   const countryDisplay = getCountryDisplay(user.country);
+
+  // Check if user has an active subscription (not Free plan)
+  const hasActiveSubscription = currentSubscriptionName && 
+    currentSubscriptionName.toLowerCase() !== "free" && 
+    currentSubscriptionName !== "Unknown";
 
   return (
     <div className="space-y-6">
@@ -272,13 +285,26 @@ const UserProfile = () => {
 
           {/* Subscription Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">{t('profile.subscription') || 'Subscription'}</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium">{t('profile.subscription') || 'Subscription'}</h3>
+              {hasActiveSubscription && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCancelModal(true)}
+                  className="text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  {t('profile.cancelSubscription') || 'Cancel Subscription'}
+                </Button>
+              )}
+            </div>
             <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
               <Globe className="h-4 w-4 text-gray-500" />
               <span className="capitalize">
                 {currentSubscriptionName} {t('profile.subscription') || 'subscription'}
               </span>
-              {authUser?.subscription?.status && (
+              {authUser?.subscription?.status && hasActiveSubscription && (
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full ml-auto">
                   {t('profile.active') || 'Active'}
                 </span>
@@ -290,6 +316,14 @@ const UserProfile = () => {
 
       {/* Password Update Section */}
       <PasswordUpdate />
+
+      {/* Cancel Subscription Modal */}
+      <SubscriptionCancelModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelSubscription}
+        currentPlan={currentSubscriptionName}
+      />
     </div>
   );
 };
