@@ -579,6 +579,7 @@ const translations = {
     "aiMealView.of": "of",
     "aiMealView.stepsCompleted": "steps completed",
     "aiMealView.recipeCompleted": "Congratulations! Recipe completed!",
+    "aiMealView.ingredientsSelector":"Shopping List",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Create Your Perfect Healthy Drink",
@@ -816,6 +817,10 @@ const translations = {
     "drinkDetailView.toShoppingList": "ingredients to your shopping list",
     "drinkDetailView.error": "Error",
     "drinkDetailView.shoppingListFailed": "Failed to create shopping list. Please try again.",
+    "drinkDetailView.expires":"Expires in",
+    "drinkDetailView.days":"days",
+    
+    
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No ingredients selected",
@@ -1659,6 +1664,8 @@ const translations = {
     "aiMealView.of": "de",
     "aiMealView.stepsCompleted": "pasos completados",
     "aiMealView.recipeCompleted": "¡Felicidades! ¡Receta completada!",
+    "aiMealView.ingredientsSelector":"Lista de compras",
+
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crea tu Bebida Saludable Perfecta",
@@ -1897,6 +1904,8 @@ const translations = {
     "drinkDetailView.toShoppingList": "ingredientes a tu lista de compras",
     "drinkDetailView.error": "Error",
     "drinkDetailView.shoppingListFailed": "No se pudo crear la lista de compras. Inténtalo de nuevo.",
+    "drinkDetailView.expires":"Expira en",
+    "drinkDetailView.days":"días",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No se seleccionaron ingredientes",
@@ -2759,6 +2768,8 @@ const translations = {
     "aiMealView.of": "de",
     "aiMealView.stepsCompleted": "passos concluídos",
     "aiMealView.recipeCompleted": "Parabéns! Receita concluída!",
+    "aiMealView.ingredientsSelector":"Lista de Ingredientes",
+
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crie Sua Bebida Saudável Perfeita",
@@ -2999,6 +3010,8 @@ const translations = {
     "drinkDetailView.toShoppingList": "ingredientes à sua lista de compras",
     "drinkDetailView.error": "Erro",
     "drinkDetailView.shoppingListFailed": "Falha ao criar a lista de compras. Por favor, tente novamente.",
+    "drinkDetailView.expires":"Expira em",
+     "drinkDetailView.days":"días",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "Nenhum ingrediente selecionado",
