@@ -66,7 +66,7 @@ const FreeSubscriptionConfirmModal = ({
             </Button>
           </div>
           <DialogDescription className="text-left">
-            {t('subscription.freeModal.description', { currentPlan })}
+            {t('subscription.freeModal.description').replace('{{currentPlan}}', currentPlan)}
           </DialogDescription>
         </DialogHeader>
 
@@ -88,7 +88,7 @@ const FreeSubscriptionConfirmModal = ({
               className="flex-1"
               disabled={isProcessing}
             >
-              {t('subscription.freeModal.buttons.keep', { currentPlan })}
+              {t('subscription.freeModal.buttons.keep').replace('{{currentPlan}}', currentPlan)}
             </Button>
             <Button
               variant="default"
