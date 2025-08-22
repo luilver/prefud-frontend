@@ -9,6 +9,7 @@ import PaymentForm from "./PaymentForm";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import PaymentMethodModal from "./PaymentMethodModal";
 import SubscriptionSuccessModal from "./SubscriptionSuccessModal";
+import FreeSubscriptionConfirmModal from "./FreeSubscriptionConfirmModal";
 
 interface SubscriptionPlan {
   id: string;
@@ -35,6 +36,7 @@ const SubscriptionManager = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFreeConfirmModal, setShowFreeConfirmModal] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -128,8 +130,13 @@ const SubscriptionManager = () => {
     
     setSelectedPlan(plan);
     if (plan.price === 0) {
-      // Free plan - direct subscription without payment
-      handleSubscriptionSuccess();
+      // Free plan - show confirmation modal if user has an active subscription
+      if (currentSubscriptionId && currentSubscriptionId !== "") {
+        setShowFreeConfirmModal(true);
+      } else {
+        // Already on free plan or no subscription
+        handleSubscriptionSuccess();
+      }
     } else {
       // Paid plan - show payment modal
       setShowPaymentModal(true);
@@ -141,6 +148,13 @@ const SubscriptionManager = () => {
     setCurrentSubscriptionId("");
     setCurrentSubscriptionName("Free");
     setShowCancelModal(false);
+  };
+
+  const handleFreeSubscriptionConfirm = () => {
+    // Simulate switching to free plan
+    setCurrentSubscriptionId("");
+    setCurrentSubscriptionName("Free");
+    setShowFreeConfirmModal(false);
   };
 
   const handleSubscriptionSuccess = () => {
@@ -349,6 +363,13 @@ const SubscriptionManager = () => {
         onClose={() => setShowSuccessModal(false)}
         planName={selectedPlan?.name || ""}
         planPrice={selectedPlan?.price || 0}
+      />
+
+      <FreeSubscriptionConfirmModal
+        isOpen={showFreeConfirmModal}
+        onClose={() => setShowFreeConfirmModal(false)}
+        onConfirm={handleFreeSubscriptionConfirm}
+        currentPlan={currentSubscriptionName}
       />
     </div>
   );
