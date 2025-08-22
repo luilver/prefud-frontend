@@ -1,3 +1,4 @@
+
 export const en = {
   "home": {
     "title": "Pantry",
@@ -119,7 +120,7 @@ export const en = {
       buttons: {
         keep: "Keep Current Plan",
         switchToFree: "Switch to Free",
-        switching": "Switching..."
+        switching: "Switching..."
       },
       success: {
         title: "Switched to Free Plan",
