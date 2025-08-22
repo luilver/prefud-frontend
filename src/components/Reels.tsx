@@ -1,8 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Bookmark, Play, Pause, Volume2, VolumeX, Share2, ChefHat } from "lucide-react";
+import { Heart, Bookmark, Play, Pause, Volume2, VolumeX, Share2, ChefHat, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Recipe {
@@ -74,11 +74,121 @@ const mockRecipes: Recipe[] = [
   }
 ];
 
+// Additional mock recipes for infinite scroll
+const generateMoreRecipes = (startId: number, count: number): Recipe[] => {
+  const additionalRecipes = [
+    {
+      title: "Thai Green Curry",
+      chef: "Chef Siriporn",
+      duration: "30 min",
+      difficulty: "Medium",
+      thumbnail: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?q=80&w=1000",
+      description: "Authentic Thai green curry with fresh herbs and coconut milk."
+    },
+    {
+      title: "French Croissants",
+      chef: "Chef Antoine",
+      duration: "4 hours",
+      difficulty: "Hard",
+      thumbnail: "https://images.unsplash.com/photo-1555507036-ab794f4afe5b?q=80&w=1000",
+      description: "Master the art of laminated dough for perfect buttery croissants."
+    },
+    {
+      title: "Korean Bibimbap",
+      chef: "Chef Min-jun",
+      duration: "45 min",
+      difficulty: "Medium",
+      thumbnail: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?q=80&w=1000",
+      description: "Colorful Korean rice bowl with vegetables and spicy gochujang."
+    },
+    {
+      title: "Indian Butter Chicken",
+      chef: "Chef Priya",
+      duration: "1 hour",
+      difficulty: "Medium",
+      thumbnail: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000",
+      description: "Creamy and aromatic butter chicken with fragrant basmati rice."
+    },
+    {
+      title: "Mexican Tacos Al Pastor",
+      chef: "Chef Carlos",
+      duration: "40 min",
+      difficulty: "Easy",
+      thumbnail: "https://images.unsplash.com/photo-1565299585323-38174c97e30d?q=80&w=1000",
+      description: "Traditional Mexican tacos with marinated pork and pineapple."
+    },
+    {
+      title: "Japanese Ramen",
+      chef: "Chef Takeshi",
+      duration: "3 hours",
+      difficulty: "Hard",
+      thumbnail: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?q=80&w=1000",
+      description: "Rich tonkotsu ramen with perfectly cooked noodles and toppings."
+    }
+  ];
+
+  return Array.from({ length: count }, (_, index) => {
+    const recipeTemplate = additionalRecipes[index % additionalRecipes.length];
+    return {
+      id: (startId + index).toString(),
+      ...recipeTemplate,
+      videoUrl: "",
+      likes: Math.floor(Math.random() * 5000) + 100,
+      isLiked: Math.random() > 0.7,
+      isSaved: Math.random() > 0.8,
+    };
+  });
+};
+
+// Simulate API call
+const fetchMoreRecipes = async (page: number, limit: number = 8): Promise<Recipe[]> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+  
+  const startId = (page - 1) * limit + mockRecipes.length + 1;
+  return generateMoreRecipes(startId, limit);
+};
+
 const Reels = () => {
   const { t } = useLanguage();
   const [recipes, setRecipes] = useState<Recipe[]>(mockRecipes);
   const [currentVideo, setCurrentVideo] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const loadMoreRecipes = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+
+    setIsLoading(true);
+    try {
+      const newRecipes = await fetchMoreRecipes(page + 1);
+      
+      if (newRecipes.length === 0) {
+        setHasMore(false);
+      } else {
+        setRecipes(prev => [...prev, ...newRecipes]);
+        setPage(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Error loading more recipes:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, page]);
+
+  // Infinite scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
+        loadMoreRecipes();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadMoreRecipes]);
 
   const toggleLike = (id: string) => {
     setRecipes(prev => prev.map(recipe => 
@@ -228,12 +338,22 @@ const Reels = () => {
         ))}
       </div>
 
-      {/* Load More Button */}
-      <div className="text-center pt-8">
-        <Button variant="outline" size="lg" className="min-w-[200px]">
-          Load More Recipes
-        </Button>
-      </div>
+      {/* Loading Indicator */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="flex items-center space-x-2 text-muted-foreground">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>Loading more recipes...</span>
+          </div>
+        </div>
+      )}
+
+      {/* End of Content Message */}
+      {!hasMore && recipes.length > mockRecipes.length && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">You've reached the end! No more recipes to load.</p>
+        </div>
+      )}
     </div>
   );
 };
