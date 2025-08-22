@@ -107,8 +107,8 @@ const Reels = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
+      {/* Header - Hidden on mobile, visible on desktop */}
+      <div className="text-center space-y-2 hidden sm:block">
         <div className="flex items-center justify-center space-x-2 mb-4">
           <div className="p-2 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl">
             <Play className="h-6 w-6 text-primary" />
