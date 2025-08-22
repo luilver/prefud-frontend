@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,26 +52,25 @@ const UserProfile = () => {
     fetchSubscriptionTypes();
   }, []);
 
-  // Find current subscription name based on subscriptionTypeId (hardened match + logs)
+  // Find current subscription name based on subscriptionTypeId
   useEffect(() => {
     const subId = (authUser?.subscription?.subscriptionTypeId ?? "").toString().trim();
     console.log("[UserProfile] authUser.subscription.subscriptionTypeId:", subId);
     console.log("[UserProfile] fetched subscriptionTypes:", subscriptionTypes);
 
-    if (subscriptionTypes.length > 0 && subId) {
-      const currentSubscription = subscriptionTypes.find(
-        (sub) => (sub._id ?? "").toString().trim() === subId
-      );
-      console.log("[UserProfile] matched subscription:", currentSubscription);
-      setCurrentSubscriptionName(currentSubscription?.name || "Unknown");
-      return;
+    if (subscriptionTypes.length > 0) {
+      if (subId) {
+        // User has a subscription ID, find the matching subscription
+        const currentSubscription = subscriptionTypes.find(
+          (sub) => (sub._id ?? "").toString().trim() === subId
+        );
+        console.log("[UserProfile] matched subscription:", currentSubscription);
+        setCurrentSubscriptionName(currentSubscription?.name || "Free");
+      } else {
+        // User has no subscription ID, they're on Free plan
+        setCurrentSubscriptionName("Free");
+      }
     }
-
-    // Default to Free if no subscription found or missing id
-    const freeSubscription = subscriptionTypes.find(
-      (sub) => sub.name?.toLowerCase().trim() === "free"
-    );
-    setCurrentSubscriptionName(freeSubscription?.name || "Free");
   }, [subscriptionTypes, authUser?.subscription?.subscriptionTypeId]);
 
   if (!user) return null;
@@ -119,8 +117,7 @@ const UserProfile = () => {
 
   // Check if user has an active subscription (not Free plan)
   const hasActiveSubscription = currentSubscriptionName && 
-    currentSubscriptionName.toLowerCase() !== "free" && 
-    currentSubscriptionName !== "Unknown";
+    currentSubscriptionName.toLowerCase() !== "free";
 
   return (
     <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
