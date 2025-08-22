@@ -101,7 +101,7 @@ export const pt = {
   subscription: {
     freeModal: {
       title: "Mudar para Plano Gratuito",
-      description: "Tem certeza de que deseja cancelar sua assinatura {{currentPlan}} e mudar para o plano Gratuito?",
+      description: "Tem certeza de que deseja cancelar sua assinatura e mudar para o plano Gratuito?",
       whatHappens: "O que acontece quando você muda para Gratuito:",
       features: {
         cancel: "Sua assinatura atual será cancelada",
@@ -110,7 +110,7 @@ export const pt = {
         upgrade: "Você pode fazer upgrade a qualquer momento"
       },
       buttons: {
-        keep: "Manter {{currentPlan}}",
+        keep: "Manter Plano Atual",
         switchToFree: "Mudar para Gratuito",
         switching: "Mudando..."
       },

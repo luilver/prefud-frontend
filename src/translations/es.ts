@@ -115,7 +115,7 @@ export const es = {
   subscription: {
     freeModal: {
       title: "Cambiar a Plan Gratuito",
-      description: "¿Estás seguro de que quieres cancelar tu suscripción {{currentPlan}} y cambiar al plan Gratuito?",
+      description: "¿Estás seguro de que quieres cancelar tu suscripción y cambiar al plan Gratuito?",
       whatHappens: "Qué sucede cuando cambias a Gratuito:",
       features: {
         cancel: "Tu suscripción actual será cancelada",
@@ -124,7 +124,7 @@ export const es = {
         upgrade: "Puedes actualizar en cualquier momento"
       },
       buttons: {
-        keep: "Mantener {{currentPlan}}",
+        keep: "Mantener Plan Actual",
         switchToFree: "Cambiar a Gratuito",
         switching: "Cambiando..."
       },

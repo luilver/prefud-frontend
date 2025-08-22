@@ -111,7 +111,7 @@ export const en = {
   "subscription": {
     "freeModal": {
       "title": "Switch to Free Plan",
-      "description": "Are you sure you want to cancel your {{currentPlan}} subscription and switch to the Free plan?",
+      "description": "Are you sure you want to cancel your subscription and switch to the Free plan?",
       "whatHappens": "What happens when you switch to Free:",
       "features": {
         "cancel": "Your current subscription will be cancelled",
@@ -120,7 +120,7 @@ export const en = {
         "upgrade": "You can upgrade anytime"
       },
       "buttons": {
-        "keep": "Keep {{currentPlan}}",
+        "keep": "Keep Current Plan",
         "switchToFree": "Switch to Free",
         "switching": "Switching..."
       },

@@ -54,25 +54,29 @@ const FreeSubscriptionConfirmModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-w-[95vw] mx-auto">
+      <DialogContent className="sm:max-w-md max-w-[90vw] mx-auto p-4 sm:p-6">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <AlertTriangle className="h-6 w-6 text-orange-500 flex-shrink-0" />
-              <DialogTitle className="text-left text-sm sm:text-base">{t('subscription.freeModal.title')}</DialogTitle>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 flex-shrink-0" />
+              <DialogTitle className="text-left text-sm sm:text-base leading-tight">
+                {t('subscription.freeModal.title')}
+              </DialogTitle>
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose} className="flex-shrink-0">
+            <Button variant="ghost" size="sm" onClick={onClose} className="flex-shrink-0 h-8 w-8 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <DialogDescription className="text-left text-xs sm:text-sm">
-            {t('subscription.freeModal.description').replace('{{currentPlan}}', currentPlan)}
+          <DialogDescription className="text-left text-xs sm:text-sm mt-2">
+            {t('subscription.freeModal.description')}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4">
-            <h4 className="font-medium text-orange-800 mb-2 text-sm sm:text-base">{t('subscription.freeModal.whatHappens')}</h4>
+            <h4 className="font-medium text-orange-800 mb-2 text-sm sm:text-base">
+              {t('subscription.freeModal.whatHappens')}
+            </h4>
             <ul className="text-xs sm:text-sm text-orange-800 space-y-1">
               <li>• {t('subscription.freeModal.features.cancel')}</li>
               <li>• {t('subscription.freeModal.features.immediate')}</li>
@@ -81,20 +85,20 @@ const FreeSubscriptionConfirmModal = ({
             </ul>
           </div>
 
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex-1 text-xs sm:text-sm"
+              className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
               disabled={isProcessing}
             >
-              {t('subscription.freeModal.buttons.keep').replace('{{currentPlan}}', currentPlan)}
+              {t('subscription.freeModal.buttons.keep')}
             </Button>
             <Button
               variant="default"
               onClick={handleConfirmSwitch}
               disabled={isProcessing}
-              className="flex-1 text-xs sm:text-sm"
+              className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
             >
               {isProcessing ? t('subscription.freeModal.buttons.switching') : t('subscription.freeModal.buttons.switchToFree')}
             </Button>
