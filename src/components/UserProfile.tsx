@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,31 +123,31 @@ const UserProfile = () => {
     currentSubscriptionName !== "Unknown";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="pb-4 sm:pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <div className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-green-600" />
-              <CardTitle>{t('profile.title') || 'Profile Information'}</CardTitle>
+              <User className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+              <CardTitle className="text-lg sm:text-xl">{t('profile.title') || 'Profile Information'}</CardTitle>
             </div>
             {!isEditing ? (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(true)}
-                className="border-green-500 text-green-600 hover:bg-green-50"
+                className="border-green-500 text-green-600 hover:bg-green-50 w-full sm:w-auto"
               >
                 <Edit2 className="h-4 w-4 mr-2" />
                 {t('profile.edit') || 'Edit'}
               </Button>
             ) : (
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleCancel}
-                  className="border-gray-300"
+                  className="border-gray-300 w-full sm:w-auto"
                 >
                   <X className="h-4 w-4 mr-2" />
                   {t('common.cancel')}
@@ -154,7 +155,7 @@ const UserProfile = () => {
                 <Button
                   size="sm"
                   onClick={handleSave}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {t('common.save')}
@@ -162,83 +163,83 @@ const UserProfile = () => {
               </div>
             )}
           </div>
-          <CardDescription>
+          <CardDescription className="text-sm">
             {t('profile.description') || 'Manage your personal information and preferences'}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
           {/* Personal Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">{t('profile.personalInfo') || 'Personal Information'}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-medium">{t('profile.personalInfo') || 'Personal Information'}</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">{t('profile.fullName') || 'Full Name'}</Label>
+                <Label htmlFor="name" className="text-sm">{t('profile.fullName') || 'Full Name'}</Label>
                 {isEditing ? (
                   <Input
                     id="name"
                     value={editData.name}
                     onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                    className="border-green-200 focus:border-green-400"
+                    className="border-green-200 focus:border-green-400 text-sm"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <User className="h-4 w-4 text-gray-500" />
-                    <span>{user.name}</span>
+                  <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+                    <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
+                    <span className="text-sm truncate">{user.name}</span>
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">{t('profile.email') || 'Email Address'}</Label>
+                <Label htmlFor="email" className="text-sm">{t('profile.email') || 'Email Address'}</Label>
                 {isEditing ? (
                   <Input
                     id="email"
                     type="email"
                     value={editData.email}
                     onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
-                    className="border-green-200 focus:border-green-400"
+                    className="border-green-200 focus:border-green-400 text-sm"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <Mail className="h-4 w-4 text-gray-500" />
-                    <span>{user.email}</span>
+                  <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+                    <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
+                    <span className="text-sm truncate">{user.email}</span>
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="country">{t('profile.country')}</Label>
+                <Label htmlFor="country" className="text-sm">{t('profile.country')}</Label>
                 {isEditing ? (
                   <CountrySelect
                     value={editData.country}
                     onValueChange={(value) => setEditData(prev => ({ ...prev, country: value }))}
                     placeholder={t('profile.selectCountry') || 'Select country'}
-                    className="border-green-200 focus:border-green-400"
+                    className="border-green-200 focus:border-green-400 text-sm"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <MapPin className="h-4 w-4 text-gray-500" />
+                  <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+                    <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
                     {countryDisplay ? (
                       <>
-                        <span className="text-lg">{countryDisplay.flag}</span>
-                        <span>{countryDisplay.name}</span>
+                        <span className="text-base sm:text-lg">{countryDisplay.flag}</span>
+                        <span className="text-sm truncate">{countryDisplay.name}</span>
                       </>
                     ) : (
-                      <span className="text-gray-500">{t('profile.notSpecified') || 'Not specified'}</span>
+                      <span className="text-gray-500 text-sm">{t('profile.notSpecified') || 'Not specified'}</span>
                     )}
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">{t('profile.phone')}</Label>
+                <Label htmlFor="phone" className="text-sm">{t('profile.phone')}</Label>
                 {isEditing ? (
                   <div className="flex space-x-2">
-                    <div className="w-20">
+                    <div className="w-16 sm:w-20">
                       <Input
                         value={countryDisplay?.prefix || ''}
                         disabled
-                        className="border-green-200 bg-gray-50 text-center"
+                        className="border-green-200 bg-gray-50 text-center text-sm"
                       />
                     </div>
                     <Input
@@ -249,16 +250,16 @@ const UserProfile = () => {
                         ...prev, 
                         phone: `${countryDisplay?.prefix || ''}${e.target.value}` 
                       }))}
-                      className="border-green-200 focus:border-green-400 flex-1"
+                      className="border-green-200 focus:border-green-400 flex-1 text-sm"
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <Phone className="h-4 w-4 text-gray-500" />
+                  <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+                    <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
                     {countryDisplay && (
-                      <span className="text-lg">{countryDisplay.flag}</span>
+                      <span className="text-base sm:text-lg">{countryDisplay.flag}</span>
                     )}
-                    <span>{user.phone || (t('profile.notSpecified') || 'Not specified')}</span>
+                    <span className="text-sm truncate">{user.phone || (t('profile.notSpecified') || 'Not specified')}</span>
                   </div>
                 )}
               </div>
@@ -268,15 +269,15 @@ const UserProfile = () => {
           <Separator />
 
           {/* Language Preference */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">{t('profile.languagePreference') || 'Language Preference'}</h3>
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-base sm:text-lg font-medium">{t('profile.languagePreference') || 'Language Preference'}</h3>
             <div className="space-y-2">
-              <Label>{t('profile.language')}</Label>
-              <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                <Languages className="h-4 w-4 text-gray-500" />
-                <span className="text-lg">{languageDisplay.flag}</span>
-                <span>{languageDisplay.name}</span>
-                <span className="text-sm text-gray-500 ml-auto">{t('profile.cannotChange') || '(Cannot be changed)'}</span>
+              <Label className="text-sm">{t('profile.language')}</Label>
+              <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+                <Languages className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
+                <span className="text-base sm:text-lg">{languageDisplay.flag}</span>
+                <span className="text-sm flex-1">{languageDisplay.name}</span>
+                <span className="text-xs text-gray-500 ml-auto hidden sm:inline">{t('profile.cannotChange') || '(Cannot be changed)'}</span>
               </div>
             </div>
           </div>
@@ -284,24 +285,25 @@ const UserProfile = () => {
           <Separator />
 
           {/* Subscription Information */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">{t('profile.subscription') || 'Subscription'}</h3>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+              <h3 className="text-base sm:text-lg font-medium">{t('profile.subscription') || 'Subscription'}</h3>
               {hasActiveSubscription && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowCancelModal(true)}
-                  className="text-red-600 border-red-200 hover:bg-red-50"
+                  className="text-red-600 border-red-200 hover:bg-red-50 w-full sm:w-auto"
                 >
                   <XCircle className="h-4 w-4 mr-2" />
-                  {t('profile.cancelSubscription') || 'Cancel Subscription'}
+                  <span className="hidden sm:inline">{t('profile.cancelSubscription') || 'Cancel Subscription'}</span>
+                  <span className="sm:hidden">Cancel</span>
                 </Button>
               )}
             </div>
-            <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-              <Globe className="h-4 w-4 text-gray-500" />
-              <span className="capitalize">
+            <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+              <Globe className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
+              <span className="capitalize text-sm flex-1">
                 {currentSubscriptionName} {t('profile.subscription') || 'subscription'}
               </span>
               {authUser?.subscription?.status && hasActiveSubscription && (
