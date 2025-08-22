@@ -104,6 +104,10 @@ const SubscriptionManager = () => {
         const userSubId = (user?.subscription?.subscriptionTypeId ?? "").toString().trim();
         console.log("[SubscriptionManager] User subscription ID:", userSubId);
         setCurrentSubscriptionId(userSubId);
+
+        // Also set the current subscription name based on the loaded plans
+        const matched = convertedPlans.find(p => p.id === userSubId);
+        setCurrentSubscriptionName(matched ? matched.name : "Free");
       } catch (error) {
         console.error('Error fetching subscription types:', error);
         toast({
@@ -237,8 +241,9 @@ const SubscriptionManager = () => {
 
       <div className="grid md:grid-cols-3 gap-6">
         {plans.map((plan) => {
-          const isCurrentPlan = plan.id === currentSubscriptionId || 
-                               (currentSubscriptionName === "Free" && plan.price === 0);
+          // Mark current plan ONLY when IDs match.
+          // If the user has no subscription ID, mark Free (price === 0) as current.
+          const isCurrentPlan = plan.id === currentSubscriptionId || (!currentSubscriptionId && plan.price === 0);
           
           return (
             <Card 
