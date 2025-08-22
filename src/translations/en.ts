@@ -1,3 +1,4 @@
+
 export const en = {
   "home": {
     "title": "Pantry",
@@ -107,29 +108,29 @@ export const en = {
       "select": "Select Language"
     }
   },
-  subscription: {
-    freeModal: {
-      title: "Switch to Free Plan",
-      description: "Are you sure you want to cancel your {{currentPlan}} subscription and switch to the Free plan?",
-      whatHappens: "What happens when you switch to Free:",
-      features: {
-        cancel: "Your current subscription will be cancelled",
-        immediate: "You'll be switched to the Free plan immediately",
-        limited: "Limited features will apply",
-        upgrade: "You can upgrade anytime"
+  "subscription": {
+    "freeModal": {
+      "title": "Switch to Free Plan",
+      "description": "Are you sure you want to cancel your {{currentPlan}} subscription and switch to the Free plan?",
+      "whatHappens": "What happens when you switch to Free:",
+      "features": {
+        "cancel": "Your current subscription will be cancelled",
+        "immediate": "You'll be switched to the Free plan immediately",
+        "limited": "Limited features will apply",
+        "upgrade": "You can upgrade anytime"
       },
-      buttons: {
-        keep: "Keep {{currentPlan}}",
-        switchToFree: "Switch to Free",
-        switching: "Switching..."
+      "buttons": {
+        "keep": "Keep {{currentPlan}}",
+        "switchToFree": "Switch to Free",
+        "switching": "Switching..."
       },
-      success: {
-        title: "Switched to Free Plan",
-        description: "Your subscription has been cancelled and you've been switched to the Free plan."
+      "success": {
+        "title": "Switched to Free Plan",
+        "description": "Your subscription has been cancelled and you've been switched to the Free plan."
       },
-      error: {
-        title: "Error",
-        description: "Failed to switch to Free plan. Please try again."
+      "error": {
+        "title": "Error",
+        "description": "Failed to switch to Free plan. Please try again."
       }
     }
   }

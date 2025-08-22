@@ -1,3 +1,4 @@
+
 export const es = {
   signup: {
     title: "Crea tu cuenta gratis",

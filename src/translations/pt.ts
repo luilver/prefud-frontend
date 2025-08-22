@@ -1,3 +1,4 @@
+
 export const pt = {
   signup: {
     title: "Criar uma conta",
