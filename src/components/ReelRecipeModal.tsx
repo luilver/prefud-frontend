@@ -101,7 +101,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         purchaseDate: new Date().toISOString(),
         carbonFootPrintToWaste: 0,
         daysToExpire: 7,
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Date object, not string
         notes: `From recipe: ${recipe.title}`,
       }));
 
