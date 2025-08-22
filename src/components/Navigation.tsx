@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  Play,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -30,11 +31,12 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const { isCollapsed, setIsCollapsed } = useSidebar();
 
   const navItems = [
+    { id: "reels", label: "Reels", icon: Play },
     { id: "planner", label: t("dashboard.nav.planner"), icon: Calendar },
     { id: "ai-meals", label: t("dashboard.nav.meals"), icon: CookingPot },
     { id: "ai-drinks", label: t("dashboard.nav.drinks"), icon: CupSoda },
     { id: "ingredients", label: t("dashboard.nav.pantry"), icon: Package },
-    { id: "profile", label: t("dashboard.nav.profile"), icon: User },
+    ...(isMobile ? [] : [{ id: "profile", label: t("dashboard.nav.profile"), icon: User }]),
   ];
 
   const getButtonStyles = (item: any, isActive: boolean) => {

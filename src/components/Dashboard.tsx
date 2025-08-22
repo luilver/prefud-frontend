@@ -20,10 +20,11 @@ import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
 import AIDrinkCreator from "./AIDrinkCreator";
+import Reels from "./Reels";
 import LanguageSelector from "./LanguageSelector";
 
 const DashboardContent = () => {
-  const [activeTab, setActiveTab] = useState("planner");
+  const [activeTab, setActiveTab] = useState("reels");
   const { user, logout } = useUser();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
@@ -46,6 +47,12 @@ const DashboardContent = () => {
         });
       }
     }, 100);
+  };
+
+  const handleUserNameClick = () => {
+    if (isMobile) {
+      setActiveTab("profile");
+    }
   };
 
   return (
@@ -125,13 +132,16 @@ const DashboardContent = () => {
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <LanguageSelector variant="button" className="mr-1 sm:mr-2" />
                 
-                {/* Mobile Welcome */}
-                <div className="flex items-center space-x-1 px-2 py-1 bg-green-50 rounded-md">
+                {/* Mobile Welcome - Now clickable to navigate to profile */}
+                <button
+                  onClick={handleUserNameClick}
+                  className="flex items-center space-x-1 px-2 py-1 bg-green-50 rounded-md hover:bg-green-100 transition-colors"
+                >
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                   <span className="text-xs text-green-700 font-medium">
                     {user?.name?.split(' ')[0] || 'Chef'}
                   </span>
-                </div>
+                </button>
                 
                 <Button 
                   variant="ghost" 
@@ -160,6 +170,12 @@ const DashboardContent = () => {
             {/* Tab Content */}
             <div className="relative p-4 sm:p-6 lg:p-8">
               <Tabs value={activeTab} className="w-full">
+                <TabsContent value="reels" className="mt-0">
+                  <div className="space-y-6">
+                    <Reels />
+                  </div>
+                </TabsContent>
+
                 <TabsContent value="planner" className="mt-0">
                   <div id="meal-planner-section" className="space-y-6">
                     <MealPlanner />
