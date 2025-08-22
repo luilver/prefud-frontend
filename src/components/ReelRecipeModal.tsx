@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
-import { updatePantry } from "@/services/pantryService";
+import { updatePantry, type Ingredient } from "@/services/pantryService";
 import MealShoppingModal from "./MealShoppingModal";
 import OrderOnlineModal from "./OrderOnlineModal";
 
@@ -90,6 +90,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         ingredient => selectedIngredients.includes(ingredient.name)
       );
 
+      // Build client-side pantry items to reflect in UI immediately
       const newPantryItems = ingredientsToAdd.map(ingredient => ({
         id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: ingredient.name,
@@ -104,8 +105,33 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         notes: `From recipe: ${recipe.title}`,
       }));
 
-      await updatePantry(user.id, [...pantryItems, ...newPantryItems]);
-      setPantryItems(prev => [...prev, ...newPantryItems]);
+      // Convert existing pantry items to Ingredient[] for the service call
+      const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        classification: item.category || "ingredient",
+        carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0,
+        daysToExpire: item.daysToExpire ?? 7,
+        dayAdded: item.purchaseDate || new Date().toISOString(),
+      }));
+
+      // Convert new items to Ingredient[] for the service call
+      const newAsIngredients: Ingredient[] = newPantryItems.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        classification: item.category || "ingredient",
+        carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0,
+        daysToExpire: item.daysToExpire ?? 7,
+        dayAdded: item.purchaseDate || new Date().toISOString(),
+      }));
+
+      // Call the service with the combined Ingredient[] payload
+      await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
+
+      // Update local state (context) with the richer PantryItem[] structure (no functional updater)
+      setPantryItems([...(pantryItems || []), ...newPantryItems]);
       
       toast.success(`Added ${ingredientsToAdd.length} ingredients to pantry!`);
       setSelectedIngredients([]);
