@@ -1,9 +1,9 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Bookmark, Play, Pause, Volume2, VolumeX, Share2, ChefHat, Loader2 } from "lucide-react";
+import { Heart, Bookmark, Play, Pause, Volume2, VolumeX, Share2, ChefHat, Loader2, Eye } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ReelRecipeModal from "./ReelRecipeModal";
 
 interface Recipe {
   id: string;
@@ -74,7 +74,6 @@ const mockRecipes: Recipe[] = [
   }
 ];
 
-// Additional mock recipes for infinite scroll
 const generateMoreRecipes = (startId: number, count: number): Recipe[] => {
   const additionalRecipes = [
     {
@@ -140,9 +139,7 @@ const generateMoreRecipes = (startId: number, count: number): Recipe[] => {
   });
 };
 
-// Simulate API call
 const fetchMoreRecipes = async (page: number, limit: number = 8): Promise<Recipe[]> => {
-  // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
   
   const startId = (page - 1) * limit + mockRecipes.length + 1;
@@ -157,6 +154,8 @@ const Reels = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [showRecipeModal, setShowRecipeModal] = useState(false);
 
   const loadMoreRecipes = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -178,7 +177,6 @@ const Reels = () => {
     }
   }, [isLoading, hasMore, page]);
 
-  // Infinite scroll effect
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
@@ -206,6 +204,11 @@ const Reels = () => {
     ));
   };
 
+  const handleViewRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    setShowRecipeModal(true);
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'easy': return 'text-green-600 bg-green-100';
@@ -218,7 +221,7 @@ const Reels = () => {
   return (
     <div className="space-y-6">
       {/* Header - Hidden on mobile, visible on desktop */}
-      <div className="text-center space-y-2 hidden sm:block">
+      <div className="text-center space-y-2 hidden md:block">
         <div className="flex items-center justify-center space-x-2 mb-4">
           <div className="p-2 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl">
             <Play className="h-6 w-6 text-primary" />
@@ -303,6 +306,18 @@ const Reels = () => {
                   >
                     <Share2 className="h-4 w-4" />
                   </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewRecipe(recipe);
+                    }}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
 
@@ -327,7 +342,12 @@ const Reels = () => {
                       <span>{recipe.likes.toLocaleString()}</span>
                     </div>
                     
-                    <Button variant="outline" size="sm" className="text-xs">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs"
+                      onClick={() => handleViewRecipe(recipe)}
+                    >
                       View Recipe
                     </Button>
                   </div>
@@ -354,6 +374,16 @@ const Reels = () => {
           <p className="text-muted-foreground">You've reached the end! No more recipes to load.</p>
         </div>
       )}
+
+      {/* Recipe Modal */}
+      <ReelRecipeModal
+        recipe={selectedRecipe}
+        isOpen={showRecipeModal}
+        onClose={() => {
+          setShowRecipeModal(false);
+          setSelectedRecipe(null);
+        }}
+      />
     </div>
   );
 };
