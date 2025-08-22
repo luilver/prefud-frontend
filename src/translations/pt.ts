@@ -1,4 +1,3 @@
-
 export const pt = {
   signup: {
     title: "Criar uma conta",
@@ -97,6 +96,30 @@ export const pt = {
     languageSelector: {
       select: "Selecione o idioma",
     },
+    freeSubscriptionConfirmModal: {
+      title: "Mudar para Plano Gratuito",
+      description: "Tem certeza de que deseja cancelar sua assinatura e mudar para o plano Gratuito?",
+      whatHappens: "O que acontece quando você muda para Gratuito:",
+      features: {
+        cancel: "Sua assinatura atual será cancelada",
+        immediate: "Você será transferido para o plano Gratuito imediatamente",
+        limited: "Recursos limitados serão aplicados",
+        upgrade: "Você pode fazer upgrade a qualquer momento"
+      },
+      buttons: {
+        keep: "Manter Plano Atual",
+        switchToFree: "Mudar para Gratuito",
+        switching: "Mudando..."
+      },
+      success: {
+        title: "Mudou para Plano Gratuito",
+        description: "Sua assinatura foi cancelada e você foi transferido para o plano Gratuito."
+      },
+      error: {
+        title: "Erro",
+        description: "Falha ao mudar para o plano Gratuito. Tente novamente."
+      }
+    }
   },
   subscription: {
     freeModal: {

@@ -1,4 +1,3 @@
-
 export const es = {
   signup: {
     title: "Crea tu cuenta gratis",
@@ -137,5 +136,31 @@ export const es = {
         description: "No se pudo cambiar al plan Gratuito. Por favor intenta de nuevo."
       }
     }
-  }
+  },
+  components: {
+    freeSubscriptionConfirmModal: {
+      title: "Cambiar a Plan Gratuito",
+      description: "¿Estás seguro de que quieres cancelar tu suscripción y cambiar al plan Gratuito?",
+      whatHappens: "Qué sucede cuando cambias a Gratuito:",
+      features: {
+        cancel: "Tu suscripción actual será cancelada",
+        immediate: "Cambiarás al plan Gratuito inmediatamente",
+        limited: "Se aplicarán características limitadas",
+        upgrade: "Puedes actualizar en cualquier momento"
+      },
+      buttons: {
+        keep: "Mantener Plan Actual",
+        switchToFree: "Cambiar a Gratuito",
+        switching: "Cambiando..."
+      },
+      success: {
+        title: "Cambiado a Plan Gratuito",
+        description: "Tu suscripción ha sido cancelada y has sido cambiado al plan Gratuito."
+      },
+      error: {
+        title: "Error",
+        description: "No se pudo cambiar al plan Gratuito. Por favor intenta de nuevo."
+      }
+    }
+  },
 };
