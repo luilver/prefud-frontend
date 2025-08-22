@@ -129,6 +129,7 @@ const translations = {
     "profile.subscription": "Subscription",
     "profile.plan": "Plan",
     "profile.active": "Active",
+     "profile.cancelSubscription":"Cancel Subscription",
 
     // Meal Planner
     "mealPlanner.title": "Meal Planner",
@@ -1204,6 +1205,7 @@ const translations = {
     "profile.subscription": "Suscripción",
     "profile.plan": "Plan",
     "profile.active": "Activo",
+     "profile.cancelSubscription":"Cancelar suscripción",
 
     // Meal Planner
     "mealPlanner.title": "Planificador de Comidas",
@@ -2303,6 +2305,7 @@ const translations = {
     "profile.subscription": "Assinatura",
     "profile.plan": "Plano",
     "profile.active": "Ativo",
+    "profile.cancelSubscription":"Cancelar Assinatura",
 
     // Meal Planner
     "mealPlanner.title": "Planejador de Refeições",
