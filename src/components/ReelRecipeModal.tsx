@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -98,7 +97,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         unit: ingredient.unit,
         category: ingredient.classification || "ingredient",
         purchased: true,
-        purchaseDate: new Date().toISOString(),
+        purchaseDate: new Date(),
         carbonFootPrintToWaste: 0,
         daysToExpire: 7,
         expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -113,7 +112,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         classification: item.category || "ingredient",
         carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0,
         daysToExpire: item.daysToExpire ?? 7,
-        dayAdded: item.purchaseDate || new Date().toISOString(),
+        dayAdded: item.purchaseDate instanceof Date ? item.purchaseDate.toISOString() : item.purchaseDate || new Date().toISOString(),
       }));
 
       // Convert new items to Ingredient[] for the service call
@@ -124,7 +123,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         classification: item.category || "ingredient",
         carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0,
         daysToExpire: item.daysToExpire ?? 7,
-        dayAdded: item.purchaseDate || new Date().toISOString(),
+        dayAdded: item.purchaseDate.toISOString(),
       }));
 
       // Call the service with the combined Ingredient[] payload (existing + new)
