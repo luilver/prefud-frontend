@@ -89,19 +89,19 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         ingredient => selectedIngredients.includes(ingredient.name)
       );
 
-      // Create new pantry items with the correct structure
+      // Create new pantry items with the exact structure you specified
       const newPantryItems = ingredientsToAdd.map(ingredient => ({
         id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: ingredient.name,
         quantity: ingredient.quantity,
         unit: ingredient.unit,
         category: ingredient.classification || "ingredient",
-        purchased: true,
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         purchaseDate: new Date().toISOString(),
+        notes: `Carbon footprint: 0.2kg CO2`,
         carbonFootPrintToWaste: 0.2,
         daysToExpire: 7,
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        notes: `From recipe: ${recipe.title} - Carbon footprint:: 0.2`,
+        purchased: true
       }));
 
       // Convert existing pantry items to Ingredient[] format for API call
@@ -121,8 +121,8 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         quantity: item.quantity,
         unit: item.unit,
         classification: item.category || "ingredient",
-        carbonFootPrintToWaste: 0.2,
-        daysToExpire: 7,
+        carbonFootPrintToWaste: item.carbonFootPrintToWaste,
+        daysToExpire: item.daysToExpire,
         dayAdded: item.purchaseDate,
       }));
 
