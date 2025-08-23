@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Plus, Package, Truck, Check, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { updatePantry, type Ingredient } from "@/services/pantryService";
 
 interface MealShoppingModalProps {
   meal: any;
@@ -17,7 +17,7 @@ interface MealShoppingModalProps {
 }
 
 const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) => {
-  const { addPantryItem } = useUser();
+  const { user, pantryItems, setPantryItems } = useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
@@ -31,7 +31,9 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
         quantity: ingredient.quantity || 1,
         unit: ingredient.unit || 'unit',
         classification: ingredient.classification || 'ingredient',
-        daysToExpire: ingredient.daysToExpire || 7
+        daysToExpire: ingredient.daysToExpire || 7,
+        // carbonFootPrintToWaste can come from meal data; if missing, we will default later when creating pantry items
+        carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste
       }));
     }
     
@@ -45,7 +47,8 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
             quantity: parseFloat(match[1]),
             unit: match[2],
             classification: 'ingredient',
-            daysToExpire: 7
+            daysToExpire: 7,
+            carbonFootPrintToWaste: undefined
           };
         }
         return {
@@ -53,7 +56,8 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
           quantity: 1,
           unit: 'unit',
           classification: 'ingredient',
-          daysToExpire: 7
+          daysToExpire: 7,
+          carbonFootPrintToWaste: undefined
         };
       });
     }
@@ -71,7 +75,7 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
     );
   };
 
-  const addSelectedToPantry = () => {
+  const addSelectedToPantry = async () => {
     if (selectedIngredients.length === 0) {
       toast({
         title: "No ingredients selected",
@@ -81,20 +85,63 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
       return;
     }
 
-    selectedIngredients.forEach(ingredientName => {
-      const ingredient = ingredients.find(ing => ing.name === ingredientName);
-      if (ingredient) {
-        addPantryItem({
-          name: ingredient.name,
-          quantity: ingredient.quantity,
-          unit: ingredient.unit,
-          category: ingredient.classification || 'ingredient',
-          expiryDate: new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000),
-          purchaseDate: new Date(),
-          notes: `From meal: ${meal.name}`
-        });
-      }
+    // Build new pantry items with the exact structure required
+    const nowISO = new Date().toISOString();
+    const selectedData = ingredients.filter(ing => selectedIngredients.includes(ing.name));
+
+    const newPantryItems = selectedData.map((ingredient) => {
+      const carbon = ingredient.carbonFootPrintToWaste ?? 0.2; // default if not provided
+      const expiryISO = new Date(Date.now() + (ingredient.daysToExpire || 7) * 24 * 60 * 60 * 1000).toISOString();
+
+      return {
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || 'ingredient',
+        purchased: true,
+        purchaseDate: nowISO,
+        carbonFootPrintToWaste: carbon,
+        daysToExpire: ingredient.daysToExpire || 7,
+        expiryDate: expiryISO,
+        notes: `Carbon footprint:: ${carbon}`
+      };
     });
+
+    // Update backend pantry if user available by converting to Ingredient[] format
+    try {
+      if (user?.id) {
+        const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          classification: item.category || "ingredient",
+          carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0.2,
+          daysToExpire: item.daysToExpire ?? 7,
+          dayAdded: typeof item.purchaseDate === 'string'
+            ? item.purchaseDate
+            : item.purchaseDate?.toISOString() || nowISO,
+        }));
+
+        const newAsIngredients: Ingredient[] = newPantryItems.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          classification: item.category,
+          carbonFootPrintToWaste: item.carbonFootPrintToWaste,
+          daysToExpire: item.daysToExpire,
+          dayAdded: item.purchaseDate,
+        }));
+
+        await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
+      }
+    } catch (e) {
+      console.error("Failed to sync pantry to backend:", e);
+      // We still proceed to update local state so the UI reflects the change
+    }
+
+    // Merge into local pantry state
+    setPantryItems([...(pantryItems || []), ...newPantryItems]);
 
     toast({
       title: "Added to Pantry!",
