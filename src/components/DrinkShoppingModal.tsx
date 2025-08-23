@@ -10,6 +10,7 @@ import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { updatePantry, type Ingredient } from "@/services/pantryService";
 
 interface DrinkShoppingModalProps {
   drink: ApiDrink;
@@ -18,7 +19,7 @@ interface DrinkShoppingModalProps {
 }
 
 const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps) => {
-  const { addPantryItem } = useUser();
+  const { user, pantryItems, setPantryItems } = useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
@@ -34,7 +35,7 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
     );
   };
 
-  const addSelectedToPantry = () => {
+  const addSelectedToPantry = async () => {
     if (selectedIngredients.length === 0) {
       toast({
         title: t("drinkShoppingModal.noIngredientsTitle") || "No ingredients selected",
@@ -44,20 +45,64 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
       return;
     }
 
-    selectedIngredients.forEach(ingredientName => {
-      const ingredient = ingredients.find(ing => ing.name === ingredientName);
-      if (ingredient) {
-        addPantryItem({
-          name: ingredient.name,
-          quantity: ingredient.quantity,
-          unit: ingredient.unit,
-          category: ingredient.classification || 'drink-ingredient',
-          expiryDate: new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000),
-          purchaseDate: new Date(),
-          notes: `From drink: ${drink.drink_name}`
-        });
-      }
+    const nowISO = new Date().toISOString();
+    const selectedData = ingredients.filter(ing => selectedIngredients.includes(ing.name));
+
+    // Build items in the exact structure required
+    const newPantryItems = selectedData.map((ingredient) => {
+      const carbon = ingredient.carbonFootPrintToWaste ?? 0.2;
+      const days = ingredient.daysToExpire ?? 7;
+      const expiryISO = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+
+      return {
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || 'drink-ingredient',
+        purchased: true,
+        purchaseDate: nowISO,
+        carbonFootPrintToWaste: carbon,
+        daysToExpire: days,
+        expiryDate: expiryISO,
+        notes: `Carbon footprint:: ${carbon}`
+      };
     });
+
+    // Sync with backend pantry
+    try {
+      if (user?.id) {
+        const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          classification: item.category || "ingredient",
+          carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0.2,
+          daysToExpire: item.daysToExpire ?? 7,
+          dayAdded: typeof item.purchaseDate === 'string'
+            ? item.purchaseDate
+            : item.purchaseDate?.toISOString() || nowISO,
+        }));
+
+        const newAsIngredients: Ingredient[] = newPantryItems.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          classification: item.category,
+          carbonFootPrintToWaste: item.carbonFootPrintToWaste,
+          daysToExpire: item.daysToExpire,
+          dayAdded: item.purchaseDate,
+        }));
+
+        await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
+      }
+    } catch (e) {
+      console.error("Failed to sync pantry to backend:", e);
+      // Proceed to update local state regardless to reflect UI changes
+    }
+
+    // Update local pantry state
+    setPantryItems([...(pantryItems || []), ...newPantryItems]);
 
     toast({
       title: t("drinkShoppingModal.addedToPantryTitle") || "Added to Pantry!",
