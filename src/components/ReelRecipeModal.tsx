@@ -101,7 +101,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         purchaseDate: new Date().toISOString(),
         carbonFootPrintToWaste: 0,
         daysToExpire: 7,
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Date object, not string
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         notes: `From recipe: ${recipe.title}`,
       }));
 
@@ -127,10 +127,10 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         dayAdded: item.purchaseDate || new Date().toISOString(),
       }));
 
-      // Call the service with the combined Ingredient[] payload
+      // Call the service with the combined Ingredient[] payload (existing + new)
       await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
 
-      // Update local state (context) with the richer PantryItem[] structure (no functional updater)
+      // Update local state (context) with the combined pantry items
       setPantryItems([...(pantryItems || []), ...newPantryItems]);
       
       toast.success(`Added ${ingredientsToAdd.length} ingredients to pantry!`);
