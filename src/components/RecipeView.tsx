@@ -1,8 +1,26 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Users, ChefHat, Play, BookOpen, Check, Timer, Flame, Maximize, X, ShoppingCart } from "lucide-react";
+import {
+  Clock,
+  Users,
+  ChefHat,
+  Play,
+  BookOpen,
+  Check,
+  Timer,
+  Flame,
+  Maximize,
+  X,
+  ShoppingCart,
+} from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import MealShoppingModal from "./MealShoppingModal";
@@ -13,6 +31,8 @@ interface RecipeViewProps {
 }
 
 const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
+  console.log("this is the meal prop in RecipeView:", meal);
+  console.log("meal.ingredientsData:", meal.ingredientsData);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -22,7 +42,7 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
-      setCompletedSteps(completedSteps.filter(i => i !== stepIndex));
+      setCompletedSteps(completedSteps.filter((i) => i !== stepIndex));
     } else {
       setCompletedSteps([...completedSteps, stepIndex]);
     }
@@ -50,10 +70,10 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
           name: ingredient.name,
           quantity: ingredient.quantity,
           unit: ingredient.unit,
-          category: ingredient.classification || 'ingredient',
-          priority: 'medium',
+          category: ingredient.classification || "ingredient",
+          priority: "medium",
           purchased: false,
-          notes: `From meal: ${meal.name}`
+          notes: `From meal: ${meal.name}`,
         });
       });
 
@@ -62,11 +82,11 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
         description: `Added ${ingredients.length} ingredients to your shopping list.`,
       });
     } catch (error) {
-      console.error('Error creating shopping list:', error);
+      console.error("Error creating shopping list:", error);
       toast({
         title: "Error",
         description: "Failed to create shopping list. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -76,11 +96,11 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
       return meal.ingredientsData.map((ingredient: any) => ({
         name: ingredient.name || ingredient,
         quantity: ingredient.quantity || 1,
-        unit: ingredient.unit || 'unit',
-        classification: ingredient.classification || 'ingredient'
+        unit: ingredient.unit || "unit",
+        classification: ingredient.classification || "ingredient",
       }));
     }
-    
+
     if (meal.ingredients && Array.isArray(meal.ingredients)) {
       return meal.ingredients.map((ingredient: string) => {
         const match = ingredient.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
@@ -89,29 +109,32 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
             name: match[3],
             quantity: parseFloat(match[1]),
             unit: match[2],
-            classification: 'ingredient'
+            classification: "ingredient",
           };
         }
         return {
           name: ingredient,
           quantity: 1,
-          unit: 'unit',
-          classification: 'ingredient'
+          unit: "unit",
+          classification: "ingredient",
         };
       });
     }
-    
+
     return [];
   };
 
-  const nutrition = useMemo(() => ({
-    calories: meal.calories,
-    protein: Math.floor(meal.calories * 0.2 / 4),
-    carbs: Math.floor(meal.calories * 0.5 / 4),
-    fat: Math.floor(meal.calories * 0.3 / 9),
-    fiber: Math.floor(Math.random() * 8) + 3,
-    sodium: Math.floor(Math.random() * 800) + 200
-  }), [meal.calories]);
+  const nutrition = useMemo(
+    () => ({
+      calories: meal.calories,
+      protein: Math.floor((meal.calories * 0.2) / 4),
+      carbs: Math.floor((meal.calories * 0.5) / 4),
+      fat: Math.floor((meal.calories * 0.3) / 9),
+      fiber: Math.floor(Math.random() * 8) + 3,
+      sodium: Math.floor(Math.random() * 800) + 200,
+    }),
+    [meal.calories]
+  );
 
   const getIngredientsDisplay = () => {
     // Check if meal has structured ingredient data (from API)
@@ -123,45 +146,20 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
         return ingredient.name || ingredient;
       });
     }
-    
+
     // Check if ingredients are already formatted strings with quantities
-    if (meal.ingredients && Array.isArray(meal.ingredients)) {
-      return meal.ingredients.map((ingredient: string) => {
+    if (meal.detailedIngredients && Array.isArray(meal.detailedIngredients)) {
+      return meal.detailedIngredients.map((ingredient: any) => {
         // If ingredient already has quantity/unit format, return as is
-        if (/^\d/.test(ingredient) || ingredient.includes('cup') || ingredient.includes('tbsp') || ingredient.includes('tsp') || ingredient.includes('lb') || ingredient.includes('oz')) {
-          return ingredient;
-        }
         
-        // Generic fallback for unformatted ingredients
-        const quantities = {
-          'chicken': '2 lbs',
-          'vegetables': '1 cup',
-          'oil': '2 tbsp',
-          'salt': '1 tsp',
-          'pepper': '1/2 tsp',
-          'garlic': '2 cloves',
-          'onion': '1 medium',
-          'tomato': '2 medium',
-          'rice': '1 cup',
-          'pasta': '8 oz',
-          'cheese': '1/2 cup',
-          'milk': '1 cup',
-          'flour': '2 cups',
-          'sugar': '1/4 cup',
-          'butter': '2 tbsp'
-        };
-        
-        const ingredientLower = ingredient.toLowerCase();
-        for (const [key, quantity] of Object.entries(quantities)) {
-          if (ingredientLower.includes(key)) {
-            return `${quantity} ${ingredient}`;
-          }
-        }
-        
-        return `1 unit ${ingredient}`;
+
+
+       
+
+        return `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`;
       });
     }
-    
+
     return [];
   };
 
@@ -176,16 +174,16 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
       "💡 Keep stirring to prevent sticking",
       "🎯 Almost there - you're doing great!",
       "✨ The aroma should be amazing now",
-      "🏆 Final stretch - you've got this!"
+      "🏆 Final stretch - you've got this!",
     ];
-    
+
     // Use instructions from the meal data
     const instructions = meal.instructions || meal.steps || [];
-    
+
     return instructions.map((instruction: string, index: number) => ({
       text: instruction,
       tip: cookingTips[index % cookingTips.length],
-      estimatedTime: 2 + (index % 5) // Fixed time based on step index instead of random
+      estimatedTime: 2 + (index % 5), // Fixed time based on step index instead of random
     }));
   }, [meal.instructions, meal.steps]);
 
@@ -197,7 +195,7 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
             ← Back to Plan
           </Button>
           <div className="flex flex-wrap gap-2">
-            <Button 
+            <Button
               onClick={openShoppingModal}
               className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
               size="sm"
@@ -216,25 +214,32 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                   {meal.name}
                 </CardTitle>
                 <CardDescription className="text-base sm:text-lg break-words">
-                  {meal.description || `A delicious ${meal.type} perfect for any time of day`}
+                  {meal.description ||
+                    `A delicious ${meal.type} perfect for any time of day`}
                 </CardDescription>
-                
+
                 <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{meal.prepTime || meal.cookingTime || 30} minutes</span>
+                    <span className="font-medium text-sm sm:text-base">
+                      {meal.prepTime || meal.cookingTime || 30} minutes
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">{meal.servings || 2} servings</span>
+                    <span className="font-medium text-sm sm:text-base">
+                      {meal.servings || 2} servings
+                    </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
-                    <span className="font-medium capitalize text-sm sm:text-base">{meal.difficulty}</span>
+                    <span className="font-medium capitalize text-sm sm:text-base">
+                      {meal.difficulty}
+                    </span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="w-full sm:w-48 h-32 bg-gradient-to-br from-green-100 to-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <ChefHat className="h-12 w-12 sm:h-16 sm:w-16 text-green-600 opacity-50" />
               </div>
@@ -249,7 +254,7 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                 <TabsTrigger value="recipe">Recipe</TabsTrigger>
                 <TabsTrigger value="video">Video Tutorial</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="recipe" className="space-y-6">
                 <Card>
                   <CardHeader>
@@ -257,16 +262,25 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                       <BookOpen className="h-5 w-5 text-green-600" />
                       <span>Ingredients</span>
                     </CardTitle>
-                    <CardDescription>Everything you need for this recipe</CardDescription>
+                    <CardDescription>
+                      Everything you need for this recipe
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3">
-                      {enhancedIngredients.map((ingredient: string, index: number) => (
-                        <div key={index} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                          <span className="flex-1 break-words">{ingredient}</span>
-                        </div>
-                      ))}
+                      {enhancedIngredients.map(
+                        (ingredient: string, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                            <span className="flex-1 break-words">
+                              {ingredient}
+                            </span>
+                          </div>
+                        )
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -277,7 +291,9 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                       <Flame className="h-5 w-5 text-orange-600" />
                       <span>Cooking Instructions</span>
                     </CardTitle>
-                    <CardDescription>Follow these steps for the perfect result</CardDescription>
+                    <CardDescription>
+                      Follow these steps for the perfect result
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -286,38 +302,42 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                           key={index}
                           className={`relative p-4 rounded-lg border transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
                             completedSteps.includes(index)
-                              ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-md'
-                              : 'bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200 hover:border-orange-200 hover:shadow-lg'
+                              ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-md"
+                              : "bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200 hover:border-orange-200 hover:shadow-lg"
                           }`}
                           onClick={() => toggleStep(index)}
                         >
                           <div className="flex items-start space-x-4">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0 ${
-                              completedSteps.includes(index)
-                                ? 'bg-green-500 text-white shadow-lg scale-110'
-                                : 'bg-gradient-to-br from-orange-400 to-red-400 text-white shadow-md'
-                            }`}>
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0 ${
+                                completedSteps.includes(index)
+                                  ? "bg-green-500 text-white shadow-lg scale-110"
+                                  : "bg-gradient-to-br from-orange-400 to-red-400 text-white shadow-md"
+                              }`}
+                            >
                               {completedSteps.includes(index) ? (
                                 <Check className="h-4 w-4" />
                               ) : (
                                 index + 1
                               )}
                             </div>
-                            
+
                             <div className="flex-1 min-w-0">
-                              <p className={`text-base leading-relaxed transition-all duration-300 break-words ${
-                                completedSteps.includes(index) 
-                                  ? 'line-through text-gray-500' 
-                                  : 'text-gray-800'
-                              }`}>
+                              <p
+                                className={`text-base leading-relaxed transition-all duration-300 break-words ${
+                                  completedSteps.includes(index)
+                                    ? "line-through text-gray-500"
+                                    : "text-gray-800"
+                                }`}
+                              >
                                 {instruction.text}
                               </p>
-                              
+
                               {!completedSteps.includes(index) && (
                                 <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
                                   <span className="inline-flex items-center px-2 py-1 rounded-full bg-orange-100 text-orange-700">
-                                    <Timer className="h-3 w-3 mr-1" />
-                                    ~{instruction.estimatedTime} min
+                                    <Timer className="h-3 w-3 mr-1" />~
+                                    {instruction.estimatedTime} min
                                   </span>
                                   <span className="text-gray-600 italic">
                                     {instruction.tip}
@@ -326,7 +346,7 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                               )}
                             </div>
                           </div>
-                          
+
                           {completedSteps.includes(index) && (
                             <div className="absolute top-2 right-2">
                               <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
@@ -337,12 +357,13 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                         </div>
                       ))}
                     </div>
-                    
+
                     {enhancedInstructions.length > 0 && (
                       <div className="mt-6 p-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-lg">
                         <p className="text-sm text-gray-700 text-center">
-                          💡 <strong>Cooking Tip:</strong> Click on each step to mark it as completed. 
-                          Take your time and enjoy the process!
+                          💡 <strong>Cooking Tip:</strong> Click on each step to
+                          mark it as completed. Take your time and enjoy the
+                          process!
                         </p>
                       </div>
                     )}
@@ -414,7 +435,7 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="mt-4 text-center text-sm text-gray-600">
                       <p>Duration: 8:30 | Difficulty: {meal.difficulty}</p>
                     </div>
@@ -434,28 +455,25 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="font-medium">Calories</span>
-                    <span>{nutrition.calories}</span>
+                    <span>{nutrition.calories} C</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Protein</span>
-                    <span>{nutrition.protein}g</span>
+                    <span>{meal.nutritionalInfo.protein} g</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Carbs</span>
-                    <span>{nutrition.carbs}g</span>
+                    <span>{meal.nutritionalInfo.carbohydrates} g</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Fat</span>
-                    <span>{nutrition.fat}g</span>
+                    <span>{meal.nutritionalInfo.fat} g</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Fiber</span>
-                    <span>{nutrition.fiber}g</span>
+                    <span>{meal.nutritionalInfo.fiber} g</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Sodium</span>
-                    <span>{nutrition.sodium}mg</span>
-                  </div>
+                  
                 </div>
               </CardContent>
             </Card>
@@ -465,9 +483,9 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
+                <Button
                   onClick={handleCreateShoppingList}
-                  className="w-full justify-start" 
+                  className="w-full justify-start"
                   variant="outline"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
@@ -491,22 +509,36 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
               <CardContent>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
+                    {Math.round(
+                      (completedSteps.length / enhancedInstructions.length) *
+                        100
+                    )}
+                    %
                   </div>
                   <p className="text-sm text-gray-600">
-                    {completedSteps.length} of {enhancedInstructions.length} steps completed
+                    {completedSteps.length} of {enhancedInstructions.length}{" "}
+                    steps completed
                   </p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div
                       className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
+                      style={{
+                        width: `${
+                          (completedSteps.length /
+                            enhancedInstructions.length) *
+                          100
+                        }%`,
+                      }}
                     ></div>
                   </div>
-                  {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
-                    <div className="mt-3 p-2 bg-green-100 rounded-lg">
-                      <p className="text-sm text-green-700 font-medium">🎉 Congratulations! Recipe completed!</p>
-                    </div>
-                  )}
+                  {completedSteps.length === enhancedInstructions.length &&
+                    enhancedInstructions.length > 0 && (
+                      <div className="mt-3 p-2 bg-green-100 rounded-lg">
+                        <p className="text-sm text-green-700 font-medium">
+                          🎉 Congratulations! Recipe completed!
+                        </p>
+                      </div>
+                    )}
                 </div>
               </CardContent>
             </Card>

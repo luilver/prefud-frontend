@@ -542,6 +542,16 @@ const MealPlanCreatorStepper = ({
                         t("mealPlanCreator.cuisine.american") || "American",
                     },
                     {
+                      key: "Ecuadorian",
+                      label:
+                        t("mealPlanCreator.cuisine.ecuadorian") || "Ecuadorian",
+                    },
+                    {
+                      key: "Chinese",
+                      label:
+                        t("mealPlanCreator.cuisine.chinese") || "Chinese",
+                    },
+                    {
                       key: "Indian",
                       label: t("mealPlanCreator.cuisine.indian") || "Indian",
                     },

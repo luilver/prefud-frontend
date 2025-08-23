@@ -50,7 +50,7 @@ const MealPlanner = () => {
     try {
       console.log(`Loading meal plans for page: ${page}, limit: ${limit}`);
       const response = await fetchMealPlansFromAPI(user.id, page, limit);
-      
+      console.log('this si the data of meal plans ',response.data)
       // Set the current page plans from the API response
       setCurrentPagePlans(response.data || []);
       setTotalPages(response.totalPages || 1);
