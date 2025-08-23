@@ -25,6 +25,18 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
 
   // Get ingredients with proper structure
   const getIngredientsData = () => {
+    // NEW: support ingredientsList (used by AI-created meals)
+    if (meal.ingredientsList && Array.isArray(meal.ingredientsList)) {
+      return meal.ingredientsList.map((ingredient: any) => ({
+        name: ingredient.name,
+        quantity: ingredient.quantity ?? 1,
+        unit: ingredient.unit ?? 'unit',
+        classification: ingredient.classification ?? 'ingredient',
+        daysToExpire: ingredient.daysToExpire ?? 7,
+        carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste ?? 0.2,
+      }));
+    }
+
     if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
       return meal.ingredientsData.map((ingredient: any) => ({
         name: ingredient.name || ingredient,
@@ -140,8 +152,15 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
       // We still proceed to update local state so the UI reflects the change
     }
 
+    // NEW: Convert ISO strings to Date objects for local PantryItem state typing
+    const newPantryItemsForState = newPantryItems.map(item => ({
+      ...item,
+      purchaseDate: new Date(item.purchaseDate),
+      expiryDate: new Date(item.expiryDate),
+    }));
+
     // Merge into local pantry state
-    setPantryItems([...(pantryItems || []), ...newPantryItems]);
+    setPantryItems([...(pantryItems || []), ...newPantryItemsForState]);
 
     toast({
       title: "Added to Pantry!",
