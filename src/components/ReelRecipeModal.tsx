@@ -89,7 +89,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         ingredient => selectedIngredients.includes(ingredient.name)
       );
 
-      // Build client-side pantry items to reflect in UI immediately
+      // Create new pantry items with the correct structure
       const newPantryItems = ingredientsToAdd.map(ingredient => ({
         id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: ingredient.name,
@@ -97,40 +97,47 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         unit: ingredient.unit,
         category: ingredient.classification || "ingredient",
         purchased: true,
-        purchaseDate: new Date(),
-        carbonFootPrintToWaste: 0,
+        purchaseDate: new Date().toISOString(),
+        carbonFootPrintToWaste: 0.2,
         daysToExpire: 7,
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        notes: `From recipe: ${recipe.title}`,
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        notes: `From recipe: ${recipe.title} - Carbon footprint:: 0.2`,
       }));
 
-      // Convert existing pantry items to Ingredient[] for the service call
+      // Convert existing pantry items to Ingredient[] format for API call
       const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
         name: item.name,
         quantity: item.quantity,
         unit: item.unit,
         classification: item.category || "ingredient",
-        carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0,
+        carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0.2,
         daysToExpire: item.daysToExpire ?? 7,
-        dayAdded: item.purchaseDate instanceof Date ? item.purchaseDate.toISOString() : item.purchaseDate || new Date().toISOString(),
+        dayAdded: typeof item.purchaseDate === 'string' ? item.purchaseDate : item.purchaseDate?.toISOString() || new Date().toISOString(),
       }));
 
-      // Convert new items to Ingredient[] for the service call
+      // Convert new items to Ingredient[] format for API call
       const newAsIngredients: Ingredient[] = newPantryItems.map(item => ({
         name: item.name,
         quantity: item.quantity,
         unit: item.unit,
         classification: item.category || "ingredient",
-        carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0,
-        daysToExpire: item.daysToExpire ?? 7,
-        dayAdded: item.purchaseDate.toISOString(),
+        carbonFootPrintToWaste: 0.2,
+        daysToExpire: 7,
+        dayAdded: item.purchaseDate,
       }));
 
       // Call the service with the combined Ingredient[] payload (existing + new)
       await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
 
+      // Convert new pantry items to match the PantryItem interface for local state
+      const newPantryItemsForState = newPantryItems.map(item => ({
+        ...item,
+        purchaseDate: new Date(item.purchaseDate),
+        expiryDate: new Date(item.expiryDate),
+      }));
+
       // Update local state (context) with the combined pantry items
-      setPantryItems([...(pantryItems || []), ...newPantryItems]);
+      setPantryItems([...(pantryItems || []), ...newPantryItemsForState]);
       
       toast.success(`Added ${ingredientsToAdd.length} ingredients to pantry!`);
       setSelectedIngredients([]);
