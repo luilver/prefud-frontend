@@ -48,7 +48,7 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
     const nowISO = new Date().toISOString();
     const selectedData = ingredients.filter(ing => selectedIngredients.includes(ing.name));
 
-    // Build items in the exact structure required
+    // Build items in the exact structure required (ISO strings for backend)
     const newPantryItems = selectedData.map((ingredient) => {
       const carbon = ingredient.carbonFootPrintToWaste ?? 0.2;
       const days = ingredient.daysToExpire ?? 7;
@@ -69,7 +69,7 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
       };
     });
 
-    // Sync with backend pantry
+    // Sync with backend pantry (expects Ingredient[] with strings)
     try {
       if (user?.id) {
         const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
@@ -101,8 +101,15 @@ const DrinkShoppingModal = ({ drink, isOpen, onClose }: DrinkShoppingModalProps)
       // Proceed to update local state regardless to reflect UI changes
     }
 
-    // Update local pantry state
-    setPantryItems([...(pantryItems || []), ...newPantryItems]);
+    // Convert ISO strings to Date objects for local PantryItem state to satisfy typing
+    const newPantryItemsForState = newPantryItems.map(item => ({
+      ...item,
+      purchaseDate: new Date(item.purchaseDate),
+      expiryDate: new Date(item.expiryDate),
+    }));
+
+    // Update local pantry state with Date objects
+    setPantryItems([...(pantryItems || []), ...newPantryItemsForState]);
 
     toast({
       title: t("drinkShoppingModal.addedToPantryTitle") || "Added to Pantry!",
