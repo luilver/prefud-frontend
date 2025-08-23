@@ -52,11 +52,11 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   // Mock recipe data based on the recipe
   const mockRecipeData = {
     ingredients: [
-      { name: "Olive Oil", quantity: 2, unit: "tbsp", classification: "oil" },
-      { name: "Garlic", quantity: 3, unit: "cloves", classification: "vegetable" },
-      { name: "Onion", quantity: 1, unit: "medium", classification: "vegetable" },
-      { name: "Salt", quantity: 1, unit: "tsp", classification: "seasoning" },
-      { name: "Black Pepper", quantity: 0.5, unit: "tsp", classification: "seasoning" },
+      { name: "Olive Oil", quantity: 2, unit: "tbsp", classification: "oil", carbonFootPrintToWaste: 0.1, daysToExpire: 90 },
+      { name: "Garlic", quantity: 3, unit: "cloves", classification: "vegetable", carbonFootPrintToWaste: 0.05, daysToExpire: 14 },
+      { name: "Onion", quantity: 1, unit: "medium", classification: "vegetable", carbonFootPrintToWaste: 0.08, daysToExpire: 21 },
+      { name: "Salt", quantity: 1, unit: "tsp", classification: "seasoning", carbonFootPrintToWaste: 0.01, daysToExpire: 365 },
+      { name: "Black Pepper", quantity: 0.5, unit: "tsp", classification: "seasoning", carbonFootPrintToWaste: 0.02, daysToExpire: 180 },
     ],
     instructions: [
       "Heat olive oil in a large pan over medium heat",
@@ -90,19 +90,24 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
       );
 
       // Create new pantry items with the exact structure you specified
-      const newPantryItems = ingredientsToAdd.map(ingredient => ({
-        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        category: ingredient.classification || "ingredient",
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        purchaseDate: new Date().toISOString(),
-        notes: `Carbon footprint: 0.2kg CO2`,
-        carbonFootPrintToWaste: 0.2,
-        daysToExpire: 7,
-        purchased: true
-      }));
+      const newPantryItems = ingredientsToAdd.map(ingredient => {
+        const currentTime = new Date().toISOString();
+        const expiryDate = new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000).toISOString();
+        
+        return {
+          id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.classification,
+          purchased: true,
+          purchaseDate: currentTime,
+          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
+          daysToExpire: ingredient.daysToExpire,
+          expiryDate: expiryDate,
+          notes: `Carbon footprint:: ${ingredient.carbonFootPrintToWaste}`
+        };
+      });
 
       // Convert existing pantry items to Ingredient[] format for API call
       const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
@@ -120,7 +125,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         name: item.name,
         quantity: item.quantity,
         unit: item.unit,
-        classification: item.category || "ingredient",
+        classification: item.category,
         carbonFootPrintToWaste: item.carbonFootPrintToWaste,
         daysToExpire: item.daysToExpire,
         dayAdded: item.purchaseDate,
