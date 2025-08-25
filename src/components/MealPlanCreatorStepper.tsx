@@ -64,6 +64,8 @@ const MealPlanCreatorStepper = ({
     budgetRange: initialData?.preferences?.budgetRange || "",
     dislikes: [],
     healthGoals: initialData?.preferences?.healthGoals || [],
+    numberKidsLessThan5: initialData?.preferences?.numberKidsLessThan5 || 0,
+    numberKids5To12: initialData?.preferences?.numberKids5To12 || 0,
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -276,7 +278,7 @@ const MealPlanCreatorStepper = ({
                   type="date"
                   id="startDate"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.startDate}
+                  value={planData.startDate || ""}
                   onChange={(e) =>
                     handleDataChange({ startDate: e.target.value })
                   }
@@ -321,6 +323,52 @@ const MealPlanCreatorStepper = ({
                   onChange={(e) =>
                     handleDataChange({
                       numberOfPersons: parseInt(e.target.value),
+                    })
+                  }
+                  min="1"
+                />
+              </div>
+              {/* Number of Kids under 5 */}
+              <div>
+                <label
+                  htmlFor="numberOfPersons"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  {t("mealPlanCreator.kidsUnder5") ||
+                    "Number of Kids under 5 years"}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="numberKidsLessThan5"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  value={planData.numberKidsLessThan5}
+                  onChange={(e) =>
+                    handleDataChange({
+                      numberKidsLessThan5: parseInt(e.target.value),
+                    })
+                  }
+                  min="0"
+                />
+              </div>
+              {/* Number of Kids from 5 to 12 */}
+              <div>
+                <label
+                  htmlFor="numberOfPersons"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  {t("mealPlanCreator.kidsFrom5to12") ||
+                    "Number of Kids from 5 to 12 years"}{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="numberKids5To12"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  value={planData.numberKids5To12}
+                  onChange={(e) =>
+                    handleDataChange({
+                      numberKids5To12: parseInt(e.target.value),
                     })
                   }
                   min="1"
@@ -548,8 +596,7 @@ const MealPlanCreatorStepper = ({
                     },
                     {
                       key: "Chinese",
-                      label:
-                        t("mealPlanCreator.cuisine.chinese") || "Chinese",
+                      label: t("mealPlanCreator.cuisine.chinese") || "Chinese",
                     },
                     {
                       key: "Indian",
@@ -807,10 +854,24 @@ const MealPlanCreatorStepper = ({
                     </p>
                     <p>
                       <strong>
-                        {t("mealPlanCreator.people") || "People"}:
+                        {t("mealPlanCreator.people") || "Adults"}:
                       </strong>{" "}
                       {planData.numberOfPersons}{" "}
                       {t("mealPlanCreator.persons") || "persons"}
+                    </p>
+                    <p>
+                      <strong>
+                        {t("mealPlanCreator.people") || "Kids 5 to 12"}:
+                      </strong>{" "}
+                      {planData.numberKids5To12}{" "}
+                      {t("mealPlanCreator.kids5to12") || "kids"}
+                    </p>
+                    <p>
+                      <strong>
+                        {t("mealPlanCreator.people") || "Kids under 5"}:
+                      </strong>{" "}
+                      {planData.numberKidsLessThan5}{" "}
+                      {t("mealPlanCreator.kidsless5") || "kids"}
                     </p>
                     <p>
                       <strong>
@@ -995,6 +1056,8 @@ const MealPlanCreatorStepper = ({
       const requestData = {
         duration: planData.numberOfDays,
         numberPeople: planData.numberOfPersons,
+        numberKids5To12: planData.numberKids5To12,
+        numberKidsLessThan5: planData.numberKidsLessThan5,
         mealsPerDay: planData.mealsPerDay,
         dietaryRestrictions: planData.dietaryRestrictions,
         cuisinePreferences: planData.cuisinePreferences,

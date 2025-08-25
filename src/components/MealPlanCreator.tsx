@@ -25,6 +25,8 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [startDate, setStartDate] = useState("");
   const [numberOfDays, setNumberOfDays] = useState(7);
   const [numberOfPersons, setNumberOfPersons] = useState(1);
+   const [numberOfKidsLessThan5, setNumberOfKidsLessThan5] = useState(0);
+    const [numberFrom5to12, setNumberFrom5to12] = useState(0);
   const [mealsPerDay, setMealsPerDay] = useState(3);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [cuisinePreferences, setCuisinePreferences] = useState<string[]>([]);
@@ -184,6 +186,8 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       const requestData = {
         duration: numberOfDays,
         numberPeople: numberOfPersons,
+        numberKidsLessThan5: numberOfKidsLessThan5,
+        numberKids5To12: numberFrom5to12,
         mealsPerDay: mealsPerDay,
         dietaryRestrictions: dietaryRestrictions,
         cuisinePreferences: cuisinePreferences,
@@ -401,6 +405,30 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   max="10"
                   value={numberOfPersons}
                   onChange={(e) => setNumberOfPersons(parseInt(e.target.value) || 1)}
+                  className="border-purple-200 focus:border-purple-400"
+                />
+              </div>
+              <div>
+                <Label htmlFor="numberOfPersons">{t('mealPlanCreator.numberOfPersons') || 'Number of Kids less than 5 years'} *</Label>
+                <Input
+                  id="numberOfKidsLessThan5"
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={numberOfKidsLessThan5}
+                  onChange={(e) => setNumberOfKidsLessThan5(parseInt(e.target.value) || 0)}
+                  className="border-purple-200 focus:border-purple-400"
+                />
+              </div>
+              <div>
+                <Label htmlFor="numberOfPersons">{t('mealPlanCreator.numberOfPersons') || 'Number of Kids from 5 to 12 years'} *</Label>
+                <Input
+                  id="numberFrom5to12"
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={numberFrom5to12}
+                  onChange={(e) => setNumberFrom5to12(parseInt(e.target.value) || 0)}
                   className="border-purple-200 focus:border-purple-400"
                 />
               </div>

@@ -1316,7 +1316,7 @@ const translations = {
       "Describe tus objetivos o preferencias de planificación de comidas...",
     "mealPlanCreator.startDate": "Fecha de Inicio",
     "mealPlanCreator.numberOfDays": "Número de Días",
-    "mealPlanCreator.numberOfPersons": "Número de Personas",
+    "mealPlanCreator.numberOfPersons": "Número de Personas Adultas",
     "mealPlanCreator.mealsPerDay": "Comidas por Día",
     "mealPlanCreator.planDuration": "Duración del Plan",
     "mealPlanCreator.person": "persona",

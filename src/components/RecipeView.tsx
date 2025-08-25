@@ -63,6 +63,7 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
   };
 
   const handleCreateShoppingList = () => {
+    console.log('va por aqui')
     try {
       const ingredients = getIngredientsForShopping();
       ingredients.forEach((ingredient) => {
