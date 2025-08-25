@@ -469,6 +469,8 @@ const translations = {
     "aiMealCreatorStepper.createAIMealTitle": "Create AI Meal",
     "aiMealCreatorStepper.previousBtn": "Previous",
     "aiMealCreatorStepper.nextBtn": "Next",
+    "aiMealCreatorStepper.dishName" : "Dish Name",
+    "aiMealCreatorStepper.review.dish":" Dish",
 
     // AI Meal Generation
     "aiMealGenerator.loaderMessage":
@@ -1623,6 +1625,8 @@ const translations = {
     "aiMealCreatorStepper.createAIMealTitle": "Crear Comida con IA",
     "aiMealCreatorStepper.previousBtn": "Anterior",
     "aiMealCreatorStepper.nextBtn": "Siguiente",
+    "aiMealCreatorStepper.dishName" : "Nombre del Plato",
+    "aiMealCreatorStepper.review.dish":" Plato",
 
     // AI Meal Generator
     "aiMealGenerator.loaderMessage":
@@ -2805,6 +2809,8 @@ const translations = {
     "aiMealCreatorStepper.createAIMealTitle": "Criar Refeição com IA",
     "aiMealCreatorStepper.previousBtn": "Anterior",
     "aiMealCreatorStepper.nextBtn": "Próximo",
+    "aiMealCreatorStepper.dishName" : "Nome do Prato",
+    "aiMealCreatorStepper.review.dish":"Prato",
 
     //AI Meal Generation
     "aiMealGenerator.loaderMessage":

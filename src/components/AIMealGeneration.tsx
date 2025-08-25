@@ -65,7 +65,9 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         dietaryRestrictions: mealData.dietaryRestrictions?.map((r: string) => r.toLowerCase().replace("-", " ")) || [],
         cuisinePreferences: mealData.cuisinePreferences?.map((c: string) => c.toLowerCase()) || [],
         allergiesIntolerance: mealData.allergiesIntolerances?.map((a: string) => a.toLowerCase()) || [],
-        customIntolerance: mealData.customAllergies || ""
+        customIntolerance: mealData.customAllergies || "",
+        nameOfMeal: mealData.nameOfMeal || "",
+
       };
 
       console.log("Sending API request with payload:", apiPayload);

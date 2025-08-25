@@ -33,7 +33,8 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     allergiesIntolerances: [],
     customAllergies: "",
     dislikes: "",
-    specialRequests: ""
+    specialRequests: "",
+    nameOfMeal: "",
   });
   const { user } = useUser();
   const { language, t } = useLanguage();
@@ -172,6 +173,16 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                   placeholder={t("aiMealCreatorStepper.mealNamePlaceholder") || "e.g., My Special Sunday Dinner"}
                   value={mealData.mealName}
                   onChange={(e) => handleStepData({ mealName: e.target.value })}
+                   maxLength={20}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t("aiMealCreatorStepper.dishName") || "Do you want a specific dish? Write it here: (Optional)"}</label>
+                <Input
+                  placeholder={t("aiMealCreatorStepper.dishName") || "e.g., Mac and cheese"}
+                  value={mealData.nameOfMeal}
+                  onChange={(e) => handleStepData({ nameOfMeal: e.target.value })}
+                   maxLength={30}
                 />
               </div>
 
@@ -273,6 +284,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                   placeholder={t("aiMealCreatorStepper.specialRequestsPlaceholder") || "Any specific requests or inspirations for your meal?"}
                   value={mealData.specialRequests}
                   onChange={(e) => handleStepData({ specialRequests: e.target.value })}
+                  maxLength={40}
                 />
               </div>
             </CardContent>
@@ -433,6 +445,8 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                       <strong>{t("aiMealCreatorStepper.review.language") || "Language"}:</strong> {getLanguageDisplayName()}
                     </div>
                     <div><strong>{t("aiMealCreatorStepper.review.mealName") || "Meal Name"}:</strong> {mealData.mealName || t("aiMealCreatorStepper.review.notSpecified") || "Not specified"}</div>
+                    <div><strong>{t("aiMealCreatorStepper.review.dish") || "Dish Name"}:</strong> {mealData.nameOfMeal || t("aiMealCreatorStepper.review.notSpecified") || "Not specified"}</div>
+
                     <div><strong>{t("aiMealCreatorStepper.review.mealType") || "Meal Type"}:</strong> {mealData.mealType || t("aiMealCreatorStepper.review.notSelected") || "Not selected"}</div>
                     <div><strong>{t("aiMealCreatorStepper.review.servings") || "Servings"}:</strong> {mealData.servings}</div>
                     <div><strong>{t("aiMealCreatorStepper.review.cookingTime") || "Max Cooking Time"}:</strong> {mealData.cookingTime} {t("aiMealCreatorStepper.review.minutes") || "minutes"}</div>
