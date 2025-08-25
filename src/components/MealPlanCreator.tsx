@@ -22,6 +22,7 @@ interface MealPlanCreatorProps {
 const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [planName, setPlanName] = useState("");
   const [planDescription, setPlanDescription] = useState("");
+  const [desiredMeal, setDesiredMeal] = useState("");
   const [startDate, setStartDate] = useState("");
   const [numberOfDays, setNumberOfDays] = useState(7);
   const [numberOfPersons, setNumberOfPersons] = useState(1);
@@ -197,7 +198,8 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         user_id: user.id,
         start_date: new Date(startDate).toISOString(),
         plan_name: planName,
-        plan_description: planDescription || `Personalized meal plan for ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}`
+        plan_description: planDescription || `Personalized meal plan for ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}`,
+        nameOfMeal: desiredMeal
       };
 
       console.log('Creating meal plan with data:', requestData);
@@ -366,6 +368,20 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 className="border-purple-200 focus:border-purple-400"
                 rows={2}
               />
+            </div>
+
+            <div>
+              <Label htmlFor="desiredMeal">{t('mealPlanCreator.desiredMeal') || 'Desired Meal'}</Label>
+              <Input
+                id="desiredMeal"
+                placeholder={t('mealPlanCreator.desiredMealPlaceholder') || 'e.g., Spaghetti Carbonara, Thai Green Curry...'}
+                value={desiredMeal}
+                onChange={(e) => setDesiredMeal(e.target.value)}
+                className="border-purple-200 focus:border-purple-400"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {t('mealPlanCreator.desiredMealDescription') || 'This is optional - you can write the name of your favorite dish'}
+              </p>
             </div>
 
             <div>
