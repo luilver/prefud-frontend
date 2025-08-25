@@ -13,6 +13,7 @@ import { useCookingLoader } from "@/hooks/useCookingLoader";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
+import { addIngredientsToPantry } from "@/services/pantryService";
 
 interface AIMealGenerationProps {
   mealData: any;
@@ -255,7 +256,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     }
   };
 
-  const handleAddToPantry = () => {
+  const handleAddToPantry = async () => {
     const selectedItems = shoppingList.filter(item => checkedIngredients.has(item.id));
     
     if (selectedItems.length === 0) {
@@ -263,20 +264,50 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       return;
     }
 
-    selectedItems.forEach(item => {
-      addPantryItem({
+    try {
+      // Transform selected items to match the required pantry structure
+      const newPantryItems = selectedItems.map((item) => ({
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: item.name,
         quantity: parseFloat(item.quantity) || 1,
         unit: item.unit || 'piece',
         category: item.category || 'other',
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        purchaseDate: new Date(),
-        notes: item.notes || `Added from ${item.mealName}`
-      });
-    });
-    
-    setCheckedIngredients(new Set());
-    toast.success(`${selectedItems.length} ingredients added to pantry!`);
+        purchased: true,
+        purchaseDate: new Date().toISOString(),
+        carbonFootPrintToWaste: 0.1, // Default value, could be enhanced based on ingredient type
+        daysToExpire: 7, // Default value, could be enhanced based on ingredient type
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        notes: `Carbon footprint:: 0.1`
+      }));
+
+      console.log('Adding ingredients to pantry:', newPantryItems);
+      
+      // Use the new endpoint to add ingredients
+      const response = await addIngredientsToPantry(user.id, newPantryItems);
+      
+      if (response.success) {
+        toast.success(`${selectedItems.length} ingredients added to pantry!`);
+        setCheckedIngredients(new Set());
+        
+        // Update local pantry state if needed
+        newPantryItems.forEach(item => {
+          addPantryItem({
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            category: item.category,
+            expiryDate: new Date(item.expiryDate),
+            purchaseDate: new Date(item.purchaseDate),
+            notes: item.notes
+          });
+        });
+      } else {
+        throw new Error('Failed to add ingredients to pantry');
+      }
+    } catch (error) {
+      console.error("Error adding to pantry:", error);
+      toast.error("Failed to add ingredients to pantry. Please try again.");
+    }
   };
 
   const handleOrderOnline = () => {
