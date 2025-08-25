@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,14 +5,28 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Clock, Users, Droplets, Leaf, ShoppingCart, Eye, Play, CheckCircle2, Circle, Maximize, X, Plus } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  Users,
+  Droplets,
+  Leaf,
+  ShoppingCart,
+  Eye,
+  Play,
+  CheckCircle2,
+  Circle,
+  Maximize,
+  X,
+  Plus,
+} from "lucide-react";
 import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import DrinkShoppingModal from "./DrinkShoppingModal";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { updatePantry } from "@/services/pantryService";
+import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
 
 interface DrinkDetailViewProps {
   drink: ApiDrink;
@@ -33,7 +46,6 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-
   const handleCreateShoppingList = () => {
     try {
       drink.drinkPlan.ingredientsList.forEach((ingredient) => {
@@ -41,39 +53,51 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
           name: ingredient.name,
           quantity: ingredient.quantity,
           unit: ingredient.unit,
-          category: ingredient.classification || 'drink-ingredient',
-          priority: 'medium',
+          category: ingredient.classification || "drink-ingredient",
+          priority: "medium",
           purchased: false,
-          notes: `From drink: ${drink.drink_name}`
+          notes: `From drink: ${drink.drink_name}`,
         });
       });
 
       toast({
-        title: t("drinkDetailView.shoppingListCreated") || "Shopping List Created!",
-        description:
-          `${t("drinkDetailView.added") || 'Added'} ${drink.drinkPlan.ingredientsList.length} ${t("drinkDetailView.toShoppingList") || 'ingredients to your shopping list'}`,
+        title:
+          t("drinkDetailView.shoppingListCreated") || "Shopping List Created!",
+        description: `${t("drinkDetailView.added") || "Added"} ${
+          drink.drinkPlan.ingredientsList.length
+        } ${
+          t("drinkDetailView.toShoppingList") ||
+          "ingredients to your shopping list"
+        }`,
       });
     } catch (error) {
-      console.error('Error creating shopping list:', error);
+      console.error("Error creating shopping list:", error);
       toast({
         title: t("drinkDetailView.error") || "Error",
-        description: t("drinkDetailView.shoppingListFailed") || "Failed to create shopping list. Please try again.",
-        variant: "destructive"
+        description:
+          t("drinkDetailView.shoppingListFailed") ||
+          "Failed to create shopping list. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
-  const handleIngredientSelection = (ingredientId: string, checked: boolean) => {
+  const handleIngredientSelection = (
+    ingredientId: string,
+    checked: boolean
+  ) => {
     if (checked) {
-      setSelectedIngredients(prev => [...prev, ingredientId]);
+      setSelectedIngredients((prev) => [...prev, ingredientId]);
     } else {
-      setSelectedIngredients(prev => prev.filter(id => id !== ingredientId));
+      setSelectedIngredients((prev) =>
+        prev.filter((id) => id !== ingredientId)
+      );
     }
   };
 
-  const handleAddToPantry = async() => {
+  const handleAddToPantry = async () => {
     const selectedIngredientsData = drink.drinkPlan.ingredientsList.filter(
-      ingredient => selectedIngredients.includes(ingredient.name)
+      (ingredient) => selectedIngredients.includes(ingredient.name)
     );
 
     try {
@@ -82,17 +106,19 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
           name: ingredient.name,
           quantity: ingredient.quantity,
           unit: ingredient.unit,
-          category: ingredient.classification || 'other',
-          expiryDate: new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000),
+          category: ingredient.classification || "other",
+          expiryDate: new Date(
+            Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000
+          ),
           purchaseDate: new Date(),
           notes: `From drink: ${drink.drink_name}`,
-          location: 'Pantry'
+          location: "Pantry",
         });
       });
 
       ///here the same process to add to pantry
-const newPantryItems = [];
-    selectedIngredientsData.forEach((ingredient) => {
+      const newPantryItems = [];
+      selectedIngredientsData.forEach((ingredient) => {
         const newPantryItem = {
           id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           name: ingredient.name,
@@ -114,49 +140,63 @@ const newPantryItems = [];
       });
 
       try {
-            const responseUpdatePantry = await updatePantry(user.id,[...pantryItems, ...newPantryItems] );
-            console.log('first response from update pantry:', responseUpdatePantry);  
-          } catch (error) {
-            console.log('error updating pantry:', error);
-          }
+        const responseUpdatePantry = await addIngredientsToPantry(user.id, [
+          ...newPantryItems,
+        ]);
+
+        console.log("first response from update pantry:", responseUpdatePantry);
+      } catch (error) {
+        console.log("error updating pantry:", error);
+      }
 
       toast({
         title: t("drinkDetailView.addedToPantry") || "Added to Pantry!",
-        description: `${t("drinkDetailView.added") || 'Added'} ${selectedIngredientsData.length} ${t("drinkDetailView.ingredientsToPantry") || 'ingredients to your pantry'}`,
+        description: `${t("drinkDetailView.added") || "Added"} ${
+          selectedIngredientsData.length
+        } ${
+          t("drinkDetailView.ingredientsToPantry") ||
+          "ingredients to your pantry"
+        }`,
       });
 
       setSelectedIngredients([]);
     } catch (error) {
-      console.error('Error adding to pantry:', error);
+      console.error("Error adding to pantry:", error);
       toast({
         title: t("drinkDetailView.error") || "Error",
-        description: t("drinkDetailView.pantryFailed") || "Failed to add ingredients to pantry. Please try again.",
-        variant: "destructive"
+        description:
+          t("drinkDetailView.pantryFailed") ||
+          "Failed to add ingredients to pantry. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
   const handleOrderOnline = () => {
     const selectedIngredientsData = drink.drinkPlan.ingredientsList
-      .filter(ingredient => selectedIngredients.includes(ingredient.name))
-      .map(ingredient => ({
+      .filter((ingredient) => selectedIngredients.includes(ingredient.name))
+      .map((ingredient) => ({
         id: ingredient.name,
         name: ingredient.name,
         quantity: ingredient.quantity,
         unit: ingredient.unit,
-        category: ingredient.classification || 'other',
-        priority: 'medium',
+        category: ingredient.classification || "other",
+        priority: "medium",
         purchased: false,
         notes: `From drink: ${drink.drink_name}`,
         estimatedPrice: Math.random() * 10 + 1, // Mock price
-        mealName: drink.drink_name
+        mealName: drink.drink_name,
       }));
 
     if (selectedIngredientsData.length === 0) {
       toast({
-        title: t("drinkDetailView.noIngredientsSelected") || "No ingredients selected",
-        description: t("drinkDetailView.selectIngredientsFirst") || "Please select ingredients first.",
-        variant: "destructive"
+        title:
+          t("drinkDetailView.noIngredientsSelected") ||
+          "No ingredients selected",
+        description:
+          t("drinkDetailView.selectIngredientsFirst") ||
+          "Please select ingredients first.",
+        variant: "destructive",
       });
       return;
     }
@@ -165,9 +205,9 @@ const newPantryItems = [];
   };
 
   const toggleStepCompletion = (stepIndex: number) => {
-    setCompletedSteps(prev => 
+    setCompletedSteps((prev) =>
       prev.includes(stepIndex)
-        ? prev.filter(index => index !== stepIndex)
+        ? prev.filter((index) => index !== stepIndex)
         : [...prev, stepIndex]
     );
   };
@@ -197,8 +237,12 @@ const newPantryItems = [];
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{drink.drink_name}</h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-1">{healthyDrink.name}</p>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
+              {drink.drink_name}
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">
+              {healthyDrink.name}
+            </p>
           </div>
         </div>
 
@@ -208,8 +252,12 @@ const newPantryItems = [];
             <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
               <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mb-1 sm:mb-2" />
               <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">{healthyDrink.cookingTime}</p>
-                <p className="text-xs text-gray-600">{t("drinkDetailView.min") || "min"}</p>
+                <p className="text-sm sm:text-lg font-bold">
+                  {healthyDrink.cookingTime}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {t("drinkDetailView.min") || "min"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -217,8 +265,12 @@ const newPantryItems = [];
             <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
               <Users className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 mb-1 sm:mb-2" />
               <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">{drink.numberPeople}</p>
-                <p className="text-xs text-gray-600">{t("drinkDetailView.servings") || "Servings"}</p>
+                <p className="text-sm sm:text-lg font-bold">
+                  {drink.numberPeople}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {t("drinkDetailView.servings") || "Servings"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -226,8 +278,12 @@ const newPantryItems = [];
             <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
               <Droplets className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 mb-1 sm:mb-2" />
               <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">{healthyDrink.calories}</p>
-                <p className="text-xs text-gray-600">{t("drinkDetailView.cal") || "Cal"}</p>
+                <p className="text-sm sm:text-lg font-bold">
+                  {healthyDrink.calories}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {t("drinkDetailView.cal") || "Cal"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -235,8 +291,12 @@ const newPantryItems = [];
             <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
               <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 mb-1 sm:mb-2" />
               <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">{drink.drinkPlan.totalCarbonFootprint}</p>
-                <p className="text-xs text-gray-600">{t("drinkDetailView.co2") || "kg CO₂"}</p>
+                <p className="text-sm sm:text-lg font-bold">
+                  {drink.drinkPlan.totalCarbonFootprint}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {t("drinkDetailView.co2") || "kg CO₂"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -249,19 +309,28 @@ const newPantryItems = [];
             {/* Description & Benefits Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-green-800">{t("drinkDetailView.descBenefits") || "Description & Benefits"}</CardTitle>
+                <CardTitle className="text-green-800">
+                  {t("drinkDetailView.descBenefits") ||
+                    "Description & Benefits"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-green-700 mb-2">{t("drinkDetailView.description") || "Description"}</h4>
+                  <h4 className="font-medium text-green-700 mb-2">
+                    {t("drinkDetailView.description") || "Description"}
+                  </h4>
                   <p className="text-gray-700">{healthyDrink.description}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-green-700 mb-2">{t("drinkDetailView.healthBenefits") || "Health Benefits"}</h4>
+                  <h4 className="font-medium text-green-700 mb-2">
+                    {t("drinkDetailView.healthBenefits") || "Health Benefits"}
+                  </h4>
                   <p className="text-gray-700">{healthyDrink.benefits}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-green-700 mb-2">{t("drinkDetailView.instructions") || "Instructions"}</h4>
+                  <h4 className="font-medium text-green-700 mb-2">
+                    {t("drinkDetailView.instructions") || "Instructions"}
+                  </h4>
                   <p className="text-gray-700">{healthyDrink.instructions}</p>
                 </div>
               </CardContent>
@@ -270,18 +339,25 @@ const newPantryItems = [];
             {/* Recipe and Video Tabs */}
             <Tabs defaultValue="recipe" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="recipe">{t("drinkDetailView.recipeTab") || "Recipe"}</TabsTrigger>
-                <TabsTrigger value="video">{t("drinkDetailView.videoTab") || "Video Tutorial"}</TabsTrigger>
+                <TabsTrigger value="recipe">
+                  {t("drinkDetailView.recipeTab") || "Recipe"}
+                </TabsTrigger>
+                <TabsTrigger value="video">
+                  {t("drinkDetailView.videoTab") || "Video Tutorial"}
+                </TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="recipe" className="space-y-6">
                 {/* Preparation Steps Card */}
                 <Card>
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <CardTitle className="text-green-800">{t("drinkDetailView.prepSteps") || "Preparation Steps"}</CardTitle>
+                      <CardTitle className="text-green-800">
+                        {t("drinkDetailView.prepSteps") || "Preparation Steps"}
+                      </CardTitle>
                       <span className="text-sm text-gray-500 self-center">
-                        {completedSteps.length}/{healthyDrink.steps.length} {t("drinkDetailView.stepsCompleted") || 'completed'}
+                        {completedSteps.length}/{healthyDrink.steps.length}{" "}
+                        {t("drinkDetailView.stepsCompleted") || "completed"}
                       </span>
                     </div>
                   </CardHeader>
@@ -289,7 +365,7 @@ const newPantryItems = [];
                     <div className="space-y-3">
                       {healthyDrink.steps.map((step, index) => (
                         <div key={index} className="flex space-x-3">
-                          <div 
+                          <div
                             className="flex-shrink-0 cursor-pointer mt-1"
                             onClick={() => toggleStepCompletion(index)}
                           >
@@ -299,10 +375,16 @@ const newPantryItems = [];
                               <Circle className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 hover:text-green-500" />
                             )}
                           </div>
-                          <p className={`text-sm sm:text-base text-gray-700 ${
-                            completedSteps.includes(index) ? 'line-through text-gray-400' : ''
-                          }`}>
-                            <span className="font-medium text-green-600 mr-2">{t("drinkDetailView.step") || "Step"} {index + 1}:</span>
+                          <p
+                            className={`text-sm sm:text-base text-gray-700 ${
+                              completedSteps.includes(index)
+                                ? "line-through text-gray-400"
+                                : ""
+                            }`}
+                          >
+                            <span className="font-medium text-green-600 mr-2">
+                              {t("drinkDetailView.step") || "Step"} {index + 1}:
+                            </span>
                             {step}
                           </p>
                         </div>
@@ -317,7 +399,9 @@ const newPantryItems = [];
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Play className="h-5 w-5 text-red-600" />
-                      <span>{t("drinkDetailView.videoTutorial") || "Video Tutorial"}</span>
+                      <span>
+                        {t("drinkDetailView.videoTutorial") || "Video Tutorial"}
+                      </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -346,7 +430,9 @@ const newPantryItems = [];
                           <iframe
                             width="100%"
                             height="315"
-                            src={`https://www.youtube.com/embed/results?search_query=${encodeURIComponent(drink.drink_name + ' recipe')}`}
+                            src={`https://www.youtube.com/embed/results?search_query=${encodeURIComponent(
+                              drink.drink_name + " recipe"
+                            )}`}
                             title="Drink Video Tutorial"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -391,35 +477,54 @@ const newPantryItems = [];
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.drinkType") || "Drink Type"}</p>
-                  <Badge variant="secondary" className="capitalize">{healthyDrink.drinkType}</Badge>
+                  <p className="text-sm font-medium text-green-700 mb-2">
+                    {t("drinkDetailView.drinkType") || "Drink Type"}
+                  </p>
+                  <Badge variant="secondary" className="capitalize">
+                    {healthyDrink.drinkType}
+                  </Badge>
                 </div>
                 <Separator />
                 <div className="space-y-2">
                   {drink.healthGoals && drink.healthGoals.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.healthGoals") || "Health Goals"}</p>
+                      <p className="text-sm font-medium text-green-700 mb-2">
+                        {t("drinkDetailView.healthGoals") || "Health Goals"}
+                      </p>
                       <div className="flex flex-wrap gap-1">
                         {drink.healthGoals.map((goal, index) => (
-                          <Badge key={index} variant="outline" className="text-xs capitalize">
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="text-xs capitalize"
+                          >
                             {goal}
                           </Badge>
                         ))}
                       </div>
                     </div>
                   )}
-                  {drink.dietaryRestrictions && drink.dietaryRestrictions.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.dietary") || "Dietary"}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {drink.dietaryRestrictions.map((restriction, index) => (
-                          <Badge key={index} variant="outline" className="text-xs capitalize">
-                            {restriction}
-                          </Badge>
-                        ))}
+                  {drink.dietaryRestrictions &&
+                    drink.dietaryRestrictions.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-green-700 mb-2">
+                          {t("drinkDetailView.dietary") || "Dietary"}
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {drink.dietaryRestrictions.map(
+                            (restriction, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs capitalize"
+                              >
+                                {restriction}
+                              </Badge>
+                            )
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </CardContent>
             </Card>
@@ -427,36 +532,62 @@ const newPantryItems = [];
             {/* Nutritional Info */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-green-800">{t("drinkDetailView.nutritionalInfo") || "Nutritional Info"}</CardTitle>
+                <CardTitle className="text-green-800">
+                  {t("drinkDetailView.nutritionalInfo") || "Nutritional Info"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t("drinkDetailView.protein") || "Protein"}</span>
-                    <span className="font-medium">{healthyDrink.nutritionalInfo.protein}g</span>
+                    <span className="text-gray-600">
+                      {t("drinkDetailView.protein") || "Protein"}
+                    </span>
+                    <span className="font-medium">
+                      {healthyDrink.nutritionalInfo.protein}g
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t("drinkDetailView.fat") || "Fat"}</span>
-                    <span className="font-medium">{healthyDrink.nutritionalInfo.fat}g</span>
+                    <span className="text-gray-600">
+                      {t("drinkDetailView.fat") || "Fat"}
+                    </span>
+                    <span className="font-medium">
+                      {healthyDrink.nutritionalInfo.fat}g
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t("drinkDetailView.carbs") || "Carbs"}</span>
-                    <span className="font-medium">{healthyDrink.nutritionalInfo.carbohydrates}g</span>
+                    <span className="text-gray-600">
+                      {t("drinkDetailView.carbs") || "Carbs"}
+                    </span>
+                    <span className="font-medium">
+                      {healthyDrink.nutritionalInfo.carbohydrates}g
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t("drinkDetailView.fiber") || "Fiber"}</span>
-                    <span className="font-medium">{healthyDrink.nutritionalInfo.fiber}g</span>
+                    <span className="text-gray-600">
+                      {t("drinkDetailView.fiber") || "Fiber"}
+                    </span>
+                    <span className="font-medium">
+                      {healthyDrink.nutritionalInfo.fiber}g
+                    </span>
                   </div>
                 </div>
                 <Separator />
                 <div>
-                  <p className="text-sm font-medium text-green-700 mb-2">{t("drinkDetailView.vitamins") || "Vitamins"}</p>
+                  <p className="text-sm font-medium text-green-700 mb-2">
+                    {t("drinkDetailView.vitamins") || "Vitamins"}
+                  </p>
                   <div className="flex flex-wrap gap-1">
-                    {healthyDrink.nutritionalInfo.vitamins.map((vitamin, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {t("drinkDetailView.vitamin") || "Vitamin"} {vitamin}
-                      </Badge>
-                    ))}
+                    {healthyDrink.nutritionalInfo.vitamins.map(
+                      (vitamin, index) => (
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="text-xs"
+                        >
+                          {t("drinkDetailView.vitamin") || "Vitamin"} {vitamin}
+                        </Badge>
+                      )
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -466,13 +597,18 @@ const newPantryItems = [];
             <Card>
               <CardHeader>
                 <CardTitle className="text-green-800 flex items-center justify-between">
-                  <span>{t("drinkDetailView.ingredients") || "Ingredients"}</span>
-                  <Button 
-                    variant="outline" 
+                  <span>
+                    {t("drinkDetailView.ingredients") || "Ingredients"}
+                  </span>
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => setShowIngredients(!showIngredients)}
                   >
-                    {showIngredients ? t("drinkDetailView.hide") || "Hide" : t("drinkDetailView.show") || "Show"} ({healthyDrink.ingredients.length})
+                    {showIngredients
+                      ? t("drinkDetailView.hide") || "Hide"
+                      : t("drinkDetailView.show") || "Show"}{" "}
+                    ({healthyDrink.ingredients.length})
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -480,8 +616,13 @@ const newPantryItems = [];
                 <CardContent>
                   <div className="space-y-2">
                     {healthyDrink.ingredients.map((ingredient, index) => (
-                      <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                        <span className="text-sm sm:text-base text-gray-700 capitalize">{ingredient.name}</span>
+                      <div
+                        key={index}
+                        className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
+                      >
+                        <span className="text-sm sm:text-base text-gray-700 capitalize">
+                          {ingredient.name}
+                        </span>
                         <span className="text-xs sm:text-sm text-gray-500 font-medium">
                           {ingredient.quantity} {ingredient.unit}
                         </span>
@@ -496,49 +637,72 @@ const newPantryItems = [];
             <Card>
               <CardHeader>
                 <CardTitle className="text-green-800 flex items-center justify-between">
-                  <span>{t("drinkDetailView.createShoppingList") || "Create Shopping List"}</span>
-                  <Button 
-                    variant="outline" 
+                  <span>
+                    {t("drinkDetailView.createShoppingList") ||
+                      "Create Shopping List"}
+                  </span>
+                  <Button
+                    variant="outline"
                     size="sm"
-                    onClick={() => setShowIngredientsSelector(!showIngredientsSelector)}
+                    onClick={() =>
+                      setShowIngredientsSelector(!showIngredientsSelector)
+                    }
                   >
-                    {showIngredientsSelector ? t("drinkDetailView.hide") || "Hide" : t("drinkDetailView.show") || "Show"}
+                    {showIngredientsSelector
+                      ? t("drinkDetailView.hide") || "Hide"
+                      : t("drinkDetailView.show") || "Show"}
                   </Button>
                 </CardTitle>
               </CardHeader>
               {showIngredientsSelector && (
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    {drink.drinkPlan.ingredientsList.map((ingredient, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                        <Checkbox
-                          id={`ingredient-${index}`}
-                          checked={selectedIngredients.includes(ingredient.name)}
-                          onCheckedChange={(checked) => handleIngredientSelection(ingredient.name, checked as boolean)}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium text-gray-700 capitalize truncate">
-                              {ingredient.name}
-                            </span>
-                            <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-                              {ingredient.quantity} {ingredient.unit}
-                            </span>
+                    {drink.drinkPlan.ingredientsList.map(
+                      (ingredient, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
+                        >
+                          <Checkbox
+                            id={`ingredient-${index}`}
+                            checked={selectedIngredients.includes(
+                              ingredient.name
+                            )}
+                            onCheckedChange={(checked) =>
+                              handleIngredientSelection(
+                                ingredient.name,
+                                checked as boolean
+                              )
+                            }
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700 capitalize truncate">
+                                {ingredient.name}
+                              </span>
+                              <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                                {ingredient.quantity} {ingredient.unit}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {t("drinkDetailView.expires") || "Expires in"}{" "}
+                              {ingredient.daysToExpire}{" "}
+                              {t("drinkDetailView.days") || "days"}
+                            </p>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {t("drinkDetailView.expires") || "Expires in"} {ingredient.daysToExpire} {t("drinkDetailView.days") || "days"}
-                          </p>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
-                  
+
                   {selectedIngredients.length > 0 && (
                     <div className="flex flex-col gap-2 pt-3 border-t">
                       <p className="text-sm text-gray-600 mb-2">
-                        {selectedIngredients.length} {t("drinkDetailView.ingredientsSelected") || "ingredients selected"}
+                        {selectedIngredients.length}{" "}
+                        {t("drinkDetailView.ingredientsSelected") ||
+                          "ingredients selected"}
                       </p>
-                      <Button 
+                      <Button
                         onClick={handleAddToPantry}
                         variant="outline"
                         className="w-full"
@@ -547,7 +711,7 @@ const newPantryItems = [];
                         <Plus className="h-4 w-4 mr-2" />
                         {t("drinkDetailView.addToPantry") || "Add to Pantry"}
                       </Button>
-                      <Button 
+                      <Button
                         onClick={handleOrderOnline}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                         size="sm"
@@ -560,24 +724,6 @@ const newPantryItems = [];
                 </CardContent>
               )}
             </Card>
-
-            {/* Action Buttons - Made responsive */}
-            <div className="space-y-3">
-              <Button 
-                onClick={openShoppingModal}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                {t("drinkDetailView.createShoppingList") || "Create Shopping List"}
-              </Button>
-              <Button 
-                onClick={handleCreateShoppingList}
-                variant="outline"
-                className="w-full"
-              >
-                {t("drinkDetailView.addToQuickShopping") || "Add to Quick Shopping"}
-              </Button>
-            </div>
           </div>
         </div>
 
@@ -590,8 +736,12 @@ const newPantryItems = [];
                   <Droplets className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-blue-800 mb-1">{t("drinkDetailView.proTip") || "Pro Tip"}</h4>
-                  <p className="text-sm sm:text-base text-blue-700">{healthyDrink.prepTip}</p>
+                  <h4 className="font-medium text-blue-800 mb-1">
+                    {t("drinkDetailView.proTip") || "Pro Tip"}
+                  </h4>
+                  <p className="text-sm sm:text-base text-blue-700">
+                    {healthyDrink.prepTip}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -608,18 +758,20 @@ const newPantryItems = [];
           isOpen={showOrderOnlineModal}
           onClose={() => setShowOrderOnlineModal(false)}
           items={drink.drinkPlan.ingredientsList
-            .filter(ingredient => selectedIngredients.includes(ingredient.name))
-            .map(ingredient => ({
+            .filter((ingredient) =>
+              selectedIngredients.includes(ingredient.name)
+            )
+            .map((ingredient) => ({
               id: ingredient.name,
               name: ingredient.name,
               quantity: ingredient.quantity,
               unit: ingredient.unit,
-              category: ingredient.classification || 'other',
-              priority: 'medium',
+              category: ingredient.classification || "other",
+              priority: "medium",
               purchased: false,
               notes: `From drink: ${drink.drink_name}`,
               estimatedPrice: Math.random() * 10 + 1,
-              mealName: drink.drink_name
+              mealName: drink.drink_name,
             }))}
           mealPlanName={drink.drink_name}
         />
@@ -638,8 +790,13 @@ const newPantryItems = [];
             <iframe
               width="100%"
               height="100%"
-              src={`https://www.youtube.com/embed/results?search_query=${encodeURIComponent(drink.drink_name + ' recipe')}&autoplay=1`}
-              title={t("drinkDetailView.videoTitleFullscreen") || "Drink Video Tutorial - Fullscreen"}
+              src={`https://www.youtube.com/embed/results?search_query=${encodeURIComponent(
+                drink.drink_name + " recipe"
+              )}&autoplay=1`}
+              title={
+                t("drinkDetailView.videoTitleFullscreen") ||
+                "Drink Video Tutorial - Fullscreen"
+              }
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

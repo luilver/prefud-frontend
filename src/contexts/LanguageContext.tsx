@@ -78,7 +78,8 @@ const translations = {
       "Use ingredients before they expire",
     "home.features.save-money.title": "Save Money",
     "home.features.save-money.description": "Shop smarter with automated lists",
-    "home.footer.copyright": "© 2025 Pantry by Bessel LLC. All rights reserved.",
+    "home.footer.copyright":
+      "© 2025 Pantry by Bessel LLC. All rights reserved.",
     "home.nav.why-pantry": "Why Pantry?",
     "home.nav.get-started": "Get Started",
 
@@ -129,7 +130,7 @@ const translations = {
     "profile.subscription": "Subscription",
     "profile.plan": "Plan",
     "profile.active": "Active",
-     "profile.cancelSubscription":"Cancel Subscription",
+    "profile.cancelSubscription": "Cancel Subscription",
 
     // Meal Planner
     "mealPlanner.title": "Meal Planner",
@@ -149,20 +150,24 @@ const translations = {
     "mealPlanner.totalMealsPlanned": "total meals planned",
     "mealPlanner.ingreNeeded": "ingredients needed",
     "mealPlanner.welcomeToAIMeal": "Welcome to AI Meal Planning",
-    "mealPlanner.createYourPersonalized": "Create your first personalized meal plan with our AI assistant",
-    "mealPlanner.getCustomizedRecipes": "Get customized recipes based on your preferences, dietary needs, and cooking skills",
+    "mealPlanner.createYourPersonalized":
+      "Create your first personalized meal plan with our AI assistant",
+    "mealPlanner.getCustomizedRecipes":
+      "Get customized recipes based on your preferences, dietary needs, and cooking skills",
     "mealPlanner.createYourFirstAIMeal": "Create Your First AI Meal Plan",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Create AI Meal Plan",
     "mealPlanCreator.backToMeal": "Back to Meal Planner",
     "mealPlanCreator.planDetails": "Plan Details",
-    "mealPlanCreator.planDetails.desc": "Basic information about your meal plan",
+    "mealPlanCreator.planDetails.desc":
+      "Basic information about your meal plan",
     "mealPlanCreator.setUpYourMeal": "Set up your meal planning preferences",
     "mealPlanCreator.planName": "Plan Name",
     "mealPlanCreator.planNamePlaceholder": "e.g., Weekly Healthy Meals",
     "mealPlanCreator.planDescription": "Plan Description",
-    "mealPlanCreator.planDescriptionPlaceholder": "Describe your meal plan goals or preferences...",
+    "mealPlanCreator.planDescriptionPlaceholder":
+      "Describe your meal plan goals or preferences...",
     "mealPlanCreator.startDate": "Start Date",
     "mealPlanCreator.numberOfDays": "Number of Days",
     "mealPlanCreator.numberOfPersons": "Number of Persons",
@@ -173,21 +178,25 @@ const translations = {
     "mealPlanCreator.perDay": "per day",
     "mealPlanCreator.language": "Language",
     "mealPlanCreator.dietary.title": "Dietary Preferences",
-    "mealPlanCreator.dietary.desc": "Tell us about your dietary needs and restrictions",
+    "mealPlanCreator.dietary.desc":
+      "Tell us about your dietary needs and restrictions",
     "mealPlanCreator.dietary.restrictions": "Dietary Restrictions",
     "mealPlanCreator.dietary.allergies": "Allergies & Intolerances",
     "mealPlanCreator.dietary.additionalAllergies": "Additional Allergies",
-    "mealPlanCreator.dietary.placeholder": "Please specify any other allergies or intolerances not listed above...",
+    "mealPlanCreator.dietary.placeholder":
+      "Please specify any other allergies or intolerances not listed above...",
     "mealPlanCreator.dietary.healthGoals": "Health Goals",
     "mealPlanCreator.cuisine.title": "Cuisine Preferences",
     "mealPlanCreator.cuisine.desc": "Select your favorite cuisines",
     "mealPlanCreator.cooking.title": "Cooking Preferences",
-    "mealPlanCreator.cooking.desc": "Set your cooking constraints and skill level",
+    "mealPlanCreator.cooking.desc":
+      "Set your cooking constraints and skill level",
     "mealPlanCreator.cooking.maxCook": "Max Cook Time (minutes)",
     "mealPlanCreator.cooking.skillLevel": "Cooking Skill Level",
     "mealPlanCreator.cooking.budget": "Budget Range",
     "mealPlanCreator.dislike.title": "Food Dislikes",
-    "mealPlanCreator.dislike.desc": "Add foods you want to avoid in your meal plan",
+    "mealPlanCreator.dislike.desc":
+      "Add foods you want to avoid in your meal plan",
     "mealPlanCreator.dislike.yourDislike": "Your dislikes",
     "mealPlanCreator.dislike.clickToRemove": "Click on any item to remove it",
     "mealPlanCreator.generate.title": "Generate Your Plan",
@@ -200,7 +209,8 @@ const translations = {
     "mealPlanCreator.dietary.paleo": "Paleo",
     "mealPlanCreator.dietary.dairyFree": "Dairy-Free",
     "mealPlanCreator.cuisine.label": "Cuisine & Cooking",
-    "mealPlanCreator.cuisine.label.desc": "Cuisine preferences and cooking constraints",
+    "mealPlanCreator.cuisine.label.desc":
+      "Cuisine preferences and cooking constraints",
     "mealPlanCreator.cooking.skillLevel.select": "Select Skill Level",
     "mealPlanCreator.cooking.skillLevel.beginner": "Beginner",
     "mealPlanCreator.cooking.skillLevel.inter": "Intermediate",
@@ -212,7 +222,8 @@ const translations = {
     "mealPlanCreator.foodPref": "Food Preferences",
     "mealPlanCreator.foodPref.desc": "Foods you like and dislike (optional)",
     "mealPlanCreator.dislikes": "Dislikes (comma-separated)",
-    "mealPlanCreator.generate.desc.alt":"Review your preferences and create your personalized meal plan",
+    "mealPlanCreator.generate.desc.alt":
+      "Review your preferences and create your personalized meal plan",
     "mealPlanCreator.generate.planSummary": "Plan Summary",
     "mealPlanCreator.name": "Name",
     "mealPlanCreator.description": "Description",
@@ -230,12 +241,13 @@ const translations = {
     "mealPlanCreator.dietary.allergy.eggs": "Eggs",
     "mealPlanCreator.dietary.allergy.soy": "Soy",
     "mealPlanCreator.dietary.allergy.fish": "Fish",
-    "mealPlanCreator.healthGoals.weightLoss": "Weight Loss", 
+    "mealPlanCreator.healthGoals.weightLoss": "Weight Loss",
     "mealPlanCreator.healthGoals.muscleGain": "Muscle Gain",
     "mealPlanCreator.healthGoals.heartHealth": "Heart Health",
     "mealPlanCreator.healthGoals.diabetesFriendly": "Diabetes Friendly",
     "mealPlanCreator.generatePlan": "Generate Plan",
-    "mealPlanCreator.generatePlan.desc": "Review your preferences and create your personalized meal plan",
+    "mealPlanCreator.generatePlan.desc":
+      "Review your preferences and create your personalized meal plan",
     "mealPlanCreator.cuisine.italian": "Italian",
     "mealPlanCreator.cuisine.mexican": "Mexican",
     "mealPlanCreator.cuisine.asian": "Asian",
@@ -265,7 +277,6 @@ const translations = {
       "You can check back in a few minutes - your meal plan will appear in your meal plans section once ready.",
     "mealPlanTimeout.checkPlans": "Check My Meal Plans",
 
-
     // Meal Plan View
     "mealPlanView.confirmDelete": "Are you sure you want to delete this meal?",
     "mealPlanView.editPlan": "Edit Plan",
@@ -289,7 +300,8 @@ const translations = {
     "mealPlanView.addToPantryOne": "Add to Pantry",
     "mealPlanView.orderOnlineOne": "Order Online",
     "mealPlanView.other": "Other",
-    "mealPlanView.noShoppingList": "No shopping list available for this meal plan",
+    "mealPlanView.noShoppingList":
+      "No shopping list available for this meal plan",
     "mealPlanView.min": "min",
     "mealPlanView.calories": "calories",
     "mealPlanView.day": "Day",
@@ -303,13 +315,15 @@ const translations = {
 
     // Meal Shopping Modal
     "mealShopping.shoppingListTitle": "Shopping List",
-    "mealShopping.selectIngredients": "Select ingredients to add to pantry or request delivery",
+    "mealShopping.selectIngredients":
+      "Select ingredients to add to pantry or request delivery",
     "mealShopping.selectAll": "Select All",
     "mealShopping.clearAll": "Clear All",
     "mealShopping.addToPantry": "Add to Pantry",
     "mealShopping.requestDelivery": "Request Delivery",
     "mealShopping.chooseDeliveryTime": "Choose Delivery Time",
-    "mealShopping.deliveryPrompt": "When would you like your ingredients delivered?",
+    "mealShopping.deliveryPrompt":
+      "When would you like your ingredients delivered?",
     "mealShopping.sameDay": "Same Day (2-4 hours)",
     "mealShopping.nextDay": "Next Day",
     "mealShopping.in2to3Days": "Within 2-3 Days",
@@ -319,7 +333,8 @@ const translations = {
 
     // AIMealCreator
     "aiMealCreator.createMealTitle": "Create a Meal",
-    "aiMealCreator.createMealDesc": "Create unique, personalized meals with AI based on your preferences, dietary needs, and available ingredients.",
+    "aiMealCreator.createMealDesc":
+      "Create unique, personalized meals with AI based on your preferences, dietary needs, and available ingredients.",
     "aiMealCreator.createAIMealBtn": "Create AI Meal",
     "aiMealCreator.showingPage": "Showing page",
     "aiMealCreator.of": "of",
@@ -331,7 +346,8 @@ const translations = {
     "aiMealCreator.mins": "mins",
     "aiMealCreator.peopleLabel": "people",
     "aiMealCreator.noMealsTitle": "No Meals created yet",
-    "aiMealCreator.noMealsDesc": "Start creating your first AI-powered meal based on your preferences and ingredients.",
+    "aiMealCreator.noMealsDesc":
+      "Start creating your first AI-powered meal based on your preferences and ingredients.",
 
     // AIMealCreator Stepper
     "aiMealCreatorStepper.step1Title": "Meal Details",
@@ -342,11 +358,14 @@ const translations = {
     "aiMealCreatorStepper.step3Desc": "Review your selections",
     "aiMealCreatorStepper.step4Title": "Generate",
     "aiMealCreatorStepper.step4Desc": "AI creates your meal",
-    "aiMealCreatorStepper.loaderMessage": "Analyzing your preferences and creating the perfect meal...",
+    "aiMealCreatorStepper.loaderMessage":
+      "Analyzing your preferences and creating the perfect meal...",
     "aiMealCreatorStepper.mealDetailsTitle": "Meal Details",
-    "aiMealCreatorStepper.mealDetailsDesc": "Tell us about the meal you want to create",
+    "aiMealCreatorStepper.mealDetailsDesc":
+      "Tell us about the meal you want to create",
     "aiMealCreatorStepper.mealNameLabel": "Special Meal Name (Optional)",
-    "aiMealCreatorStepper.mealNamePlaceholder": "e.g., My Special Sunday Dinner",
+    "aiMealCreatorStepper.mealNamePlaceholder":
+      "e.g., My Special Sunday Dinner",
     "aiMealCreatorStepper.mealTypeLabel": "Meal Type",
     "aiMealCreatorStepper.mealType.breakfast": "Breakfast",
     "aiMealCreatorStepper.mealType.lunch": "Lunch",
@@ -368,9 +387,11 @@ const translations = {
     "aiMealCreatorStepper.budget.medium": "Medium Budget",
     "aiMealCreatorStepper.budget.high": "High Budget",
     "aiMealCreatorStepper.specialRequestsLabel": "Special Requests (Optional)",
-    "aiMealCreatorStepper.specialRequestsPlaceholder": "Any specific requests or inspirations for your meal?",
+    "aiMealCreatorStepper.specialRequestsPlaceholder":
+      "Any specific requests or inspirations for your meal?",
     "aiMealCreatorStepper.preferencesTitle": "Preferences & Goals",
-    "aiMealCreatorStepper.preferencesDesc": "Help us customize your meal to your dietary needs and health goals",
+    "aiMealCreatorStepper.preferencesDesc":
+      "Help us customize your meal to your dietary needs and health goals",
     "aiMealCreatorStepper.dietaryRestrictionsLabel": "Dietary Restrictions",
     "aiMealCreatorStepper.dietary.vegetarian": "Vegetarian",
     "aiMealCreatorStepper.dietary.vegan": "Vegan",
@@ -415,12 +436,16 @@ const translations = {
     "aiMealCreatorStepper.allergy.wheat": "Wheat",
     "aiMealCreatorStepper.allergy.sesame": "Sesame",
     "aiMealCreatorStepper.allergy.sulfites": "Sulfites",
-    "aiMealCreatorStepper.customAllergiesLabel": "Custom Allergies/Intolerances (Optional)",
-    "aiMealCreatorStepper.customAllergiesPlaceholder": "List any other ingredients or foods you're allergic to or intolerant of...",
+    "aiMealCreatorStepper.customAllergiesLabel":
+      "Custom Allergies/Intolerances (Optional)",
+    "aiMealCreatorStepper.customAllergiesPlaceholder":
+      "List any other ingredients or foods you're allergic to or intolerant of...",
     "aiMealCreatorStepper.dislikesLabel": "Dislikes (Optional)",
-    "aiMealCreatorStepper.dislikesPlaceholder": "List any ingredients or foods you dislike...",
+    "aiMealCreatorStepper.dislikesPlaceholder":
+      "List any ingredients or foods you dislike...",
     "aiMealCreatorStepper.reviewTitle": "Review Your Selections",
-    "aiMealCreatorStepper.reviewDesc": "Please review all your preferences before generating your meal",
+    "aiMealCreatorStepper.reviewDesc":
+      "Please review all your preferences before generating your meal",
     "aiMealCreatorStepper.review.basicInfo": "Basic Information",
     "aiMealCreatorStepper.review.language": "Language",
     "aiMealCreatorStepper.review.mealName": "Meal Name",
@@ -436,7 +461,8 @@ const translations = {
     "aiMealCreatorStepper.review.cuisinePreferences": "Cuisine Preferences",
     "aiMealCreatorStepper.review.healthGoals": "Health Goals",
     "aiMealCreatorStepper.review.allergies": "Allergies & Intolerances",
-    "aiMealCreatorStepper.review.customAllergies": "Custom Allergies/Intolerances",
+    "aiMealCreatorStepper.review.customAllergies":
+      "Custom Allergies/Intolerances",
     "aiMealCreatorStepper.review.dislikes": "Dislikes",
     "aiMealCreatorStepper.review.specialRequests": "Special Requests",
     "aiMealCreatorStepper.backToMeals": "Back to AI Meals",
@@ -444,12 +470,13 @@ const translations = {
     "aiMealCreatorStepper.previousBtn": "Previous",
     "aiMealCreatorStepper.nextBtn": "Next",
 
-
     // AI Meal Generation
-    "aiMealGenerator.loaderMessage": "Creating your personalized meal with AI...",
+    "aiMealGenerator.loaderMessage":
+      "Creating your personalized meal with AI...",
     "aiMealGenerator.createAIMealTitle": "Your AI-generated meal is ready!",
     "aiMealGenerator.mealNamePlaceholder": "Healthy Veggie Bowl",
-    "aiMealGenerator.mealDetailsDesc": "A delightful fusion of flavors that will satisfy your taste buds.",
+    "aiMealGenerator.mealDetailsDesc":
+      "A delightful fusion of flavors that will satisfy your taste buds.",
     "aiMealGenerator.review.specialRequests": "AI Generated",
     "aiMealGenerator.review.healthGoals": "Healthy",
     "aiMealGenerator.benefits": "Benefits",
@@ -471,12 +498,16 @@ const translations = {
     "aiMealGenerator.bellPepper": "bell pepper",
     "aiMealGenerator.salt": "salt",
     "aiMealGenerator.blackPepper": "black pepper",
-    "aiMealGenerator.prepareIngredients": "Prepare all ingredients by washing and chopping as needed.",
+    "aiMealGenerator.prepareIngredients":
+      "Prepare all ingredients by washing and chopping as needed.",
     "aiMealGenerator.heatOil": "Heat oil in a large pan over medium-high heat.",
-    "aiMealGenerator.addAromatics": "Add aromatics and cook until fragrant, about 2-3 minutes.",
-    "aiMealGenerator.addMainIngredients": "Add main ingredients and cook according to type and preference.",
+    "aiMealGenerator.addAromatics":
+      "Add aromatics and cook until fragrant, about 2-3 minutes.",
+    "aiMealGenerator.addMainIngredients":
+      "Add main ingredients and cook according to type and preference.",
     "aiMealGenerator.season": "Season with salt, pepper, and selected spices.",
-    "aiMealGenerator.combine": "Combine all elements and cook until heated through.",
+    "aiMealGenerator.combine":
+      "Combine all elements and cook until heated through.",
     "aiMealGenerator.tasteAdjust": "Taste and adjust seasoning as needed.",
     "aiMealGenerator.serve": "Serve hot and enjoy!",
     "aiMealGenerator.shoppingListTitle": "Shopping List",
@@ -509,8 +540,10 @@ const translations = {
     "aiMealGenerator.countryPlaceholder": "United States",
     "aiMealGenerator.placeOrder": "Place Order",
     "aiMealGenerator.completeOrder": "Complete Your Order",
-    "aiMealGenerator.selectIngredients": "Please select ingredients to add to pantry",
-    "aiMealGenerator.deliveryPrompt": "Please fill in all delivery address fields",
+    "aiMealGenerator.selectIngredients":
+      "Please select ingredients to add to pantry",
+    "aiMealGenerator.deliveryPrompt":
+      "Please fill in all delivery address fields",
     "aiMealGenerator.chooseDeliveryTime": "Please select a payment method",
     "aiMealGenerator.for": "For",
     "aiMealGenerator.recipe": "recipe",
@@ -535,7 +568,8 @@ const translations = {
     "mealTabs.fullscreen": "Fullscreen",
     "mealTabs.closeVideo": "Close Video",
     "aiMealGenerator.heatPan": "🔥 Heat your pan to medium-high heat",
-    "aiMealGenerator.patience": "⏱️ Don't rush this step - patience makes perfect!",
+    "aiMealGenerator.patience":
+      "⏱️ Don't rush this step - patience makes perfect!",
     "aiMealGenerator.taste": "👨‍🍳 Pro tip: Taste as you go",
     "aiMealGenerator.magic": "🌟 This is where the magic happens",
     "aiMealGenerator.stir": "💡 Keep stirring to prevent sticking",
@@ -582,11 +616,12 @@ const translations = {
     "aiMealView.of": "of",
     "aiMealView.stepsCompleted": "steps completed",
     "aiMealView.recipeCompleted": "Congratulations! Recipe completed!",
-    "aiMealView.ingredientsSelector":"Shopping List",
+    "aiMealView.ingredientsSelector": "Shopping List",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Create Your Perfect Healthy Drink",
-    "aiDrinkCreator.desc": "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences",
+    "aiDrinkCreator.desc":
+      "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences",
     "aiDrinkCreator.start": "Start Creating",
     "aiDrinkCreator.loading": "Loading your drinks...",
     "aiDrinkCreator.yourCreatedDrinks": "Your Created Drinks",
@@ -601,11 +636,14 @@ const translations = {
     "aiDrinkCreator.viewRecipe": "View Recipe",
     "aiDrinkCreator.yourAIDrinks": "Your AI Created Drinks",
     "aiDrinkCreator.smoothies": "Smoothies",
-    "aiDrinkCreator.smoothiesDesc": "Nutrient-packed smoothies for energy and wellness",
+    "aiDrinkCreator.smoothiesDesc":
+      "Nutrient-packed smoothies for energy and wellness",
     "aiDrinkCreator.juices": "Fresh Juices",
-    "aiDrinkCreator.juicesDesc": "Vitamin-rich fresh juices for detox and health",
+    "aiDrinkCreator.juicesDesc":
+      "Vitamin-rich fresh juices for detox and health",
     "aiDrinkCreator.teas": "Wellness Teas",
-    "aiDrinkCreator.teasDesc": "Herbal and wellness teas for relaxation and health",
+    "aiDrinkCreator.teasDesc":
+      "Herbal and wellness teas for relaxation and health",
 
     //AI Drink Creator Stepper
     "aiDrinkCreatorStepper.title": "Create Healthy Drink",
@@ -620,14 +658,17 @@ const translations = {
 
     // AI Drink Type
     "aiDrinkType.chooseTitle": "Choose Your Drink Type",
-    "aiDrinkType.chooseDesc": "Select the type of healthy drink you'd like to create",
+    "aiDrinkType.chooseDesc":
+      "Select the type of healthy drink you'd like to create",
     "aiDrinkType.smoothie.title": "Smoothie",
-    "aiDrinkType.smoothie.desc": "Thick, creamy blended drinks with fruits and vegetables",
+    "aiDrinkType.smoothie.desc":
+      "Thick, creamy blended drinks with fruits and vegetables",
     "aiDrinkType.smoothie.benefit1": "High in fiber",
     "aiDrinkType.smoothie.benefit2": "Filling",
     "aiDrinkType.smoothie.benefit3": "Easy to digest",
     "aiDrinkType.juice.title": "Fresh Juice",
-    "aiDrinkType.juice.desc": "Pure liquid extracted from fruits and vegetables",
+    "aiDrinkType.juice.desc":
+      "Pure liquid extracted from fruits and vegetables",
     "aiDrinkType.juice.benefit1": "Quick absorption",
     "aiDrinkType.juice.benefit2": "Vitamin-rich",
     "aiDrinkType.juice.benefit3": "Hydrating",
@@ -642,19 +683,22 @@ const translations = {
     "aiDrinkType.protein.benefit2": "Post-workout",
     "aiDrinkType.protein.benefit3": "Sustained energy",
     "aiDrinkType.detox.title": "Detox Drink",
-    "aiDrinkType.detox.desc": "Cleansing drinks with natural detoxifying ingredients",
+    "aiDrinkType.detox.desc":
+      "Cleansing drinks with natural detoxifying ingredients",
     "aiDrinkType.detox.benefit1": "Liver support",
     "aiDrinkType.detox.benefit2": "Cleansing",
     "aiDrinkType.detox.benefit3": "Anti-inflammatory",
     "aiDrinkType.energy.title": "Energy Boost",
-    "aiDrinkType.energy.desc": "Natural energy drinks without artificial stimulants",
+    "aiDrinkType.energy.desc":
+      "Natural energy drinks without artificial stimulants",
     "aiDrinkType.energy.benefit1": "Natural caffeine",
     "aiDrinkType.energy.benefit2": "B-vitamins",
     "aiDrinkType.energy.benefit3": "Sustained energy",
 
     // AI Drink Goals
     "aiDrinkGoals.customizeTitle": "Customize Your Healthy Drink",
-    "aiDrinkGoals.customizeDesc": "Tell us about your preferences to create the perfect drink",
+    "aiDrinkGoals.customizeDesc":
+      "Tell us about your preferences to create the perfect drink",
     "aiDrinkGoals.basicInfo": "Basic Information",
     "aiDrinkGoals.drinkName": "Drink Name",
     "aiDrinkGoals.drinkNamePlaceholder": "e.g., Morning Energy Smoothie",
@@ -668,19 +712,25 @@ const translations = {
     "aiDrinkGoals.allergies": "Allergies & Intolerances",
     "aiDrinkGoals.foodDislikes": "Food Dislikes",
     "aiDrinkGoals.foodDislikesLabel": "What foods would you like to avoid?",
-    "aiDrinkGoals.foodDislikesPlaceholder": "e.g., cabbage, spicy foods, bitter ingredients...",
+    "aiDrinkGoals.foodDislikesPlaceholder":
+      "e.g., cabbage, spicy foods, bitter ingredients...",
     "aiDrinkGoals.next": "Next",
-    "aiDrinkGoals.validation": "Please select at least one health goal and provide a drink name",
+    "aiDrinkGoals.validation":
+      "Please select at least one health goal and provide a drink name",
     "aiDrinkGoals.energyBoost.title": "Energy Boost",
     "aiDrinkGoals.energyBoost.desc": "Natural ingredients for sustained energy",
     "aiDrinkGoals.weightLoss.title": "Weight Management",
-    "aiDrinkGoals.weightLoss.desc": "Low-calorie, metabolism-boosting ingredients",
+    "aiDrinkGoals.weightLoss.desc":
+      "Low-calorie, metabolism-boosting ingredients",
     "aiDrinkGoals.immunity.title": "Immune Support",
-    "aiDrinkGoals.immunity.desc": "Vitamin C, antioxidants, and immune-boosting nutrients",
+    "aiDrinkGoals.immunity.desc":
+      "Vitamin C, antioxidants, and immune-boosting nutrients",
     "aiDrinkGoals.digestiveHealth.title": "Digestive Health",
-    "aiDrinkGoals.digestiveHealth.desc": "Fiber, probiotics, and gut-friendly ingredients",
+    "aiDrinkGoals.digestiveHealth.desc":
+      "Fiber, probiotics, and gut-friendly ingredients",
     "aiDrinkGoals.skinHealth.title": "Skin Health",
-    "aiDrinkGoals.skinHealth.desc": "Antioxidants and vitamins for glowing skin",
+    "aiDrinkGoals.skinHealth.desc":
+      "Antioxidants and vitamins for glowing skin",
     "aiDrinkGoals.detox.title": "Detoxification",
     "aiDrinkGoals.detox.desc": "Cleansing ingredients to support natural detox",
     "aiDrinkGoals.diet.keto": "Keto",
@@ -723,10 +773,12 @@ const translations = {
 
     // AI Drink Creation
     "aiDrinkGeneration.readyTitle": "Ready to Generate Your Drink",
-    "aiDrinkGeneration.readyDesc": "Click below to create your personalized healthy drink",
+    "aiDrinkGeneration.readyDesc":
+      "Click below to create your personalized healthy drink",
     "aiDrinkGeneration.generateBtn": "Generate AI Drink",
     "aiDrinkGeneration.creatingTitle": "AI is Creating Your Drink",
-    "aiDrinkGeneration.creatingDesc": "Analyzing your preferences to create the perfect healthy drink...",
+    "aiDrinkGeneration.creatingDesc":
+      "Analyzing your preferences to create the perfect healthy drink...",
     "aiDrinkGeneration.failed": "Failed to generate drink. Please try again.",
     "aiDrinkGeneration.retry": "Retry Generation",
     "aiDrinkGeneration.prepTime": "Prep Time",
@@ -819,30 +871,38 @@ const translations = {
     "drinkDetailView.added": "Added",
     "drinkDetailView.toShoppingList": "ingredients to your shopping list",
     "drinkDetailView.error": "Error",
-    "drinkDetailView.shoppingListFailed": "Failed to create shopping list. Please try again.",
-    "drinkDetailView.expires":"Expires in",
-    "drinkDetailView.days":"days",
-    
-    
+    "drinkDetailView.shoppingListFailed":
+      "Failed to create shopping list. Please try again.",
+    "drinkDetailView.expires": "Expires in",
+    "drinkDetailView.days": "days",
+    "drinkDetailView.addToPantry": "Add to Pantry",
+    "drinkDetailView.orderOnline": "Order Online",
+    "drinkDetailView.ingredientsSelected": "ingredients selected",
+    "drinkDetailView.healthGoals": "Health Goals",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No ingredients selected",
-    "drinkShoppingModal.noIngredientsDesc": "Please select ingredients to add to pantry.",
-    "drinkShoppingModal.noDeliveryDesc": "Please select ingredients for delivery.",
+    "drinkShoppingModal.noIngredientsDesc":
+      "Please select ingredients to add to pantry.",
+    "drinkShoppingModal.noDeliveryDesc":
+      "Please select ingredients for delivery.",
     "drinkShoppingModal.addedToPantryTitle": "Added to Pantry!",
     "drinkShoppingModal.added": "Added",
     "drinkShoppingModal.ingredientsToPantry": "ingredients to your pantry.",
     "drinkShoppingModal.deliveryRequestedTitle": "Delivery Requested!",
     "drinkShoppingModal.yourIngreWill": "Your ingredients will be delivered",
-    "drinkShoppingModal.youWillReceive": "You will receive a confirmation email shortly.",
+    "drinkShoppingModal.youWillReceive":
+      "You will receive a confirmation email shortly.",
     "drinkShoppingModal.shoppingList": "Shopping List",
-    "drinkShoppingModal.selectIngredients": "Select ingredients to add to pantry or request delivery",
+    "drinkShoppingModal.selectIngredients":
+      "Select ingredients to add to pantry or request delivery",
     "drinkShoppingModal.selectAll": "Select All",
     "drinkShoppingModal.clearAll": "Clear All",
     "drinkShoppingModal.addToPantry": "Add to Pantry",
     "drinkShoppingModal.requestDelivery": "Request Delivery",
     "drinkShoppingModal.chooseDeliveryTime": "Choose Delivery Time",
-    "drinkShoppingModal.whenDelivery": "When would you like your ingredients delivered?",
+    "drinkShoppingModal.whenDelivery":
+      "When would you like your ingredients delivered?",
     "drinkShoppingModal.backToIngredients": "Back to Ingredients",
     "drinkShoppingModal.sameDay": "Same Day (2-4 hours)",
     "drinkShoppingModal.nextDay": "Next Day",
@@ -855,7 +915,8 @@ const translations = {
     "recipeView.added": "Added",
     "recipeView.ingredientsToYour": "ingredients to your shopping list.",
     "recipeView.error": "Error",
-    "recipeView.shoppingListFailed": "Failed to create shopping list. Please try again.",
+    "recipeView.shoppingListFailed":
+      "Failed to create shopping list. Please try again.",
     "recipeView.backToPlan": "Back to Plan",
     "recipeView.shoppingList": "Shopping List",
     "recipeView.minutes": "minutes",
@@ -868,7 +929,8 @@ const translations = {
     "recipeView.instructionsDesc": "Follow these steps for the perfect result",
     "recipeView.min": "min",
     "recipeView.cookingTip": "Cooking Tip",
-    "recipeView.cookingTipDesc": "Click on each step to mark it as completed. Take your time and enjoy the process!",
+    "recipeView.cookingTipDesc":
+      "Click on each step to mark it as completed. Take your time and enjoy the process!",
     "recipeView.videoTutorial": "Video Tutorial",
     "recipeView.videoDesc": "Watch step-by-step preparation",
     "recipeView.playVideo": "Play Video",
@@ -1156,7 +1218,8 @@ const translations = {
     "home.features.save-money.title": "Ahorrar Dinero",
     "home.features.save-money.description":
       "Compra más inteligentemente con listas automatizadas",
-    "home.footer.copyright": "© 2025 Pantry de Bessel LLC. Todos los derechos reservados.",
+    "home.footer.copyright":
+      "© 2025 Pantry de Bessel LLC. Todos los derechos reservados.",
     "home.nav.why-pantry": "¿Por qué Pantry?",
     "home.nav.get-started": "Comenzar",
 
@@ -1207,11 +1270,12 @@ const translations = {
     "profile.subscription": "Suscripción",
     "profile.plan": "Plan",
     "profile.active": "Activo",
-     "profile.cancelSubscription":"Cancelar suscripción",
+    "profile.cancelSubscription": "Cancelar suscripción",
 
     // Meal Planner
     "mealPlanner.title": "Planificador de Comidas",
-    "mealPlanner.description": "Crea y gestiona tus planes de comidas semanales",
+    "mealPlanner.description":
+      "Crea y gestiona tus planes de comidas semanales",
     "mealPlanner.aiMeal": "Crear Plan de Comidas con IA",
     "mealPlanner.showingPage": "Mostrando página",
     "mealPlanner.of": "de",
@@ -1226,12 +1290,14 @@ const translations = {
     "mealPlanner.skillLevel": "Nivel de Habilidad",
     "mealPlanner.totalMealsPlanned": "total de comidas planificadas",
     "mealPlanner.ingreNeeded": "ingredientes necesarios",
-    "mealPlanner.welcomeToAIMeal": "Bienvenido a la Planificación de Comidas con IA",
+    "mealPlanner.welcomeToAIMeal":
+      "Bienvenido a la Planificación de Comidas con IA",
     "mealPlanner.createYourPersonalized":
       "Crea tu primer plan de comidas personalizado con nuestro asistente de IA",
     "mealPlanner.getCustomizedRecipes":
       "Obtén recetas personalizadas basadas en tus preferencias, necesidades dietéticas y habilidades culinarias",
-    "mealPlanner.createYourFirstAIMeal": "Crea Tu Primer Plan de Comidas con IA",
+    "mealPlanner.createYourFirstAIMeal":
+      "Crea Tu Primer Plan de Comidas con IA",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Crear Plan de Comidas con IA",
@@ -1239,7 +1305,8 @@ const translations = {
     "mealPlanCreator.planDetails": "Detalles del Plan",
     "mealPlanCreator.planDetails.desc":
       "Información básica sobre tu plan de comidas",
-    "mealPlanCreator.setUpYourMeal": "Configura tus preferencias de planificación de comidas",
+    "mealPlanCreator.setUpYourMeal":
+      "Configura tus preferencias de planificación de comidas",
     "mealPlanCreator.planName": "Nombre del Plan",
     "mealPlanCreator.planNamePlaceholder": "ej. Comidas Saludables Semanales",
     "mealPlanCreator.planDescription": "Descripción del Plan",
@@ -1266,16 +1333,20 @@ const translations = {
     "mealPlanCreator.cuisine.title": "Preferencias de Cocina",
     "mealPlanCreator.cuisine.desc": "Selecciona tus cocinas favoritas",
     "mealPlanCreator.cooking.title": "Preferencias de Cocina",
-    "mealPlanCreator.cooking.desc": "Configura tus restricciones de cocina y nivel de habilidad",
+    "mealPlanCreator.cooking.desc":
+      "Configura tus restricciones de cocina y nivel de habilidad",
     "mealPlanCreator.cooking.maxCook": "Tiempo Máximo de Cocción (minutos)",
     "mealPlanCreator.cooking.skillLevel": "Nivel de Habilidad Culinaria",
     "mealPlanCreator.cooking.budget": "Rango de Presupuesto",
     "mealPlanCreator.dislike.title": "Disgustos Alimentarios",
-    "mealPlanCreator.dislike.desc": "Agrega alimentos que deseas evitar en tu plan de comidas",
+    "mealPlanCreator.dislike.desc":
+      "Agrega alimentos que deseas evitar en tu plan de comidas",
     "mealPlanCreator.dislike.yourDislike": "Tus disgustos",
-    "mealPlanCreator.dislike.clickToRemove": "Haz clic en cualquier elemento para eliminarlo",
+    "mealPlanCreator.dislike.clickToRemove":
+      "Haz clic en cualquier elemento para eliminarlo",
     "mealPlanCreator.generate.title": "Genera Tu Plan",
-    "mealPlanCreator.generate.desc": "Crea un plan de comidas personalizado con IA",
+    "mealPlanCreator.generate.desc":
+      "Crea un plan de comidas personalizado con IA",
     "mealPlanCreator.generate.button": "Generar Plan de Comidas con IA",
     "mealPlanCreator.dietary.vegetarian": "Vegetariano",
     "mealPlanCreator.dietary.vegan": "Vegano",
@@ -1284,8 +1355,10 @@ const translations = {
     "mealPlanCreator.dietary.paleo": "Paleo",
     "mealPlanCreator.dietary.dairyFree": "Sin Lácteos",
     "mealPlanCreator.cuisine.label": "Cocina y Cocina",
-    "mealPlanCreator.cuisine.label.desc": "Preferencias de cocina y restricciones culinarias",
-    "mealPlanCreator.cooking.skillLevel.select": "Seleccionar Nivel de Habilidad",
+    "mealPlanCreator.cuisine.label.desc":
+      "Preferencias de cocina y restricciones culinarias",
+    "mealPlanCreator.cooking.skillLevel.select":
+      "Seleccionar Nivel de Habilidad",
     "mealPlanCreator.cooking.skillLevel.beginner": "Principiante",
     "mealPlanCreator.cooking.skillLevel.inter": "Intermedio",
     "mealPlanCreator.cooking.skillLevel.adv": "Avanzado",
@@ -1294,7 +1367,8 @@ const translations = {
     "mealPlanCreator.cooking.budget.medium": "Medio",
     "mealPlanCreator.cooking.budget.high": "Alto",
     "mealPlanCreator.foodPref": "Preferencias Alimentarias",
-    "mealPlanCreator.foodPref.desc": "Alimentos que te gustan y disgustan (opcional)",
+    "mealPlanCreator.foodPref.desc":
+      "Alimentos que te gustan y disgustan (opcional)",
     "mealPlanCreator.dislikes": "Disgustos (separados por comas)",
     "mealPlanCreator.generate.desc.alt":
       "Revisa tus preferencias y crea tu plan de comidas personalizado",
@@ -1332,10 +1406,10 @@ const translations = {
     "mealPlanCreator.generate.btn": "Generar plan con IA",
     "mealPlanCreator.generate.btnLoad": "Generando plan con IA...",
 
-
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "¡Plan de Comidas Creado Exitosamente! 🎉",
-    "mealPlanSuccess.yourPersonalized": "Tu plan de comidas personalizado con IA",
+    "mealPlanSuccess.yourPersonalized":
+      "Tu plan de comidas personalizado con IA",
     "mealPlanSuccess.readyToUse": "ha sido generado y está listo para usar!",
     "mealPlanSuccess.days": "Días",
     "mealPlanSuccess.person": "Persona",
@@ -1353,7 +1427,8 @@ const translations = {
     "mealPlanTimeout.checkPlans": "Revisar Mis Planes de Comidas",
 
     // Meal Plan View
-    "mealPlanView.confirmDelete": "¿Estás seguro de que deseas eliminar esta comida?",
+    "mealPlanView.confirmDelete":
+      "¿Estás seguro de que deseas eliminar esta comida?",
     "mealPlanView.editPlan": "Editar Plan",
     "mealPlanView.days": "Días",
     "mealPlanView.persons": "Personas",
@@ -1375,7 +1450,8 @@ const translations = {
     "mealPlanView.addToPantryOne": "Agregar a la Despensa",
     "mealPlanView.orderOnlineOne": "Ordenar en Línea",
     "mealPlanView.other": "Otro",
-    "mealPlanView.noShoppingList": "No hay lista de compras disponible para este plan de comidas",
+    "mealPlanView.noShoppingList":
+      "No hay lista de compras disponible para este plan de comidas",
     "mealPlanView.min": "min",
     "mealPlanView.calories": "calorías",
     "mealPlanView.day": "Día",
@@ -1407,7 +1483,8 @@ const translations = {
 
     //AI Meal Creator
     "aiMealCreator.createMealTitle": "Crear una Comida",
-    "aiMealCreator.createMealDesc": "Crea comidas únicas y personalizadas con IA según tus preferencias, necesidades dietéticas e ingredientes disponibles.",
+    "aiMealCreator.createMealDesc":
+      "Crea comidas únicas y personalizadas con IA según tus preferencias, necesidades dietéticas e ingredientes disponibles.",
     "aiMealCreator.createAIMealBtn": "Crear Comida con IA",
     "aiMealCreator.showingPage": "Mostrando página",
     "aiMealCreator.of": "de",
@@ -1419,7 +1496,8 @@ const translations = {
     "aiMealCreator.mins": "min",
     "aiMealCreator.peopleLabel": "personas",
     "aiMealCreator.noMealsTitle": "Aún no se han creado comidas",
-    "aiMealCreator.noMealsDesc": "Comienza a crear tu primera comida con IA según tus preferencias e ingredientes.",
+    "aiMealCreator.noMealsDesc":
+      "Comienza a crear tu primera comida con IA según tus preferencias e ingredientes.",
 
     // AI Meal Creator Stepper
     "aiMealCreatorStepper.step1Title": "Detalles de la Comida",
@@ -1430,11 +1508,15 @@ const translations = {
     "aiMealCreatorStepper.step3Desc": "Revisa tus selecciones",
     "aiMealCreatorStepper.step4Title": "Generar",
     "aiMealCreatorStepper.step4Desc": "La IA crea tu comida",
-    "aiMealCreatorStepper.loaderMessage": "Analizando tus preferencias y creando la comida perfecta...",
+    "aiMealCreatorStepper.loaderMessage":
+      "Analizando tus preferencias y creando la comida perfecta...",
     "aiMealCreatorStepper.mealDetailsTitle": "Detalles de la Comida",
-    "aiMealCreatorStepper.mealDetailsDesc": "Cuéntanos sobre la comida que deseas crear",
-    "aiMealCreatorStepper.mealNameLabel": "Nombre Especial de la Comida (Opcional)",
-    "aiMealCreatorStepper.mealNamePlaceholder": "ej., Mi Cena Especial de Domingo",
+    "aiMealCreatorStepper.mealDetailsDesc":
+      "Cuéntanos sobre la comida que deseas crear",
+    "aiMealCreatorStepper.mealNameLabel":
+      "Nombre Especial de la Comida (Opcional)",
+    "aiMealCreatorStepper.mealNamePlaceholder":
+      "ej., Mi Cena Especial de Domingo",
     "aiMealCreatorStepper.mealTypeLabel": "Tipo de Comida",
     "aiMealCreatorStepper.mealType.breakfast": "Desayuno",
     "aiMealCreatorStepper.mealType.lunch": "Almuerzo",
@@ -1446,7 +1528,8 @@ const translations = {
     "aiMealCreatorStepper.servingsLabel": "Porciones",
     "aiMealCreatorStepper.cookingTimeLabel": "Tiempo Máximo de Cocción (min)",
     "aiMealCreatorStepper.skillLevelLabel": "Nivel de Habilidad Culinaria",
-    "aiMealCreatorStepper.skillLevelPlaceholder": "Selecciona el nivel de habilidad",
+    "aiMealCreatorStepper.skillLevelPlaceholder":
+      "Selecciona el nivel de habilidad",
     "aiMealCreatorStepper.skillLevel.beginner": "Principiante",
     "aiMealCreatorStepper.skillLevel.intermediate": "Intermedio",
     "aiMealCreatorStepper.skillLevel.advanced": "Avanzado",
@@ -1455,10 +1538,13 @@ const translations = {
     "aiMealCreatorStepper.budget.low": "Presupuesto Bajo",
     "aiMealCreatorStepper.budget.medium": "Presupuesto Medio",
     "aiMealCreatorStepper.budget.high": "Presupuesto Alto",
-    "aiMealCreatorStepper.specialRequestsLabel": "Peticiones Especiales (Opcional)",
-    "aiMealCreatorStepper.specialRequestsPlaceholder": "¿Alguna petición o inspiración especial para tu comida?",
+    "aiMealCreatorStepper.specialRequestsLabel":
+      "Peticiones Especiales (Opcional)",
+    "aiMealCreatorStepper.specialRequestsPlaceholder":
+      "¿Alguna petición o inspiración especial para tu comida?",
     "aiMealCreatorStepper.preferencesTitle": "Preferencias y Objetivos",
-    "aiMealCreatorStepper.preferencesDesc": "Ayúdanos a personalizar tu comida según tus necesidades dietéticas y objetivos de salud",
+    "aiMealCreatorStepper.preferencesDesc":
+      "Ayúdanos a personalizar tu comida según tus necesidades dietéticas y objetivos de salud",
     "aiMealCreatorStepper.dietaryRestrictionsLabel": "Restricciones Dietéticas",
     "aiMealCreatorStepper.dietary.vegetarian": "Vegetariano",
     "aiMealCreatorStepper.dietary.vegan": "Vegano",
@@ -1503,12 +1589,16 @@ const translations = {
     "aiMealCreatorStepper.allergy.wheat": "Trigo",
     "aiMealCreatorStepper.allergy.sesame": "Sésamo",
     "aiMealCreatorStepper.allergy.sulfites": "Sulfitos",
-    "aiMealCreatorStepper.customAllergiesLabel": "Alergias/Intolerancias Personalizadas (Opcional)",
-    "aiMealCreatorStepper.customAllergiesPlaceholder": "Enumera otros ingredientes o alimentos a los que eres alérgico o intolerante...",
+    "aiMealCreatorStepper.customAllergiesLabel":
+      "Alergias/Intolerancias Personalizadas (Opcional)",
+    "aiMealCreatorStepper.customAllergiesPlaceholder":
+      "Enumera otros ingredientes o alimentos a los que eres alérgico o intolerante...",
     "aiMealCreatorStepper.dislikesLabel": "Disgustos (Opcional)",
-    "aiMealCreatorStepper.dislikesPlaceholder": "Enumera los ingredientes o alimentos que no te gustan...",
+    "aiMealCreatorStepper.dislikesPlaceholder":
+      "Enumera los ingredientes o alimentos que no te gustan...",
     "aiMealCreatorStepper.reviewTitle": "Revisa tus Selecciones",
-    "aiMealCreatorStepper.reviewDesc": "Por favor revisa todas tus preferencias antes de generar tu comida",
+    "aiMealCreatorStepper.reviewDesc":
+      "Por favor revisa todas tus preferencias antes de generar tu comida",
     "aiMealCreatorStepper.review.basicInfo": "Información Básica",
     "aiMealCreatorStepper.review.language": "Idioma",
     "aiMealCreatorStepper.review.mealName": "Nombre de la Comida",
@@ -1520,11 +1610,13 @@ const translations = {
     "aiMealCreatorStepper.review.minutes": "minutos",
     "aiMealCreatorStepper.review.skillLevel": "Nivel de Habilidad",
     "aiMealCreatorStepper.review.budget": "Presupuesto",
-    "aiMealCreatorStepper.review.dietaryRestrictions": "Restricciones Dietéticas",
+    "aiMealCreatorStepper.review.dietaryRestrictions":
+      "Restricciones Dietéticas",
     "aiMealCreatorStepper.review.cuisinePreferences": "Preferencias de Cocina",
     "aiMealCreatorStepper.review.healthGoals": "Objetivos de Salud",
     "aiMealCreatorStepper.review.allergies": "Alergias e Intolerancias",
-    "aiMealCreatorStepper.review.customAllergies": "Alergias/Intolerancias Personalizadas",
+    "aiMealCreatorStepper.review.customAllergies":
+      "Alergias/Intolerancias Personalizadas",
     "aiMealCreatorStepper.review.dislikes": "Disgustos",
     "aiMealCreatorStepper.review.specialRequests": "Peticiones Especiales",
     "aiMealCreatorStepper.backToMeals": "Volver a Comidas IA",
@@ -1533,10 +1625,13 @@ const translations = {
     "aiMealCreatorStepper.nextBtn": "Siguiente",
 
     // AI Meal Generator
-    "aiMealGenerator.loaderMessage": "Creando tu comida personalizada con IA...",
-    "aiMealGenerator.createAIMealTitle": "¡Tu comida generada por IA está lista!",
+    "aiMealGenerator.loaderMessage":
+      "Creando tu comida personalizada con IA...",
+    "aiMealGenerator.createAIMealTitle":
+      "¡Tu comida generada por IA está lista!",
     "aiMealGenerator.mealNamePlaceholder": "Bowl Saludable de Verduras",
-    "aiMealGenerator.mealDetailsDesc": "Una deliciosa fusión de sabores que satisfará tu paladar.",
+    "aiMealGenerator.mealDetailsDesc":
+      "Una deliciosa fusión de sabores que satisfará tu paladar.",
     "aiMealGenerator.review.specialRequests": "Generado por IA",
     "aiMealGenerator.review.healthGoals": "Saludable",
     "aiMealGenerator.benefits": "Beneficios",
@@ -1546,7 +1641,8 @@ const translations = {
     "aiMealGenerator.skillLevel.beginner": "Principiante",
     "aiMealGenerator.skillLevel.intermediate": "Intermedio",
     "aiMealGenerator.skillLevel.advanced": "Avanzado",
-    "aiMealGenerator.error": "No se pudo generar la comida. Por favor, inténtalo de nuevo.",
+    "aiMealGenerator.error":
+      "No se pudo generar la comida. Por favor, inténtalo de nuevo.",
     "aiMealGenerator.save": "¡Comida guardada exitosamente!",
     "aiMealGenerator.back": "Volver a la receta",
     "aiMealGenerator.cancel": "Cancelar",
@@ -1558,13 +1654,20 @@ const translations = {
     "aiMealGenerator.bellPepper": "pimiento",
     "aiMealGenerator.salt": "sal",
     "aiMealGenerator.blackPepper": "pimienta negra",
-    "aiMealGenerator.prepareIngredients": "Prepara todos los ingredientes lavando y cortando según sea necesario.",
-    "aiMealGenerator.heatOil": "Calienta el aceite en una sartén grande a fuego medio-alto.",
-    "aiMealGenerator.addAromatics": "Agrega aromáticos y cocina hasta que estén fragantes, unos 2-3 minutos.",
-    "aiMealGenerator.addMainIngredients": "Agrega los ingredientes principales y cocina según el tipo y preferencia.",
-    "aiMealGenerator.season": "Sazona con sal, pimienta y especias seleccionadas.",
-    "aiMealGenerator.combine": "Combina todos los elementos y cocina hasta que estén bien calientes.",
-    "aiMealGenerator.tasteAdjust": "Prueba y ajusta el sazón según sea necesario.",
+    "aiMealGenerator.prepareIngredients":
+      "Prepara todos los ingredientes lavando y cortando según sea necesario.",
+    "aiMealGenerator.heatOil":
+      "Calienta el aceite en una sartén grande a fuego medio-alto.",
+    "aiMealGenerator.addAromatics":
+      "Agrega aromáticos y cocina hasta que estén fragantes, unos 2-3 minutos.",
+    "aiMealGenerator.addMainIngredients":
+      "Agrega los ingredientes principales y cocina según el tipo y preferencia.",
+    "aiMealGenerator.season":
+      "Sazona con sal, pimienta y especias seleccionadas.",
+    "aiMealGenerator.combine":
+      "Combina todos los elementos y cocina hasta que estén bien calientes.",
+    "aiMealGenerator.tasteAdjust":
+      "Prueba y ajusta el sazón según sea necesario.",
     "aiMealGenerator.serve": "¡Sirve caliente y disfruta!",
     "aiMealGenerator.shoppingListTitle": "Lista de Compras",
     "aiMealGenerator.generateShoppingList": "Generar Lista de Compras",
@@ -1596,9 +1699,12 @@ const translations = {
     "aiMealGenerator.countryPlaceholder": "España",
     "aiMealGenerator.placeOrder": "Realizar Pedido",
     "aiMealGenerator.completeOrder": "Completa tu Pedido",
-    "aiMealGenerator.selectIngredients": "Por favor selecciona ingredientes para agregar a la despensa",
-    "aiMealGenerator.deliveryPrompt": "Por favor completa todos los campos de dirección de entrega",
-    "aiMealGenerator.chooseDeliveryTime": "Por favor selecciona un método de pago",
+    "aiMealGenerator.selectIngredients":
+      "Por favor selecciona ingredientes para agregar a la despensa",
+    "aiMealGenerator.deliveryPrompt":
+      "Por favor completa todos los campos de dirección de entrega",
+    "aiMealGenerator.chooseDeliveryTime":
+      "Por favor selecciona un método de pago",
     "aiMealGenerator.for": "Para",
     "aiMealGenerator.recipe": "receta",
     "mealSidebar.nutrition": "Nutrición (por porción)",
@@ -1622,7 +1728,8 @@ const translations = {
     "mealTabs.fullscreen": "Pantalla Completa",
     "mealTabs.closeVideo": "Cerrar Video",
     "aiMealGenerator.heatPan": "🔥 Calienta tu sartén a fuego medio-alto",
-    "aiMealGenerator.patience": "⏱️ No apresures este paso - ¡la paciencia da resultados!",
+    "aiMealGenerator.patience":
+      "⏱️ No apresures este paso - ¡la paciencia da resultados!",
     "aiMealGenerator.taste": "👨‍🍳 Consejo: Prueba mientras cocinas",
     "aiMealGenerator.magic": "🌟 Aquí es donde ocurre la magia",
     "aiMealGenerator.stir": "💡 Sigue revolviendo para evitar que se pegue",
@@ -1632,7 +1739,6 @@ const translations = {
 
     // Loading Animation
     "useCooking.creatingYourMealPlan": "Creando tu Plan de Comidas",
-
 
     //AI Meal View
     "aiMealView.backToAiMeals": "Volver a comidas IA",
@@ -1648,7 +1754,8 @@ const translations = {
     "aiMealView.ingredientsTitle": "Ingredientes",
     "aiMealView.ingredientsDesc": "Todo lo que necesitas para esta receta",
     "aiMealView.instructionsTitle": "Instrucciones de Cocina",
-    "aiMealView.instructionsDesc": "Sigue estos pasos para un resultado perfecto",
+    "aiMealView.instructionsDesc":
+      "Sigue estos pasos para un resultado perfecto",
     "aiMealView.videoTitle": "Video Tutorial",
     "aiMealView.videoDesc": "Mira la preparación paso a paso",
     "aiMealView.playVideo": "Reproducir Video",
@@ -1670,12 +1777,12 @@ const translations = {
     "aiMealView.of": "de",
     "aiMealView.stepsCompleted": "pasos completados",
     "aiMealView.recipeCompleted": "¡Felicidades! ¡Receta completada!",
-    "aiMealView.ingredientsSelector":"Lista de compras",
-
+    "aiMealView.ingredientsSelector": "Lista de compras",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crea tu Bebida Saludable Perfecta",
-    "aiDrinkCreator.desc": "Deja que la IA te ayude a crear bebidas deliciosas y nutritivas adaptadas a tus objetivos y preferencias de salud",
+    "aiDrinkCreator.desc":
+      "Deja que la IA te ayude a crear bebidas deliciosas y nutritivas adaptadas a tus objetivos y preferencias de salud",
     "aiDrinkCreator.start": "Comenzar a Crear",
     "aiDrinkCreator.loading": "Cargando tus bebidas...",
     "aiDrinkCreator.yourCreatedDrinks": "Tus Bebidas Creadas",
@@ -1690,11 +1797,14 @@ const translations = {
     "aiDrinkCreator.viewRecipe": "Ver Receta",
     "aiDrinkCreator.yourAIDrinks": "Tus Bebidas Creadas por IA",
     "aiDrinkCreator.smoothies": "Batidos",
-    "aiDrinkCreator.smoothiesDesc": "Batidos llenos de nutrientes para energía y bienestar",
+    "aiDrinkCreator.smoothiesDesc":
+      "Batidos llenos de nutrientes para energía y bienestar",
     "aiDrinkCreator.juices": "Jugos Frescos",
-    "aiDrinkCreator.juicesDesc": "Jugos frescos ricos en vitaminas para desintoxicar y cuidar la salud",
+    "aiDrinkCreator.juicesDesc":
+      "Jugos frescos ricos en vitaminas para desintoxicar y cuidar la salud",
     "aiDrinkCreator.teas": "Tés de Bienestar",
-    "aiDrinkCreator.teasDesc": "Tés herbales y de bienestar para relajación y salud",
+    "aiDrinkCreator.teasDesc":
+      "Tés herbales y de bienestar para relajación y salud",
 
     // AI Drink Creator Stepper
     "aiDrinkCreatorStepper.title": "Crear Bebida Saludable",
@@ -1709,9 +1819,11 @@ const translations = {
 
     // AI Drink Type
     "aiDrinkType.chooseTitle": "Elige tu Tipo de Bebida",
-    "aiDrinkType.chooseDesc": "Selecciona el tipo de bebida saludable que deseas crear",
+    "aiDrinkType.chooseDesc":
+      "Selecciona el tipo de bebida saludable que deseas crear",
     "aiDrinkType.smoothie.title": "Batido",
-    "aiDrinkType.smoothie.desc": "Bebidas espesas y cremosas mezcladas con frutas y verduras",
+    "aiDrinkType.smoothie.desc":
+      "Bebidas espesas y cremosas mezcladas con frutas y verduras",
     "aiDrinkType.smoothie.benefit1": "Alto en fibra",
     "aiDrinkType.smoothie.benefit2": "Saciantes",
     "aiDrinkType.smoothie.benefit3": "Fácil de digerir",
@@ -1721,29 +1833,34 @@ const translations = {
     "aiDrinkType.juice.benefit2": "Rico en vitaminas",
     "aiDrinkType.juice.benefit3": "Hidratante",
     "aiDrinkType.tea.title": "Té de Bienestar",
-    "aiDrinkType.tea.desc": "Tés herbales y funcionales para beneficios de salud",
+    "aiDrinkType.tea.desc":
+      "Tés herbales y funcionales para beneficios de salud",
     "aiDrinkType.tea.benefit1": "Antioxidantes",
     "aiDrinkType.tea.benefit2": "Relajante",
     "aiDrinkType.tea.benefit3": "Apoyo digestivo",
     "aiDrinkType.protein.title": "Batido de Proteína",
-    "aiDrinkType.protein.desc": "Bebidas altas en proteína para fitness y recuperación",
+    "aiDrinkType.protein.desc":
+      "Bebidas altas en proteína para fitness y recuperación",
     "aiDrinkType.protein.benefit1": "Apoyo muscular",
     "aiDrinkType.protein.benefit2": "Post-entrenamiento",
     "aiDrinkType.protein.benefit3": "Energía sostenida",
     "aiDrinkType.detox.title": "Bebida Detox",
-    "aiDrinkType.detox.desc": "Bebidas depurativas con ingredientes naturales desintoxicantes",
+    "aiDrinkType.detox.desc":
+      "Bebidas depurativas con ingredientes naturales desintoxicantes",
     "aiDrinkType.detox.benefit1": "Apoyo hepático",
     "aiDrinkType.detox.benefit2": "Depurativo",
     "aiDrinkType.detox.benefit3": "Antiinflamatorio",
     "aiDrinkType.energy.title": "Energía",
-    "aiDrinkType.energy.desc": "Bebidas energéticas naturales sin estimulantes artificiales",
+    "aiDrinkType.energy.desc":
+      "Bebidas energéticas naturales sin estimulantes artificiales",
     "aiDrinkType.energy.benefit1": "Cafeína natural",
     "aiDrinkType.energy.benefit2": "Vitaminas B",
     "aiDrinkType.energy.benefit3": "Energía sostenida",
 
     // AI Drink Goals
     "aiDrinkGoals.customizeTitle": "Personaliza tu Bebida Saludable",
-    "aiDrinkGoals.customizeDesc": "Cuéntanos tus preferencias para crear la bebida perfecta",
+    "aiDrinkGoals.customizeDesc":
+      "Cuéntanos tus preferencias para crear la bebida perfecta",
     "aiDrinkGoals.basicInfo": "Información Básica",
     "aiDrinkGoals.drinkName": "Nombre de la Bebida",
     "aiDrinkGoals.drinkNamePlaceholder": "ej., Batido Energético Matutino",
@@ -1757,21 +1874,29 @@ const translations = {
     "aiDrinkGoals.allergies": "Alergias e Intolerancias",
     "aiDrinkGoals.foodDislikes": "Comidas que No Te Gustan",
     "aiDrinkGoals.foodDislikesLabel": "¿Qué alimentos te gustaría evitar?",
-    "aiDrinkGoals.foodDislikesPlaceholder": "ej., repollo, comidas picantes, ingredientes amargos...",
+    "aiDrinkGoals.foodDislikesPlaceholder":
+      "ej., repollo, comidas picantes, ingredientes amargos...",
     "aiDrinkGoals.next": "Siguiente",
-    "aiDrinkGoals.validation": "Selecciona al menos un objetivo de salud y proporciona un nombre para la bebida",
+    "aiDrinkGoals.validation":
+      "Selecciona al menos un objetivo de salud y proporciona un nombre para la bebida",
     "aiDrinkGoals.energyBoost.title": "Energía",
-    "aiDrinkGoals.energyBoost.desc": "Ingredientes naturales para energía sostenida",
+    "aiDrinkGoals.energyBoost.desc":
+      "Ingredientes naturales para energía sostenida",
     "aiDrinkGoals.weightLoss.title": "Control de Peso",
-    "aiDrinkGoals.weightLoss.desc": "Ingredientes bajos en calorías y que aceleran el metabolismo",
+    "aiDrinkGoals.weightLoss.desc":
+      "Ingredientes bajos en calorías y que aceleran el metabolismo",
     "aiDrinkGoals.immunity.title": "Apoyo Inmune",
-    "aiDrinkGoals.immunity.desc": "Vitamina C, antioxidantes y nutrientes para el sistema inmune",
+    "aiDrinkGoals.immunity.desc":
+      "Vitamina C, antioxidantes y nutrientes para el sistema inmune",
     "aiDrinkGoals.digestiveHealth.title": "Salud Digestiva",
-    "aiDrinkGoals.digestiveHealth.desc": "Fibra, probióticos e ingredientes amigables con el intestino",
+    "aiDrinkGoals.digestiveHealth.desc":
+      "Fibra, probióticos e ingredientes amigables con el intestino",
     "aiDrinkGoals.skinHealth.title": "Salud de la Piel",
-    "aiDrinkGoals.skinHealth.desc": "Antioxidantes y vitaminas para una piel radiante",
+    "aiDrinkGoals.skinHealth.desc":
+      "Antioxidantes y vitaminas para una piel radiante",
     "aiDrinkGoals.detox.title": "Desintoxicación",
-    "aiDrinkGoals.detox.desc": "Ingredientes depurativos para apoyar la desintoxicación natural",
+    "aiDrinkGoals.detox.desc":
+      "Ingredientes depurativos para apoyar la desintoxicación natural",
     "aiDrinkGoals.diet.keto": "Keto",
     "aiDrinkGoals.diet.paleo": "Paleo",
     "aiDrinkGoals.diet.vegan": "Vegano",
@@ -1812,11 +1937,14 @@ const translations = {
 
     // AI Drink Creation
     "aiDrinkGeneration.readyTitle": "Listo para Generar tu Bebida",
-    "aiDrinkGeneration.readyDesc": "Haz clic abajo para crear tu bebida saludable personalizada",
+    "aiDrinkGeneration.readyDesc":
+      "Haz clic abajo para crear tu bebida saludable personalizada",
     "aiDrinkGeneration.generateBtn": "Generar Bebida IA",
     "aiDrinkGeneration.creatingTitle": "La IA está Creando tu Bebida",
-    "aiDrinkGeneration.creatingDesc": "Analizando tus preferencias para crear la bebida saludable perfecta...",
-    "aiDrinkGeneration.failed": "No se pudo generar la bebida. Inténtalo de nuevo.",
+    "aiDrinkGeneration.creatingDesc":
+      "Analizando tus preferencias para crear la bebida saludable perfecta...",
+    "aiDrinkGeneration.failed":
+      "No se pudo generar la bebida. Inténtalo de nuevo.",
     "aiDrinkGeneration.retry": "Reintentar Generación",
     "aiDrinkGeneration.prepTime": "Tiempo de Preparación",
     "aiDrinkGeneration.serving": "porción",
@@ -1866,10 +1994,10 @@ const translations = {
     "aiDrinkView.stepsCompleted": "pasos completados",
     "aiDrinkView.of": "de",
     "aiDrinkView.enjoy": "🎉 ¡Disfruta tu bebida saludable!",
-    "aiDrinkView.videoTitleFullscreen": "Video Tutorial de la Bebida - Pantalla Completa",
+    "aiDrinkView.videoTitleFullscreen":
+      "Video Tutorial de la Bebida - Pantalla Completa",
 
-
-    // Drink Detail View  
+    // Drink Detail View
     "drinkDetailView.back": "Volver",
     "drinkDetailView.min": "min",
     "drinkDetailView.servings": "Porciones",
@@ -1904,33 +2032,44 @@ const translations = {
     "drinkDetailView.createShoppingList": "Crear Lista de Compras",
     "drinkDetailView.addToQuickShopping": "Agregar a Compras Rápidas",
     "drinkDetailView.proTip": "Consejo Pro",
-    "drinkDetailView.videoTitleFullscreen": "Video Tutorial de la Bebida - Pantalla Completa",
+    "drinkDetailView.videoTitleFullscreen":
+      "Video Tutorial de la Bebida - Pantalla Completa",
     "drinkDetailView.shoppingListCreated": "¡Lista de compras creada!",
     "drinkDetailView.added": "Se agregaron",
     "drinkDetailView.toShoppingList": "ingredientes a tu lista de compras",
     "drinkDetailView.error": "Error",
-    "drinkDetailView.shoppingListFailed": "No se pudo crear la lista de compras. Inténtalo de nuevo.",
-    "drinkDetailView.expires":"Expira en",
-    "drinkDetailView.days":"días",
+    "drinkDetailView.shoppingListFailed":
+      "No se pudo crear la lista de compras. Inténtalo de nuevo.",
+    "drinkDetailView.expires": "Expira en",
+    "drinkDetailView.days": "días",
+    "drinkDetailView.addToPantry": "Añadir a la despensa",
+    "drinkDetailView.orderOnline": "Ordenar en línea",
+     "drinkDetailView.ingredientsSelected": "ingredientes seleccionados",
+     "drinkDetailView.healthGoals": "Objetivos de Salud",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No se seleccionaron ingredientes",
-    "drinkShoppingModal.noIngredientsDesc": "Por favor selecciona ingredientes para añadir a la despensa.",
-    "drinkShoppingModal.noDeliveryDesc": "Por favor selecciona ingredientes para la entrega.",
+    "drinkShoppingModal.noIngredientsDesc":
+      "Por favor selecciona ingredientes para añadir a la despensa.",
+    "drinkShoppingModal.noDeliveryDesc":
+      "Por favor selecciona ingredientes para la entrega.",
     "drinkShoppingModal.addedToPantryTitle": "¡Añadido a la despensa!",
     "drinkShoppingModal.added": "Se agregaron",
     "drinkShoppingModal.ingredientsToPantry": "ingredientes a tu despensa.",
     "drinkShoppingModal.deliveryRequestedTitle": "¡Entrega solicitada!",
     "drinkShoppingModal.yourIngreWill": "Tus ingredientes serán entregados",
-    "drinkShoppingModal.youWillReceive": "Recibirás un correo de confirmación pronto.",
+    "drinkShoppingModal.youWillReceive":
+      "Recibirás un correo de confirmación pronto.",
     "drinkShoppingModal.shoppingList": "Lista de Compras",
-    "drinkShoppingModal.selectIngredients": "Selecciona ingredientes para añadir a la despensa o solicitar entrega",
+    "drinkShoppingModal.selectIngredients":
+      "Selecciona ingredientes para añadir a la despensa o solicitar entrega",
     "drinkShoppingModal.selectAll": "Seleccionar Todo",
     "drinkShoppingModal.clearAll": "Limpiar Todo",
     "drinkShoppingModal.addToPantry": "Añadir a la despensa",
     "drinkShoppingModal.requestDelivery": "Solicitar Entrega",
     "drinkShoppingModal.chooseDeliveryTime": "Elige el tiempo de entrega",
-    "drinkShoppingModal.whenDelivery": "¿Cuándo te gustaría que se entregaran tus ingredientes?",
+    "drinkShoppingModal.whenDelivery":
+      "¿Cuándo te gustaría que se entregaran tus ingredientes?",
     "drinkShoppingModal.backToIngredients": "Volver a Ingredientes",
     "drinkShoppingModal.sameDay": "Mismo día (2-4 horas)",
     "drinkShoppingModal.nextDay": "Día siguiente",
@@ -1943,7 +2082,8 @@ const translations = {
     "recipeView.added": "Añadido",
     "recipeView.ingredientsToYour": "ingredientes a tu lista de compras.",
     "recipeView.error": "Error",
-    "recipeView.shoppingListFailed": "No se pudo crear la lista de compras. Inténtalo de nuevo.",
+    "recipeView.shoppingListFailed":
+      "No se pudo crear la lista de compras. Inténtalo de nuevo.",
     "recipeView.backToPlan": "Volver al Plan",
     "recipeView.shoppingList": "Lista de Compras",
     "recipeView.minutes": "minutos",
@@ -1953,10 +2093,12 @@ const translations = {
     "recipeView.ingredients": "Ingredientes",
     "recipeView.ingredientsDesc": "Todo lo que necesitas para esta receta",
     "recipeView.cookingInstructions": "Instrucciones de Cocina",
-    "recipeView.instructionsDesc": "Sigue estos pasos para el resultado perfecto",
+    "recipeView.instructionsDesc":
+      "Sigue estos pasos para el resultado perfecto",
     "recipeView.min": "min",
     "recipeView.cookingTip": "Consejo de Cocina",
-    "recipeView.cookingTipDesc": "Haz clic en cada paso para marcarlo como completado. ¡Tómate tu tiempo y disfruta el proceso!",
+    "recipeView.cookingTipDesc":
+      "Haz clic en cada paso para marcarlo como completado. ¡Tómate tu tiempo y disfruta el proceso!",
     "recipeView.videoTutorial": "Video Tutorial",
     "recipeView.videoDesc": "Mira la preparación paso a paso",
     "recipeView.playVideo": "Ver Video",
@@ -1980,7 +2122,8 @@ const translations = {
     "recipeView.of": "de",
     "recipeView.stepsCompleted": "pasos completados",
     "recipeView.completed": "🎉 ¡Felicidades! ¡Receta completada!",
-    "recipeView.videoTitleFullscreen": "Video Tutorial de la Receta - Pantalla Completa",
+    "recipeView.videoTitleFullscreen":
+      "Video Tutorial de la Receta - Pantalla Completa",
 
     // Password
     "password.security.title": "Seguridad de Contraseña",
@@ -2258,7 +2401,8 @@ const translations = {
     "home.features.save-money.title": "Economizar Dinheiro",
     "home.features.save-money.description":
       "Compre mais inteligentemente com listas automatizadas",
-    "home.footer.copyright": "© 2025 Pantry do Bessel LLC. Todos os direitos reservados.",
+    "home.footer.copyright":
+      "© 2025 Pantry do Bessel LLC. Todos os direitos reservados.",
     "home.nav.why-pantry": "Por que Pantry?",
     "home.nav.get-started": "Começar",
 
@@ -2309,11 +2453,12 @@ const translations = {
     "profile.subscription": "Assinatura",
     "profile.plan": "Plano",
     "profile.active": "Ativo",
-    "profile.cancelSubscription":"Cancelar Assinatura",
+    "profile.cancelSubscription": "Cancelar Assinatura",
 
     // Meal Planner
     "mealPlanner.title": "Planejador de Refeições",
-    "mealPlanner.description": "Crie e gerencie seus planos de refeições semanais",
+    "mealPlanner.description":
+      "Crie e gerencie seus planos de refeições semanais",
     "mealPlanner.aiMeal": "Criar Plano de Refeições com IA",
     "mealPlanner.showingPage": "Mostrando página",
     "mealPlanner.of": "de",
@@ -2328,12 +2473,14 @@ const translations = {
     "mealPlanner.skillLevel": "Nível de Habilidade",
     "mealPlanner.totalMealsPlanned": "total de refeições planejadas",
     "mealPlanner.ingreNeeded": "ingredientes necessários",
-    "mealPlanner.welcomeToAIMeal": "Bem-vindo ao Planejamento de Refeições com IA",
+    "mealPlanner.welcomeToAIMeal":
+      "Bem-vindo ao Planejamento de Refeições com IA",
     "mealPlanner.createYourPersonalized":
       "Crie seu primeiro plano de refeições personalizado com nosso assistente de IA",
     "mealPlanner.getCustomizedRecipes":
       "Obtenha receitas personalizadas com base em suas preferências, necessidades dietéticas e habilidades culinárias",
-    "mealPlanner.createYourFirstAIMeal": "Crie Seu Primeiro Plano de Refeições com IA",
+    "mealPlanner.createYourFirstAIMeal":
+      "Crie Seu Primeiro Plano de Refeições com IA",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Criar Plano de Refeições com IA",
@@ -2391,8 +2538,10 @@ const translations = {
     "mealPlanCreator.dietary.paleo": "Paleo",
     "mealPlanCreator.dietary.dairyFree": "Sem Laticínios",
     "mealPlanCreator.cuisine.label": "Culinária e Cozinha",
-    "mealPlanCreator.cuisine.label.desc": "Preferências de culinária e restrições culinárias",
-    "mealPlanCreator.cooking.skillLevel.select": "Selecionar Nível de Habilidade",
+    "mealPlanCreator.cuisine.label.desc":
+      "Preferências de culinária e restrições culinárias",
+    "mealPlanCreator.cooking.skillLevel.select":
+      "Selecionar Nível de Habilidade",
     "mealPlanCreator.cooking.skillLevel.beginner": "Iniciante",
     "mealPlanCreator.cooking.skillLevel.inter": "Intermediário",
     "mealPlanCreator.cooking.skillLevel.adv": "Avançado",
@@ -2435,10 +2584,10 @@ const translations = {
     "mealPlanCreator.cuisine.asian": "Asiática",
     "mealPlanCreator.cuisine.american": "Americana",
     "mealPlanCreator.cuisine.indian": "India",
-     "mealPlanCreator.cuisine.ecuadorian": "Ecuatoriana",
+    "mealPlanCreator.cuisine.ecuadorian": "Ecuatoriana",
     "mealPlanCreator.cuisine.chinese": "China",
     "mealPlanCreator.generate.btn": "Gerar Plano com IA",
-     "mealPlanCreator.generate.btnLoad": "Criando plano com IA...",
+    "mealPlanCreator.generate.btnLoad": "Criando plano com IA...",
 
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "Plano de Refeições Criado com Sucesso! 🎉",
@@ -2450,7 +2599,7 @@ const translations = {
     "mealPlanSuccess.mealsPerDay": "Refeições/Dia",
     "mealPlanSuccess.viewDetails": "Ver Detalhes do Plano de Refeições",
     "mealPlanSuccess.backToPlans": "Voltar aos Planos de Refeições",
-    
+
     // Meal Plan Timeout Modal
     "mealPlanTimeout.title": "Seu Plano de Refeições Está Sendo Criado ⏳",
     "mealPlanTimeout.desc":
@@ -2461,7 +2610,8 @@ const translations = {
     "mealPlanTimeout.checkPlans": "Verificar Meus Planos de Refeições",
 
     //Meal Plan View
-    "mealPlanView.confirmDelete": "Tem certeza de que deseja excluir esta refeição?",
+    "mealPlanView.confirmDelete":
+      "Tem certeza de que deseja excluir esta refeição?",
     "mealPlanView.editPlan": "Editar Plano",
     "mealPlanView.days": "Dias",
     "mealPlanView.persons": "Pessoas",
@@ -2483,7 +2633,8 @@ const translations = {
     "mealPlanView.addToPantryOne": "Adicionar à Despensa",
     "mealPlanView.orderOnlineOne": "Pedir Online",
     "mealPlanView.other": "Outro",
-    "mealPlanView.noShoppingList": "Nenhuma lista de compras disponível para este plano de refeições",
+    "mealPlanView.noShoppingList":
+      "Nenhuma lista de compras disponível para este plano de refeições",
     "mealPlanView.min": "min",
     "mealPlanView.calories": "calorias",
     "mealPlanView.day": "Dia",
@@ -2494,17 +2645,18 @@ const translations = {
     "days.thursday": "Quinta-feira",
     "days.friday": "Sexta-feira",
     "days.saturday": "Sábado",
-    
 
     // Meal Shopping Modal
     "mealShopping.shoppingListTitle": "Lista de Compras",
-    "mealShopping.selectIngredients": "Selecione os ingredientes para adicionar à despensa ou solicitar entrega",
+    "mealShopping.selectIngredients":
+      "Selecione os ingredientes para adicionar à despensa ou solicitar entrega",
     "mealShopping.selectAll": "Selecionar Tudo",
     "mealShopping.clearAll": "Limpar Tudo",
     "mealShopping.addToPantry": "Adicionar à Despensa",
     "mealShopping.requestDelivery": "Solicitar Entrega",
     "mealShopping.chooseDeliveryTime": "Escolher Hora de Entrega",
-    "mealShopping.deliveryPrompt": "Quando você gostaria que seus ingredientes fossem entregues?",
+    "mealShopping.deliveryPrompt":
+      "Quando você gostaria que seus ingredientes fossem entregues?",
     "mealShopping.sameDay": "Mesmo Dia (2-4 horas)",
     "mealShopping.nextDay": "Dia Seguinte",
     "mealShopping.in2to3Days": "Em 2-3 Dias",
@@ -2512,10 +2664,10 @@ const translations = {
     "mealShopping.ingredientCount": "ingredientes",
     "mealShopping.backToIngredients": "Voltar para Ingredientes",
 
-
     // AI Meal Creator
     "aiMealCreator.createMealTitle": "Criar uma Refeição",
-    "aiMealCreator.createMealDesc": "Crie refeições únicas e personalizadas com IA com base em suas preferências, necessidades dietéticas e ingredientes disponíveis.",
+    "aiMealCreator.createMealDesc":
+      "Crie refeições únicas e personalizadas com IA com base em suas preferências, necessidades dietéticas e ingredientes disponíveis.",
     "aiMealCreator.createAIMealBtn": "Criar Refeição com IA",
     "aiMealCreator.showingPage": "Mostrando página",
     "aiMealCreator.of": "de",
@@ -2527,7 +2679,8 @@ const translations = {
     "aiMealCreator.mins": "min",
     "aiMealCreator.peopleLabel": "pessoas",
     "aiMealCreator.noMealsTitle": "Nenhuma refeição criada ainda",
-    "aiMealCreator.noMealsDesc": "Comece a criar sua primeira refeição com IA com base em suas preferências e ingredientes.",
+    "aiMealCreator.noMealsDesc":
+      "Comece a criar sua primeira refeição com IA com base em suas preferências e ingredientes.",
 
     //AI Meal Creator Stepper
     "aiMealCreatorStepper.step1Title": "Detalhes da Refeição",
@@ -2538,11 +2691,15 @@ const translations = {
     "aiMealCreatorStepper.step3Desc": "Revise suas seleções",
     "aiMealCreatorStepper.step4Title": "Gerar",
     "aiMealCreatorStepper.step4Desc": "A IA cria sua refeição",
-    "aiMealCreatorStepper.loaderMessage": "Analisando suas preferências e criando a refeição perfeita...",
+    "aiMealCreatorStepper.loaderMessage":
+      "Analisando suas preferências e criando a refeição perfeita...",
     "aiMealCreatorStepper.mealDetailsTitle": "Detalhes da Refeição",
-    "aiMealCreatorStepper.mealDetailsDesc": "Conte-nos sobre a refeição que você deseja criar",
-    "aiMealCreatorStepper.mealNameLabel": "Nome Especial da Refeição (Opcional)",
-    "aiMealCreatorStepper.mealNamePlaceholder": "ex: Meu Jantar Especial de Domingo",
+    "aiMealCreatorStepper.mealDetailsDesc":
+      "Conte-nos sobre a refeição que você deseja criar",
+    "aiMealCreatorStepper.mealNameLabel":
+      "Nome Especial da Refeição (Opcional)",
+    "aiMealCreatorStepper.mealNamePlaceholder":
+      "ex: Meu Jantar Especial de Domingo",
     "aiMealCreatorStepper.mealTypeLabel": "Tipo de Refeição",
     "aiMealCreatorStepper.mealType.breakfast": "Café da Manhã",
     "aiMealCreatorStepper.mealType.lunch": "Almoço",
@@ -2554,7 +2711,8 @@ const translations = {
     "aiMealCreatorStepper.servingsLabel": "Porções",
     "aiMealCreatorStepper.cookingTimeLabel": "Tempo Máximo de Preparo (min)",
     "aiMealCreatorStepper.skillLevelLabel": "Nível de Habilidade Culinária",
-    "aiMealCreatorStepper.skillLevelPlaceholder": "Selecione o nível de habilidade",
+    "aiMealCreatorStepper.skillLevelPlaceholder":
+      "Selecione o nível de habilidade",
     "aiMealCreatorStepper.skillLevel.beginner": "Iniciante",
     "aiMealCreatorStepper.skillLevel.intermediate": "Intermediário",
     "aiMealCreatorStepper.skillLevel.advanced": "Avançado",
@@ -2564,9 +2722,11 @@ const translations = {
     "aiMealCreatorStepper.budget.medium": "Médio Orçamento",
     "aiMealCreatorStepper.budget.high": "Alto Orçamento",
     "aiMealCreatorStepper.specialRequestsLabel": "Pedidos Especiais (Opcional)",
-    "aiMealCreatorStepper.specialRequestsPlaceholder": "Algum pedido ou inspiração especial para sua refeição?",
+    "aiMealCreatorStepper.specialRequestsPlaceholder":
+      "Algum pedido ou inspiração especial para sua refeição?",
     "aiMealCreatorStepper.preferencesTitle": "Preferências e Objetivos",
-    "aiMealCreatorStepper.preferencesDesc": "Ajude-nos a personalizar sua refeição conforme suas necessidades dietéticas e objetivos de saúde",
+    "aiMealCreatorStepper.preferencesDesc":
+      "Ajude-nos a personalizar sua refeição conforme suas necessidades dietéticas e objetivos de saúde",
     "aiMealCreatorStepper.dietaryRestrictionsLabel": "Restrições Dietéticas",
     "aiMealCreatorStepper.dietary.vegetarian": "Vegetariano",
     "aiMealCreatorStepper.dietary.vegan": "Vegano",
@@ -2611,12 +2771,16 @@ const translations = {
     "aiMealCreatorStepper.allergy.wheat": "Trigo",
     "aiMealCreatorStepper.allergy.sesame": "Gergelim",
     "aiMealCreatorStepper.allergy.sulfites": "Sulfitos",
-    "aiMealCreatorStepper.customAllergiesLabel": "Alergias/Intolerâncias Personalizadas (Opcional)",
-    "aiMealCreatorStepper.customAllergiesPlaceholder": "Liste outros ingredientes ou alimentos aos quais você é alérgico ou intolerante...",
+    "aiMealCreatorStepper.customAllergiesLabel":
+      "Alergias/Intolerâncias Personalizadas (Opcional)",
+    "aiMealCreatorStepper.customAllergiesPlaceholder":
+      "Liste outros ingredientes ou alimentos aos quais você é alérgico ou intolerante...",
     "aiMealCreatorStepper.dislikesLabel": "Desgostos (Opcional)",
-    "aiMealCreatorStepper.dislikesPlaceholder": "Liste ingredientes ou alimentos que você não gosta...",
+    "aiMealCreatorStepper.dislikesPlaceholder":
+      "Liste ingredientes ou alimentos que você não gosta...",
     "aiMealCreatorStepper.reviewTitle": "Revise Suas Seleções",
-    "aiMealCreatorStepper.reviewDesc": "Por favor, revise todas as suas preferências antes de gerar sua refeição",
+    "aiMealCreatorStepper.reviewDesc":
+      "Por favor, revise todas as suas preferências antes de gerar sua refeição",
     "aiMealCreatorStepper.review.basicInfo": "Informações Básicas",
     "aiMealCreatorStepper.review.language": "Idioma",
     "aiMealCreatorStepper.review.mealName": "Nome da Refeição",
@@ -2629,10 +2793,12 @@ const translations = {
     "aiMealCreatorStepper.review.skillLevel": "Nível de Habilidade",
     "aiMealCreatorStepper.review.budget": "Orçamento",
     "aiMealCreatorStepper.review.dietaryRestrictions": "Restrições Dietéticas",
-    "aiMealCreatorStepper.review.cuisinePreferences": "Preferências de Culinária",
+    "aiMealCreatorStepper.review.cuisinePreferences":
+      "Preferências de Culinária",
     "aiMealCreatorStepper.review.healthGoals": "Objetivos de Saúde",
     "aiMealCreatorStepper.review.allergies": "Alergias e Intolerâncias",
-    "aiMealCreatorStepper.review.customAllergies": "Alergias/Intolerâncias Personalizadas",
+    "aiMealCreatorStepper.review.customAllergies":
+      "Alergias/Intolerâncias Personalizadas",
     "aiMealCreatorStepper.review.dislikes": "Desgostos",
     "aiMealCreatorStepper.review.specialRequests": "Pedidos Especiais",
     "aiMealCreatorStepper.backToMeals": "Voltar para Refeições IA",
@@ -2641,10 +2807,13 @@ const translations = {
     "aiMealCreatorStepper.nextBtn": "Próximo",
 
     //AI Meal Generation
-    "aiMealGenerator.loaderMessage": "Criando sua refeição personalizada com IA...",
-    "aiMealGenerator.createAIMealTitle": "Sua refeição gerada por IA está pronta!",
+    "aiMealGenerator.loaderMessage":
+      "Criando sua refeição personalizada com IA...",
+    "aiMealGenerator.createAIMealTitle":
+      "Sua refeição gerada por IA está pronta!",
     "aiMealGenerator.mealNamePlaceholder": "Bowl Saudável de Legumes",
-    "aiMealGenerator.mealDetailsDesc": "Uma deliciosa fusão de sabores que vai agradar seu paladar.",
+    "aiMealGenerator.mealDetailsDesc":
+      "Uma deliciosa fusão de sabores que vai agradar seu paladar.",
     "aiMealGenerator.review.specialRequests": "Gerado por IA",
     "aiMealGenerator.review.healthGoals": "Saudável",
     "aiMealGenerator.benefits": "Benefícios",
@@ -2654,7 +2823,8 @@ const translations = {
     "aiMealGenerator.skillLevel.beginner": "Iniciante",
     "aiMealGenerator.skillLevel.intermediate": "Intermediário",
     "aiMealGenerator.skillLevel.advanced": "Avançado",
-    "aiMealGenerator.error": "Falha ao gerar a refeição. Por favor, tente novamente.",
+    "aiMealGenerator.error":
+      "Falha ao gerar a refeição. Por favor, tente novamente.",
     "aiMealGenerator.save": "Refeição salva com sucesso!",
     "aiMealGenerator.back": "Voltar para a Receita",
     "aiMealGenerator.cancel": "Cancelar",
@@ -2666,18 +2836,26 @@ const translations = {
     "aiMealGenerator.bellPepper": "pimentão",
     "aiMealGenerator.salt": "sal",
     "aiMealGenerator.blackPepper": "pimenta-do-reino",
-    "aiMealGenerator.prepareIngredients": "Prepare todos os ingredientes lavando e cortando conforme necessário.",
-    "aiMealGenerator.heatOil": "Aqueça o azeite em uma panela grande em fogo médio-alto.",
-    "aiMealGenerator.addAromatics": "Adicione os aromáticos e cozinhe até ficarem perfumados, cerca de 2-3 minutos.",
-    "aiMealGenerator.addMainIngredients": "Adicione os ingredientes principais e cozinhe conforme o tipo e preferência.",
-    "aiMealGenerator.season": "Tempere com sal, pimenta e especiarias selecionadas.",
-    "aiMealGenerator.combine": "Misture todos os elementos e cozinhe até aquecer bem.",
-    "aiMealGenerator.tasteAdjust": "Prove e ajuste o tempero conforme necessário.",
+    "aiMealGenerator.prepareIngredients":
+      "Prepare todos os ingredientes lavando e cortando conforme necessário.",
+    "aiMealGenerator.heatOil":
+      "Aqueça o azeite em uma panela grande em fogo médio-alto.",
+    "aiMealGenerator.addAromatics":
+      "Adicione os aromáticos e cozinhe até ficarem perfumados, cerca de 2-3 minutos.",
+    "aiMealGenerator.addMainIngredients":
+      "Adicione os ingredientes principais e cozinhe conforme o tipo e preferência.",
+    "aiMealGenerator.season":
+      "Tempere com sal, pimenta e especiarias selecionadas.",
+    "aiMealGenerator.combine":
+      "Misture todos os elementos e cozinhe até aquecer bem.",
+    "aiMealGenerator.tasteAdjust":
+      "Prove e ajuste o tempero conforme necessário.",
     "aiMealGenerator.serve": "Sirva quente e aproveite!",
     "aiMealGenerator.shoppingListTitle": "Lista de Compras",
     "aiMealGenerator.generateShoppingList": "Gerar Lista de Compras",
     "aiMealGenerator.ingredientsTitle": "Ingredientes",
-    "aiMealGenerator.ingredientsDesc": "Tudo que você precisa para esta receita",
+    "aiMealGenerator.ingredientsDesc":
+      "Tudo que você precisa para esta receita",
     "aiMealGenerator.ingredientCount": "itens",
     "aiMealGenerator.selected": "selecionado",
     "aiMealGenerator.of": "de",
@@ -2704,9 +2882,12 @@ const translations = {
     "aiMealGenerator.countryPlaceholder": "Brasil",
     "aiMealGenerator.placeOrder": "Fazer Pedido",
     "aiMealGenerator.completeOrder": "Concluir Pedido",
-    "aiMealGenerator.selectIngredients": "Por favor, selecione ingredientes para adicionar à despensa",
-    "aiMealGenerator.deliveryPrompt": "Por favor, preencha todos os campos do endereço de entrega",
-    "aiMealGenerator.chooseDeliveryTime": "Por favor, selecione um método de pagamento",
+    "aiMealGenerator.selectIngredients":
+      "Por favor, selecione ingredientes para adicionar à despensa",
+    "aiMealGenerator.deliveryPrompt":
+      "Por favor, preencha todos os campos do endereço de entrega",
+    "aiMealGenerator.chooseDeliveryTime":
+      "Por favor, selecione um método de pagamento",
     "aiMealGenerator.for": "Para",
     "aiMealGenerator.recipe": "receita",
     "mealSidebar.nutrition": "Nutrição (por porção)",
@@ -2730,7 +2911,8 @@ const translations = {
     "mealTabs.fullscreen": "Tela Cheia",
     "mealTabs.closeVideo": "Fechar Vídeo",
     "aiMealGenerator.heatPan": "🔥 Aqueça sua panela em fogo médio-alto",
-    "aiMealGenerator.patience": "⏱️ Não apresse este passo - a paciência faz a diferença!",
+    "aiMealGenerator.patience":
+      "⏱️ Não apresse este passo - a paciência faz a diferença!",
     "aiMealGenerator.taste": "👨‍🍳 Dica: Prove enquanto cozinha",
     "aiMealGenerator.magic": "🌟 Aqui é onde acontece a mágica",
     "aiMealGenerator.stir": "💡 Mexa sempre para não grudar",
@@ -2755,7 +2937,8 @@ const translations = {
     "aiMealView.ingredientsTitle": "Ingredientes",
     "aiMealView.ingredientsDesc": "Tudo que você precisa para esta receita",
     "aiMealView.instructionsTitle": "Instruções de Preparo",
-    "aiMealView.instructionsDesc": "Siga estes passos para um resultado perfeito",
+    "aiMealView.instructionsDesc":
+      "Siga estes passos para um resultado perfeito",
     "aiMealView.videoTitle": "Vídeo Tutorial",
     "aiMealView.videoDesc": "Veja o preparo passo a passo",
     "aiMealView.playVideo": "Assistir Vídeo",
@@ -2777,12 +2960,12 @@ const translations = {
     "aiMealView.of": "de",
     "aiMealView.stepsCompleted": "passos concluídos",
     "aiMealView.recipeCompleted": "Parabéns! Receita concluída!",
-    "aiMealView.ingredientsSelector":"Lista de Ingredientes",
-
+    "aiMealView.ingredientsSelector": "Lista de Ingredientes",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crie Sua Bebida Saudável Perfeita",
-    "aiDrinkCreator.desc": "Deixe a IA ajudar você a criar bebidas deliciosas e nutritivas adaptadas aos seus objetivos e preferências de saúde",
+    "aiDrinkCreator.desc":
+      "Deixe a IA ajudar você a criar bebidas deliciosas e nutritivas adaptadas aos seus objetivos e preferências de saúde",
     "aiDrinkCreator.start": "Começar a Criar",
     "aiDrinkCreator.loading": "Carregando suas bebidas...",
     "aiDrinkCreator.yourCreatedDrinks": "Suas Bebidas Criadas",
@@ -2797,11 +2980,14 @@ const translations = {
     "aiDrinkCreator.viewRecipe": "Ver Receita",
     "aiDrinkCreator.yourAIDrinks": "Suas Bebidas Criadas por IA",
     "aiDrinkCreator.smoothies": "Smoothies",
-    "aiDrinkCreator.smoothiesDesc": "Smoothies ricos em nutrientes para energia e bem-estar",
+    "aiDrinkCreator.smoothiesDesc":
+      "Smoothies ricos em nutrientes para energia e bem-estar",
     "aiDrinkCreator.juices": "Sucos Naturais",
-    "aiDrinkCreator.juicesDesc": "Sucos naturais ricos em vitaminas para desintoxicação e saúde",
+    "aiDrinkCreator.juicesDesc":
+      "Sucos naturais ricos em vitaminas para desintoxicação e saúde",
     "aiDrinkCreator.teas": "Chás de Bem-Estar",
-    "aiDrinkCreator.teasDesc": "Chás de ervas e bem-estar para relaxamento e saúde",
+    "aiDrinkCreator.teasDesc":
+      "Chás de ervas e bem-estar para relaxamento e saúde",
 
     // AI Drink Creator Stepper
     "aiDrinkCreatorStepper.title": "Criar Bebida Saudável",
@@ -2816,9 +3002,11 @@ const translations = {
 
     // AI Dtink Type
     "aiDrinkType.chooseTitle": "Escolha o Tipo de Bebida",
-    "aiDrinkType.chooseDesc": "Selecione o tipo de bebida saudável que deseja criar",
+    "aiDrinkType.chooseDesc":
+      "Selecione o tipo de bebida saudável que deseja criar",
     "aiDrinkType.smoothie.title": "Smoothie",
-    "aiDrinkType.smoothie.desc": "Bebidas espessas e cremosas batidas com frutas e vegetais",
+    "aiDrinkType.smoothie.desc":
+      "Bebidas espessas e cremosas batidas com frutas e vegetais",
     "aiDrinkType.smoothie.benefit1": "Rico em fibras",
     "aiDrinkType.smoothie.benefit2": "Sacia",
     "aiDrinkType.smoothie.benefit3": "Fácil de digerir",
@@ -2828,30 +3016,34 @@ const translations = {
     "aiDrinkType.juice.benefit2": "Rico em vitaminas",
     "aiDrinkType.juice.benefit3": "Hidratante",
     "aiDrinkType.tea.title": "Chá de Bem-Estar",
-    "aiDrinkType.tea.desc": "Chás de ervas e funcionais para benefícios à saúde",
+    "aiDrinkType.tea.desc":
+      "Chás de ervas e funcionais para benefícios à saúde",
     "aiDrinkType.tea.benefit1": "Antioxidantes",
     "aiDrinkType.tea.benefit2": "Calmante",
     "aiDrinkType.tea.benefit3": "Apoio digestivo",
     "aiDrinkType.protein.title": "Shake de Proteína",
-    "aiDrinkType.protein.desc": "Bebidas ricas em proteína para fitness e recuperação",
+    "aiDrinkType.protein.desc":
+      "Bebidas ricas em proteína para fitness e recuperação",
     "aiDrinkType.protein.benefit1": "Apoio muscular",
     "aiDrinkType.protein.benefit2": "Pós-treino",
     "aiDrinkType.protein.benefit3": "Energia sustentada",
     "aiDrinkType.detox.title": "Bebida Detox",
-    "aiDrinkType.detox.desc": "Bebidas de limpeza com ingredientes naturais desintoxicantes",
+    "aiDrinkType.detox.desc":
+      "Bebidas de limpeza com ingredientes naturais desintoxicantes",
     "aiDrinkType.detox.benefit1": "Apoio ao fígado",
     "aiDrinkType.detox.benefit2": "Desintoxicante",
     "aiDrinkType.detox.benefit3": "Anti-inflamatório",
     "aiDrinkType.energy.title": "Energia",
-    "aiDrinkType.energy.desc": "Bebidas energéticas naturais sem estimulantes artificiais",
+    "aiDrinkType.energy.desc":
+      "Bebidas energéticas naturais sem estimulantes artificiais",
     "aiDrinkType.energy.benefit1": "Cafeína natural",
     "aiDrinkType.energy.benefit2": "Vitaminas do complexo B",
     "aiDrinkType.energy.benefit3": "Energia sustentada",
 
-
     // AI Drink Goals
     "aiDrinkGoals.customizeTitle": "Personalize Sua Bebida Saudável",
-    "aiDrinkGoals.customizeDesc": "Conte-nos suas preferências para criar a bebida perfeita",
+    "aiDrinkGoals.customizeDesc":
+      "Conte-nos suas preferências para criar a bebida perfeita",
     "aiDrinkGoals.basicInfo": "Informações Básicas",
     "aiDrinkGoals.drinkName": "Nome da Bebida",
     "aiDrinkGoals.drinkNamePlaceholder": "ex., Smoothie Energético Matinal",
@@ -2864,22 +3056,31 @@ const translations = {
     "aiDrinkGoals.cuisinePreferences": "Preferências de Culinária",
     "aiDrinkGoals.allergies": "Alergias e Intolerâncias",
     "aiDrinkGoals.foodDislikes": "Alimentos que Não Gosta",
-    "aiDrinkGoals.foodDislikesLabel": "Quais alimentos você gostaria de evitar?",
-    "aiDrinkGoals.foodDislikesPlaceholder": "ex., repolho, comidas picantes, ingredientes amargos...",
+    "aiDrinkGoals.foodDislikesLabel":
+      "Quais alimentos você gostaria de evitar?",
+    "aiDrinkGoals.foodDislikesPlaceholder":
+      "ex., repolho, comidas picantes, ingredientes amargos...",
     "aiDrinkGoals.next": "Próximo",
-    "aiDrinkGoals.validation": "Selecione pelo menos um objetivo de saúde e forneça um nome para a bebida",
+    "aiDrinkGoals.validation":
+      "Selecione pelo menos um objetivo de saúde e forneça um nome para a bebida",
     "aiDrinkGoals.energyBoost.title": "Energia",
-    "aiDrinkGoals.energyBoost.desc": "Ingredientes naturais para energia prolongada",
+    "aiDrinkGoals.energyBoost.desc":
+      "Ingredientes naturais para energia prolongada",
     "aiDrinkGoals.weightLoss.title": "Controle de Peso",
-    "aiDrinkGoals.weightLoss.desc": "Ingredientes de baixa caloria e que aceleram o metabolismo",
+    "aiDrinkGoals.weightLoss.desc":
+      "Ingredientes de baixa caloria e que aceleram o metabolismo",
     "aiDrinkGoals.immunity.title": "Apoio Imunológico",
-    "aiDrinkGoals.immunity.desc": "Vitamina C, antioxidantes e nutrientes para o sistema imunológico",
+    "aiDrinkGoals.immunity.desc":
+      "Vitamina C, antioxidantes e nutrientes para o sistema imunológico",
     "aiDrinkGoals.digestiveHealth.title": "Saúde Digestiva",
-    "aiDrinkGoals.digestiveHealth.desc": "Fibras, probióticos e ingredientes benéficos para o intestino",
+    "aiDrinkGoals.digestiveHealth.desc":
+      "Fibras, probióticos e ingredientes benéficos para o intestino",
     "aiDrinkGoals.skinHealth.title": "Saúde da Pele",
-    "aiDrinkGoals.skinHealth.desc": "Antioxidantes e vitaminas para uma pele radiante",
+    "aiDrinkGoals.skinHealth.desc":
+      "Antioxidantes e vitaminas para uma pele radiante",
     "aiDrinkGoals.detox.title": "Desintoxicação",
-    "aiDrinkGoals.detox.desc": "Ingredientes de limpeza para apoiar a desintoxicação natural",
+    "aiDrinkGoals.detox.desc":
+      "Ingredientes de limpeza para apoiar a desintoxicação natural",
     "aiDrinkGoals.diet.keto": "Keto",
     "aiDrinkGoals.diet.paleo": "Paleo",
     "aiDrinkGoals.diet.vegan": "Vegano",
@@ -2918,14 +3119,16 @@ const translations = {
     "aiDrinkGoals.budget.medium": "Médio",
     "aiDrinkGoals.budget.high": "Alto",
 
-
     // AI Drink Generation
     "aiDrinkGeneration.readyTitle": "Pronto para Gerar Sua Bebida",
-    "aiDrinkGeneration.readyDesc": "Clique abaixo para criar sua bebida saudável personalizada",
+    "aiDrinkGeneration.readyDesc":
+      "Clique abaixo para criar sua bebida saudável personalizada",
     "aiDrinkGeneration.generateBtn": "Gerar Bebida IA",
     "aiDrinkGeneration.creatingTitle": "A IA está Criando Sua Bebida",
-    "aiDrinkGeneration.creatingDesc": "Analisando suas preferências para criar a bebida saudável perfeita...",
-    "aiDrinkGeneration.failed": "Falha ao gerar a bebida. Por favor, tente novamente.",
+    "aiDrinkGeneration.creatingDesc":
+      "Analisando suas preferências para criar a bebida saudável perfeita...",
+    "aiDrinkGeneration.failed":
+      "Falha ao gerar a bebida. Por favor, tente novamente.",
     "aiDrinkGeneration.retry": "Tentar Novamente",
     "aiDrinkGeneration.prepTime": "Tempo de Preparo",
     "aiDrinkGeneration.serving": "porção",
@@ -2977,7 +3180,6 @@ const translations = {
     "aiDrinkView.enjoy": "🎉 Aproveite sua bebida saudável!",
     "aiDrinkView.videoTitleFullscreen": "Vídeo Tutorial da Bebida - Tela Cheia",
 
-
     // Drink Details View
     "drinkDetailView.back": "Voltar",
     "drinkDetailView.min": "min",
@@ -3013,33 +3215,43 @@ const translations = {
     "drinkDetailView.createShoppingList": "Criar Lista de Compras",
     "drinkDetailView.addToQuickShopping": "Adicionar à Compra Rápida",
     "drinkDetailView.proTip": "Dica Pro",
-    "drinkDetailView.videoTitleFullscreen": "Vídeo Tutorial da Bebida - Tela Cheia",
+    "drinkDetailView.videoTitleFullscreen":
+      "Vídeo Tutorial da Bebida - Tela Cheia",
     "drinkDetailView.shoppingListCreated": "Lista de compras criada!",
     "drinkDetailView.added": "Foram adicionados",
     "drinkDetailView.toShoppingList": "ingredientes à sua lista de compras",
     "drinkDetailView.error": "Erro",
-    "drinkDetailView.shoppingListFailed": "Falha ao criar a lista de compras. Por favor, tente novamente.",
-    "drinkDetailView.expires":"Expira em",
-     "drinkDetailView.days":"días",
+    "drinkDetailView.shoppingListFailed":
+      "Falha ao criar a lista de compras. Por favor, tente novamente.",
+    "drinkDetailView.expires": "Expira em",
+    "drinkDetailView.days": "días",
+    "drinkDetailView.addToPantry": "Adicionar à Despensa",
+    "drinkDetailView.orderOnline": "Solicitar Entrega",
+     "drinkDetailView.ingredientsSelected": "ingredientes selecionados",
+     "drinkDetailView.healthGoals": "Objetivos de Saúde",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "Nenhum ingrediente selecionado",
-    "drinkShoppingModal.noIngredientsDesc": "Selecione ingredientes para adicionar à despensa.",
+    "drinkShoppingModal.noIngredientsDesc":
+      "Selecione ingredientes para adicionar à despensa.",
     "drinkShoppingModal.noDeliveryDesc": "Selecione ingredientes para entrega.",
     "drinkShoppingModal.addedToPantryTitle": "Adicionado à Despensa!",
     "drinkShoppingModal.added": "Foram adicionados",
     "drinkShoppingModal.ingredientsToPantry": "ingredientes à sua despensa.",
     "drinkShoppingModal.deliveryRequestedTitle": "Entrega Solicitada!",
     "drinkShoppingModal.yourIngreWill": "Seus ingredientes serão entregues",
-    "drinkShoppingModal.youWillReceive": "Você receberá um e-mail de confirmação em breve.",
+    "drinkShoppingModal.youWillReceive":
+      "Você receberá um e-mail de confirmação em breve.",
     "drinkShoppingModal.shoppingList": "Lista de Compras",
-    "drinkShoppingModal.selectIngredients": "Selecione ingredientes para adicionar à despensa ou solicitar entrega",
+    "drinkShoppingModal.selectIngredients":
+      "Selecione ingredientes para adicionar à despensa ou solicitar entrega",
     "drinkShoppingModal.selectAll": "Selecionar Todos",
     "drinkShoppingModal.clearAll": "Limpar Todos",
     "drinkShoppingModal.addToPantry": "Adicionar à Despensa",
     "drinkShoppingModal.requestDelivery": "Solicitar Entrega",
     "drinkShoppingModal.chooseDeliveryTime": "Escolha o Tempo de Entrega",
-    "drinkShoppingModal.whenDelivery": "Quando você gostaria que seus ingredientes fossem entregues?",
+    "drinkShoppingModal.whenDelivery":
+      "Quando você gostaria que seus ingredientes fossem entregues?",
     "drinkShoppingModal.backToIngredients": "Voltar aos Ingredientes",
     "drinkShoppingModal.sameDay": "Mesmo dia (2-4 horas)",
     "drinkShoppingModal.nextDay": "Dia seguinte",
@@ -3052,7 +3264,8 @@ const translations = {
     "recipeView.added": "Adicionado",
     "recipeView.ingredientsToYour": "ingredientes à sua lista de compras.",
     "recipeView.error": "Erro",
-    "recipeView.shoppingListFailed": "Falha ao criar a lista de compras. Por favor, tente novamente.",
+    "recipeView.shoppingListFailed":
+      "Falha ao criar a lista de compras. Por favor, tente novamente.",
     "recipeView.backToPlan": "Voltar ao Plano",
     "recipeView.shoppingList": "Lista de Compras",
     "recipeView.minutes": "minutos",
@@ -3062,10 +3275,12 @@ const translations = {
     "recipeView.ingredients": "Ingredientes",
     "recipeView.ingredientsDesc": "Tudo que você precisa para esta receita",
     "recipeView.cookingInstructions": "Instruções de Cozinha",
-    "recipeView.instructionsDesc": "Siga estes passos para o resultado perfeito",
+    "recipeView.instructionsDesc":
+      "Siga estes passos para o resultado perfeito",
     "recipeView.min": "min",
     "recipeView.cookingTip": "Dica de Cozinha",
-    "recipeView.cookingTipDesc": "Clique em cada passo para marcar como concluído. Aproveite o processo!",
+    "recipeView.cookingTipDesc":
+      "Clique em cada passo para marcar como concluído. Aproveite o processo!",
     "recipeView.videoTutorial": "Vídeo Tutorial",
     "recipeView.videoDesc": "Veja o preparo passo a passo",
     "recipeView.playVideo": "Assistir Vídeo",

@@ -28,7 +28,7 @@ import MealShoppingModal from "./MealShoppingModal";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Checkbox } from "@/components/ui/checkbox";
-import { updatePantry } from "@/services/pantryService";
+import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
 
 interface AIMealViewProps {
   meal: any;
@@ -176,9 +176,10 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         newPantryItems
       );
       try {
-        const responseUpdatePantry = await updatePantry(user.id, [
-          ...pantryItems,
-          ...newPantryItems,
+        
+
+        const responseUpdatePantry = await addIngredientsToPantry(user.id, [
+         ...newPantryItems
         ]);
         console.log("response from update pantry", responseUpdatePantry);
         if (responseUpdatePantry.success) {

@@ -456,9 +456,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <p className="font-semibold">{t('mealShopping.selectedItems') || 'Selected Items'}: {selectedCount}</p>
-                  <p className="text-sm text-gray-600">
-                    {t('mealShopping.totalCost') || 'Total Cost'}: ${totalCost.toFixed(2)}
-                  </p>
+                  
                 </div>
               </div>
               <div className="flex gap-2">

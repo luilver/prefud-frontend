@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this import
-import { updatePantry } from "@/services/pantryService";
+import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
 
 interface MealPlanViewProps {
   plan: any;
@@ -146,7 +146,10 @@ const { pantryItems, user } = useUser();
     console.log('new patry with added items:', [...pantryItems, ...newPantryItems]);
 
     try {
-      const responseUpdatePantry = await updatePantry(user.id,[...pantryItems, ...newPantryItems] );
+      
+      const responseUpdatePantry = await addIngredientsToPantry(user.id, [
+         ...newPantryItems
+        ]);
       console.log('first response from update pantry:', responseUpdatePantry);  
     } catch (error) {
       console.log('error updating pantry:', error);
