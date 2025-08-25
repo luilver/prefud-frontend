@@ -146,26 +146,5 @@ export const pt = {
         description: "Falha ao mudar para o plano Gratuito. Tente novamente."
       }
     }
-  },
-  mealPlanCreator: {
-    title: "Criar Plano de Refeições com IA",
-    backToMeal: "Voltar ao Planejador de Refeições",
-    planDetails: "Detalhes do Plano",
-    setUpYourMeal: "Configure suas preferências de planejamento de refeições",
-    planName: "Nome do Plano",
-    planNamePlaceholder: "ex., Refeições Saudáveis Semanais",
-    planDescription: "Descrição do Plano (Opcional)",
-    planDescriptionPlaceholder: "Descreva os objetivos ou preferências do seu plano de refeições...",
-    startDate: "Data de Início",
-    numberOfDays: "Número de Dias",
-    numberOfPersons: "Número de Adultos",
-    numberKidsLessThan5: "Crianças Menores de 5",
-    numberKids5To12: "Crianças 5-12 Anos",
-    mealsPerDay: "Refeições por Dia",
-    planDuration: "Duração do Plano",
-    person: "adulto",
-    meal: "refeição",
-    perDay: "por dia",
-    language: "Idioma",
   }
 };

@@ -25,8 +25,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [startDate, setStartDate] = useState("");
   const [numberOfDays, setNumberOfDays] = useState(7);
   const [numberOfPersons, setNumberOfPersons] = useState(1);
-  const [numberKidsLessThan5, setNumberKidsLessThan5] = useState(0);
-  const [numberKids5To12, setNumberKids5To12] = useState(0);
   const [mealsPerDay, setMealsPerDay] = useState(3);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
   const [cuisinePreferences, setCuisinePreferences] = useState<string[]>([]);
@@ -186,8 +184,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       const requestData = {
         duration: numberOfDays,
         numberPeople: numberOfPersons,
-        numberKidsLessThan5: numberKidsLessThan5,
-        numberKids5To12: numberKids5To12,
         mealsPerDay: mealsPerDay,
         dietaryRestrictions: dietaryRestrictions,
         cuisinePreferences: cuisinePreferences,
@@ -279,10 +275,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
     return endDateObj.toISOString().split('T')[0];
   };
 
-  const calculateTotalPeople = () => {
-    return numberOfPersons + numberKidsLessThan5 + numberKids5To12;
-  };
-
   const handleBackFromPlanView = () => {
     setShowPlanView(false);
     onBack(); // Navigate back to meal planner
@@ -330,7 +322,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         mealPlan={createdPlan ? {
           name: createdPlan.name || planName,
           numberOfDays: numberOfDays,
-          numberOfPersons: calculateTotalPeople(),
+          numberOfPersons: numberOfPersons,
           mealsPerDay: mealsPerDay
         } : undefined}
       />
@@ -387,7 +379,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
               />
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="numberOfDays">{t('mealPlanCreator.numberOfDays') || 'Number of Days'} *</Label>
                 <Input
@@ -401,7 +393,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="numberOfPersons">{t('mealPlanCreator.numberOfPersons') || 'Number of Adults'} *</Label>
+                <Label htmlFor="numberOfPersons">{t('mealPlanCreator.numberOfPersons') || 'Number of Persons'} *</Label>
                 <Input
                   id="numberOfPersons"
                   type="number"
@@ -409,30 +401,6 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   max="10"
                   value={numberOfPersons}
                   onChange={(e) => setNumberOfPersons(parseInt(e.target.value) || 1)}
-                  className="border-purple-200 focus:border-purple-400"
-                />
-              </div>
-              <div>
-                <Label htmlFor="numberKidsLessThan5">{t('mealPlanCreator.numberKidsLessThan5') || 'Kids Under 5'}</Label>
-                <Input
-                  id="numberKidsLessThan5"
-                  type="number"
-                  min="0"
-                  max="5"
-                  value={numberKidsLessThan5}
-                  onChange={(e) => setNumberKidsLessThan5(parseInt(e.target.value) || 0)}
-                  className="border-purple-200 focus:border-purple-400"
-                />
-              </div>
-              <div>
-                <Label htmlFor="numberKids5To12">{t('mealPlanCreator.numberKids5To12') || 'Kids 5-12 Years'}</Label>
-                <Input
-                  id="numberKids5To12"
-                  type="number"
-                  min="0"
-                  max="5"
-                  value={numberKids5To12}
-                  onChange={(e) => setNumberKids5To12(parseInt(e.target.value) || 0)}
                   className="border-purple-200 focus:border-purple-400"
                 />
               </div>
@@ -456,10 +424,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   <strong>{t('mealPlanCreator.planDuration') || 'Plan Duration'}:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(calculateEndDate(startDate, numberOfDays)).toLocaleDateString()}
                 </p>
                 <p className="text-xs text-purple-600 mt-1">
-                  {numberOfDays} {t('mealPlanner.day') || 'day'}{numberOfDays > 1 ? 's' : ''} • {calculateTotalPeople()} {t('mealPlanCreator.person') || 'person'}{calculateTotalPeople() > 1 ? 's' : ''} 
-                  {numberKidsLessThan5 > 0 && ` (${numberKidsLessThan5} kids <5)`}
-                  {numberKids5To12 > 0 && ` (${numberKids5To12} kids 5-12)`}
-                  • {mealsPerDay} {t('mealPlanCreator.meal') || 'meal'}{mealsPerDay > 1 ? 's' : ''} {t('mealPlanCreator.perDay') || 'per day'}
+                  {numberOfDays} {t('mealPlanner.day') || 'day'}{numberOfDays > 1 ? 's' : ''} • {numberOfPersons} {t('mealPlanCreator.person') || 'person'}{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} {t('mealPlanCreator.meal') || 'meal'}{mealsPerDay > 1 ? 's' : ''} {t('mealPlanCreator.perDay') || 'per day'}
                 </p>
                 <p className="text-xs text-purple-600 mt-1 flex items-center gap-1">
                   <Globe className="h-3 w-3" />
