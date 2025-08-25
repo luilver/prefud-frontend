@@ -8,7 +8,7 @@ import { Plus, Package, Truck, Check, X } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { updatePantry, type Ingredient } from "@/services/pantryService";
+import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
 
 interface MealShoppingModalProps {
   meal: any;
@@ -97,11 +97,11 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
       return;
     }
 
-    // Build new pantry items with the exact structure required
+    // Build new pantry items with the exact PantryIngredient structure
     const nowISO = new Date().toISOString();
     const selectedData = ingredients.filter(ing => selectedIngredients.includes(ing.name));
 
-    const newPantryItems = selectedData.map((ingredient) => {
+    const newPantryItems: PantryIngredient[] = selectedData.map((ingredient) => {
       const carbon = ingredient.carbonFootPrintToWaste ?? 0.2; // default if not provided
       const expiryISO = new Date(Date.now() + (ingredient.daysToExpire || 7) * 24 * 60 * 60 * 1000).toISOString();
 
@@ -116,43 +116,26 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
         carbonFootPrintToWaste: carbon,
         daysToExpire: ingredient.daysToExpire || 7,
         expiryDate: expiryISO,
-        notes: `Carbon footprint:: ${carbon}`
+        notes: `Added from meal: ${meal.name}`
       };
     });
 
-    // Update backend pantry if user available by converting to Ingredient[] format
+    // Update backend pantry using addIngredientsToPantry endpoint
     try {
       if (user?.id) {
-        const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          classification: item.category || "ingredient",
-          carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0.2,
-          daysToExpire: item.daysToExpire ?? 7,
-          dayAdded: typeof item.purchaseDate === 'string'
-            ? item.purchaseDate
-            : item.purchaseDate?.toISOString() || nowISO,
-        }));
-
-        const newAsIngredients: Ingredient[] = newPantryItems.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          classification: item.category,
-          carbonFootPrintToWaste: item.carbonFootPrintToWaste,
-          daysToExpire: item.daysToExpire,
-          dayAdded: item.purchaseDate,
-        }));
-
-        await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
+        await addIngredientsToPantry(user.id, newPantryItems);
       }
     } catch (e) {
-      console.error("Failed to sync pantry to backend:", e);
-      // We still proceed to update local state so the UI reflects the change
+      console.error("Failed to add ingredients to pantry:", e);
+      toast({
+        title: "Error",
+        description: "Failed to add ingredients to pantry. Please try again.",
+        variant: "destructive"
+      });
+      return;
     }
 
-    // NEW: Convert ISO strings to Date objects for local PantryItem state typing
+    // Convert ISO strings to Date objects for local PantryItem state typing
     const newPantryItemsForState = newPantryItems.map(item => ({
       ...item,
       purchaseDate: new Date(item.purchaseDate),
