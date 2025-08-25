@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
-import { updatePantry, type Ingredient } from "@/services/pantryService";
+import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
 import MealShoppingModal from "./MealShoppingModal";
 import OrderOnlineModal from "./OrderOnlineModal";
 
@@ -101,9 +100,9 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         return;
       }
 
-      // Create new pantry items with the EXACT structure you specified
+      // Create new pantry items with the EXACT structure for the new endpoint
       const currentTime = new Date().toISOString();
-      const newPantryItems = ingredientsToAdd.map(ingredient => {
+      const newPantryItems: PantryIngredient[] = ingredientsToAdd.map(ingredient => {
         const expiryDate = new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000).toISOString();
         
         return {
@@ -121,36 +120,12 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         };
       });
 
-      console.log('New pantry items to create:', newPantryItems);
+      console.log('New pantry items to add:', newPantryItems);
 
-      // Update backend if user is available
+      // Call the new add-ingredients endpoint if user is available
       if (user?.id) {
-        // Convert existing pantry items to Ingredient[] format for API call
-        const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          classification: item.category || "ingredient",
-          carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0.2,
-          daysToExpire: item.daysToExpire ?? 7,
-          dayAdded: typeof item.purchaseDate === 'string' ? item.purchaseDate : item.purchaseDate?.toISOString() || currentTime,
-        }));
-
-        // Convert new items to Ingredient[] format for API call
-        const newAsIngredients: Ingredient[] = newPantryItems.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          classification: item.category,
-          carbonFootPrintToWaste: item.carbonFootPrintToWaste,
-          daysToExpire: item.daysToExpire,
-          dayAdded: item.purchaseDate,
-        }));
-
-        console.log('Calling updatePantry with:', [...existingAsIngredients, ...newAsIngredients]);
-
-        // Call the service with the combined Ingredient[] payload (existing + new)
-        await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
+        console.log('Calling addIngredientsToPantry with:', newPantryItems);
+        await addIngredientsToPantry(user.id, newPantryItems);
       }
 
       // Convert new pantry items to match the PantryItem interface for local state
