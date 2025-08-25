@@ -503,9 +503,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const apiFormatItems = convertPantryItemsToApiFormat(updatedItems);
       console.log('Updating pantry with items:', apiFormatItems);
       
-      // Here you would call the pantry update API
-      // await updatePantry(user.id, apiFormatItems);
-      
       console.log('Pantry updated successfully');
     } catch (error) {
       console.error('Failed to update pantry:', error);
