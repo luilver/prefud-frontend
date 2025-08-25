@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Clock, Users, Zap, Droplets, RefreshCw, Save, ShoppingCart, Check } from "lucide-react";
+import { Clock, Users, Zap, Droplets, RefreshCw, Save, ShoppingCart, Check, Package, Truck } from "lucide-react";
 import { toast } from "sonner";
 import CocktailAnimation from "./CocktailAnimation";
+import OrderOnlineModal from "./OrderOnlineModal";
 import { createHealthyDrink, ApiDrinkPlan } from "@/services/drinkService";
+import { addIngredientsToPantry } from "@/services/pantryService";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -21,8 +23,9 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
   const [generatedDrink, setGeneratedDrink] = useState<any>(null);
   const [shoppingList, setShoppingList] = useState<any[]>([]);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [showOrderModal, setShowOrderModal] = useState(false);
   
-  const { user } = useUser();
+  const { user, addPantryItem } = useUser();
   const { language } = useLanguage();
   const { t } = useLanguage();
 
@@ -126,6 +129,95 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       }
       return newSet;
     });
+  };
+
+  const selectAllItems = () => {
+    setCheckedItems(new Set(shoppingList.map(item => item.name)));
+  };
+
+  const clearAllItems = () => {
+    setCheckedItems(new Set());
+  };
+
+  const handleAddToPantry = async () => {
+    const selectedItems = shoppingList.filter(item => checkedItems.has(item.name));
+    
+    if (selectedItems.length === 0) {
+      toast.error("Please select ingredients to add to pantry");
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error("Please log in to add ingredients to pantry");
+      return;
+    }
+
+    try {
+      // Transform selected items to match the required pantry structure
+      const newPantryItems = selectedItems.map((item) => ({
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: item.name,
+        quantity: parseFloat(item.amount.split(' ')[0]) || 1,
+        unit: item.amount.split(' ')[1] || 'piece',
+        category: item.category || 'drink-ingredient',
+        purchased: true,
+        purchaseDate: new Date().toISOString(),
+        carbonFootPrintToWaste: 0.1,
+        daysToExpire: 7,
+        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        notes: `Carbon footprint:: 0.1`
+      }));
+
+      console.log('Adding ingredients to pantry:', newPantryItems);
+      
+      // Use the new endpoint to add ingredients
+      const response = await addIngredientsToPantry(user.id, newPantryItems);
+      
+      if (response.success) {
+        toast.success(`${selectedItems.length} ingredients added to pantry!`);
+        setCheckedItems(new Set());
+        
+        // Update local pantry state
+        newPantryItems.forEach(item => {
+          addPantryItem({
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            category: item.category,
+            expiryDate: new Date(item.expiryDate),
+            purchaseDate: new Date(item.purchaseDate),
+            notes: item.notes
+          });
+        });
+      } else {
+        throw new Error('Failed to add ingredients to pantry');
+      }
+    } catch (error) {
+      console.error("Error adding to pantry:", error);
+      toast.error("Failed to add ingredients to pantry. Please try again.");
+    }
+  };
+
+  const handleOrderOnline = () => {
+    const selectedItems = shoppingList.filter(item => checkedItems.has(item.name));
+    
+    if (selectedItems.length === 0) {
+      toast.error("Please select ingredients to order online");
+      return;
+    }
+
+    // Transform ingredients for the order modal
+    const orderItems = selectedItems.map((item, index) => ({
+      id: `drink-ingredient-${index}`,
+      name: item.name,
+      quantity: parseFloat(item.amount.split(' ')[0]) || 1,
+      unit: item.amount.split(' ')[1] || 'piece',
+      category: item.category || 'drink-ingredient',
+      estimatedPrice: parseFloat(item.price.replace('$', '')) || 0,
+      notes: `From ${generatedDrink?.name || 'Healthy Drink'} recipe`
+    }));
+
+    setShowOrderModal(true);
   };
 
   const saveDrink = () => {
@@ -239,6 +331,20 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-sm text-gray-600">
+              Select ingredients to add to pantry or order online
+            </p>
+            <div className="flex space-x-2">
+              <Button variant="outline" size="sm" onClick={selectAllItems}>
+                Select All
+              </Button>
+              <Button variant="outline" size="sm" onClick={clearAllItems}>
+                Clear All
+              </Button>
+            </div>
+          </div>
+          
           <div className="space-y-3">
             {shoppingList.map((ingredient, index) => (
               <div 
@@ -275,14 +381,37 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
               </div>
             ))}
           </div>
+          
           <Separator className="my-4" />
-          <div className="flex justify-between items-center">
+          
+          <div className="flex justify-between items-center mb-4">
             <span className="text-lg font-semibold text-green-800">
               {t("aiDrinkGeneration.totalCost") || "Total Estimated Cost:"}
             </span>
             <span className="text-lg font-bold text-green-600">
               ${shoppingList.reduce((total, item) => total + parseFloat(item.price.replace('$', '')), 0).toFixed(2)}
             </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex space-x-3">
+            <Button
+              onClick={handleAddToPantry}
+              disabled={checkedItems.size === 0}
+              className="flex-1 bg-green-600 hover:bg-green-700"
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Add to Pantry ({checkedItems.size})
+            </Button>
+            <Button
+              onClick={handleOrderOnline}
+              disabled={checkedItems.size === 0}
+              variant="outline"
+              className="flex-1"
+            >
+              <Truck className="h-4 w-4 mr-2" />
+              Order Online ({checkedItems.size})
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -364,6 +493,24 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           {t("aiDrinkGeneration.generateNew") || "Generate New Version"}
         </Button>
       </div>
+
+      {/* Order Online Modal */}
+      {showOrderModal && (
+        <OrderOnlineModal
+          isOpen={showOrderModal}
+          onClose={() => setShowOrderModal(false)}
+          items={shoppingList.filter(item => checkedItems.has(item.name)).map((item, index) => ({
+            id: `drink-ingredient-${index}`,
+            name: item.name,
+            quantity: parseFloat(item.amount.split(' ')[0]) || 1,
+            unit: item.amount.split(' ')[1] || 'piece',
+            category: item.category || 'drink-ingredient',
+            estimatedPrice: parseFloat(item.price.replace('$', '')) || 0,
+            notes: `From ${generatedDrink?.name || 'Healthy Drink'} recipe`
+          }))}
+          mealPlanName={generatedDrink?.name || 'Healthy Drink Recipe'}
+        />
+      )}
     </div>
   );
 };
