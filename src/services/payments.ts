@@ -80,17 +80,6 @@ export async function createPaymentMethod(
   }
 }
 
-// Uso ejemplo
-(async () => {
-  try {
-    const paymentMethod = await createPaymentMethod(
-      "tok_1RuhY3QtxIPdrkdTKFvOeEH5"
-    );
-    console.log("PaymentMethod ID:", paymentMethod.id);
-  } catch (error) {
-    // Manejo de errores
-  }
-})();
 
 interface StripePaymentMethod {
   id: string;
