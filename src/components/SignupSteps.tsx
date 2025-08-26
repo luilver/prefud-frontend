@@ -207,16 +207,26 @@ const SignupSteps = () => {
 
   const handleFreeSubscription = async (planId: string) => {
     try {
+      if (!userId) {
+        console.warn("Free subscription aborted: missing userId");
+        toast({
+          title: "❌ Subscription Failed",
+          description: "We couldn't find your user ID. Please complete your profile and try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        return;
+      }
+
       console.log("Registering free subscription for user:", userId);
-      
+
       const subscriptionData = {
-        userId: userId,
-        subscriptionTypeId: planId
+        subscriptionTypeId: planId, // API expects only this in the body
       };
 
       const config = {
         method: "post",
-        url: `${BasicURL}/subscription/${userId}`,
+        url: `${BasicURL}/subscription/${userId}`, // userId only in the path
         headers: {
           "Content-Type": "application/json",
         },
@@ -232,18 +242,20 @@ const SignupSteps = () => {
           description: "Your free subscription has been activated successfully.",
           duration: 5000,
         });
-        
+
         completeSignup();
       } else {
         throw new Error("Failed to activate free subscription");
       }
     } catch (error: any) {
       console.error("Free subscription failed:", error);
-      
-      const errorMessage = error.response?.data?.message || "Failed to activate free subscription";
+
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to activate free subscription";
       toast({
         title: "❌ Subscription Failed",
-        description: errorMessage,
+        description: typeof errorMessage === "string" ? errorMessage : "Failed to activate free subscription",
         variant: "destructive",
         duration: 5000,
       });
