@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/contexts/AuthContext";
-import { authService } from "@/services/authService";
 
 interface PasswordFormData {
   currentPassword: string;
@@ -25,7 +24,6 @@ const PasswordUpdate = () => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
-  const { user } = useAuth();
 
   const form = useForm<PasswordFormData>({
     defaultValues: {
@@ -45,19 +43,10 @@ const PasswordUpdate = () => {
       return;
     }
 
-    if (data.newPassword.length < 8) {
+    if (data.newPassword.length < 6) {
       toast({
-        title: t('password.tooShort.title') || 'Password too short',
-        description: t('password.tooShort.description') || 'Password must be at least 8 characters long',
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!user?.userId) {
-      toast({
-        title: 'Error',
-        description: 'User ID not found. Please log in again.',
+        title: t('password.tooShort.title'),
+        description: t('password.tooShort.description'),
         variant: "destructive"
       });
       return;
@@ -65,27 +54,20 @@ const PasswordUpdate = () => {
 
     setIsLoading(true);
     try {
-      const response = await authService.updatePassword(
-        user.userId,
-        data.currentPassword,
-        data.newPassword
-      );
+      // Simulate password update API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: t('password.updated.title') || 'Password updated',
-        description: response.message || t('password.updated.description'),
+        title: t('password.updated.title'),
+        description: t('password.updated.description'),
       });
       
       form.reset();
       setOpen(false);
-    } catch (error: any) {
-      console.error('Password update error:', error);
-      
-      const errorMessage = error.message || t('password.updateFailed.description') || 'Failed to update password';
-      
+    } catch (error) {
       toast({
-        title: t('password.updateFailed.title') || 'Update failed',
-        description: errorMessage,
+        title: t('password.updateFailed.title'),
+        description: t('password.updateFailed.description'),
         variant: "destructive"
       });
     } finally {
