@@ -66,6 +66,7 @@ interface SignupData {
 }
 const BasicURL =
   import.meta.env.VITE_BASE_URL || "https://pantry-auth-1.onrender.com";
+
 const SignupSteps = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [signupData, setSignupData] = useState<SignupData>({
@@ -83,71 +84,11 @@ const SignupSteps = () => {
   const [userId, setUserId] = useState<string>("");
   const [subscriptionTypes, setSubscriptionTypes] = useState<Plan[]>([]);
 
-  // const subscriptionTypes = [
-  //   {
-  //     id: "free",
-  //     name: "Free",
-  //     price: 0,
-  //     interval: "month",
-  //     description: "Perfect for getting started with meal planning",
-  //     features: [
-  //       "1 Meal Plan per month",
-  //       "Basic Recipe Collection",
-  //       "Shopping List Generator",
-  //       "Pantry Management",
-  //       "Email Support",
-  //     ],
-  //     popular: false,
-  //     gradient: "from-muted to-muted-foreground",
-  //   },
-  //   {
-  //     id: "family",
-  //     name: "Family",
-  //     price: 40,
-  //     interval: "month",
-  //     description: "Ideal for families looking to optimize meal planning",
-  //     features: [
-  //       "5 Meal Plans per month",
-  //       "10 Meal Creations with pantry ingredients",
-  //       "AI Meal Recommendations",
-  //       "Advanced Recipe Collection",
-  //       "3 Free Delivery Commissions",
-  //       "Nutritional Analysis",
-  //       "Priority Support",
-  //     ],
-  //     popular: true,
-  //     gradient: "from-primary to-accent",
-  //   },
-  //   {
-  //     id: "professional",
-  //     name: "Professional",
-  //     price: 120,
-  //     interval: "month",
-  //     description: "For meal planning professionals and large households",
-  //     features: [
-  //       "12 Meal Plans per month",
-  //       "Unlimited Meal Creations",
-  //       "10 Free Delivery Commissions",
-  //       "3 Free Home Deliveries",
-  //       "Advanced AI Recommendations",
-  //       "Custom Dietary Plans",
-  //       "Bulk Shopping Lists",
-  //       "Professional Analytics",
-  //       "Phone Support",
-  //       "Priority Processing",
-  //     ],
-  //     popular: false,
-  //     gradient: "from-secondary to-muted",
-  //   },
-  // ];
-
   useEffect(() => {
     const fetchSubscriptionTypes = async () => {
       try {
         const responseSubscriptionTypes = await getAllSubscriptionTypes();
         console.log("this a response ", responseSubscriptionTypes);
-        //setSubscriptionTypes(responseSubscriptionTypes);
-        console.log('plan formatted', mapApiToPlan(responseSubscriptionTypes));
         setSubscriptionTypes(mapApiToPlan(responseSubscriptionTypes));
       } catch (err: any) {
         console.log("error getting subscription types");
@@ -247,26 +188,70 @@ const SignupSteps = () => {
     setCurrentStep(4);
   };
 
-  const handleSubscriptionChoice = (planId: string) => {
-    console.log("Mock: Subscription choice:", planId);
+  const handleSubscriptionChoice = async (planId: string) => {
+    console.log("Subscription choice:", planId);
     const selectedPlan = subscriptionTypes.find((plan) => plan.id === planId);
     setSignupData((prev) => ({
       ...prev,
-      wantsSubscription: selectedPlan.name !== "Free",
+      wantsSubscription: selectedPlan?.name !== "Free",
       selectedPlan: planId,
     }));
 
-    if (planId === "Free") {
-      //here subscribe to free plan
-      //integrate the same endpoint to do it
-      completeSignup();
+    if (selectedPlan?.name === "Free") {
+      // Handle Free subscription - register directly without payment
+      await handleFreeSubscription(planId);
     } else {
       setCurrentStep(5);
     }
   };
 
+  const handleFreeSubscription = async (planId: string) => {
+    try {
+      console.log("Registering free subscription for user:", userId);
+      
+      const subscriptionData = {
+        userId: userId,
+        subscriptionTypeId: planId
+      };
+
+      const config = {
+        method: "post",
+        url: `${BasicURL}/subscription/${userId}`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: subscriptionData,
+      };
+
+      const response = await axios.request(config);
+      console.log("Free subscription response:", response.data);
+
+      if (response.data) {
+        toast({
+          title: "✅ Free Subscription Activated!",
+          description: "Your free subscription has been activated successfully.",
+          duration: 5000,
+        });
+        
+        completeSignup();
+      } else {
+        throw new Error("Failed to activate free subscription");
+      }
+    } catch (error: any) {
+      console.error("Free subscription failed:", error);
+      
+      const errorMessage = error.response?.data?.message || "Failed to activate free subscription";
+      toast({
+        title: "❌ Subscription Failed",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  };
+
   const handlePaymentSuccess = async (paymentData: any) => {
-    console.log("Mock: Payment processed:", paymentData);
+    console.log("Payment processed:", paymentData);
     completeSignup();
   };
 
@@ -647,7 +632,7 @@ const SignupSteps = () => {
 
                     <Button
                       className={`w-full h-11 sm:h-12 text-sm font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${
-                        plan.id === "free"
+                        plan.name === "Free"
                           ? "bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground"
                           : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
                       }`}
