@@ -309,6 +309,35 @@ class AuthService {
     }
   }
 
+  async resendOTP(userId: string): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseURL}/security/resend-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: userId
+        })
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        // Handle both array and string error messages
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message[0] 
+          : errorData.message.message;
+        throw new Error(errorMessage);
+      }
+
+      const data: ApiResponse = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      throw error;
+    }
+  }
+
   async requestPasswordReset(email: string): Promise<ApiResponse> {
     // Mock implementation - will be replaced with actual API call
     console.log('Password reset requested for:', email);

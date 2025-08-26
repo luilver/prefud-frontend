@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, Mail, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { authService } from "@/services/authService";
 import axios from "axios";
 
 interface OTPVerificationProps {
@@ -102,57 +103,33 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
     try {
       console.log('Resending OTP for userId:', userId);
 
-      const requestData = {
-        user_id: userId
-      };
-
-      const config = {
-        method: 'post',
-        url: `${BasicURL}/security/resend-otp`,
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        data: requestData
-      };
-
-      const response = await axios.request(config);
-      console.log('Resend OTP API response:', response.data);
+      const response = await authService.resendOTP(userId);
+      console.log('Resend OTP service response:', response);
 
       // Check if response indicates success
-      if (response.data.success && response.data.message === 'OTP sent successfully to your email') {
+      if (response.message === 'OTP sent successfully to your email') {
         toast({
           title: "📧 OTP Resent",
           description: "A new verification code has been sent to your email.",
           duration: 5000,
         });
       } else {
-        throw new Error('Unexpected response format');
+        toast({
+          title: "📧 OTP Resent",
+          description: response.message || "A new verification code has been sent to your email.",
+          duration: 5000,
+        });
       }
     } catch (error: any) {
       console.error('Failed to resend OTP:', error);
       
-      // Handle API error responses
-      if (error.response?.data?.message) {
-        const errorMessage = typeof error.response.data.message === 'string' 
-          ? error.response.data.message 
-          : error.response.data.message.message || 'Failed to resend OTP';
-        
-        console.log('Showing error toast with message:', errorMessage);
-        toast({
-          title: "❌ Resend Failed",
-          description: errorMessage,
-          variant: "destructive",
-          duration: 5000,
-        });
-      } else {
-        console.log('Showing generic error toast');
-        toast({
-          title: "❌ Resend Failed",
-          description: "Unable to resend OTP. Please try again.",
-          variant: "destructive",
-          duration: 5000,
-        });
-      }
+      console.log('Showing error toast with message:', error.message);
+      toast({
+        title: "❌ Resend Failed",
+        description: error.message || "Unable to resend OTP. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsResending(false);
     }
