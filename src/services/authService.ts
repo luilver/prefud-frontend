@@ -1,4 +1,3 @@
-
 interface LoginResponse {
   email: string;
   isActive: boolean;
@@ -339,13 +338,32 @@ class AuthService {
   }
 
   async requestPasswordReset(email: string): Promise<ApiResponse> {
-    // Mock implementation - will be replaced with actual API call
-    console.log('Password reset requested for:', email);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      message: 'Password reset code has been sent to your email'
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/security/request-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email
+        })
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        // Handle both array and string error messages
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message[0] 
+          : errorData.message.message;
+        throw new Error(errorMessage);
+      }
+
+      const data: ApiResponse = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Request password reset error:', error);
+      throw error;
+    }
   }
 
   async verifyOTP(email: string, otp: string): Promise<ApiResponse> {
