@@ -10,11 +10,12 @@ interface LoginResponse {
 
 interface ApiResponse {
   message: string;
+  success?: boolean;
 }
 
 interface ApiErrorResponse {
   message: {
-    message: string;
+    message: string | string[];
     error: string;
     statusCode: number;
   };
@@ -265,6 +266,37 @@ class AuthService {
     };
     
     return categoryMap[classification.toLowerCase()] || 'Pantry';
+  }
+
+  async updatePassword(userId: string, oldPassword: string, newPassword: string): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseURL}/security/update-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          oldPassword,
+          newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        // Handle array of error messages
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message.join(', ')
+          : errorData.message.message;
+        throw new Error(errorMessage);
+      }
+
+      const responseData: ApiResponse = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error('Update password error:', error);
+      throw error;
+    }
   }
 
   async requestPasswordReset(email: string): Promise<ApiResponse> {
