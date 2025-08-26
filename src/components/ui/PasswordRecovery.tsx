@@ -124,18 +124,15 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
   const handleResendOtp = async () => {
     setIsLoading(true);
     try {
-      // TODO: Replace with your resend OTP service
-      console.log('Resending OTP to:', email);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await authService.requestPasswordReset(email);
       toast({
         title: "OTP resent!",
-        description: "Check your email for the new verification code.",
+        description: response.message || "Check your email for the new verification code.",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to resend OTP. Please try again.",
+        description: formatErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -143,7 +140,6 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     }
   };
 
-  // Email Step
   if (currentStep === 'email') {
     return (
       <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm border-green-200 shadow-xl">
@@ -191,7 +187,6 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     );
   }
 
-  // OTP Verification Step
   if (currentStep === 'otp') {
     return (
       <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm border-green-200 shadow-xl">
@@ -255,7 +250,6 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     );
   }
 
-  // New Password Step
   if (currentStep === 'password') {
     return (
       <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm border-green-200 shadow-xl">
@@ -332,7 +326,6 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     );
   }
 
-  // Success Step
   if (currentStep === 'success') {
     return (
       <Card className="max-w-md mx-auto bg-white/90 backdrop-blur-sm border-green-200 shadow-xl">

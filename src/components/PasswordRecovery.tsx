@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Mail, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { authService } from "@/services/authService";
 
 interface PasswordRecoveryProps {
   onBack: () => void;
@@ -30,21 +30,16 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with your password recovery service
-      console.log('Password recovery request for:', email);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await authService.requestPasswordReset(email);
       setCurrentStep('otp');
       toast({
         title: "OTP sent!",
-        description: "Check your email for the verification code.",
+        description: response.message || "Check your email for the verification code.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to send recovery email. Please try again.",
+        description: error.message || "Failed to send recovery email. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -130,18 +125,15 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
   const handleResendOtp = async () => {
     setIsLoading(true);
     try {
-      // TODO: Replace with your resend OTP service
-      console.log('Resending OTP to:', email);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await authService.requestPasswordReset(email);
       toast({
         title: "OTP resent!",
-        description: "Check your email for the new verification code.",
+        description: response.message || "Check your email for the new verification code.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to resend OTP. Please try again.",
+        description: error.message || "Failed to resend OTP. Please try again.",
         variant: "destructive",
       });
     } finally {
