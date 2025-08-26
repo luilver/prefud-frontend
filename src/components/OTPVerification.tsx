@@ -15,7 +15,6 @@ interface OTPVerificationProps {
 }
 const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
 
-
 const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationProps) => {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -89,25 +88,71 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
   };
 
   const handleResend = async () => {
-    setIsResending(true);
-    try {
-      // In a real app, this would resend the OTP
-      console.log('Resending OTP to:', email);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "📧 OTP Resent",
-        description: "A new verification code has been sent to your email.",
-        duration: 5000,
-      });
-    } catch (error) {
-      console.error('Failed to resend OTP:', error);
+    if (!userId) {
       toast({
         title: "❌ Resend Failed",
-        description: "Unable to resend OTP. Please try again.",
+        description: "User ID not found. Please go back and try again.",
         variant: "destructive",
         duration: 5000,
       });
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      console.log('Resending OTP for userId:', userId);
+
+      const requestData = {
+        user_id: userId
+      };
+
+      const config = {
+        method: 'post',
+        url: `${BasicURL}/security/resend-otp`,
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data: requestData
+      };
+
+      const response = await axios.request(config);
+      console.log('Resend OTP API response:', response.data);
+
+      // Check if response indicates success
+      if (response.data.success && response.data.message === 'OTP sent successfully to your email') {
+        toast({
+          title: "📧 OTP Resent",
+          description: "A new verification code has been sent to your email.",
+          duration: 5000,
+        });
+      } else {
+        throw new Error('Unexpected response format');
+      }
+    } catch (error: any) {
+      console.error('Failed to resend OTP:', error);
+      
+      // Handle API error responses
+      if (error.response?.data?.message) {
+        const errorMessage = typeof error.response.data.message === 'string' 
+          ? error.response.data.message 
+          : error.response.data.message.message || 'Failed to resend OTP';
+        
+        console.log('Showing error toast with message:', errorMessage);
+        toast({
+          title: "❌ Resend Failed",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 5000,
+        });
+      } else {
+        console.log('Showing generic error toast');
+        toast({
+          title: "❌ Resend Failed",
+          description: "Unable to resend OTP. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
     } finally {
       setIsResending(false);
     }
@@ -169,7 +214,7 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
             <Button 
               variant="ghost" 
               onClick={handleResend}
-              disabled={isResending}
+              disabled={isResending || !userId}
               className="text-green-600 hover:text-green-700"
             >
               {isResending ? (
