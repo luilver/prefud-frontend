@@ -1,3 +1,4 @@
+
 interface LoginResponse {
   email: string;
   isActive: boolean;
@@ -121,8 +122,11 @@ class AuthService {
 
       if (!response.ok) {
         const errorData: ApiErrorResponse = await response.json();
-        // Throw the specific error message from the API
-        throw new Error(errorData.message.message);
+        // Handle both array and string error messages
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message[0] 
+          : errorData.message.message;
+        throw new Error(errorMessage);
       }
 
       const loginData: LoginResponse = await response.json();
@@ -160,7 +164,10 @@ class AuthService {
 
       if (!response.ok) {
         const errorData: ApiErrorResponse = await response.json();
-        throw new Error(errorData.message.message);
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message[0] 
+          : errorData.message.message;
+        throw new Error(errorMessage);
       }
 
       const profileData: UserProfile = await response.json();
@@ -182,7 +189,10 @@ class AuthService {
 
       if (!response.ok) {
         const errorData: ApiErrorResponse = await response.json();
-        throw new Error(errorData.message.message);
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message[0] 
+          : errorData.message.message;
+        throw new Error(errorMessage);
       }
 
       const pantryResponse: PantryApiResponse = await response.json();
