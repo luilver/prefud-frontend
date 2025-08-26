@@ -49,27 +49,19 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
 
   const handleOtpVerify = async () => {
     if (otp.length !== 6) return;
-    
     setIsLoading(true);
+
     try {
-      // TODO: Replace with your OTP verification service
-      console.log('Verifying OTP:', otp, 'for email:', email);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any 6-digit code
-      if (otp.length === 6) {
-        setCurrentStep('password');
-        toast({
-          title: "OTP verified!",
-          description: "You can now set your new password.",
-        });
-      }
-    } catch (error) {
+      const response = await authService.validateOTP(email, otp);
+      setCurrentStep('password');
+      toast({
+        title: "OTP verified!",
+        description: response.message || "You can now set your new password.",
+      });
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Invalid OTP. Please try again.",
+        description: error.message || "Invalid OTP. Please try again.",
         variant: "destructive",
       });
     } finally {

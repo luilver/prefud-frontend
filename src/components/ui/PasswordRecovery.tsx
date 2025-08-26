@@ -63,7 +63,7 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
     setIsLoading(true);
 
     try {
-      const response = await authService.verifyOTP(email, otp);
+      const response = await authService.validateOTP(email, otp);
       setCurrentStep('password');
       toast({
         title: "OTP verified!",

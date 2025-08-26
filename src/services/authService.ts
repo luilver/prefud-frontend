@@ -366,17 +366,33 @@ class AuthService {
     }
   }
 
-  async verifyOTP(email: string, otp: string): Promise<ApiResponse> {
-    // Mock implementation - will be replaced with actual API call
-    console.log('Verifying OTP:', otp, 'for email:', email);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (otp.length === 6) {
-      return {
-        message: 'OTP verified successfully'
-      };
-    } else {
-      throw new Error('Invalid OTP');
+  async validateOTP(email: string, otp: string): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseURL}/security/validate-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          otp: otp
+        })
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        // Handle both array and string error messages
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message[0] 
+          : errorData.message.message;
+        throw new Error(errorMessage);
+      }
+
+      const data: ApiResponse = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Validate OTP error:', error);
+      throw error;
     }
   }
 
