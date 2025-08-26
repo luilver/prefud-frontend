@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { authService } from "@/services/authService";
 
 interface PasswordFormData {
   currentPassword: string;
@@ -24,6 +26,7 @@ const PasswordUpdate = () => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const form = useForm<PasswordFormData>({
     defaultValues: {
@@ -43,7 +46,7 @@ const PasswordUpdate = () => {
       return;
     }
 
-    if (data.newPassword.length < 6) {
+    if (data.newPassword.length < 8) {
       toast({
         title: t('password.tooShort.title'),
         description: t('password.tooShort.description'),
@@ -52,10 +55,18 @@ const PasswordUpdate = () => {
       return;
     }
 
+    if (!user?.userId) {
+      toast({
+        title: "Error",
+        description: "User not found. Please log in again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Simulate password update API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await authService.updatePassword(user.userId, data.currentPassword, data.newPassword);
       
       toast({
         title: t('password.updated.title'),
@@ -65,9 +76,10 @@ const PasswordUpdate = () => {
       form.reset();
       setOpen(false);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update password';
       toast({
         title: t('password.updateFailed.title'),
-        description: t('password.updateFailed.description'),
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
