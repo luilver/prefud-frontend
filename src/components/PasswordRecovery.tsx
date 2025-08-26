@@ -92,21 +92,16 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
 
     setIsLoading(true);
     try {
-      // TODO: Replace with your password reset service
-      console.log('Resetting password for:', email, 'with new password');
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await authService.resetPassword(email, otp, newPassword);
       setCurrentStep('success');
       toast({
         title: "Password updated!",
-        description: "Your password has been successfully changed.",
+        description: response.message || "Your password has been successfully changed.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to update password. Please try again.",
+        description: error.message || "Failed to update password. Please try again.",
         variant: "destructive",
       });
     } finally {

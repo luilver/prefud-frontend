@@ -397,13 +397,33 @@ class AuthService {
   }
 
   async resetPassword(email: string, otp: string, newPassword: string): Promise<ApiResponse> {
-    // Mock implementation - will be replaced with actual API call
-    console.log('Resetting password for:', email);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      message: 'Password has been reset successfully'
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/security/recover-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          newPassword: newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        // Handle both array and string error messages
+        const errorMessage = Array.isArray(errorData.message.message) 
+          ? errorData.message.message[0] 
+          : errorData.message.message;
+        throw new Error(errorMessage);
+      }
+
+      const data: ApiResponse = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    }
   }
 
   getStoredToken(): string | null {
