@@ -1071,7 +1071,7 @@ const MealPlanCreatorStepper = ({
         healthGoals: planData.healthGoals,
         language: getLanguageName(language),
         user_id: user.id,
-        start_date: new Date(planData.startDate).toISOString(),
+        start_date: planData.startDate,
         plan_name: planData.planName,
         plan_description: planData.planDescription,
       };

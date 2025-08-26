@@ -199,7 +199,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         healthGoals: healthGoals,
         language: getLanguageName(language),
         user_id: user.id,
-        start_date: new Date(startDate).toISOString(),
+        start_date: startDate,
         plan_name: planName,
         plan_description: planDescription || `Personalized meal plan for ${numberOfPersons} person${numberOfPersons > 1 ? 's' : ''}`
       };

@@ -36,32 +36,45 @@ const { pantryItems, user } = useUser();
   };
 
   // Function to get day name and date
-  const getDayInfo = (dayIndex: number) => {
-    const startDate = new Date(plan.startDate);
-    const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() + dayIndex);
-    
-    const dayNames = [
-      t('days.sunday') || 'Sunday',
-      t('days.monday') || 'Monday',
-      t('days.tuesday') || 'Tuesday',
-      t('days.wednesday') || 'Wednesday',
-      t('days.thursday') || 'Thursday',
-      t('days.friday') || 'Friday',
-      t('days.saturday') || 'Saturday'
-    ];
-    const dayName = dayNames[currentDate.getDay()];
-    const dateString = currentDate.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    });
-    
-    return {
-      dayName,
-      dateString,
-      fullDate: currentDate
-    };
+  
+  // Function to get day name and date (UTC-safe)
+const getDayInfo = (dayIndex: number) => {
+  console.log('this is the plan start date:', plan.startDate);
+
+  // Parse the start date in UTC
+  const startDate = new Date(plan.startDate);
+  
+  // Create a new date in UTC and add the dayIndex
+  const currentDate = new Date(Date.UTC(
+    startDate.getUTCFullYear(),
+    startDate.getUTCMonth(),
+    startDate.getUTCDate() + dayIndex
+  ));
+
+  const dayNames = [
+    t('days.sunday') || 'Sunday',
+    t('days.monday') || 'Monday',
+    t('days.tuesday') || 'Tuesday',
+    t('days.wednesday') || 'Wednesday',
+    t('days.thursday') || 'Thursday',
+    t('days.friday') || 'Friday',
+    t('days.saturday') || 'Saturday'
+  ];
+
+  const dayName = dayNames[currentDate.getUTCDay()]; // use UTC day
+  const dateString = currentDate.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    timeZone: 'UTC'  // force UTC to avoid timezone shift
+  });
+
+  return {
+    dayName,
+    dateString,
+    fullDate: currentDate
   };
+};
+
 
   // Function to sort meals by type order
   const sortMealsByType = (meals: any[]) => {
@@ -202,7 +215,7 @@ const { pantryItems, user } = useUser();
           dayKey = `Day ${meal.day}`;
         } else if (meal.date) {
           // Calculate day from date
-          const startDate = new Date(plan.startDate);
+          const startDate = plan.startDate;
           const mealDate = new Date(meal.date);
           const dayDiff = Math.floor((mealDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
           dayKey = `Day ${dayDiff}`;
@@ -265,7 +278,7 @@ const { pantryItems, user } = useUser();
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{plan.name}</h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">
-              {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+              {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
             </p>
           </div>
         </div>

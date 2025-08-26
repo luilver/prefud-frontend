@@ -267,7 +267,7 @@ const MealPlanner = () => {
                       {plan.name}
                     </CardTitle>
                     <CardDescription>
-                      {new Date(plan.startDate).toLocaleDateString()} - {new Date(plan.endDate).toLocaleDateString()}
+                      {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
