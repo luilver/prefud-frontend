@@ -1,11 +1,27 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { format } from "date-fns";
 import { CalendarIcon, Plus, X, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -32,17 +48,32 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
     setName(productName);
     setProductImage(imageBlob);
     setShowCamera(false);
-    
+
     // Auto-suggest category based on product name
     const categoryMap: Record<string, string> = {
-      'chicken': 'Meat', 'beef': 'Meat', 'pork': 'Meat', 'turkey': 'Meat',
-      'milk': 'Dairy', 'cheese': 'Dairy', 'yogurt': 'Dairy', 'butter': 'Dairy',
-      'banana': 'Fruits', 'apple': 'Fruits', 'orange': 'Fruits', 'grapes': 'Fruits',
-      'tomato': 'Vegetables', 'onion': 'Vegetables', 'carrot': 'Vegetables', 'pepper': 'Vegetables',
-      'bread': 'Grains', 'rice': 'Grains', 'pasta': 'Grains', 'cereal': 'Grains'
+      chicken: "Meat",
+      beef: "Meat",
+      pork: "Meat",
+      turkey: "Meat",
+      milk: "Dairy",
+      cheese: "Dairy",
+      yogurt: "Dairy",
+      butter: "Dairy",
+      banana: "Fruits",
+      apple: "Fruits",
+      orange: "Fruits",
+      grapes: "Fruits",
+      tomato: "Vegetables",
+      onion: "Vegetables",
+      carrot: "Vegetables",
+      pepper: "Vegetables",
+      bread: "Grains",
+      rice: "Grains",
+      pasta: "Grains",
+      cereal: "Grains",
     };
 
-    const detectedCategory = Object.entries(categoryMap).find(([key]) => 
+    const detectedCategory = Object.entries(categoryMap).find(([key]) =>
       productName.toLowerCase().includes(key)
     )?.[1];
 
@@ -79,11 +110,11 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
         location: location || "Pantry",
         expiryDate,
         image: productImage ? URL.createObjectURL(productImage) : undefined,
-        addedViaCamera: !!productImage
+        addedViaCamera: !!productImage,
       };
 
-      console.log('Adding ingredient:', newIngredient);
-      
+      console.log("Adding ingredient:", newIngredient);
+
       onAdd(newIngredient);
       toast({
         title: "Ingredient added!",
@@ -129,7 +160,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <Button
             type="button"
             variant="outline"
@@ -139,7 +170,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
             <Camera className="h-4 w-4 mr-2" />
             Scan Product with Camera
           </Button>
-        </div>
+        </div> */}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
@@ -151,6 +182,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Chicken Breast"
                 className="border-green-200 focus:border-green-400"
+                maxLength={40}
               />
             </div>
             <div>
@@ -160,14 +192,15 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Meat">Meat</SelectItem>
-                  <SelectItem value="Dairy">Dairy</SelectItem>
-                  <SelectItem value="Fruits">Fruits</SelectItem>
-                  <SelectItem value="Vegetables">Vegetables</SelectItem>
-                  <SelectItem value="Grains">Grains</SelectItem>
-                  <SelectItem value="Pantry">Pantry</SelectItem>
-                  <SelectItem value="Spices">Spices</SelectItem>
-                  <SelectItem value="Beverages">Beverages</SelectItem>
+                  <SelectItem value="dairy">Dairy</SelectItem>
+                  <SelectItem value="fruit">Fruits</SelectItem>
+                  <SelectItem value="vegetable">Vegetables</SelectItem>
+                  <SelectItem value="grain">Grains</SelectItem>
+                  <SelectItem value="herb">Herbs</SelectItem>
+                  <SelectItem value="spice">Spices</SelectItem>
+                  <SelectItem value="protein">Protein</SelectItem>
+                  <SelectItem value="oil">Oil</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -193,37 +226,23 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pieces">pieces</SelectItem>
-                  <SelectItem value="lbs">lbs</SelectItem>
-                  <SelectItem value="kg">kg</SelectItem>
-                  <SelectItem value="oz">oz</SelectItem>
-                  <SelectItem value="g">g</SelectItem>
-                  <SelectItem value="cups">cups</SelectItem>
-                  <SelectItem value="ml">ml</SelectItem>
-                  <SelectItem value="l">l</SelectItem>
-                  <SelectItem value="container">container</SelectItem>
-                  <SelectItem value="bag">bag</SelectItem>
-                  <SelectItem value="box">box</SelectItem>
+                  <SelectItem value="pieces">Pieces</SelectItem>
+                  <SelectItem value="unit">Unit</SelectItem>
+                  <SelectItem value="g">Grams (g)</SelectItem>
+                  <SelectItem value="kg">Kilograms (kg)</SelectItem>
+                  <SelectItem value="lbs">Pounds (lbs)</SelectItem>
+                  <SelectItem value="cups">Cups</SelectItem>
+                  <SelectItem value="ml">Milliliters (ml)</SelectItem>
+                  <SelectItem value="l">Liters (l)</SelectItem>
+                  <SelectItem value="spoons">Spoons</SelectItem>
+                  <SelectItem value="bag">Bag</SelectItem>
+                  <SelectItem value="box">Box</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="location">Storage Location</Label>
-            <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger className="border-green-200 focus:border-green-400">
-                <SelectValue placeholder="Select location" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Refrigerator">Refrigerator</SelectItem>
-                <SelectItem value="Freezer">Freezer</SelectItem>
-                <SelectItem value="Pantry">Pantry</SelectItem>
-                <SelectItem value="Counter">Counter</SelectItem>
-                <SelectItem value="Spice Rack">Spice Rack</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+         
 
           <div>
             <Label>Expiry Date *</Label>
@@ -248,19 +267,21 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
             </Popover>
           </div>
 
-          {productImage && (
+          {/* {productImage && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <p className="text-sm text-green-700">✓ Product image captured via camera</p>
+              <p className="text-sm text-green-700">
+                ✓ Product image captured via camera
+              </p>
             </div>
-          )}
+          )} */}
 
           <div className="flex space-x-2 pt-4">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
               disabled={isLoading}
             >
-              {isLoading ? 'Adding...' : 'Add Ingredient'}
+              {isLoading ? "Adding..." : "Add Ingredient"}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
