@@ -97,26 +97,26 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
 
     // Auto-suggest category based on product name
     const categoryMap: Record<string, string> = {
-      chicken: "protein",
-      beef: "protein",
-      pork: "protein",
-      turkey: "protein",
-      milk: "dairy",
-      cheese: "dairy",
-      yogurt: "dairy",
-      butter: "dairy",
-      banana: "fruit",
-      apple: "fruit",
-      orange: "fruit",
-      grapes: "fruit",
-      tomato: "vegetable",
-      onion: "vegetable",
-      carrot: "vegetable",
-      pepper: "vegetable",
-      bread: "grain",
-      rice: "grain",
-      pasta: "grain",
-      cereal: "grain",
+      chicken: t("addIngredient.categories.protein.value"),
+      beef: t("addIngredient.categories.protein.value"),
+      pork: t("addIngredient.categories.protein.value"),
+      turkey: t("addIngredient.categories.protein.value"),
+      milk: t("addIngredient.categories.dairy.value"),
+      cheese: t("addIngredient.categories.dairy.value"),
+      yogurt: t("addIngredient.categories.dairy.value"),
+      butter: t("addIngredient.categories.dairy.value"),
+      banana: t("addIngredient.categories.fruit.value"),
+      apple: t("addIngredient.categories.fruit.value"),
+      orange: t("addIngredient.categories.fruit.value"),
+      grapes: t("addIngredient.categories.fruit.value"),
+      tomato: t("addIngredient.categories.vegetable.value"),
+      onion: t("addIngredient.categories.vegetable.value"),
+      carrot: t("addIngredient.categories.vegetable.value"),
+      pepper: t("addIngredient.categories.vegetable.value"),
+      bread: t("addIngredient.categories.grain.value"),
+      rice: t("addIngredient.categories.grain.value"),
+      pasta: t("addIngredient.categories.grain.value"),
+      cereal: t("addIngredient.categories.grain.value"),
     };
 
     const detectedCategory = Object.entries(categoryMap).find(([key]) =>
@@ -293,31 +293,31 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                       />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-gray-800 z-50">
-                      <SelectItem value="dairy">
+                      <SelectItem value={t("addIngredient.categories.dairy.value")}>
                         {t("addIngredient.categories.dairy")}
                       </SelectItem>
-                      <SelectItem value="fruit">
+                      <SelectItem value={t("addIngredient.categories.fruit.value")}>
                         {t("addIngredient.categories.fruit")}
                       </SelectItem>
-                      <SelectItem value="vegetable">
+                      <SelectItem value={t("addIngredient.categories.vegetable.value")}>
                         {t("addIngredient.categories.vegetable")}
                       </SelectItem>
-                      <SelectItem value="grain">
+                      <SelectItem value={t("addIngredient.categories.grain.value")}>
                         {t("addIngredient.categories.grain")}
                       </SelectItem>
-                      <SelectItem value="herb">
+                      <SelectItem value={t("addIngredient.categories.herb.value")}>
                         {t("addIngredient.categories.herb")}
                       </SelectItem>
-                      <SelectItem value="spice">
+                      <SelectItem value={t("addIngredient.categories.spice.value")}>
                         {t("addIngredient.categories.spice")}
                       </SelectItem>
-                      <SelectItem value="protein">
+                      <SelectItem value={t("addIngredient.categories.protein.value")}>
                         {t("addIngredient.categories.protein")}
                       </SelectItem>
-                      <SelectItem value="oil">
+                      <SelectItem value={t("addIngredient.categories.oil.value")}>
                         {t("addIngredient.categories.oil")}
                       </SelectItem>
-                      <SelectItem value="other">
+                      <SelectItem value={t("addIngredient.categories.other.value")}>
                         {t("addIngredient.categories.other")}
                       </SelectItem>
                     </SelectContent>
@@ -348,37 +348,37 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                       <SelectValue placeholder={t("addIngredient.unitSelect")} />
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-gray-800 z-50">
-                      <SelectItem value="pieces">
+                      <SelectItem value={t("addIngredient.units.pieces.value")}>
                         {t("addIngredient.units.pieces")}
                       </SelectItem>
-                      <SelectItem value="unit">
+                      <SelectItem value={t("addIngredient.units.unit.value")}>
                         {t("addIngredient.units.unit")}
                       </SelectItem>
-                      <SelectItem value="g">
+                      <SelectItem value={t("addIngredient.units.g.value")}>
                         {t("addIngredient.units.g")}
                       </SelectItem>
-                      <SelectItem value="kg">
+                      <SelectItem value={t("addIngredient.units.kg.value")}>
                         {t("addIngredient.units.kg")}
                       </SelectItem>
-                      <SelectItem value="lbs">
+                      <SelectItem value={t("addIngredient.units.lbs.value")}>
                         {t("addIngredient.units.lbs")}
                       </SelectItem>
-                      <SelectItem value="cups">
+                      <SelectItem value={t("addIngredient.units.cups.value")}>
                         {t("addIngredient.units.cups")}
                       </SelectItem>
-                      <SelectItem value="ml">
+                      <SelectItem value={t("addIngredient.units.ml.value")}>
                         {t("addIngredient.units.ml")}
                       </SelectItem>
-                      <SelectItem value="l">
+                      <SelectItem value={t("addIngredient.units.l.value")}>
                         {t("addIngredient.units.l")}
                       </SelectItem>
-                      <SelectItem value="spoons">
+                      <SelectItem value={t("addIngredient.units.spoons.value")}>
                         {t("addIngredient.units.spoons")}
                       </SelectItem>
-                      <SelectItem value="bag">
+                      <SelectItem value={t("addIngredient.units.bag.value")}>
                         {t("addIngredient.units.bag")}
                       </SelectItem>
-                      <SelectItem value="box">
+                      <SelectItem value={t("addIngredient.units.box.value")}>
                         {t("addIngredient.units.box")}
                       </SelectItem>
                     </SelectContent>
