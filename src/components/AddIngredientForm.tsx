@@ -49,6 +49,33 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
   const { user } = useUser();
   const { t } = useLanguage();
 
+  // Category and unit mapping to ensure API compatibility
+  const categoryOptions = [
+    { value: t("addIngredient.categories.dairy"), apiValue: "dairy", label: t("addIngredient.categories.dairy") },
+    { value: t("addIngredient.categories.fruit"), apiValue: "fruit", label: t("addIngredient.categories.fruit") },
+    { value: t("addIngredient.categories.vegetable"), apiValue: "vegetable", label: t("addIngredient.categories.vegetable") },
+    { value: t("addIngredient.categories.grain"), apiValue: "grain", label: t("addIngredient.categories.grain") },
+    { value: t("addIngredient.categories.herb"), apiValue: "herb", label: t("addIngredient.categories.herb") },
+    { value: t("addIngredient.categories.spice"), apiValue: "spice", label: t("addIngredient.categories.spice") },
+    { value: t("addIngredient.categories.protein"), apiValue: "protein", label: t("addIngredient.categories.protein") },
+    { value: t("addIngredient.categories.oil"), apiValue: "oil", label: t("addIngredient.categories.oil") },
+    { value: t("addIngredient.categories.other"), apiValue: "other", label: t("addIngredient.categories.other") }
+  ];
+
+  const unitOptions = [
+    { value: t("addIngredient.units.pieces"), apiValue: "pieces", label: t("addIngredient.units.pieces") },
+    { value: t("addIngredient.units.unit"), apiValue: "unit", label: t("addIngredient.units.unit") },
+    { value: t("addIngredient.units.g"), apiValue: "g", label: t("addIngredient.units.g") },
+    { value: t("addIngredient.units.kg"), apiValue: "kg", label: t("addIngredient.units.kg") },
+    { value: t("addIngredient.units.lbs"), apiValue: "lbs", label: t("addIngredient.units.lbs") },
+    { value: t("addIngredient.units.cups"), apiValue: "cups", label: t("addIngredient.units.cups") },
+    { value: t("addIngredient.units.ml"), apiValue: "ml", label: t("addIngredient.units.ml") },
+    { value: t("addIngredient.units.l"), apiValue: "l", label: t("addIngredient.units.l") },
+    { value: t("addIngredient.units.spoons"), apiValue: "spoons", label: t("addIngredient.units.spoons") },
+    { value: t("addIngredient.units.bag"), apiValue: "bag", label: t("addIngredient.units.bag") },
+    { value: t("addIngredient.units.box"), apiValue: "box", label: t("addIngredient.units.box") }
+  ];
+
   const handleProductDetected = (productName: string, imageBlob: Blob) => {
     setName(productName);
     setProductImage(imageBlob);
@@ -118,12 +145,16 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
       const purchaseDate = new Date();
       const daysToExpire = Math.ceil((expiryDate.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24));
       
+      // Convert multilingual values back to API format
+      const categoryApiValue = categoryOptions.find(opt => opt.value === category)?.apiValue || category;
+      const unitApiValue = unitOptions.find(opt => opt.value === unit)?.apiValue || unit;
+      
       const newIngredient: PantryIngredient = {
         id: `pantry-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         name,
         quantity: parseFloat(quantity),
-        unit,
-        category: category.toLowerCase(),
+        unit: unitApiValue,
+        category: categoryApiValue.toLowerCase(),
         purchased: true,
         purchaseDate: purchaseDate.toISOString(),
         carbonFootPrintToWaste: 0.5,
@@ -224,15 +255,11 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                   <SelectValue placeholder={t("addIngredient.categorySelect")} />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 z-50">
-                  <SelectItem value="dairy">{t("addIngredient.categories.dairy")}</SelectItem>
-                  <SelectItem value="fruit">{t("addIngredient.categories.fruit")}</SelectItem>
-                  <SelectItem value="vegetable">{t("addIngredient.categories.vegetable")}</SelectItem>
-                  <SelectItem value="grain">{t("addIngredient.categories.grain")}</SelectItem>
-                  <SelectItem value="herb">{t("addIngredient.categories.herb")}</SelectItem>
-                  <SelectItem value="spice">{t("addIngredient.categories.spice")}</SelectItem>
-                  <SelectItem value="protein">{t("addIngredient.categories.protein")}</SelectItem>
-                  <SelectItem value="oil">{t("addIngredient.categories.oil")}</SelectItem>
-                  <SelectItem value="other">{t("addIngredient.categories.other")}</SelectItem>
+                  {categoryOptions.map((option) => (
+                    <SelectItem key={option.apiValue} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -258,17 +285,11 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                   <SelectValue placeholder={t("addIngredient.unitSelect")} />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-gray-800 z-50">
-                  <SelectItem value="pieces">{t("addIngredient.units.pieces")}</SelectItem>
-                  <SelectItem value="unit">{t("addIngredient.units.unit")}</SelectItem>
-                  <SelectItem value="g">{t("addIngredient.units.g")}</SelectItem>
-                  <SelectItem value="kg">{t("addIngredient.units.kg")}</SelectItem>
-                  <SelectItem value="lbs">{t("addIngredient.units.lbs")}</SelectItem>
-                  <SelectItem value="cups">{t("addIngredient.units.cups")}</SelectItem>
-                  <SelectItem value="ml">{t("addIngredient.units.ml")}</SelectItem>
-                  <SelectItem value="l">{t("addIngredient.units.l")}</SelectItem>
-                  <SelectItem value="spoons">{t("addIngredient.units.spoons")}</SelectItem>
-                  <SelectItem value="bag">{t("addIngredient.units.bag")}</SelectItem>
-                  <SelectItem value="box">{t("addIngredient.units.box")}</SelectItem>
+                  {unitOptions.map((option) => (
+                    <SelectItem key={option.apiValue} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
