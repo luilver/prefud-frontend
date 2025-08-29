@@ -1160,6 +1160,15 @@ const translations = {
     // Add Ingredient Form
     "addIngredient.title": "Add Ingredient",
     "addIngredient.description": "Add a new ingredient to your pantry",
+    "addIngredient.addAnother": "Add Another Ingredient",
+    "addIngredient.removeIngredient": "Remove Ingredient",
+    "addIngredient.addAllIngredients": "Add All Ingredients",
+    "addIngredient.addingAllIngredients": "Adding All...",
+    "addIngredient.multipleTitle": "Add Multiple Ingredients",
+    "addIngredient.multipleDescription": "Add multiple ingredients to your pantry at once",
+    "addIngredient.ingredient": "Ingredient",
+    "addIngredient.allIngredientsAdded": "All ingredients added!",
+    "addIngredient.allIngredientsAddedDesc": "ingredients have been added to your pantry.",
     "addIngredient.scanProduct": "Scan Product with Camera",
     "addIngredient.productDetected": "Product Added!",
     "addIngredient.productDetectedDesc":
@@ -2421,6 +2430,15 @@ const translations = {
     // Add Ingredient Form
     "addIngredient.title": "Agregar Ingrediente",
     "addIngredient.description": "Agrega un nuevo ingrediente a tu despensa",
+    "addIngredient.addAnother": "Agregar Otro Ingrediente",
+    "addIngredient.removeIngredient": "Quitar Ingrediente",
+    "addIngredient.addAllIngredients": "Agregar Todos los Ingredientes",
+    "addIngredient.addingAllIngredients": "Agregando Todos...",
+    "addIngredient.multipleTitle": "Agregar Múltiples Ingredientes",
+    "addIngredient.multipleDescription": "Agrega múltiples ingredientes a tu despensa de una vez",
+    "addIngredient.ingredient": "Ingrediente",
+    "addIngredient.allIngredientsAdded": "¡Todos los ingredientes agregados!",
+    "addIngredient.allIngredientsAddedDesc": "ingredientes han sido agregados a tu despensa.",
     "addIngredient.scanProduct": "Escanear Producto con Cámara",
     "addIngredient.productDetected": "¡Producto Agregado!",
     "addIngredient.productDetectedDesc":
@@ -3682,6 +3700,15 @@ const translations = {
     // Add Ingredient Form
     "addIngredient.title": "Adicionar Ingrediente",
     "addIngredient.description": "Adicione um novo ingrediente à sua despensa",
+    "addIngredient.addAnother": "Adicionar Outro Ingrediente",
+    "addIngredient.removeIngredient": "Remover Ingrediente",
+    "addIngredient.addAllIngredients": "Adicionar Todos os Ingredientes",
+    "addIngredient.addingAllIngredients": "Adicionando Todos...",
+    "addIngredient.multipleTitle": "Adicionar Múltiplos Ingredientes",
+    "addIngredient.multipleDescription": "Adicione múltiplos ingredientes à sua despensa de uma vez",
+    "addIngredient.ingredient": "Ingrediente",
+    "addIngredient.allIngredientsAdded": "Todos os ingredientes adicionados!",
+    "addIngredient.allIngredientsAddedDesc": "ingredientes foram adicionados à sua despensa.",
     "addIngredient.scanProduct": "Escanear Produto com Câmera",
     "addIngredient.productDetected": "Produto Adicionado!",
     "addIngredient.productDetectedDesc":
