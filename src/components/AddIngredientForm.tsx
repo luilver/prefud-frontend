@@ -179,17 +179,13 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
   return (
     <Card className="bg-white/90 backdrop-blur-sm border-green-200">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-green-700 flex items-center">
-              <Plus className="h-5 w-5 mr-2" />
-              {t("addIngredient.title")}
-            </CardTitle>
-            <CardDescription>
-              {t("addIngredient.description")}
-            </CardDescription>
-          </div>
-        </div>
+        <CardTitle className="text-green-700 flex items-center">
+          <Plus className="h-5 w-5 mr-2" />
+          {t("addIngredient.title")}
+        </CardTitle>
+        <CardDescription>
+          {t("addIngredient.description")}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {/* <div className="mb-4">
