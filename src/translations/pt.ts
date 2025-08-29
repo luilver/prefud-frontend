@@ -146,5 +146,56 @@ export const pt = {
         description: "Falha ao mudar para o plano Gratuito. Tente novamente."
       }
     }
+  },
+  "addIngredient": {
+    "title": "Adicionar Ingrediente",
+    "description": "Adicione um novo ingrediente à sua despensa",
+    "scanProduct": "Escanear Produto com Câmera",
+    "productDetected": "Produto Adicionado!",
+    "productDetectedDesc": "detectado. Por favor, preencha os detalhes restantes.",
+    "ingredientName": "Nome do Ingrediente",
+    "ingredientNamePlaceholder": "ex., Peito de Frango",
+    "category": "Categoria",
+    "categorySelect": "Selecionar categoria",
+    "quantity": "Quantidade",
+    "quantityPlaceholder": "1.5",
+    "unit": "Unidade",
+    "unitSelect": "Selecionar unidade",
+    "expiryDate": "Data de Validade",
+    "pickDate": "Escolha uma data",
+    "missingFields": "Campos obrigatórios",
+    "missingFieldsDesc": "Por favor, preencha todos os campos obrigatórios.",
+    "userNotFound": "Usuário não encontrado. Por favor, faça login novamente.",
+    "addButton": "Adicionar Ingrediente",
+    "addingButton": "Adicionando...",
+    "cancel": "Cancelar",
+    "ingredientAdded": "Ingrediente adicionado!",
+    "ingredientAddedDesc": "foi adicionado à sua despensa.",
+    "error": "Erro",
+    "errorDesc": "Falha ao adicionar ingrediente. Por favor, tente novamente.",
+    "categories": {
+      "dairy": "Laticínios",
+      "fruit": "Frutas",
+      "vegetable": "Vegetais",
+      "grain": "Grãos",
+      "herb": "Ervas",
+      "spice": "Temperos",
+      "protein": "Proteína",
+      "oil": "Óleo",
+      "other": "Outro"
+    },
+    "units": {
+      "pieces": "Peças",
+      "unit": "Unidade",
+      "g": "Gramas (g)",
+      "kg": "Quilogramas (kg)",
+      "lbs": "Libras (lbs)",
+      "cups": "Xícaras",
+      "ml": "Mililitros (ml)",
+      "l": "Litros (l)",
+      "spoons": "Colheres",
+      "bag": "Saco",
+      "box": "Caixa"
+    }
   }
 };

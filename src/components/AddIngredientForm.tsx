@@ -27,6 +27,7 @@ import { CalendarIcon, Plus, X, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { addIngredientsToPantry, PantryIngredient } from "@/services/pantryService";
+import { useLanguage } from "@/contexts/LanguageContext";
 import CameraProductScanner from "./CameraProductScanner";
 
 interface AddIngredientFormProps {
@@ -46,6 +47,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
   const [productImage, setProductImage] = useState<Blob | null>(null);
   const { toast } = useToast();
   const { user } = useUser();
+  const { t } = useLanguage();
 
   const handleProductDetected = (productName: string, imageBlob: Blob) => {
     setName(productName);
@@ -85,8 +87,8 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
     }
 
     toast({
-      title: "Product Added!",
-      description: `${productName} detected. Please fill in the remaining details.`,
+      title: t("addIngredient.productDetected"),
+      description: `${productName} ${t("addIngredient.productDetectedDesc")}`,
     });
   };
 
@@ -94,8 +96,8 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
     e.preventDefault();
     if (!name || !quantity || !unit || !category || !expiryDate) {
       toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields.",
+        title: t("addIngredient.missingFields"),
+        description: t("addIngredient.missingFieldsDesc"),
         variant: "destructive",
       });
       return;
@@ -103,8 +105,8 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
 
     if (!user?.id) {
       toast({
-        title: "Error",
-        description: "User not found. Please try logging in again.",
+        title: t("addIngredient.error"),
+        description: t("addIngredient.userNotFound"),
         variant: "destructive",
       });
       return;
@@ -149,15 +151,15 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
       });
 
       toast({
-        title: "Ingredient added!",
-        description: `${name} has been added to your pantry.`,
+        title: t("addIngredient.ingredientAdded"),
+        description: `${name} ${t("addIngredient.ingredientAddedDesc")}`,
       });
       onClose();
     } catch (error: any) {
       console.error("Error adding ingredient:", error);
       toast({
-        title: "Error",
-        description: error.response?.data?.message || "Failed to add ingredient. Please try again.",
+        title: t("addIngredient.error"),
+        description: error.response?.data?.message || t("addIngredient.errorDesc"),
         variant: "destructive",
       });
     } finally {
@@ -181,10 +183,10 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
           <div>
             <CardTitle className="text-green-700 flex items-center">
               <Plus className="h-5 w-5 mr-2" />
-              Add Ingredient
+              {t("addIngredient.title")}
             </CardTitle>
             <CardDescription>
-              Add a new ingredient to your pantry
+              {t("addIngredient.description")}
             </CardDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -201,39 +203,39 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
             className="w-full border-green-300 text-green-700 hover:bg-green-50"
           >
             <Camera className="h-4 w-4 mr-2" />
-            Scan Product with Camera
+            {t("addIngredient.scanProduct")}
           </Button>
         </div> */}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">Ingredient Name *</Label>
+              <Label htmlFor="name">{t("addIngredient.ingredientName")} *</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Chicken Breast"
+                placeholder={t("addIngredient.ingredientNamePlaceholder")}
                 className="border-green-200 focus:border-green-400"
                 maxLength={40}
               />
             </div>
             <div>
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category">{t("addIngredient.category")} *</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className="border-green-200 focus:border-green-400">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t("addIngredient.categorySelect")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dairy">Dairy</SelectItem>
-                  <SelectItem value="fruit">Fruits</SelectItem>
-                  <SelectItem value="vegetable">Vegetables</SelectItem>
-                  <SelectItem value="grain">Grains</SelectItem>
-                  <SelectItem value="herb">Herbs</SelectItem>
-                  <SelectItem value="spice">Spices</SelectItem>
-                  <SelectItem value="protein">Protein</SelectItem>
-                  <SelectItem value="oil">Oil</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="dairy">{t("addIngredient.categories.dairy")}</SelectItem>
+                  <SelectItem value="fruit">{t("addIngredient.categories.fruit")}</SelectItem>
+                  <SelectItem value="vegetable">{t("addIngredient.categories.vegetable")}</SelectItem>
+                  <SelectItem value="grain">{t("addIngredient.categories.grain")}</SelectItem>
+                  <SelectItem value="herb">{t("addIngredient.categories.herb")}</SelectItem>
+                  <SelectItem value="spice">{t("addIngredient.categories.spice")}</SelectItem>
+                  <SelectItem value="protein">{t("addIngredient.categories.protein")}</SelectItem>
+                  <SelectItem value="oil">{t("addIngredient.categories.oil")}</SelectItem>
+                  <SelectItem value="other">{t("addIngredient.categories.other")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -241,35 +243,35 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="quantity">Quantity *</Label>
+              <Label htmlFor="quantity">{t("addIngredient.quantity")} *</Label>
               <Input
                 id="quantity"
                 type="number"
                 step="0.1"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                placeholder="1.5"
+                placeholder={t("addIngredient.quantityPlaceholder")}
                 className="border-green-200 focus:border-green-400"
               />
             </div>
             <div>
-              <Label htmlFor="unit">Unit *</Label>
+              <Label htmlFor="unit">{t("addIngredient.unit")} *</Label>
               <Select value={unit} onValueChange={setUnit}>
                 <SelectTrigger className="border-green-200 focus:border-green-400">
-                  <SelectValue placeholder="Select unit" />
+                  <SelectValue placeholder={t("addIngredient.unitSelect")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pieces">Pieces</SelectItem>
-                  <SelectItem value="unit">Unit</SelectItem>
-                  <SelectItem value="g">Grams (g)</SelectItem>
-                  <SelectItem value="kg">Kilograms (kg)</SelectItem>
-                  <SelectItem value="lbs">Pounds (lbs)</SelectItem>
-                  <SelectItem value="cups">Cups</SelectItem>
-                  <SelectItem value="ml">Milliliters (ml)</SelectItem>
-                  <SelectItem value="l">Liters (l)</SelectItem>
-                  <SelectItem value="spoons">Spoons</SelectItem>
-                  <SelectItem value="bag">Bag</SelectItem>
-                  <SelectItem value="box">Box</SelectItem>
+                  <SelectItem value="pieces">{t("addIngredient.units.pieces")}</SelectItem>
+                  <SelectItem value="unit">{t("addIngredient.units.unit")}</SelectItem>
+                  <SelectItem value="g">{t("addIngredient.units.g")}</SelectItem>
+                  <SelectItem value="kg">{t("addIngredient.units.kg")}</SelectItem>
+                  <SelectItem value="lbs">{t("addIngredient.units.lbs")}</SelectItem>
+                  <SelectItem value="cups">{t("addIngredient.units.cups")}</SelectItem>
+                  <SelectItem value="ml">{t("addIngredient.units.ml")}</SelectItem>
+                  <SelectItem value="l">{t("addIngredient.units.l")}</SelectItem>
+                  <SelectItem value="spoons">{t("addIngredient.units.spoons")}</SelectItem>
+                  <SelectItem value="bag">{t("addIngredient.units.bag")}</SelectItem>
+                  <SelectItem value="box">{t("addIngredient.units.box")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -278,7 +280,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
          
 
           <div>
-            <Label>Expiry Date *</Label>
+            <Label>{t("addIngredient.expiryDate")} *</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -286,7 +288,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                   className="w-full justify-start text-left font-normal border-green-200 focus:border-green-400"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {expiryDate ? format(expiryDate, "PPP") : "Pick a date"}
+                  {expiryDate ? format(expiryDate, "PPP") : t("addIngredient.pickDate")}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -314,10 +316,10 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
               className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
               disabled={isLoading}
             >
-              {isLoading ? "Adding..." : "Add Ingredient"}
+              {isLoading ? t("addIngredient.addingButton") : t("addIngredient.addButton")}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {t("addIngredient.cancel")}
             </Button>
           </div>
         </form>

@@ -157,5 +157,56 @@ export const en = {
         "description": "Failed to switch to Free plan. Please try again."
       }
     }
+  },
+  "addIngredient": {
+    "title": "Add Ingredient",
+    "description": "Add a new ingredient to your pantry",
+    "scanProduct": "Scan Product with Camera",
+    "productDetected": "Product Added!",
+    "productDetectedDesc": "detected. Please fill in the remaining details.",
+    "ingredientName": "Ingredient Name",
+    "ingredientNamePlaceholder": "e.g., Chicken Breast",
+    "category": "Category",
+    "categorySelect": "Select category",
+    "quantity": "Quantity",
+    "quantityPlaceholder": "1.5",
+    "unit": "Unit",
+    "unitSelect": "Select unit",
+    "expiryDate": "Expiry Date",
+    "pickDate": "Pick a date",
+    "missingFields": "Missing fields",
+    "missingFieldsDesc": "Please fill in all required fields.",
+    "userNotFound": "User not found. Please try logging in again.",
+    "addButton": "Add Ingredient",
+    "addingButton": "Adding...",
+    "cancel": "Cancel",
+    "ingredientAdded": "Ingredient added!",
+    "ingredientAddedDesc": "has been added to your pantry.",
+    "error": "Error",
+    "errorDesc": "Failed to add ingredient. Please try again.",
+    "categories": {
+      "dairy": "Dairy",
+      "fruit": "Fruits",
+      "vegetable": "Vegetables",
+      "grain": "Grains",
+      "herb": "Herbs",
+      "spice": "Spices",
+      "protein": "Protein",
+      "oil": "Oil",
+      "other": "Other"
+    },
+    "units": {
+      "pieces": "Pieces",
+      "unit": "Unit",
+      "g": "Grams (g)",
+      "kg": "Kilograms (kg)",
+      "lbs": "Pounds (lbs)",
+      "cups": "Cups",
+      "ml": "Milliliters (ml)",
+      "l": "Liters (l)",
+      "spoons": "Spoons",
+      "bag": "Bag",
+      "box": "Box"
+    }
   }
 };

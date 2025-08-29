@@ -163,4 +163,55 @@ export const es = {
       }
     }
   },
+  "addIngredient": {
+    "title": "Agregar Ingrediente",
+    "description": "Agrega un nuevo ingrediente a tu despensa",
+    "scanProduct": "Escanear Producto con Cámara",
+    "productDetected": "¡Producto Agregado!",
+    "productDetectedDesc": "detectado. Por favor completa los detalles restantes.",
+    "ingredientName": "Nombre del Ingrediente",
+    "ingredientNamePlaceholder": "ej., Pechuga de Pollo",
+    "category": "Categoría",
+    "categorySelect": "Seleccionar categoría",
+    "quantity": "Cantidad",
+    "quantityPlaceholder": "1.5",
+    "unit": "Unidad",
+    "unitSelect": "Seleccionar unidad",
+    "expiryDate": "Fecha de Vencimiento",
+    "pickDate": "Seleccionar una fecha",
+    "missingFields": "Campos faltantes",
+    "missingFieldsDesc": "Por favor completa todos los campos requeridos.",
+    "userNotFound": "Usuario no encontrado. Por favor inicia sesión nuevamente.",
+    "addButton": "Agregar Ingrediente",
+    "addingButton": "Agregando...",
+    "cancel": "Cancelar",
+    "ingredientAdded": "¡Ingrediente agregado!",
+    "ingredientAddedDesc": "ha sido agregado a tu despensa.",
+    "error": "Error",
+    "errorDesc": "No se pudo agregar el ingrediente. Por favor inténtalo de nuevo.",
+    "categories": {
+      "dairy": "Lácteos",
+      "fruit": "Frutas",
+      "vegetable": "Verduras",
+      "grain": "Granos",
+      "herb": "Hierbas",
+      "spice": "Especias",
+      "protein": "Proteína",
+      "oil": "Aceite",
+      "other": "Otro"
+    },
+    "units": {
+      "pieces": "Piezas",
+      "unit": "Unidad",
+      "g": "Gramos (g)",
+      "kg": "Kilogramos (kg)",
+      "lbs": "Libras (lbs)",
+      "cups": "Tazas",
+      "ml": "Mililitros (ml)",
+      "l": "Litros (l)",
+      "spoons": "Cucharadas",
+      "bag": "Bolsa",
+      "box": "Caja"
+    }
+  }
 };
