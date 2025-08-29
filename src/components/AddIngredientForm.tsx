@@ -23,7 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Plus, X, Camera } from "lucide-react";
+import { CalendarIcon, Plus, X, Camera, Minus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -33,52 +33,90 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import CameraProductScanner from "./CameraProductScanner";
 
+interface IngredientFormData {
+  name: string;
+  quantity: string;
+  unit: string;
+  category: string;
+  location: string;
+  expiryDate: Date | undefined;
+  productImage: Blob | null;
+}
+
 interface AddIngredientFormProps {
   onClose: () => void;
   onAdd: (ingredient: any) => void;
 }
 
 const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
-  const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [unit, setUnit] = useState("");
-  const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
-  const [expiryDate, setExpiryDate] = useState<Date>();
+  const [ingredients, setIngredients] = useState<IngredientFormData[]>([{
+    name: "",
+    quantity: "",
+    unit: "",
+    category: "",
+    location: "",
+    expiryDate: undefined,
+    productImage: null,
+  }]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
-  const [productImage, setProductImage] = useState<Blob | null>(null);
+  const [cameraIngredientIndex, setCameraIngredientIndex] = useState(0);
   const { toast } = useToast();
   const { user } = useUser();
   const { t } = useLanguage();
 
+  const addIngredient = () => {
+    setIngredients([...ingredients, {
+      name: "",
+      quantity: "",
+      unit: "",
+      category: "",
+      location: "",
+      expiryDate: undefined,
+      productImage: null,
+    }]);
+  };
+
+  const removeIngredient = (index: number) => {
+    if (ingredients.length > 1) {
+      setIngredients(ingredients.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateIngredient = (index: number, field: keyof IngredientFormData, value: any) => {
+    const updatedIngredients = ingredients.map((ingredient, i) => 
+      i === index ? { ...ingredient, [field]: value } : ingredient
+    );
+    setIngredients(updatedIngredients);
+  };
+
   const handleProductDetected = (productName: string, imageBlob: Blob) => {
-    setName(productName);
-    setProductImage(imageBlob);
+    updateIngredient(cameraIngredientIndex, 'name', productName);
+    updateIngredient(cameraIngredientIndex, 'productImage', imageBlob);
     setShowCamera(false);
 
     // Auto-suggest category based on product name
     const categoryMap: Record<string, string> = {
-      chicken: "Meat",
-      beef: "Meat",
-      pork: "Meat",
-      turkey: "Meat",
-      milk: "Dairy",
-      cheese: "Dairy",
-      yogurt: "Dairy",
-      butter: "Dairy",
-      banana: "Fruits",
-      apple: "Fruits",
-      orange: "Fruits",
-      grapes: "Fruits",
-      tomato: "Vegetables",
-      onion: "Vegetables",
-      carrot: "Vegetables",
-      pepper: "Vegetables",
-      bread: "Grains",
-      rice: "Grains",
-      pasta: "Grains",
-      cereal: "Grains",
+      chicken: "protein",
+      beef: "protein",
+      pork: "protein",
+      turkey: "protein",
+      milk: "dairy",
+      cheese: "dairy",
+      yogurt: "dairy",
+      butter: "dairy",
+      banana: "fruit",
+      apple: "fruit",
+      orange: "fruit",
+      grapes: "fruit",
+      tomato: "vegetable",
+      onion: "vegetable",
+      carrot: "vegetable",
+      pepper: "vegetable",
+      bread: "grain",
+      rice: "grain",
+      pasta: "grain",
+      cereal: "grain",
     };
 
     const detectedCategory = Object.entries(categoryMap).find(([key]) =>
@@ -86,7 +124,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
     )?.[1];
 
     if (detectedCategory) {
-      setCategory(detectedCategory);
+      updateIngredient(cameraIngredientIndex, 'category', detectedCategory);
     }
 
     toast({
@@ -97,13 +135,17 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !quantity || !unit || !category || !expiryDate) {
-      toast({
-        title: t("addIngredient.missingFields"),
-        description: t("addIngredient.missingFieldsDesc"),
-        variant: "destructive",
-      });
-      return;
+    
+    // Validate all ingredients
+    for (const ingredient of ingredients) {
+      if (!ingredient.name || !ingredient.quantity || !ingredient.unit || !ingredient.category || !ingredient.expiryDate) {
+        toast({
+          title: t("addIngredient.missingFields"),
+          description: t("addIngredient.missingFieldsDesc"),
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     if (!user?.id) {
@@ -119,47 +161,56 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
 
     try {
       const purchaseDate = new Date();
-      const daysToExpire = Math.ceil(
-        (expiryDate.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
+      const newIngredients: PantryIngredient[] = [];
+      
+      // Process all ingredients
+      for (const ingredient of ingredients) {
+        const daysToExpire = Math.ceil(
+          (ingredient.expiryDate!.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
 
-      const newIngredient: PantryIngredient = {
-        id: `pantry-${Date.now()}-${Math.random()
-          .toString(36)
-          .substring(2, 9)}`,
-        name,
-        quantity: parseFloat(quantity),
-        unit,
-        category: category.toLowerCase(),
-        purchased: true,
-        purchaseDate: purchaseDate.toISOString(),
-        carbonFootPrintToWaste: 0.5,
-        daysToExpire,
-        expiryDate: expiryDate.toISOString(),
-        notes: `Carbon footprint: 0.5`,
-      };
+        const newIngredient: PantryIngredient = {
+          id: `pantry-${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2, 9)}`,
+          name: ingredient.name,
+          quantity: parseFloat(ingredient.quantity),
+          unit: ingredient.unit,
+          category: ingredient.category.toLowerCase(),
+          purchased: true,
+          purchaseDate: purchaseDate.toISOString(),
+          carbonFootPrintToWaste: 0.5,
+          daysToExpire,
+          expiryDate: ingredient.expiryDate!.toISOString(),
+          notes: `Carbon footprint: 0.5`,
+        };
 
-      console.log("Adding ingredient to API:", newIngredient);
+        newIngredients.push(newIngredient);
 
-      // Call the API to add the ingredient
-      await addIngredientsToPantry(user.id, [newIngredient]);
+        // Also call the local onAdd callback for immediate UI update
+        onAdd({
+          id: newIngredient.id,
+          name: ingredient.name,
+          quantity: parseFloat(ingredient.quantity),
+          unit: ingredient.unit,
+          category: ingredient.category,
+          location: ingredient.location || "Pantry",
+          expiryDate: ingredient.expiryDate,
+          image: ingredient.productImage ? URL.createObjectURL(ingredient.productImage) : undefined,
+          addedViaCamera: !!ingredient.productImage,
+        });
+      }
 
-      // Also call the local onAdd callback for immediate UI update
-      onAdd({
-        id: newIngredient.id,
-        name,
-        quantity: parseFloat(quantity),
-        unit,
-        category,
-        location: location || "Pantry",
-        expiryDate,
-        image: productImage ? URL.createObjectURL(productImage) : undefined,
-        addedViaCamera: !!productImage,
-      });
+      console.log("Adding ingredients to API:", newIngredients);
+
+      // Call the API to add all ingredients
+      await addIngredientsToPantry(user.id, newIngredients);
 
       toast({
-        title: t("addIngredient.ingredientAdded"),
-        description: `${name} ${t("addIngredient.ingredientAddedDesc")}`,
+        title: ingredients.length === 1 ? t("addIngredient.ingredientAdded") : t("addIngredient.allIngredientsAdded"),
+        description: ingredients.length === 1 
+          ? `${ingredients[0].name} ${t("addIngredient.ingredientAddedDesc")}` 
+          : `${ingredients.length} ${t("addIngredient.allIngredientsAddedDesc")}`,
       });
       onClose();
     } catch (error: any) {
@@ -189,173 +240,190 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
       <CardHeader>
         <CardTitle className="text-green-700 flex items-center">
           <Plus className="h-5 w-5 mr-2" />
-          {t("addIngredient.title")}
+          {ingredients.length === 1 ? t("addIngredient.title") : t("addIngredient.multipleTitle")}
         </CardTitle>
-        <CardDescription>{t("addIngredient.description")}</CardDescription>
+        <CardDescription>
+          {ingredients.length === 1 ? t("addIngredient.description") : t("addIngredient.multipleDescription")}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* <div className="mb-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowCamera(true)}
-            className="w-full border-green-300 text-green-700 hover:bg-green-50"
-          >
-            <Camera className="h-4 w-4 mr-2" />
-            {t("addIngredient.scanProduct")}
-          </Button>
-        </div> */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {ingredients.map((ingredient, index) => (
+            <div key={index} className="border border-green-200 rounded-lg p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-green-700">
+                  {t("addIngredient.ingredient")} {index + 1}
+                </h3>
+                {ingredients.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeIngredient(index)}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="name">
-                {t("addIngredient.ingredientName")} *
-              </Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t("addIngredient.ingredientNamePlaceholder")}
-                className="border-green-200 focus:border-green-400"
-                maxLength={40}
-              />
-            </div>
-            <div>
-              <Label htmlFor="category">{t("addIngredient.category")} *</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="border-green-200 focus:border-green-400">
-                  <SelectValue
-                    placeholder={t("addIngredient.categorySelect")}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`name-${index}`}>
+                    {t("addIngredient.ingredientName")} *
+                  </Label>
+                  <Input
+                    id={`name-${index}`}
+                    value={ingredient.name}
+                    onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+                    placeholder={t("addIngredient.ingredientNamePlaceholder")}
+                    className="border-green-200 focus:border-green-400"
+                    maxLength={40}
                   />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800 z-50">
-                  <SelectItem value={t("addIngredient.categories.dairy.value")}>
-                    {t("addIngredient.categories.dairy")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.categories.fruit.value")}>
-                    {t("addIngredient.categories.fruit")}
-                  </SelectItem>
-                  <SelectItem
-                    value={t("addIngredient.categories.vegetable.value")}
+                </div>
+                <div>
+                  <Label htmlFor={`category-${index}`}>{t("addIngredient.category")} *</Label>
+                  <Select 
+                    value={ingredient.category} 
+                    onValueChange={(value) => updateIngredient(index, 'category', value)}
                   >
-                    {t("addIngredient.categories.vegetable")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.categories.grain.value")}>
-                    {t("addIngredient.categories.grain")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.categories.herb.value")}>
-                    {t("addIngredient.categories.herb")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.categories.spice.value")}>
-                    {t("addIngredient.categories.spice")}
-                  </SelectItem>
-                  <SelectItem
-                    value={t("addIngredient.categories.protein.value")}
+                    <SelectTrigger className="border-green-200 focus:border-green-400">
+                      <SelectValue
+                        placeholder={t("addIngredient.categorySelect")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-800 z-50">
+                      <SelectItem value="dairy">
+                        {t("addIngredient.categories.dairy")}
+                      </SelectItem>
+                      <SelectItem value="fruit">
+                        {t("addIngredient.categories.fruit")}
+                      </SelectItem>
+                      <SelectItem value="vegetable">
+                        {t("addIngredient.categories.vegetable")}
+                      </SelectItem>
+                      <SelectItem value="grain">
+                        {t("addIngredient.categories.grain")}
+                      </SelectItem>
+                      <SelectItem value="herb">
+                        {t("addIngredient.categories.herb")}
+                      </SelectItem>
+                      <SelectItem value="spice">
+                        {t("addIngredient.categories.spice")}
+                      </SelectItem>
+                      <SelectItem value="protein">
+                        {t("addIngredient.categories.protein")}
+                      </SelectItem>
+                      <SelectItem value="oil">
+                        {t("addIngredient.categories.oil")}
+                      </SelectItem>
+                      <SelectItem value="other">
+                        {t("addIngredient.categories.other")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`quantity-${index}`}>{t("addIngredient.quantity")} *</Label>
+                  <Input
+                    id={`quantity-${index}`}
+                    type="number"
+                    step="0.1"
+                    value={ingredient.quantity}
+                    onChange={(e) => updateIngredient(index, 'quantity', e.target.value)}
+                    placeholder={t("addIngredient.quantityPlaceholder")}
+                    className="border-green-200 focus:border-green-400"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`unit-${index}`}>{t("addIngredient.unit")} *</Label>
+                  <Select 
+                    value={ingredient.unit} 
+                    onValueChange={(value) => updateIngredient(index, 'unit', value)}
                   >
-                    {t("addIngredient.categories.protein")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.categories.oil.value")}>
-                    {t("addIngredient.categories.oil")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.categories.other.value")}>
-                    {t("addIngredient.categories.other")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                    <SelectTrigger className="border-green-200 focus:border-green-400">
+                      <SelectValue placeholder={t("addIngredient.unitSelect")} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-gray-800 z-50">
+                      <SelectItem value="pieces">
+                        {t("addIngredient.units.pieces")}
+                      </SelectItem>
+                      <SelectItem value="unit">
+                        {t("addIngredient.units.unit")}
+                      </SelectItem>
+                      <SelectItem value="g">
+                        {t("addIngredient.units.g")}
+                      </SelectItem>
+                      <SelectItem value="kg">
+                        {t("addIngredient.units.kg")}
+                      </SelectItem>
+                      <SelectItem value="lbs">
+                        {t("addIngredient.units.lbs")}
+                      </SelectItem>
+                      <SelectItem value="cups">
+                        {t("addIngredient.units.cups")}
+                      </SelectItem>
+                      <SelectItem value="ml">
+                        {t("addIngredient.units.ml")}
+                      </SelectItem>
+                      <SelectItem value="l">
+                        {t("addIngredient.units.l")}
+                      </SelectItem>
+                      <SelectItem value="spoons">
+                        {t("addIngredient.units.spoons")}
+                      </SelectItem>
+                      <SelectItem value="bag">
+                        {t("addIngredient.units.bag")}
+                      </SelectItem>
+                      <SelectItem value="box">
+                        {t("addIngredient.units.box")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="quantity">{t("addIngredient.quantity")} *</Label>
-              <Input
-                id="quantity"
-                type="number"
-                step="0.1"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                placeholder={t("addIngredient.quantityPlaceholder")}
-                className="border-green-200 focus:border-green-400"
-              />
+              <div>
+                <Label>{t("addIngredient.expiryDate")} *</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal border-green-200 focus:border-green-400"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {ingredient.expiryDate
+                        ? format(ingredient.expiryDate, "PPP")
+                        : t("addIngredient.pickDate")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={ingredient.expiryDate}
+                      onSelect={(date) => updateIngredient(index, 'expiryDate', date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="unit">{t("addIngredient.unit")} *</Label>
-              <Select value={unit} onValueChange={setUnit}>
-                <SelectTrigger className="border-green-200 focus:border-green-400">
-                  <SelectValue placeholder={t("addIngredient.unitSelect")} />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800 z-50">
-                  <SelectItem value={t("addIngredient.units.pieces.value")}>
-                    {t("addIngredient.units.pieces")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.unit.value")}>
-                    {t("addIngredient.units.unit")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.g.value")}>
-                    {t("addIngredient.units.g")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.kg.value")}>
-                    {t("addIngredient.units.kg")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.lbs.value")}>
-                    {t("addIngredient.units.lbs")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.cups.value")}>
-                    {t("addIngredient.units.cups")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.ml.value")}>
-                    {t("addIngredient.units.ml")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.l.value")}>
-                    {t("addIngredient.units.l")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.spoons.value")}>
-                    {t("addIngredient.units.spoons")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.bag.value")}>
-                    {t("addIngredient.units.bag")}
-                  </SelectItem>
-                  <SelectItem value={t("addIngredient.units.box.value")}>
-                    {t("addIngredient.units.box")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          ))}
 
-          <div>
-            <Label>{t("addIngredient.expiryDate")} *</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal border-green-200 focus:border-green-400"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {expiryDate
-                    ? format(expiryDate, "PPP")
-                    : t("addIngredient.pickDate")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={expiryDate}
-                  onSelect={setExpiryDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+          <div className="flex justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addIngredient}
+              className="border-green-300 text-green-700 hover:bg-green-50"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t("addIngredient.addAnother")}
+            </Button>
           </div>
-
-          {/* {productImage && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <p className="text-sm text-green-700">
-                ✓ Product image captured via camera
-              </p>
-            </div>
-          )} */}
 
           <div className="flex space-x-2 pt-4">
             <Button
@@ -364,8 +432,8 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
               disabled={isLoading}
             >
               {isLoading
-                ? t("addIngredient.addingButton")
-                : t("addIngredient.addButton")}
+                ? (ingredients.length === 1 ? t("addIngredient.addingButton") : t("addIngredient.addingAllIngredients"))
+                : (ingredients.length === 1 ? t("addIngredient.addButton") : t("addIngredient.addAllIngredients"))}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>
               {t("addIngredient.cancel")}
