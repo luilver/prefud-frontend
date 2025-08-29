@@ -189,9 +189,6 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
               {t("addIngredient.description")}
             </CardDescription>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -226,7 +223,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                 <SelectTrigger className="border-green-200 focus:border-green-400">
                   <SelectValue placeholder={t("addIngredient.categorySelect")} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-gray-800 z-50">
                   <SelectItem value="dairy">{t("addIngredient.categories.dairy")}</SelectItem>
                   <SelectItem value="fruit">{t("addIngredient.categories.fruit")}</SelectItem>
                   <SelectItem value="vegetable">{t("addIngredient.categories.vegetable")}</SelectItem>
@@ -260,7 +257,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
                 <SelectTrigger className="border-green-200 focus:border-green-400">
                   <SelectValue placeholder={t("addIngredient.unitSelect")} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-gray-800 z-50">
                   <SelectItem value="pieces">{t("addIngredient.units.pieces")}</SelectItem>
                   <SelectItem value="unit">{t("addIngredient.units.unit")}</SelectItem>
                   <SelectItem value="g">{t("addIngredient.units.g")}</SelectItem>
