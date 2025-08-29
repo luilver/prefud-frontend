@@ -25,6 +25,8 @@ import {
 import { format } from "date-fns";
 import { CalendarIcon, Plus, X, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/contexts/UserContext";
+import { addIngredientsToPantry, PantryIngredient } from "@/services/pantryService";
 import CameraProductScanner from "./CameraProductScanner";
 
 interface AddIngredientFormProps {
@@ -43,6 +45,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
   const [showCamera, setShowCamera] = useState(false);
   const [productImage, setProductImage] = useState<Blob | null>(null);
   const { toast } = useToast();
+  const { user } = useUser();
 
   const handleProductDetected = (productName: string, imageBlob: Blob) => {
     setName(productName);
@@ -98,11 +101,43 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
       return;
     }
 
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "User not found. Please try logging in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const newIngredient = {
-        id: Date.now().toString(),
+      const purchaseDate = new Date();
+      const daysToExpire = Math.ceil((expiryDate.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const newIngredient: PantryIngredient = {
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name,
+        quantity: parseFloat(quantity),
+        unit,
+        category: category.toLowerCase(),
+        purchased: true,
+        purchaseDate: purchaseDate.toISOString(),
+        carbonFootPrintToWaste: 0.5,
+        daysToExpire,
+        expiryDate: expiryDate.toISOString(),
+        notes: `Carbon footprint: 0.5`
+      };
+
+      console.log("Adding ingredient to API:", newIngredient);
+
+      // Call the API to add the ingredient
+      await addIngredientsToPantry(user.id, [newIngredient]);
+
+      // Also call the local onAdd callback for immediate UI update
+      onAdd({
+        id: newIngredient.id,
         name,
         quantity: parseFloat(quantity),
         unit,
@@ -111,20 +146,18 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
         expiryDate,
         image: productImage ? URL.createObjectURL(productImage) : undefined,
         addedViaCamera: !!productImage,
-      };
+      });
 
-      console.log("Adding ingredient:", newIngredient);
-
-      onAdd(newIngredient);
       toast({
         title: "Ingredient added!",
         description: `${name} has been added to your pantry.`,
       });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error adding ingredient:", error);
       toast({
         title: "Error",
-        description: "Failed to add ingredient. Please try again.",
+        description: error.response?.data?.message || "Failed to add ingredient. Please try again.",
         variant: "destructive",
       });
     } finally {
