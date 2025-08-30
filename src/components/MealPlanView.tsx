@@ -263,8 +263,15 @@ const getDayInfo = (dayIndex: number) => {
     return groupedMeals;
   })();
 
-  // Generate days array based on plan duration
-  const days = Array.from({ length: totalDays }, (_, index) => `Day ${index + 1}`);
+  // Build day entries from new or old structure
+  const dayEntries = plan.plan?.mealPlan?.length
+    ? plan.plan.mealPlan.map((d: any, idx: number) => ({ label: `Day ${d.day}`, index: idx, meals: d.meals }))
+    : (Array.from({ length: Number(totalDays) || 0 }, (_, index) => `Day ${index + 1}`)).map((label, idx) => ({ label, index: idx, meals: mealsByDay[label] || [] }));
+
+  // Generate days array based on plan data
+  const days = plan.plan?.mealPlan?.length
+    ? plan.plan.mealPlan.map((d: any) => `Day ${d.day}`)
+    : Array.from({ length: Number(totalDays) || 0 }, (_, index) => `Day ${index + 1}`);
 
   // Calculate shopping list stats
   const shoppingList = plan.plan?.ingredientsList || plan.shoppingList || [];
