@@ -27,27 +27,22 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const { t } = useLanguage(); // <-- Add this line
 const { pantryItems, user } = useUser();
+  // Meal type order for sorting
   const mealTypeOrder = {
-    desayuno: 1,
     breakfast: 1,
-    almuerzo: 2,
     lunch: 2,
-    cena: 3,
     dinner: 3,
-    snack: 4,
-    postre: 5,
-    dessert: 5
+    snack: 4
   };
 
   // Function to get day name and date
   
   // Function to get day name and date (UTC-safe)
 const getDayInfo = (dayIndex: number) => {
-  const planStartDate = plan.start_date || plan.startDate;
-  console.log('this is the plan start date:', planStartDate);
+  console.log('this is the plan start date:', plan.startDate);
 
   // Parse the start date in UTC
-  const startDate = new Date(planStartDate);
+  const startDate = new Date(plan.startDate);
   
   // Create a new date in UTC and add the dayIndex
   const currentDate = new Date(Date.UTC(
@@ -84,10 +79,8 @@ const getDayInfo = (dayIndex: number) => {
   // Function to sort meals by type order
   const sortMealsByType = (meals: any[]) => {
     return meals.sort((a, b) => {
-      const aType = (a.mealType || a.type)?.toLowerCase();
-      const bType = (b.mealType || b.type)?.toLowerCase();
-      const aOrder = mealTypeOrder[aType as keyof typeof mealTypeOrder] || 5;
-      const bOrder = mealTypeOrder[bType as keyof typeof mealTypeOrder] || 5;
+      const aOrder = mealTypeOrder[a.type?.toLowerCase() as keyof typeof mealTypeOrder] || 5;
+      const bOrder = mealTypeOrder[b.type?.toLowerCase() as keyof typeof mealTypeOrder] || 5;
       return aOrder - bOrder;
     });
   };
@@ -120,26 +113,23 @@ const getDayInfo = (dayIndex: number) => {
     setCheckedItems(newCheckedItems);
     
     // Update select all state
-    const shoppingList = plan.plan?.ingredientsList || plan.shoppingList || [];
-    const totalItems = shoppingList.length || 0;
+    const totalItems = plan.shoppingList?.length || 0;
     setSelectAll(newCheckedItems.size === totalItems);
   };
 
   const handleSelectAll = () => {
-    const shoppingList = plan.plan?.ingredientsList || plan.shoppingList || [];
     if (selectAll) {
       setCheckedItems(new Set());
       setSelectAll(false);
     } else {
-      const allItemIds = new Set<string>(shoppingList.map((item: any) => item.name || item.id) || []);
+      const allItemIds = new Set<string>(plan.shoppingList?.map((item: any) => item.id) || []);
       setCheckedItems(allItemIds);
       setSelectAll(true);
     }
   };
 
   const handleAddToPantry = async (items?: any[]) => {
-    const shoppingList = plan.plan?.ingredientsList || plan.shoppingList || [];
-    const itemsToAdd = items || shoppingList.filter((item: any) => checkedItems.has(item.name || item.id)) || [];
+    const itemsToAdd = items || plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) || [];
     
     const newPantryItems = [];
     itemsToAdd.forEach((ingredient) => {
@@ -186,8 +176,7 @@ const getDayInfo = (dayIndex: number) => {
   };
 
   const handleOrderOnline = (items?: any[]) => {
-    const shoppingList = plan.plan?.ingredientsList || plan.shoppingList || [];
-    const itemsToOrder = items || shoppingList.filter((item: any) => checkedItems.has(item.name || item.id)) || [];
+    const itemsToOrder = items || plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) || [];
     setOrderItems(itemsToOrder);
     setShowOrderModal(true);
   };
@@ -203,46 +192,35 @@ const getDayInfo = (dayIndex: number) => {
   }
 
   // Calculate plan statistics with better fallbacks
-  const totalDays = plan.duration || 
-                   plan.preferences?.numberOfDays || 
+  const totalDays = plan.preferences?.numberOfDays || 
                    (plan.duration ? parseInt(plan.duration.replace(' days', '')) : 7);
-  const peopleCount = plan.numberPeople || 
-                     plan.preferences?.numberOfPersons || 
+  const peopleCount = plan.preferences?.numberOfPersons || 
                      plan.preferences?.people || 1;
-  const mealsPerDay = plan.mealsPerDay || 
-                     plan.preferences?.mealsPerDay || 3;
+  const mealsPerDay = plan.preferences?.mealsPerDay || 3;
 
-  // Group meals by day - handle the new API structure
+  // Group meals by day - handle the actual data structure from your meal plan
   const mealsByDay = (() => {
     const groupedMeals: any = {};
     
     console.log('Plan structure:', plan);
+    console.log('Plan meals:', plan.meals);
     
-    // Handle new API structure with plan.plan.mealPlan
-    if (plan.plan && plan.plan.mealPlan && Array.isArray(plan.plan.mealPlan)) {
-      plan.plan.mealPlan.forEach((dayData: any) => {
-        const dayKey = `Day ${dayData.day}`;
-        if (dayData.meals && Array.isArray(dayData.meals)) {
-          if (!groupedMeals[dayKey]) {
-            groupedMeals[dayKey] = [];
-          }
-          groupedMeals[dayKey] = dayData.meals;
-        }
-      });
-    }
-    // Fallback for old structure
-    else if (plan.meals && plan.meals.length > 0) {
+    // If meals are directly in the plan (your current structure)
+    if (plan.meals && plan.meals.length > 0) {
       plan.meals.forEach((meal: any) => {
+        // Map the meal day based on the date or day property
         let dayKey = 'Day 1';
         
         if (meal.day) {
           dayKey = `Day ${meal.day}`;
         } else if (meal.date) {
-          const startDate = new Date(plan.start_date || plan.startDate);
+          // Calculate day from date
+          const startDate = plan.startDate;
           const mealDate = new Date(meal.date);
           const dayDiff = Math.floor((mealDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
           dayKey = `Day ${dayDiff}`;
         } else if (meal.id && meal.id.includes('-')) {
+          // Extract day from ID pattern like "1-0", "2-1", etc.
           const dayFromId = meal.id.split('-')[0];
           dayKey = `Day ${dayFromId}`;
         }
@@ -251,6 +229,23 @@ const getDayInfo = (dayIndex: number) => {
           groupedMeals[dayKey] = [];
         }
         groupedMeals[dayKey].push(meal);
+      });
+    }
+    
+    // If meals are within weeks structure
+    if (plan.weeks && plan.weeks.length > 0) {
+      plan.weeks.forEach((week: any) => {
+        if (week.days && week.days.length > 0) {
+          week.days.forEach((day: any, dayIndex: number) => {
+            const dayKey = `Day ${dayIndex + 1}`;
+            if (day.meals && day.meals.length > 0) {
+              if (!groupedMeals[dayKey]) {
+                groupedMeals[dayKey] = [];
+              }
+              groupedMeals[dayKey].push(...day.meals);
+            }
+          });
+        }
       });
     }
     
@@ -263,21 +258,13 @@ const getDayInfo = (dayIndex: number) => {
     return groupedMeals;
   })();
 
-  // Build day entries from new or old structure
-  const dayEntries = plan.plan?.mealPlan?.length
-    ? plan.plan.mealPlan.map((d: any, idx: number) => ({ label: `Day ${d.day}`, index: idx, meals: d.meals }))
-    : (Array.from({ length: Number(totalDays) || 0 }, (_, index) => `Day ${index + 1}`)).map((label, idx) => ({ label, index: idx, meals: mealsByDay[label] || [] }));
-
-  // Generate days array based on plan data
-  const days = plan.plan?.mealPlan?.length
-    ? plan.plan.mealPlan.map((d: any) => `Day ${d.day}`)
-    : Array.from({ length: Number(totalDays) || 0 }, (_, index) => `Day ${index + 1}`);
+  // Generate days array based on plan duration
+  const days = Array.from({ length: totalDays }, (_, index) => `Day ${index + 1}`);
 
   // Calculate shopping list stats
-  const shoppingList = plan.plan?.ingredientsList || plan.shoppingList || [];
-  const totalItems = shoppingList.length || 0;
+  const totalItems = plan.shoppingList?.length || 0;
   const checkedCount = checkedItems.size;
-  const totalEstimatedCost = shoppingList.reduce((total: number, item: any) => 
+  const totalEstimatedCost = plan.shoppingList?.reduce((total: number, item: any) => 
     total + (item.estimatedPrice || 0), 0) || 0;
 
   return (
@@ -289,9 +276,9 @@ const getDayInfo = (dayIndex: number) => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{plan.plan_name || plan.name}</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">{plan.name}</h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">
-              {plan.start_date || plan.startDate} - {new Date((plan.start_date || plan.startDate) || Date.now()).toLocaleDateString()}
+              {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
             </p>
           </div>
         </div>
@@ -369,9 +356,7 @@ const getDayInfo = (dayIndex: number) => {
                   {dayMeals.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {dayMeals.map((meal: any, mealIndex: number) => {
-                        // Use the consumed field from the API instead of local completion check
-                        const isCompleted = meal.consumed || false;
-                        const mealType = meal.mealType || meal.type;
+                        const isCompleted = isMealCompleted(meal.id, day);
                         
                         return (
                           <Card 
@@ -392,14 +377,13 @@ const getDayInfo = (dayIndex: number) => {
                                     <Badge 
                                       variant="secondary" 
                                       className={`text-xs ${
-                                        mealType?.toLowerCase() === 'desayuno' || mealType?.toLowerCase() === 'breakfast' ? 'bg-orange-100 text-orange-800' :
-                                        mealType?.toLowerCase() === 'almuerzo' || mealType?.toLowerCase() === 'lunch' ? 'bg-blue-100 text-blue-800' :
-                                        mealType?.toLowerCase() === 'cena' || mealType?.toLowerCase() === 'dinner' ? 'bg-purple-100 text-purple-800' :
-                                        mealType?.toLowerCase() === 'postre' || mealType?.toLowerCase() === 'dessert' ? 'bg-pink-100 text-pink-800' :
+                                        meal.type?.toLowerCase() === 'breakfast' ? 'bg-orange-100 text-orange-800' :
+                                        meal.type?.toLowerCase() === 'lunch' ? 'bg-blue-100 text-blue-800' :
+                                        meal.type?.toLowerCase() === 'dinner' ? 'bg-purple-100 text-purple-800' :
                                         'bg-gray-100 text-gray-800'
                                       }`}
                                     >
-                                      {mealType || 'Meal'}
+                                      {meal.type || 'Meal'}
                                     </Badge>
                                     {meal.cuisine && (
                                       <Badge variant="outline" className="text-xs">
@@ -423,10 +407,10 @@ const getDayInfo = (dayIndex: number) => {
                             </CardHeader>
                             <CardContent className="pt-0">
                               <div className="space-y-2 text-sm text-gray-600">
-                                {meal.cookingTime && (
+                                {meal.prepTime && (
                                   <div className="flex items-center gap-2">
                                     <Clock className="h-4 w-4" />
-                                    <span>{meal.cookingTime} {t('mealPlanView.min') || 'min'}</span>
+                                    <span>{meal.prepTime} {t('mealPlanView.min') || 'min'}</span>
                                   </div>
                                 )}
                                 {meal.difficulty && (
@@ -470,16 +454,16 @@ const getDayInfo = (dayIndex: number) => {
                                   ) : (
                                     <>
                                       <Circle className="h-3 w-3 mr-1" />
-                                      {t('mealPlanView.markAsComplete') || 'Mark as Complete'}
+                                      {t('mealPlanView.markAsDone') || 'Mark as Done'}
                                     </>
                                   )}
                                 </Button>
                               </div>
                             </CardContent>
                           </Card>
-                         );
-                       })}
-                     </div>
+                        );
+                      })}
+                    </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500">
                       <ChefHat className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -493,7 +477,7 @@ const getDayInfo = (dayIndex: number) => {
         </TabsContent>
 
         <TabsContent value="shopping" className="space-y-6">
-          {shoppingList && shoppingList.length > 0 ? (
+          {plan.shoppingList && plan.shoppingList.length > 0 ? (
             <>
               {/* Shopping List Header with Summary */}
               <Card>
@@ -546,13 +530,10 @@ const getDayInfo = (dayIndex: number) => {
 
               {/* Shopping Items by Category */}
               {Object.entries(
-                shoppingList.reduce((acc: any, item: any) => {
-                  const category = item.classification || item.category || 'Other';
+                plan.shoppingList.reduce((acc: any, item: any) => {
+                  const category = item.category || 'Other';
                   if (!acc[category]) acc[category] = [];
-                  acc[category].push({
-                    ...item,
-                    id: item.name || item.id // Use name as ID for new structure
-                  });
+                  acc[category].push(item);
                   return acc;
                 }, {})
               ).map(([category, items]: [string, any]) => (
@@ -566,20 +547,20 @@ const getDayInfo = (dayIndex: number) => {
                   <CardContent>
                     <div className="space-y-3">
                       {items.map((item: any) => (
-                         <div 
-                           key={item.name || item.id} 
-                           className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
-                             checkedItems.has(item.name || item.id) 
-                               ? 'bg-blue-50 border-blue-200' 
-                               : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                           }`}
-                         >
-                           <div className="flex items-center gap-3">
-                             <Checkbox
-                               id={`item-${item.name || item.id}`}
-                               checked={checkedItems.has(item.name || item.id)}
-                               onCheckedChange={() => handleItemCheck(item.name || item.id)}
-                             />
+                        <div 
+                          key={item.id} 
+                          className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+                            checkedItems.has(item.id) 
+                              ? 'bg-blue-50 border-blue-200' 
+                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Checkbox
+                              id={`item-${item.id}`}
+                              checked={checkedItems.has(item.id)}
+                              onCheckedChange={() => handleItemCheck(item.id)}
+                            />
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <p className="font-medium">{item.name}</p>

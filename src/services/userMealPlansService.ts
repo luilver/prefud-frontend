@@ -18,19 +18,9 @@ export const getMealPlansByUser = async (userId: string, page: number = 1, limit
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result = await response.json();
-    console.log('Fetched meal plans:', result);
-    
-    // Handle the new API response structure with data wrapper
-    if (result.data && Array.isArray(result.data)) {
-      return {
-        ...result,
-        data: result.data
-      };
-    }
-    
-    // Fallback for old format
-    return result;
+    const data = await response.json();
+    console.log('Fetched meal plans:', data);
+    return data;
   } catch (error) {
     console.error('Error fetching user meal plans:', error);
     throw error;
@@ -52,19 +42,9 @@ export const getSpecialMealsByUser = async (userId: string, page: number = 1, li
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result = await response.json();
-    console.log('Fetched special meals:', result);
-    
-    // Handle the new API response structure with data wrapper
-    if (result.data && Array.isArray(result.data)) {
-      return {
-        ...result,
-        data: result.data
-      };
-    }
-    
-    // Fallback for old format
-    return result;
+    const data = await response.json();
+    console.log('Fetched special meals:', data);
+    return data;
   } catch (error) {
     console.error('Error fetching special meals:', error);
     throw error;
