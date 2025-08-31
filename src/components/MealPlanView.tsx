@@ -29,7 +29,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
 import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this import
-import { addIngredientsToPantry, updateMealConsumed, updatePantry } from "@/services/pantryService";
+import {
+  addIngredientsToPantry,
+  updateMealConsumed,
+  updatePantry,
+} from "@/services/pantryService";
 
 interface MealPlanViewProps {
   plan: any;
@@ -138,45 +142,23 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       complete
     );
 
-    if (complete) {
-      // change the completion status of the meal in the plan
+    // change the completion status of the meal in the plan
 
-      try {
-        const responseUpdateMeal = updateMealConsumed(
-          plan.id,
-          mealId,
-          complete,
-          parseInt(dayParsed)
-        );
-        console.log(
-          "response from updating meal consumed:",
-          responseUpdateMeal
-        );
-      } catch (error) {
-        console.log('error updating meal consumed')
-      }
-      // implement the endpoin to update
-      console.log("complete is true");
-      toggleMealCompletion(mealId, date, complete);
-      return;
-    }
-    console.log("complete is false");
-
-    toggleMealCompletion(mealId, date, complete);
     try {
-        const responseUpdateMeal = updateMealConsumed(
-          plan.id,
-          mealId,
-          complete,
-          parseInt(dayParsed)
-        );
-        console.log(
-          "response from updating meal consumed:",
-          responseUpdateMeal
-        );
-      } catch (error) {
-        console.log('error updating meal consumed')
-      }
+      const responseUpdateMeal = updateMealConsumed(
+        plan.id,
+        mealId,
+        complete,
+        parseInt(dayParsed)
+      );
+      console.log("response from updating meal consumed:", responseUpdateMeal);
+    } catch (error) {
+      console.log("error updating meal consumed");
+    }
+    // implement the endpoin to update
+    console.log("complete is true");
+    toggleMealCompletion(mealId, date, complete);
+    return;
   };
 
   const handleMealClick = (meal: any) => {
