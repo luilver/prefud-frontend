@@ -65,10 +65,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
   // Function to get day name and date (UTC-safe)
   const getDayInfo = (dayIndex: number) => {
-    console.log("this is the plan start date:", plan.startDate);
+    console.log("this is the plan start date:", plan.start_date);
 
     // Parse the start date in UTC
-    const startDate = new Date(plan.startDate);
+    const startDate = new Date(plan.start_date);
 
     // Create a new date in UTC and add the dayIndex
     const currentDate = new Date(
@@ -106,10 +106,25 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   // Function to sort meals by type order
   const sortMealsByType = (meals: any[]) => {
     return meals.sort((a, b) => {
-      const aOrder =
-        mealTypeOrder[a.type?.toLowerCase() as keyof typeof mealTypeOrder] || 5;
-      const bOrder =
-        mealTypeOrder[b.type?.toLowerCase() as keyof typeof mealTypeOrder] || 5;
+      // Handle Spanish meal types
+      const mealTypeMap: { [key: string]: string } = {
+        'desayuno': 'breakfast',
+        'almuerzo': 'lunch', 
+        'cena': 'dinner',
+        'snack': 'snack',
+        'postre': 'snack'
+      };
+
+      const normalizeType = (type: string) => {
+        const lowerType = type?.toLowerCase() || '';
+        return mealTypeMap[lowerType] || lowerType;
+      };
+
+      const aType = normalizeType(a.type || a.mealType || '');
+      const bType = normalizeType(b.type || b.mealType || '');
+      
+      const aOrder = mealTypeOrder[aType as keyof typeof mealTypeOrder] || 5;
+      const bOrder = mealTypeOrder[bType as keyof typeof mealTypeOrder] || 5;
       return aOrder - bOrder;
     });
   };
@@ -197,7 +212,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     setCheckedItems(newCheckedItems);
 
     // Update select all state
-    const totalItems = plan.shoppingList?.length || 0;
     setSelectAll(newCheckedItems.size === totalItems);
   };
 
@@ -207,7 +221,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       setSelectAll(false);
     } else {
       const allItemIds = new Set<string>(
-        plan.shoppingList?.map((item: any) => item.id) || []
+        shoppingList?.map((item: any, index: number) => item.name || `item-${index}`) || []
       );
       setCheckedItems(allItemIds);
       setSelectAll(true);
@@ -217,7 +231,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const handleAddToPantry = async (items?: any[]) => {
     const itemsToAdd =
       items ||
-      plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) ||
+      shoppingList?.filter((item: any) => checkedItems.has(item.name || `item-${shoppingList.indexOf(item)}`)) ||
       [];
 
     const newPantryItems = [];
@@ -267,7 +281,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const handleOrderOnline = (items?: any[]) => {
     const itemsToOrder =
       items ||
-      plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) ||
+      shoppingList?.filter((item: any) => checkedItems.has(item.name || `item-${shoppingList.indexOf(item)}`)) ||
       [];
     setOrderItems(itemsToOrder);
     setShowOrderModal(true);
@@ -279,63 +293,32 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   }
 
   // Calculate plan statistics with better fallbacks
-  const totalDays =
-    plan.preferences?.numberOfDays ||
-    (plan.duration ? parseInt(plan.duration.replace(" days", "")) : 7);
-  const peopleCount =
-    plan.preferences?.numberOfPersons || plan.preferences?.people || 1;
-  const mealsPerDay = plan.preferences?.mealsPerDay || 3;
+  const totalDays = plan.duration || 7;
+  const peopleCount = plan.numberPeople || 1;
+  const mealsPerDay = plan.mealsPerDay || 3;
 
-  // Group meals by day - handle the actual data structure from your meal plan
+  // Group meals by day - handle the new API structure
   const mealsByDay = (() => {
     const groupedMeals: any = {};
 
     console.log("Plan structure:", plan);
-    console.log("Plan meals:", plan.meals);
+    console.log("Plan meals:", plan.plan?.plan?.mealPlan);
 
-    // If meals are directly in the plan (your current structure)
-    if (plan.meals && plan.meals.length > 0) {
-      plan.meals.forEach((meal: any) => {
-        // Map the meal day based on the date or day property
-        let dayKey = "Day 1";
-
-        if (meal.day) {
-          dayKey = `Day ${meal.day}`;
-        } else if (meal.date) {
-          // Calculate day from date
-          const startDate = plan.startDate;
-          const mealDate = new Date(meal.date);
-          const dayDiff =
-            Math.floor(
-              (mealDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-            ) + 1;
-          dayKey = `Day ${dayDiff}`;
-        } else if (meal.id && meal.id.includes("-")) {
-          // Extract day from ID pattern like "1-0", "2-1", etc.
-          const dayFromId = meal.id.split("-")[0];
-          dayKey = `Day ${dayFromId}`;
-        }
-
-        if (!groupedMeals[dayKey]) {
-          groupedMeals[dayKey] = [];
-        }
-        groupedMeals[dayKey].push(meal);
-      });
-    }
-
-    // If meals are within weeks structure
-    if (plan.weeks && plan.weeks.length > 0) {
-      plan.weeks.forEach((week: any) => {
-        if (week.days && week.days.length > 0) {
-          week.days.forEach((day: any, dayIndex: number) => {
-            const dayKey = `Day ${dayIndex + 1}`;
-            if (day.meals && day.meals.length > 0) {
-              if (!groupedMeals[dayKey]) {
-                groupedMeals[dayKey] = [];
-              }
-              groupedMeals[dayKey].push(...day.meals);
-            }
-          });
+    // Handle new API structure with plan.plan.mealPlan
+    if (plan.plan?.plan?.mealPlan && plan.plan.plan.mealPlan.length > 0) {
+      plan.plan.plan.mealPlan.forEach((dayData: any) => {
+        const dayKey = `Day ${dayData.day}`;
+        
+        if (dayData.meals && dayData.meals.length > 0) {
+          if (!groupedMeals[dayKey]) {
+            groupedMeals[dayKey] = [];
+          }
+          groupedMeals[dayKey] = dayData.meals.map((meal: any) => ({
+            ...meal,
+            type: meal.mealType || meal.type,
+            cookingTime: meal.cookingTime,
+            prepTime: meal.cookingTime
+          }));
         }
       });
     }
@@ -355,12 +338,13 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     (_, index) => `Day ${index + 1}`
   );
 
-  // Calculate shopping list stats
-  const totalItems = plan.shoppingList?.length || 0;
+  // Calculate shopping list stats - use ingredientsList from new API structure
+  const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
+  const totalItems = shoppingList.length;
   const checkedCount = checkedItems.size;
   const totalEstimatedCost =
-    plan.shoppingList?.reduce(
-      (total: number, item: any) => total + (item.estimatedPrice || 0),
+    shoppingList?.reduce(
+      (total: number, item: any) => total + (item.estimatedPrice || 0), 
       0
     ) || 0;
 
@@ -374,10 +358,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           </Button>
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-              {plan.name}
+              {plan.plan_name || plan.name}
             </h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">
-              {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
+              {plan.start_date} - {new Date(new Date(plan.start_date).getTime() + (totalDays - 1) * 24 * 60 * 60 * 1000).toLocaleDateString()}
             </p>
           </div>
         </div>
@@ -464,19 +448,19 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                 <CardContent>
                   {dayMeals.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {dayMeals.map((meal: any, mealIndex: number) => {
-                        const isCompleted = isMealCompleted(meal.id, day);
+                       {dayMeals.map((meal: any, mealIndex: number) => {
+                         const isCompleted = meal.consumed;
 
-                        return (
-                          <Card
-                            key={`${meal.id}-${mealIndex}`}
-                            className={`relative hover:shadow-md transition-all cursor-pointer ${
-                              isCompleted
-                                ? "bg-green-50 border-green-200"
-                                : "hover:shadow-lg"
-                            }`}
-                            onClick={() => handleMealClick(meal)}
-                          >
+                         return (
+                           <Card
+                             key={`${meal.id}-${mealIndex}`}
+                             className={`relative hover:shadow-md transition-all cursor-pointer ${
+                               isCompleted
+                                 ? "bg-green-50 border-green-200"
+                                 : "hover:shadow-lg"
+                             }`}
+                             onClick={() => handleMealClick(meal)}
+                           >
                             <CardHeader className="pb-3">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
@@ -486,22 +470,21 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                       <CheckCircle className="h-4 w-4 text-green-500" />
                                     )}
                                   </CardTitle>
-                                  <div className="flex flex-wrap gap-1 mt-2">
-                                    <Badge
-                                      variant="secondary"
-                                      className={`text-xs ${
-                                        meal.type?.toLowerCase() === "breakfast"
-                                          ? "bg-orange-100 text-orange-800"
-                                          : meal.type?.toLowerCase() === "lunch"
-                                          ? "bg-blue-100 text-blue-800"
-                                          : meal.type?.toLowerCase() ===
-                                            "dinner"
-                                          ? "bg-purple-100 text-purple-800"
-                                          : "bg-gray-100 text-gray-800"
-                                      }`}
-                                    >
-                                      {meal.type || "Meal"}
-                                    </Badge>
+                                   <div className="flex flex-wrap gap-1 mt-2">
+                                     <Badge
+                                       variant="secondary"
+                                       className={`text-xs ${
+                                         (meal.type || meal.mealType)?.toLowerCase() === "breakfast" || (meal.type || meal.mealType)?.toLowerCase() === "desayuno"
+                                           ? "bg-orange-100 text-orange-800"
+                                           : (meal.type || meal.mealType)?.toLowerCase() === "lunch" || (meal.type || meal.mealType)?.toLowerCase() === "almuerzo"
+                                           ? "bg-blue-100 text-blue-800"
+                                           : (meal.type || meal.mealType)?.toLowerCase() === "dinner" || (meal.type || meal.mealType)?.toLowerCase() === "cena"
+                                           ? "bg-purple-100 text-purple-800"
+                                           : "bg-gray-100 text-gray-800"
+                                       }`}
+                                     >
+                                       {meal.type || meal.mealType || "Meal"}
+                                     </Badge>
                                     {meal.cuisine && (
                                       <Badge
                                         variant="outline"
@@ -625,7 +608,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsContent>
 
         <TabsContent value="shopping" className="space-y-6">
-          {plan.shoppingList && plan.shoppingList.length > 0 ? (
+          {shoppingList && shoppingList.length > 0 ? (
             <>
               {/* Shopping List Header with Summary */}
               <Card>
@@ -689,10 +672,14 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
               {/* Shopping Items by Category */}
               {Object.entries(
-                plan.shoppingList.reduce((acc: any, item: any) => {
-                  const category = item.category || "Other";
+                shoppingList.reduce((acc: any, item: any, index: number) => {
+                  const category = item.classification || item.category || "Other";
                   if (!acc[category]) acc[category] = [];
-                  acc[category].push(item);
+                  acc[category].push({
+                    ...item,
+                    id: item.name || `item-${index}`,
+                    unit: item.unit || 'unit'
+                  });
                   return acc;
                 }, {})
               ).map(([category, items]: [string, any]) => (
@@ -796,7 +783,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         isOpen={showOrderModal}
         onClose={() => setShowOrderModal(false)}
         items={orderItems}
-        mealPlanName={plan.name}
+        mealPlanName={plan.plan_name || plan.name}
       />
     </div>
   );
