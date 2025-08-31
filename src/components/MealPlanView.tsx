@@ -453,7 +453,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                           <Card
                             key={`${meal.id}-${mealIndex}`}
                             className={`relative hover:shadow-md transition-all cursor-pointer ${
-                              isCompleted
+                              meal.consumed
                                 ? "bg-green-50 border-green-200"
                                 : "hover:shadow-lg"
                             }`}
@@ -462,12 +462,12 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                             <CardHeader className="pb-3">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <CardTitle className="text-lg flex items-center gap-2">
-                                    {meal.name}
-                                    {isCompleted && (
-                                      <CheckCircle className="h-4 w-4 text-green-500" />
-                                    )}
-                                  </CardTitle>
+                                   <CardTitle className="text-lg flex items-center gap-2">
+                                     {meal.name}
+                                     {meal.consumed && (
+                                       <CheckCircle className="h-4 w-4 text-green-500" />
+                                     )}
+                                   </CardTitle>
                                   <div className="flex flex-wrap gap-1 mt-2">
                                     <Badge
                                       variant="secondary"
@@ -539,52 +539,41 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                               )}
 
                               <div className="flex items-center justify-between mt-4">
-                                {meal.consumed ? (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleToggleCompletion(
-                                          meal.id,
-                                          day,
-                                          false
-                                        );
-                                      }}
-                                      className={`text-xs  "text-gray-500 hover:text-gray-700"
-                                  `}
-                                    >
-                                      <>
-                                        <CheckCircle className="h-3 w-3 mr-1" />
-                                        {t("mealPlanView.completed") ||
-                                          "Completed"}
-                                      </>
-                                    </Button>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleToggleCompletion(
-                                          meal.id,
-                                          day,
-                                          true
-                                        );
-                                      }}
-                                      className={`text-xs ${"text-green-600 hover:text-green-700"}`}
-                                    >
-                                      <>
-                                        <Circle className="h-3 w-3 mr-1" />
-                                        {t("mealPlanView.markAsDone") ||
-                                          "Mark as Done"}
-                                      </>
-                                    </Button>
-                                  </>
-                                )}
+                                 {meal.consumed ? (
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={(e) => {
+                                       e.stopPropagation();
+                                       handleToggleCompletion(
+                                         meal.id,
+                                         day,
+                                         false
+                                       );
+                                     }}
+                                     className="text-xs text-green-600 hover:text-green-700"
+                                   >
+                                     <CheckCircle className="h-3 w-3 mr-1" />
+                                     {t("mealPlanView.completed") || "Completed"}
+                                   </Button>
+                                 ) : (
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={(e) => {
+                                       e.stopPropagation();
+                                       handleToggleCompletion(
+                                         meal.id,
+                                         day,
+                                         true
+                                       );
+                                     }}
+                                     className="text-xs text-gray-500 hover:text-gray-700"
+                                   >
+                                     <Circle className="h-3 w-3 mr-1" />
+                                     {t("mealPlanView.markAsDone") || "Mark as Done"}
+                                   </Button>
+                                 )}
                               </div>
                             </CardContent>
                           </Card>
