@@ -122,6 +122,8 @@ const MealPlanner = () => {
   const handlePlanSelect = (plan: any) => {
     // Get the most up-to-date version of the plan from context
     const updatedPlan = getMealPlanById(plan.id) || plan;
+    console.log('this is the updated plan object',updatedPlan);
+    console.log('this is the normal plan object',plan);
     console.log('Selecting plan:', updatedPlan);
     setSelectedMealPlan(updatedPlan);
     setShowCreator(false);
@@ -310,7 +312,13 @@ const MealPlanner = () => {
                       
                       {plan.shoppingList && plan.shoppingList.length > 0 && (
                         <div className="text-xs text-orange-600">
-                          {plan.shoppingList.length} {t('mealPlanner.ingreNeeded') || 'ingredients needed'}
+                          {plan.shoppingList.length} {t('mealPlanner.ingreNeeded') || 'ingredients needed'} {" "}
+                          {plan.totalCarbonFootprint} CO2
+                        </div>
+                      )}
+                      {plan.totalCarbonFootprint && (
+                        <div className="text-xs text-green-600">
+                          {plan.totalCarbonFootprint} Kg CO2 
                         </div>
                       )}
                     </div>

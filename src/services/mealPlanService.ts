@@ -40,6 +40,8 @@ interface ApiMealPlan {
       date: string;
       dayOfWeek: string;
       meals: Array<{
+        id?: string;
+        consumed?: boolean;
         name: string;
         description?: string;
         ingredients: Array<{
@@ -260,7 +262,8 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
       if (dayPlan.meals && Array.isArray(dayPlan.meals)) {
         dayPlan.meals.forEach((meal, mealIndex) => {
           transformedMeals.push({
-            id: `${dayPlan.day || 1}-${mealIndex}`,
+            id: meal.id || `${dayPlan.day || 1}-${mealIndex}`,
+            consumed: meal.consumed || false,
             name: meal.name || 'Unnamed Meal',
             description: meal.description || '',
             type: meal.mealType || 'meal',

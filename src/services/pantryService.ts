@@ -83,3 +83,29 @@ export const getPantry = async (userId: string): Promise<any> => {
     throw error;
   }
 };
+
+export const updateMealConsumed = async (
+  planId: string,
+  mealId: string,
+  consumed: boolean,
+  day: number
+): Promise<any> => {
+  try {
+    console.log(`Updating meal consumed for plan: ${planId}, meal: ${mealId}`);
+
+    const response = await axios.patch(
+      `${BASE_URL}/meal-plan/updateconsumed?plan=${planId}&meal=${mealId}`,
+      { consumed, day },
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    console.log("Update meal consumed response:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error updating meal consumed:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
