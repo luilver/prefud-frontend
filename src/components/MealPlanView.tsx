@@ -56,6 +56,20 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [selectAll, setSelectAll] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [mealCompletionStatus, setMealCompletionStatus] = useState<Record<string, boolean>>(() => {
+    // Initialize with current consumed status from the plan
+    const initialStatus: Record<string, boolean> = {};
+    if (plan.plan?.plan?.mealPlan) {
+      plan.plan.plan.mealPlan.forEach((dayPlan: any) => {
+        dayPlan.meals?.forEach((meal: any) => {
+          if (meal.id) {
+            initialStatus[meal.id] = meal.consumed || false;
+          }
+        });
+      });
+    }
+    return initialStatus;
+  });
   const { t } = useLanguage(); // <-- Add this line
   const { toast } = useToast();
   const { pantryItems, user } = useUser();
@@ -143,6 +157,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       dayParsed,
       complete
     );
+    console.log("Current meal data before update:", plan.plan?.plan?.mealPlan);
 
     try {
       const responseUpdateMeal = await updateMealConsumed(
@@ -154,19 +169,11 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       console.log("response from updating meal consumed:", responseUpdateMeal);
       
       if (responseUpdateMeal?.success) {
-        // Update local meal plan data with the new consumed status
-        const updatedPlan = { ...plan };
-        if (updatedPlan.plan?.plan?.mealPlan) {
-          updatedPlan.plan.plan.mealPlan.forEach((dayPlan: any) => {
-            if (dayPlan.day === parseInt(dayParsed)) {
-              dayPlan.meals.forEach((meal: any) => {
-                if (meal.id === mealId) {
-                  meal.consumed = complete;
-                }
-              });
-            }
-          });
-        }
+        // Update local state to trigger re-render
+        setMealCompletionStatus(prev => ({
+          ...prev,
+          [mealId]: complete
+        }));
         
         // Show success toast
         toast({
@@ -503,7 +510,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                           <Card
                             key={`${meal.id}-${mealIndex}`}
                             className={`relative hover:shadow-md transition-all cursor-pointer ${
-                              meal.consumed
+                              mealCompletionStatus[meal.id]
                                 ? "bg-green-50 border-green-200"
                                 : "hover:shadow-lg"
                             }`}
@@ -514,7 +521,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                 <div className="flex-1">
                                    <CardTitle className="text-lg flex items-center gap-2">
                                      {meal.name}
-                                     {meal.consumed && (
+                                     {mealCompletionStatus[meal.id] && (
                                        <CheckCircle className="h-4 w-4 text-green-500" />
                                      )}
                                    </CardTitle>
@@ -589,12 +596,13 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                               )}
 
                               <div className="flex items-center justify-between mt-4">
-                                 {meal.consumed ? (
+                                 {mealCompletionStatus[meal.id] ? (
                                    <Button
                                      variant="ghost"
                                      size="sm"
                                      onClick={(e) => {
                                        e.stopPropagation();
+                                       console.log("Clicking completed button for meal:", meal.id, "current consumed:", mealCompletionStatus[meal.id]);
                                        handleToggleCompletion(
                                          meal.id,
                                          day,
@@ -612,6 +620,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                      size="sm"
                                      onClick={(e) => {
                                        e.stopPropagation();
+                                       console.log("Clicking mark as done button for meal:", meal.id, "current consumed:", mealCompletionStatus[meal.id]);
                                        handleToggleCompletion(
                                          meal.id,
                                          day,
