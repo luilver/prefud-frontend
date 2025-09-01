@@ -150,6 +150,14 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     date: string,
     complete: boolean
   ) => {
+    //update the status locally first
+    plan.meals?.forEach((meal: any) => {        
+      if (meal.id === mealId) {
+
+        meal.consumed = complete;
+      }
+    });
+
     const dayParsed = date.replace("Day ", "");
     console.log(
       "meal completed and date to toggle:",
@@ -596,7 +604,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                               )}
 
                               <div className="flex items-center justify-between mt-4">
-                                 {mealCompletionStatus[meal.id] ? (
+                                 {mealCompletionStatus[meal.id] || meal.consumed == true ? (
                                    <Button
                                      variant="ghost"
                                      size="sm"
