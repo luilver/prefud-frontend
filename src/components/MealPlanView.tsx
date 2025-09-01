@@ -34,6 +34,7 @@ import {
   updateMealConsumed,
   updatePantry,
 } from "@/services/pantryService";
+import { useToast } from "@/hooks/use-toast";
 
 interface MealPlanViewProps {
   plan: any;
@@ -56,6 +57,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const { t } = useLanguage(); // <-- Add this line
+  const { toast } = useToast();
   const { pantryItems, user } = useUser();
   // Meal type order for sorting
   const mealTypeOrder = {
@@ -129,7 +131,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     }
   };
 
-  const handleToggleCompletion = (
+  const handleToggleCompletion = async (
     mealId: string,
     date: string,
     complete: boolean
@@ -142,23 +144,55 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       complete
     );
 
-    // change the completion status of the meal in the plan
-
     try {
-      const responseUpdateMeal = updateMealConsumed(
+      const responseUpdateMeal = await updateMealConsumed(
         plan.id,
         mealId,
         complete,
         parseInt(dayParsed)
       );
       console.log("response from updating meal consumed:", responseUpdateMeal);
+      
+      if (responseUpdateMeal?.success) {
+        // Update local meal plan data with the new consumed status
+        const updatedPlan = { ...plan };
+        if (updatedPlan.plan?.plan?.mealPlan) {
+          updatedPlan.plan.plan.mealPlan.forEach((dayPlan: any) => {
+            if (dayPlan.day === parseInt(dayParsed)) {
+              dayPlan.meals.forEach((meal: any) => {
+                if (meal.id === mealId) {
+                  meal.consumed = complete;
+                }
+              });
+            }
+          });
+        }
+        
+        // Show success toast
+        toast({
+          title: complete ? 
+            (t("mealPlanView.mealCompleted") || "Meal completed!") : 
+            (t("mealPlanView.mealUncompleted") || "Meal marked as not done"),
+          description: complete ? 
+            (t("mealPlanView.mealCompletedDesc") || "Great job on completing your meal!") : 
+            (t("mealPlanView.mealUncompletedDesc") || "Meal status updated successfully"),
+        });
+        
+        // Also call the existing toggle function for consistency
+        toggleMealCompletion(mealId, date, complete);
+      } else {
+        throw new Error("Failed to update meal");
+      }
     } catch (error) {
-      console.log("error updating meal consumed");
+      console.log("error updating meal consumed:", error);
+      
+      // Show error toast
+      toast({
+        title: t("mealPlanView.updateError") || "Update failed",
+        description: t("mealPlanView.updateErrorDesc") || "Failed to update meal status. Please try again.",
+        variant: "destructive",
+      });
     }
-    // implement the endpoin to update
-    console.log("complete is true");
-    toggleMealCompletion(mealId, date, complete);
-    return;
   };
 
   const handleMealClick = (meal: any) => {
@@ -179,17 +213,19 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     setCheckedItems(newCheckedItems);
 
     // Update select all state
-    const totalItems = plan.shoppingList?.length || 0;
+    const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
+    const totalItems = shoppingList.length;
     setSelectAll(newCheckedItems.size === totalItems);
   };
 
   const handleSelectAll = () => {
+    const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
     if (selectAll) {
       setCheckedItems(new Set());
       setSelectAll(false);
     } else {
       const allItemIds = new Set<string>(
-        plan.shoppingList?.map((item: any) => item.id) || []
+        shoppingList.map((item: any, index: number) => item.id || item.name || index.toString())
       );
       setCheckedItems(allItemIds);
       setSelectAll(true);
@@ -197,9 +233,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   };
 
   const handleAddToPantry = async (items?: any[]) => {
+    const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
     const itemsToAdd =
       items ||
-      plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) ||
+      shoppingList.filter((item: any) => checkedItems.has(item.id || item.name)) ||
       [];
 
     const newPantryItems = [];
@@ -247,9 +284,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   };
 
   const handleOrderOnline = (items?: any[]) => {
+    const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
     const itemsToOrder =
       items ||
-      plan.shoppingList?.filter((item: any) => checkedItems.has(item.id)) ||
+      shoppingList.filter((item: any) => checkedItems.has(item.id || item.name)) ||
       [];
     setOrderItems(itemsToOrder);
     setShowOrderModal(true);
@@ -275,8 +313,20 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     console.log("Plan structure:", plan);
     console.log("Plan meals:", plan.meals);
 
-    // If meals are directly in the plan (your current structure)
-    if (plan.meals && plan.meals.length > 0) {
+    // Handle the new API structure: plan.plan.plan.mealPlan
+    if (plan.plan?.plan?.mealPlan && plan.plan.plan.mealPlan.length > 0) {
+      plan.plan.plan.mealPlan.forEach((dayPlan: any) => {
+        const dayKey = `Day ${dayPlan.day}`;
+        if (!groupedMeals[dayKey]) {
+          groupedMeals[dayKey] = [];
+        }
+        if (dayPlan.meals && dayPlan.meals.length > 0) {
+          groupedMeals[dayKey].push(...dayPlan.meals);
+        }
+      });
+    }
+    // If meals are directly in the plan (your old structure)
+    else if (plan.meals && plan.meals.length > 0) {
       plan.meals.forEach((meal: any) => {
         // Map the meal day based on the date or day property
         let dayKey = "Day 1";
@@ -304,9 +354,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         groupedMeals[dayKey].push(meal);
       });
     }
-
     // If meals are within weeks structure
-    if (plan.weeks && plan.weeks.length > 0) {
+    else if (plan.weeks && plan.weeks.length > 0) {
       plan.weeks.forEach((week: any) => {
         if (week.days && week.days.length > 0) {
           week.days.forEach((day: any, dayIndex: number) => {
@@ -338,10 +387,11 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   );
 
   // Calculate shopping list stats
-  const totalItems = plan.shoppingList?.length || 0;
+  const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
+  const totalItems = shoppingList.length;
   const checkedCount = checkedItems.size;
   const totalEstimatedCost =
-    plan.shoppingList?.reduce(
+    shoppingList.reduce(
       (total: number, item: any) => total + (item.estimatedPrice || 0),
       0
     ) || 0;
@@ -596,7 +646,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsContent>
 
         <TabsContent value="shopping" className="space-y-6">
-          {plan.shoppingList && plan.shoppingList.length > 0 ? (
+          {shoppingList && shoppingList.length > 0 ? (
             <>
               {/* Shopping List Header with Summary */}
               <Card>
@@ -660,8 +710,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
               {/* Shopping Items by Category */}
               {Object.entries(
-                plan.shoppingList.reduce((acc: any, item: any) => {
-                  const category = item.category || "Other";
+                shoppingList.reduce((acc: any, item: any) => {
+                  const category = item.classification || item.category || "Other";
                   if (!acc[category]) acc[category] = [];
                   acc[category].push(item);
                   return acc;
@@ -678,21 +728,23 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {items.map((item: any) => (
-                        <div
-                          key={item.id}
-                          className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
-                            checkedItems.has(item.id)
-                              ? "bg-blue-50 border-blue-200"
-                              : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Checkbox
-                              id={`item-${item.id}`}
-                              checked={checkedItems.has(item.id)}
-                              onCheckedChange={() => handleItemCheck(item.id)}
-                            />
+                       {items.map((item: any, index: number) => {
+                         const itemId = item.id || item.name || `${category}-${index}`;
+                         return (
+                         <div
+                           key={itemId}
+                           className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+                             checkedItems.has(itemId)
+                               ? "bg-blue-50 border-blue-200"
+                               : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                           }`}
+                         >
+                           <div className="flex items-center gap-3">
+                             <Checkbox
+                               id={`item-${itemId}`}
+                               checked={checkedItems.has(itemId)}
+                               onCheckedChange={() => handleItemCheck(itemId)}
+                             />
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <p className="font-medium">{item.name}</p>
@@ -741,8 +793,9 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                               </Button>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                         </div>
+                         );
+                       })}
                     </div>
                   </CardContent>
                 </Card>
