@@ -425,12 +425,14 @@ interface SubscriptionResponse {
 
 export async function persistUserSubscription(
   userId: string,
-  subscriptionTypeId: string
+  subscriptionTypeId: string,
+  responseCreateSubscription: string
 ): Promise<SubscriptionResponse> {
   const data = JSON.stringify({
     subscriptionTypeId,
+    rukusubscriptionID: responseCreateSubscription
   });
-
+console.log('data to send to persist subscription ', data);
   const config = {
     method: "post",
     maxBodyLength: Infinity,

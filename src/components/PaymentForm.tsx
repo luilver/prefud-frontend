@@ -136,7 +136,8 @@ const PaymentForm = ({
                   const responsePersistSubscription =
                     await persistUserSubscription(
                       userInfo.userId,
-                      selectedPlan.id
+                      selectedPlan.id,
+                      responseCreateSubscription.id
                     );
 
                   // You can now send this token to your backend for further processing
