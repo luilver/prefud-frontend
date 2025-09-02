@@ -457,7 +457,7 @@ console.log('data to send to persist subscription ', data);
 }
 
 //cancel subscription
-export async function cancelUserSubscription(userId: string): Promise<{ success: boolean; message?: string }> {
+export async function cancelUserSubscription(userId: string): Promise<{ success: boolean; message?: string; subscription?: any }> {
   const config = {
     method: "delete",
     maxBodyLength: Infinity,
@@ -469,8 +469,12 @@ export async function cancelUserSubscription(userId: string): Promise<{ success:
     const response = await axios.request(config);
     console.log("Subscription cancelled:", response.data);
     
-    if (response.status === 200) {
-      return { success: true };
+    if (response.status === 200 && response.data.code === "01") {
+      return { 
+        success: true, 
+        message: response.data.message,
+        subscription: response.data.return 
+      };
     } else {
       return { success: false, message: "Unexpected response status" };
     }
