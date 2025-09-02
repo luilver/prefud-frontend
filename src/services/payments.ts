@@ -455,3 +455,30 @@ console.log('data to send to persist subscription ', data);
     throw error;
   }
 }
+
+//cancel subscription
+export async function cancelUserSubscription(userId: string): Promise<{ success: boolean; message?: string }> {
+  const config = {
+    method: "delete",
+    maxBodyLength: Infinity,
+    url: `${BASE_URL}/subscription/${userId}`,
+    headers: {},
+  };
+
+  try {
+    const response = await axios.request(config);
+    console.log("Subscription cancelled:", response.data);
+    
+    if (response.status === 200) {
+      return { success: true };
+    } else {
+      return { success: false, message: "Unexpected response status" };
+    }
+  } catch (error: any) {
+    console.error("Error cancelling subscription:", error.response?.data || error.message);
+    return { 
+      success: false, 
+      message: error.response?.data?.message || error.message || "Failed to cancel subscription"
+    };
+  }
+}

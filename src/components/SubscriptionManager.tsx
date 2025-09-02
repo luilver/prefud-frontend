@@ -349,6 +349,7 @@ const SubscriptionManager = () => {
         onClose={() => setShowCancelModal(false)}
         onConfirm={handleCancelSubscription}
         currentPlan={currentSubscriptionName}
+        userId={user?.userId || ""}
       />
 
       <PaymentMethodModal

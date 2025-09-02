@@ -322,6 +322,7 @@ const UserProfile = () => {
         onClose={() => setShowCancelModal(false)}
         onConfirm={handleCancelSubscription}
         currentPlan={currentSubscriptionName}
+        userId={authUser?.userId || ""}
       />
     </div>
   );

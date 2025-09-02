@@ -10,19 +10,22 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cancelUserSubscription } from "@/services/payments";
 
 interface SubscriptionCancelModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   currentPlan: string;
+  userId: string;
 }
 
 const SubscriptionCancelModal = ({ 
   isOpen, 
   onClose, 
   onConfirm,
-  currentPlan 
+  currentPlan,
+  userId 
 }: SubscriptionCancelModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -30,15 +33,22 @@ const SubscriptionCancelModal = ({
   const handleConfirmCancel = async () => {
     setIsProcessing(true);
     try {
-      // Simulate API call to cancel subscription
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const result = await cancelUserSubscription(userId);
       
-      onConfirm();
-      toast({
-        title: "Subscription Cancelled",
-        description: "Your subscription has been cancelled. You'll continue to have access until the end of your billing period.",
-      });
-      onClose();
+      if (result.success) {
+        onConfirm();
+        toast({
+          title: "Subscription Cancelled",
+          description: "Your subscription has been cancelled successfully.",
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to cancel subscription. Please try again.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",
