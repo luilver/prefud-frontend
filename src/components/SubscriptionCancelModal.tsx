@@ -36,6 +36,7 @@ const SubscriptionCancelModal = ({
     setIsProcessing(true);
     try {
       const result = await cancelUserSubscription(userId);
+      console.log('this si the result of cancel subscription ', result)
       
       if (result.success && result.subscription) {
         // Update SubscriptionContext
