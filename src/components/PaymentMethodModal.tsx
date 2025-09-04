@@ -13,7 +13,15 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CreditCard, Plus, X, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getUserPaymentMethods, UserPaymentMethod, subscribeUser } from "@/services/payments";
+import { 
+  getUserPaymentMethods, 
+  UserPaymentMethod, 
+  subscribeUser,
+  setDefaultPaymentMethod,
+  createStripeProduct,
+  createStripePrice,
+  createStripeSubscription
+} from "@/services/payments";
 
 interface PaymentMethodModalProps {
   isOpen: boolean;
@@ -97,17 +105,46 @@ const PaymentMethodModal = ({
     }
 
     try {
-      // For now, we're just simulating the subscription process
-      // In a real implementation, you would:
-      // 1. Create a Stripe subscription using the selected payment method
-      // 2. Get the rukusubscriptionID from the Stripe response
-      // 3. Call subscribeUser with the actual values
-      
-      // Simulate rukusubscriptionID (in real implementation, this comes from Stripe)
-      const simulatedRukuSubscriptionID = `sub_${Date.now()}`;
-      
-      // Call the subscribe endpoint
-      const result = await subscribeUser(userId, selectedPlan.id, simulatedRukuSubscriptionID);
+      // Step 1: Check if selected payment method is default, if not set it as default
+      const selectedMethod = paymentMethods.find(method => method.id === selectedPaymentMethod);
+      if (selectedMethod && !selectedMethod.isDefault) {
+        console.log('Setting payment method as default...');
+        await setDefaultPaymentMethod(selectedPaymentMethod, rukuClientId);
+        toast({
+          title: "Payment Method Updated",
+          description: "Payment method set as default.",
+        });
+      }
+
+      // Step 2: Create Stripe product
+      console.log('Creating Stripe product...');
+      const product = await createStripeProduct(
+        selectedPlan.name,
+        `${selectedPlan.name} subscription plan`
+      );
+      console.log('Product created:', product);
+
+      // Step 3: Create Stripe price
+      console.log('Creating Stripe price...');
+      const price = await createStripePrice(
+        product.id,
+        selectedPlan.price * 100, // Convert to cents
+        'usd',
+        'month'
+      );
+      console.log('Price created:', price);
+
+      // Step 4: Create Stripe subscription
+      console.log('Creating Stripe subscription...');
+      const subscription = await createStripeSubscription(
+        rukuClientId,
+        price.id
+      );
+      console.log('Subscription created:', subscription);
+
+      // Step 5: Call subscribeUser with the actual subscription ID
+      console.log('Calling subscribeUser...');
+      const result = await subscribeUser(userId, selectedPlan.id, subscription.id);
       console.log('Subscription result:', result);
       
       onSuccess();
