@@ -357,6 +357,7 @@ const SubscriptionManager = () => {
         onClose={() => setShowPaymentModal(false)}
         onSuccess={handleSubscriptionSuccess}
         rukuClientId={user?.profile?.ruku_client_id || ""}
+        userId={user?.userId || ""}
         selectedPlan={selectedPlan || { id: "", name: "", price: 0 }}
       />
 

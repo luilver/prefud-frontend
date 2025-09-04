@@ -13,13 +13,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CreditCard, Plus, X, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getUserPaymentMethods, UserPaymentMethod } from "@/services/payments";
+import { getUserPaymentMethods, UserPaymentMethod, subscribeUser } from "@/services/payments";
 
 interface PaymentMethodModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   rukuClientId: string;
+  userId: string;
   selectedPlan: {
     id: string;
     name: string;
@@ -32,6 +33,7 @@ const PaymentMethodModal = ({
   onClose, 
   onSuccess,
   rukuClientId,
+  userId,
   selectedPlan 
 }: PaymentMethodModalProps) => {
   const [paymentMethods, setPaymentMethods] = useState<UserPaymentMethod[]>([]);
@@ -83,17 +85,39 @@ const PaymentMethodModal = ({
 
   const handleSubscribe = async () => {
     setIsProcessing(true);
+    
+    if (!selectedPaymentMethod) {
+      toast({
+        title: "No Payment Method",
+        description: "Please select a payment method first.",
+        variant: "destructive"
+      });
+      setIsProcessing(false);
+      return;
+    }
+
     try {
-      // Simulate API call to process subscription
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // For now, we're just simulating the subscription process
+      // In a real implementation, you would:
+      // 1. Create a Stripe subscription using the selected payment method
+      // 2. Get the rukusubscriptionID from the Stripe response
+      // 3. Call subscribeUser with the actual values
+      
+      // Simulate rukusubscriptionID (in real implementation, this comes from Stripe)
+      const simulatedRukuSubscriptionID = `sub_${Date.now()}`;
+      
+      // Call the subscribe endpoint
+      const result = await subscribeUser(userId, selectedPlan.id, simulatedRukuSubscriptionID);
+      console.log('Subscription result:', result);
       
       onSuccess();
       toast({
         title: "Subscription Successful!",
-        description: `Welcome to ${selectedPlan.name}! Your subscription is now active.`,
+        description: result.message || `Welcome to ${selectedPlan.name}! Your subscription is now active.`,
       });
       onClose();
     } catch (error) {
+      console.error('Subscription error:', error);
       toast({
         title: "Payment Failed",
         description: "There was an error processing your payment. Please try again.",

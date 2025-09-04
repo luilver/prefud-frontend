@@ -518,3 +518,51 @@ export async function cancelUserSubscription(userId: string): Promise<{ success:
     };
   }
 }
+
+// Subscribe user to a subscription
+export interface SubscribeUserResponse {
+  code: string;
+  message: string;
+  return: {
+    userId: string;
+    subscriptionTypeId: string;
+    dayOfTheMonth: number;
+    dateStarted: string;
+    status: boolean;
+    mealPlans: number;
+    specialMeals: number;
+    healthyDrinks: number;
+    generateMeals: number;
+    rukusubscriptionID: string;
+    _id: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
+}
+
+export const subscribeUser = async (
+  userId: string,
+  subscriptionTypeId: string,
+  rukusubscriptionID: string
+): Promise<SubscribeUserResponse> => {
+  try {
+    const response = await axios.post(
+      `http://localhost:3001/subscription/subscribe/${userId}`,
+      {
+        subscriptionTypeId,
+        rukusubscriptionID
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    console.error('Error subscribing user:', error);
+    throw new Error(error.response?.data?.message || 'Failed to subscribe user');
+  }
+};
