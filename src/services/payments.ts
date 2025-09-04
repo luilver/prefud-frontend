@@ -456,6 +456,38 @@ console.log('data to send to persist subscription ', data);
   }
 }
 
+export interface UserPaymentMethod {
+  id: string;
+  brand: string;
+  last4: string;
+  exp_month: number;
+  exp_year: number;
+  isDefault: boolean;
+}
+
+//get user payment methods
+export async function getUserPaymentMethods(rukuClientId: string): Promise<UserPaymentMethod[]> {
+  const config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: `${API_PAYMENTS}/stripe/methods/${rukuClientId}`,
+    headers: {},
+  };
+
+  try {
+    const response = await axios.request<UserPaymentMethod[]>(config);
+    console.log('Payment methods:', response.data);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 400) {
+      console.error('Customer not found:', error.response?.data?.message);
+      return [];
+    }
+    console.error('Error fetching payment methods:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
 //cancel subscription
 export async function cancelUserSubscription(userId: string): Promise<{ success: boolean; message?: string; subscription?: any }> {
   const config = {

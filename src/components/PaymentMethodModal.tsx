@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,22 +11,15 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { CreditCard, Plus, X, Check } from "lucide-react";
+import { CreditCard, Plus, X, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface PaymentMethod {
-  id: string;
-  brand: string;
-  last4: string;
-  expiryMonth: number;
-  expiryYear: number;
-  isDefault: boolean;
-}
+import { getUserPaymentMethods, UserPaymentMethod } from "@/services/payments";
 
 interface PaymentMethodModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  rukuClientId: string;
   selectedPlan: {
     id: string;
     name: string;
@@ -38,28 +31,12 @@ const PaymentMethodModal = ({
   isOpen, 
   onClose, 
   onSuccess,
+  rukuClientId,
   selectedPlan 
 }: PaymentMethodModalProps) => {
-  const [paymentMethods] = useState<PaymentMethod[]>([
-    {
-      id: "pm_1",
-      brand: "visa",
-      last4: "4242",
-      expiryMonth: 12,
-      expiryYear: 2025,
-      isDefault: true
-    },
-    {
-      id: "pm_2",
-      brand: "mastercard",
-      last4: "8888",
-      expiryMonth: 8,
-      expiryYear: 2026,
-      isDefault: false
-    }
-  ]);
-  
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("pm_1");
+  const [paymentMethods, setPaymentMethods] = useState<UserPaymentMethod[]>([]);
+  const [isLoadingMethods, setIsLoadingMethods] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [showAddCard, setShowAddCard] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardNumber, setCardNumber] = useState("");
@@ -67,6 +44,42 @@ const PaymentMethodModal = ({
   const [cvv, setCvv] = useState("");
   const [cardName, setCardName] = useState("");
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isOpen && rukuClientId) {
+      fetchPaymentMethods();
+    }
+  }, [isOpen, rukuClientId]);
+
+  const fetchPaymentMethods = async () => {
+    setIsLoadingMethods(true);
+    try {
+      const methods = await getUserPaymentMethods(rukuClientId);
+      setPaymentMethods(methods);
+      
+      // Auto-select the default payment method or first one
+      const defaultMethod = methods.find(method => method.isDefault);
+      if (defaultMethod) {
+        setSelectedPaymentMethod(defaultMethod.id);
+      } else if (methods.length > 0) {
+        setSelectedPaymentMethod(methods[0].id);
+      }
+      
+      // If no payment methods, show add card form
+      if (methods.length === 0) {
+        setShowAddCard(true);
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load payment methods. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingMethods(false);
+    }
+  };
 
   const handleSubscribe = async () => {
     setIsProcessing(true);
@@ -143,7 +156,12 @@ const PaymentMethodModal = ({
         </DialogHeader>
 
         <div className="space-y-6">
-          {!showAddCard ? (
+          {isLoadingMethods ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span className="ml-2">Loading payment methods...</span>
+            </div>
+          ) : !showAddCard && paymentMethods.length > 0 ? (
             <>
               <div className="space-y-4">
                 <h4 className="font-medium">Saved Payment Methods</h4>
@@ -166,7 +184,7 @@ const PaymentMethodModal = ({
                                 )}
                               </div>
                               <p className="text-sm text-gray-500">
-                                Expires {method.expiryMonth.toString().padStart(2, '0')}/{method.expiryYear}
+                                Expires {method.exp_month.toString().padStart(2, '0')}/{method.exp_year}
                               </p>
                             </div>
                           </div>
@@ -195,7 +213,7 @@ const PaymentMethodModal = ({
                 </div>
                 <Button 
                   onClick={handleSubscribe}
-                  disabled={isProcessing}
+                  disabled={isProcessing || !selectedPaymentMethod}
                   className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
                 >
                   {isProcessing ? 'Processing...' : 'Subscribe Now'}
