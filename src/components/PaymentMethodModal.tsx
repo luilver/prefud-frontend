@@ -93,7 +93,7 @@ const PaymentMethodModal = ({
 
   const handleSubscribe = async () => {
     setIsProcessing(true);
-    
+    //check for a payment method
     if (!selectedPaymentMethod) {
       toast({
         title: "No Payment Method",
@@ -103,7 +103,7 @@ const PaymentMethodModal = ({
       setIsProcessing(false);
       return;
     }
-
+    
     try {
       // Step 1: Check if selected payment method is default, if not set it as default
       const selectedMethod = paymentMethods.find(method => method.id === selectedPaymentMethod);

@@ -224,10 +224,8 @@ const SubscriptionManager = () => {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-800">Choose Your Plan</h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Select the perfect plan for your meal planning needs. Upgrade or downgrade anytime.
-        </p>
+        <h1 className="text-3xl font-bold text-gray-800">Actual Plan</h1>
+        
         
         {/* Current Subscription Display */}
         {currentSubscriptionName !== "Free" && (
@@ -251,9 +249,14 @@ const SubscriptionManager = () => {
             </div>
           </div>
         )}
+        <h1 className="text-3xl font-bold text-gray-800">Update your plan</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Select the perfect plan for your meal planning needs. Upgrade or downgrade anytime.
+        </p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
+        
         {plans.map((plan) => {
           // Mark current plan ONLY when IDs match.
           // If the user has no subscription ID, mark Free (price === 0) as current.

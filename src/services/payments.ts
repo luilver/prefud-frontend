@@ -489,7 +489,7 @@ export async function getUserPaymentMethods(rukuClientId: string): Promise<UserP
 }
 
 //cancel subscription
-export async function cancelUserSubscription(userId: string): Promise<{ success: boolean; message?: string; subscription?: any }> {
+export async function cancelUserSubscription(userId: string): Promise<{ success: boolean; message?: string; subscription?: any, code: string }> {
   const config = {
     method: "delete",
     maxBodyLength: Infinity,
