@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,15 +12,28 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CreditCard, Plus, X, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  getUserPaymentMethods, 
-  UserPaymentMethod, 
+import {
+  getUserPaymentMethods,
+  UserPaymentMethod,
   subscribeUser,
   setDefaultPaymentMethod,
   createStripeProduct,
   createStripePrice,
-  createStripeSubscription
+  createStripeSubscription,
 } from "@/services/payments";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Plan } from "@/utils/mapSubscriptionPlans";
+import PaymentForm2 from "./PaymentForm2";
+
+
+
+
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
+
 
 interface PaymentMethodModalProps {
   isOpen: boolean;
@@ -36,14 +48,17 @@ interface PaymentMethodModalProps {
   };
 }
 
-const PaymentMethodModal = ({ 
-  isOpen, 
-  onClose, 
+const PaymentMethodModal = ({
+  isOpen,
+  onClose,
   onSuccess,
   rukuClientId,
   userId,
-  selectedPlan 
+  selectedPlan,
 }: PaymentMethodModalProps) => {
+  const { user } = useUser();
+  const { user: authUser } = useAuth();
+
   const [paymentMethods, setPaymentMethods] = useState<UserPaymentMethod[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
@@ -54,6 +69,8 @@ const PaymentMethodModal = ({
   const [cvv, setCvv] = useState("");
   const [cardName, setCardName] = useState("");
   const { toast } = useToast();
+  const [subscriptionTypes, setSubscriptionTypes] = useState<Plan[]>([]);
+
 
   useEffect(() => {
     if (isOpen && rukuClientId) {
@@ -66,25 +83,25 @@ const PaymentMethodModal = ({
     try {
       const methods = await getUserPaymentMethods(rukuClientId);
       setPaymentMethods(methods);
-      
+
       // Auto-select the default payment method or first one
-      const defaultMethod = methods.find(method => method.isDefault);
+      const defaultMethod = methods.find((method) => method.isDefault);
       if (defaultMethod) {
         setSelectedPaymentMethod(defaultMethod.id);
       } else if (methods.length > 0) {
         setSelectedPaymentMethod(methods[0].id);
       }
-      
+
       // If no payment methods, show add card form
       if (methods.length === 0) {
         setShowAddCard(true);
       }
     } catch (error) {
-      console.error('Error fetching payment methods:', error);
+      console.error("Error fetching payment methods:", error);
       toast({
         title: "Error",
         description: "Failed to load payment methods. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoadingMethods(false);
@@ -98,17 +115,19 @@ const PaymentMethodModal = ({
       toast({
         title: "No Payment Method",
         description: "Please select a payment method first.",
-        variant: "destructive"
+        variant: "destructive",
       });
       setIsProcessing(false);
       return;
     }
-    
+
     try {
       // Step 1: Check if selected payment method is default, if not set it as default
-      const selectedMethod = paymentMethods.find(method => method.id === selectedPaymentMethod);
+      const selectedMethod = paymentMethods.find(
+        (method) => method.id === selectedPaymentMethod
+      );
       if (selectedMethod && !selectedMethod.isDefault) {
-        console.log('Setting payment method as default...');
+        console.log("Setting payment method as default...");
         await setDefaultPaymentMethod(selectedPaymentMethod, rukuClientId);
         toast({
           title: "Payment Method Updated",
@@ -117,84 +136,82 @@ const PaymentMethodModal = ({
       }
 
       // Step 2: Create Stripe product
-      console.log('Creating Stripe product...');
+      console.log("Creating Stripe product...");
       const product = await createStripeProduct(
         selectedPlan.name,
         `${selectedPlan.name} subscription plan`
       );
-      console.log('Product created:', product);
+      console.log("Product created:", product);
 
       // Step 3: Create Stripe price
-      console.log('Creating Stripe price...');
+      console.log("Creating Stripe price...");
       const price = await createStripePrice(
         product.id,
         selectedPlan.price * 100, // Convert to cents
-        'usd',
-        'month'
+        "usd",
+        "month"
       );
-      console.log('Price created:', price);
+      console.log("Price created:", price);
 
       // Step 4: Create Stripe subscription
-      console.log('Creating Stripe subscription...');
+      console.log("Creating Stripe subscription...");
       const subscription = await createStripeSubscription(
         rukuClientId,
         price.id
       );
-      console.log('Subscription created:', subscription);
+      console.log("Subscription created:", subscription);
 
       // Step 5: Call subscribeUser with the actual subscription ID
-      console.log('Calling subscribeUser...');
-      const result = await subscribeUser(userId, selectedPlan.id, subscription.id);
-      console.log('Subscription result:', result);
-      
+      console.log("Calling subscribeUser...");
+      const result = await subscribeUser(
+        userId,
+        selectedPlan.id,
+        subscription.id
+      );
+      console.log("Subscription result:", result);
+
       onSuccess();
       toast({
         title: "Subscription Successful!",
-        description: result.message || `Welcome to ${selectedPlan.name}! Your subscription is now active.`,
+        description:
+          result.message ||
+          `Welcome to ${selectedPlan.name}! Your subscription is now active.`,
       });
       onClose();
     } catch (error) {
-      console.error('Subscription error:', error);
+      console.error("Subscription error:", error);
       toast({
         title: "Payment Failed",
-        description: "There was an error processing your payment. Please try again.",
-        variant: "destructive"
+        description:
+          "There was an error processing your payment. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleAddCard = async () => {
-    if (!cardNumber || !expiryDate || !cvv || !cardName) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all card details.",
-        variant: "destructive"
-      });
-      return;
-    }
+  const handleAddCard = async (paymentData: any) => {
+    console.log('this is the received information ', paymentData);
+    
 
     setIsProcessing(true);
     try {
       // Simulate API call to add card
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       toast({
-        title: "Card Added",
-        description: "Your payment method has been added successfully.",
+        title: "Subscription updated!",
+        description: "Your subscription was updated successfully.",
       });
       setShowAddCard(false);
-      // Reset form
-      setCardNumber("");
-      setExpiryDate("");
-      setCvv("");
-      setCardName("");
+      onClose();
+      
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add payment method. Please try again.",
-        variant: "destructive"
+        description: "Failed to update your subscription. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
@@ -207,12 +224,11 @@ const PaymentMethodModal = ({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>Choose Payment Method</DialogTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+            
           </div>
           <DialogDescription>
-            Select a payment method for your {selectedPlan.name} subscription (${selectedPlan.price}/month)
+            Select a payment method for your {selectedPlan.name} subscription ($
+            {selectedPlan.price}/month)
           </DialogDescription>
         </DialogHeader>
 
@@ -226,17 +242,28 @@ const PaymentMethodModal = ({
             <>
               <div className="space-y-4">
                 <h4 className="font-medium">Saved Payment Methods</h4>
-                <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                <RadioGroup
+                  value={selectedPaymentMethod}
+                  onValueChange={setSelectedPaymentMethod}
+                >
                   {paymentMethods.map((method) => (
-                    <div key={method.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                    <div
+                      key={method.id}
+                      className="flex items-center space-x-3 p-3 border rounded-lg"
+                    >
                       <RadioGroupItem value={method.id} id={method.id} />
-                      <Label htmlFor={method.id} className="flex-1 cursor-pointer">
+                      <Label
+                        htmlFor={method.id}
+                        className="flex-1 cursor-pointer"
+                      >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             <CreditCard className="h-5 w-5 text-gray-600" />
                             <div>
                               <div className="flex items-center space-x-2">
-                                <span className="font-medium capitalize">{method.brand}</span>
+                                <span className="font-medium capitalize">
+                                  {method.brand}
+                                </span>
                                 <span>•••• {method.last4}</span>
                                 {method.isDefault && (
                                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
@@ -245,7 +272,9 @@ const PaymentMethodModal = ({
                                 )}
                               </div>
                               <p className="text-sm text-gray-500">
-                                Expires {method.exp_month.toString().padStart(2, '0')}/{method.exp_year}
+                                Expires{" "}
+                                {method.exp_month.toString().padStart(2, "0")}/
+                                {method.exp_year}
                               </p>
                             </div>
                           </div>
@@ -254,9 +283,9 @@ const PaymentMethodModal = ({
                     </div>
                   ))}
                 </RadioGroup>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   onClick={() => setShowAddCard(true)}
                   className="w-full"
                 >
@@ -267,82 +296,56 @@ const PaymentMethodModal = ({
 
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
-                  <h4 className="font-semibold text-gray-800">{selectedPlan.name} Plan</h4>
+                  <h4 className="font-semibold text-gray-800">
+                    {selectedPlan.name} Plan
+                  </h4>
                   <p className="text-2xl font-bold text-green-600">
                     ${selectedPlan.price}/month
                   </p>
                 </div>
-                <Button 
+                <Button
                   onClick={handleSubscribe}
                   disabled={isProcessing || !selectedPaymentMethod}
                   className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
                 >
-                  {isProcessing ? 'Processing...' : 'Subscribe Now'}
+                  {isProcessing ? "Processing..." : "Subscribe Now"}
                 </Button>
               </div>
             </>
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium">Add New Card</h4>
-                <Button variant="ghost" size="sm" onClick={() => setShowAddCard(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
+               
+               
               </div>
-              
+
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="cardName">Cardholder Name</Label>
-                  <Input
-                    id="cardName"
-                    value={cardName}
-                    onChange={(e) => setCardName(e.target.value)}
-                    placeholder="John Doe"
+               
+
+                
+
+                <Elements stripe={stripePromise}>
+                  <PaymentForm2
+                    onSuccess={handleAddCard}
+                    onBack={() => setShowAddCard(false)}
+                    userInfo={{
+                      email: user.email,
+                      phone: user.phone || "",
+                      customerId: authUser.profile.ruku_client_id,
+                      userId: userId,
+                    }}
+                    selectedPlan={
+                      {id: selectedPlan.id,
+                        name: selectedPlan.name,
+                        price: selectedPlan.price*100,
+                        features: [""],
+                        interval: '',
+                      }
+                    }
                   />
-                </div>
-                
-                <div>
-                  <Label htmlFor="cardNumber">Card Number</Label>
-                  <Input
-                    id="cardNumber"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    placeholder="1234 5678 9012 3456"
-                    maxLength={19}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="expiryDate">Expiry Date</Label>
-                    <Input
-                      id="expiryDate"
-                      value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.target.value)}
-                      placeholder="MM/YY"
-                      maxLength={5}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="cvv">CVV</Label>
-                    <Input
-                      id="cvv"
-                      value={cvv}
-                      onChange={(e) => setCvv(e.target.value)}
-                      placeholder="123"
-                      maxLength={3}
-                    />
-                  </div>
-                </div>
-                
-                <Button 
-                  onClick={handleAddCard}
-                  disabled={isProcessing}
-                  className="w-full"
-                >
-                  {isProcessing ? 'Adding Card...' : 'Add Card'}
-                </Button>
+                </Elements>
+
+               
               </div>
             </div>
           )}
