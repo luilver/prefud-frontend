@@ -112,10 +112,16 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       
       toast.success("Healthy drink was created successfully!");
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating drink:', error);
       setIsGenerating(false);
-      toast.error("Failed to generate drink. Please try again.");
+      
+      // Handle specific subscription error
+      if (error.code === "03") {
+        toast.error(error.message || "No healthy drinks available according to your subscription");
+      } else {
+        toast.error("Failed to generate drink. Please try again.");
+      }
     }
   };
 

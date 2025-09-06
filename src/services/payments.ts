@@ -518,9 +518,14 @@ export async function cancelUserSubscription(
         success: true,
         message: response.data.message,
         subscription: response.data.subscription,
+        code: response.data.code,
       };
     } else {
-      return { success: false, message: "Unexpected response status" };
+      return { 
+        success: false, 
+        message: "Unexpected response status",
+        code: response.data.code || "error"
+      };
     }
   } catch (error: any) {
     console.error(
@@ -533,6 +538,7 @@ export async function cancelUserSubscription(
         error.response?.data?.message ||
         error.message ||
         "Failed to cancel subscription",
+      code: error.response?.data?.code || "error"
     };
   }
 }

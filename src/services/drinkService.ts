@@ -123,11 +123,19 @@ export const createHealthyDrink = async (drinkData: CreateDrinkRequest): Promise
       body: JSON.stringify(drinkData),
     });
 
+    const data = await response.json();
+    
+    // Check for specific error codes
+    if (data.code === "03") {
+      const error = new Error(data.message || "No healthy drinks available according to your subscription");
+      (error as any).code = "03";
+      throw error;
+    }
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
     console.log('Created drink plan:', data);
     return data;
   } catch (error) {
