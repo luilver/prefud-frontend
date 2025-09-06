@@ -120,7 +120,11 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       setIsGenerating(false);
       
       // Handle specific subscription error
-      if (error.code === "03") {
+      if (
+        error?.code === "03" ||
+        error?.response?.data?.code === "03" ||
+        (typeof error?.message === "string" && error.message.includes("No healthy drinks available according to your subscription"))
+      ) {
         console.log('Showing upgrade modal for code 03');
         setShowUpgradeModal(true);
       } else {
