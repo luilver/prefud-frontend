@@ -13,6 +13,7 @@ import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlan
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanView from "./MealPlanView";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
+import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
 
 interface MealPlanCreatorProps {
   onPlanCreated: (plan: any) => void;
@@ -42,6 +43,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [showPlanView, setShowPlanView] = useState(false);
   const [createdPlan, setCreatedPlan] = useState<any>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const { user, refreshMealPlans } = useUser();
   const { language } = useLanguage();
@@ -251,8 +253,9 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       // Refresh meal plans from server
       await refreshMealPlans();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating meal plan:', error);
+      console.log('Error code:', error.code);
       
       // Clear the timeout
       if (timeout) {
@@ -263,11 +266,21 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       // Hide the loader
       hideLoader();
       
-      toast({
-        title: "Generation Failed",
-        description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
-        variant: "destructive"
-      });
+      // Handle specific subscription error
+      if (
+        error?.code === "03" ||
+        error?.response?.data?.code === "03" ||
+        (typeof error?.message === "string" && error.message.includes("No meal plans available according to your subscription"))
+      ) {
+        console.log('Showing upgrade modal for meal plan code 03');
+        setShowUpgradeModal(true);
+      } else {
+        toast({
+          title: "Generation Failed",
+          description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -723,6 +736,12 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
           </CardContent>
         </Card>
       </div>
+
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureType="plans"
+      />
     </div>
   );
 };

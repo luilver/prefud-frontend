@@ -144,11 +144,21 @@ export const createMealPlan = async (planData: CreateMealPlanRequest): Promise<A
       body: JSON.stringify(planData)
     });
 
+    const data = await response.json();
+    console.log('API Response:', data);
+    
+    // Check for specific error codes first (even with 201 status)
+    if (data.code === "03") {
+      console.log('Meal plan subscription limit reached - code 03 detected');
+      const error = new Error(data.message || "No meal plans available according to your subscription");
+      (error as any).code = "03";
+      throw error;
+    }
+
     if (!response.ok) {
       throw new Error(`Failed to create meal plan: ${response.status}`);
     }
 
-    const data: ApiMealPlan = await response.json();
     console.log('Service: Meal plan created successfully', data);
     
     return data;

@@ -14,6 +14,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { addIngredientsToPantry } from "@/services/pantryService";
+import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
 
 interface AIMealGenerationProps {
   mealData: any;
@@ -37,6 +38,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     zipCode: '',
     country: ''
   });
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
   const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
@@ -80,12 +82,20 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         body: JSON.stringify(apiPayload)
       });
 
+      const data = await response.json();
+      console.log("API response:", data);
+
+      // Check for specific error codes first (even with 201 status)
+      if (data.code === "03") {
+        console.log('Meal subscription limit reached - code 03 detected');
+        const error = new Error(data.message || "No meal plans available according to your subscription");
+        (error as any).code = "03";
+        throw error;
+      }
+
       if (!response.ok) {
         throw new Error(`API request failed: ${response.status}`);
       }
-
-      const data = await response.json();
-      console.log("API response:", data);
 
       // Transform the API response to match our expected meal format
       const generatedMeal = {
@@ -110,10 +120,22 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       setMeal(generatedMeal);
       hideLoader();
       toast.success(t("aiMealGenerator.createAIMealTitle") || "Your AI-generated meal is ready!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating meal:", error);
+      console.log('Error code:', error.code);
       hideLoader();
-      toast.error(t("aiMealGenerator.error") || "Failed to generate meal. Please try again.");
+      
+      // Handle specific subscription error
+      if (
+        error?.code === "03" ||
+        error?.response?.data?.code === "03" ||
+        (typeof error?.message === "string" && error.message.includes("No meal plans available according to your subscription"))
+      ) {
+        console.log('Showing upgrade modal for meal code 03');
+        setShowUpgradeModal(true);
+      } else {
+        toast.error(t("aiMealGenerator.error") || "Failed to generate meal. Please try again.");
+      }
       const fallbackMeal = {
         id: Date.now().toString(),
         name: t("aiMealGenerator.mealNamePlaceholder") || "Healthy Veggie Bowl",
@@ -1003,6 +1025,12 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
           </div>
         </div>
       )}
+
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureType="meals"
+      />
     </>
   );
 };

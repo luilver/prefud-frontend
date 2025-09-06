@@ -30,6 +30,7 @@ import {
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
+import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
 
 interface MealPlanCreatorStepperProps {
   onPlanCreated: (plan: any) => void;
@@ -72,6 +73,7 @@ const MealPlanCreatorStepper = ({
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
   const [createdPlan, setCreatedPlan] = useState<any>(null);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const { user, refreshMealPlans } = useUser();
   const { language } = useLanguage();
@@ -1108,8 +1110,9 @@ const MealPlanCreatorStepper = ({
 
       // Refresh meal plans from server
       await refreshMealPlans();
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Error generating meal plan:", error);
+      console.log('Error code:', error.code);
 
       // Clear the timeout
       if (timeout) {
@@ -1121,14 +1124,24 @@ const MealPlanCreatorStepper = ({
       hideLoader();
       setIsGenerating(false);
 
-      toast({
-        title: "Generation Failed",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to generate meal plan. Please try again.",
-        variant: "destructive",
-      });
+      // Handle specific subscription error
+      if (
+        error?.code === "03" ||
+        error?.response?.data?.code === "03" ||
+        (typeof error?.message === "string" && error.message.includes("No meal plans available according to your subscription"))
+      ) {
+        console.log('Showing upgrade modal for meal plan stepper code 03');
+        setShowUpgradeModal(true);
+      } else {
+        toast({
+          title: "Generation Failed",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Failed to generate meal plan. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -1240,6 +1253,12 @@ const MealPlanCreatorStepper = ({
       <MealPlanTimeoutModal
         isOpen={showTimeoutModal}
         onClose={handleTimeoutModalClose}
+      />
+
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureType="plans"
       />
     </div>
   );
