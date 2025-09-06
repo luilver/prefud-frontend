@@ -21,6 +21,7 @@ import {
   setDefaultPaymentMethod,
   subscribeUser,
 } from "@/services/payments";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SubscriptionPlan {
   id: string;
@@ -51,6 +52,7 @@ const PaymentForm2 = ({
 }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
+  const {updateSubscription} =useAuth();
 
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -141,6 +143,8 @@ const PaymentForm2 = ({
                       responseCreateSubscription.id
                     );
                   console.log('result subscribe ', responsePersistSubscription);
+
+                  updateSubscription(responsePersistSubscription.return)
                   // You can now send this token to your backend for further processing
                   const paymentData = {
                     tokenId: token.id,

@@ -28,12 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Plan } from "@/utils/mapSubscriptionPlans";
 import PaymentForm2 from "./PaymentForm2";
 
-
-
-
-
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
-
 
 interface PaymentMethodModalProps {
   isOpen: boolean;
@@ -58,6 +53,7 @@ const PaymentMethodModal = ({
 }: PaymentMethodModalProps) => {
   const { user } = useUser();
   const { user: authUser } = useAuth();
+  const {updateSubscription} = useAuth();
 
   const [paymentMethods, setPaymentMethods] = useState<UserPaymentMethod[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(false);
@@ -70,7 +66,6 @@ const PaymentMethodModal = ({
   const [cardName, setCardName] = useState("");
   const { toast } = useToast();
   const [subscriptionTypes, setSubscriptionTypes] = useState<Plan[]>([]);
-
 
   useEffect(() => {
     if (isOpen && rukuClientId) {
@@ -170,6 +165,9 @@ const PaymentMethodModal = ({
       );
       console.log("Subscription result:", result);
 
+      //update the subscription in the user
+        updateSubscription(result.return)
+
       onSuccess();
       toast({
         title: "Subscription Successful!",
@@ -192,8 +190,7 @@ const PaymentMethodModal = ({
   };
 
   const handleAddCard = async (paymentData: any) => {
-    console.log('this is the received information ', paymentData);
-    
+    console.log("this is the received information ", paymentData);
 
     setIsProcessing(true);
     try {
@@ -206,7 +203,6 @@ const PaymentMethodModal = ({
       });
       setShowAddCard(false);
       onClose();
-      
     } catch (error) {
       toast({
         title: "Error",
@@ -224,7 +220,6 @@ const PaymentMethodModal = ({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>Choose Payment Method</DialogTitle>
-            
           </div>
           <DialogDescription>
             Select a payment method for your {selectedPlan.name} subscription ($
@@ -314,16 +309,9 @@ const PaymentMethodModal = ({
             </>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-               
-               
-              </div>
+              <div className="flex items-center justify-between"></div>
 
               <div className="space-y-4">
-               
-
-                
-
                 <Elements stripe={stripePromise}>
                   <PaymentForm2
                     onSuccess={handleAddCard}
@@ -334,18 +322,15 @@ const PaymentMethodModal = ({
                       customerId: authUser.profile.ruku_client_id,
                       userId: userId,
                     }}
-                    selectedPlan={
-                      {id: selectedPlan.id,
-                        name: selectedPlan.name,
-                        price: selectedPlan.price*100,
-                        features: [""],
-                        interval: '',
-                      }
-                    }
+                    selectedPlan={{
+                      id: selectedPlan.id,
+                      name: selectedPlan.name,
+                      price: selectedPlan.price * 100,
+                      features: [""],
+                      interval: "",
+                    }}
                   />
                 </Elements>
-
-               
               </div>
             </div>
           )}

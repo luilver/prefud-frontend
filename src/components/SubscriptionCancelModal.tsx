@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +11,7 @@ import { AlertTriangle, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cancelUserSubscription } from "@/services/payments";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SubscriptionCancelModalProps {
   isOpen: boolean;
@@ -21,50 +21,59 @@ interface SubscriptionCancelModalProps {
   userId: string;
 }
 
-const SubscriptionCancelModal = ({ 
-  isOpen, 
-  onClose, 
+const SubscriptionCancelModal = ({
+  isOpen,
+  onClose,
   onConfirm,
   currentPlan,
-  userId 
+  userId,
 }: SubscriptionCancelModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const { setSubscription } = useSubscription();
+  const { user, updateSubscription } = useAuth();
 
   const handleConfirmCancel = async () => {
     setIsProcessing(true);
     try {
       const result = await cancelUserSubscription(userId);
-      console.log('this is the result of cancel subscription ', result)
-      
+      console.log("this is the result of cancel subscription ", result);
+
       if (result.success) {
         // Update SubscriptionContext
         setSubscription(result.subscription);
-        
+        //update the subscription in the user
+        updateSubscription(result.subscription)
+
         // Dispatch subscription sync event for AuthContext
-        window.dispatchEvent(new CustomEvent('subscription-sync', {
-          detail: { subscription: result.subscription }
-        }));
-        
+        window.dispatchEvent(
+          new CustomEvent("subscription-sync", {
+            detail: { subscription: result.subscription },
+          })
+        );
+
         onConfirm();
         toast({
           title: "Subscription Cancelled",
-          description: result.message || "Your subscription has been cancelled successfully.",
+          description:
+            result.message ||
+            "Your subscription has been cancelled successfully.",
         });
         onClose();
       } else {
         toast({
           title: "Error",
-          description: result.message || "Failed to cancel subscription. Please try again.",
-          variant: "destructive"
+          description:
+            result.message ||
+            "Failed to cancel subscription. Please try again.",
+          variant: "destructive",
         });
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to cancel subscription. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
@@ -91,7 +100,9 @@ const SubscriptionCancelModal = ({
 
         <div className="space-y-4">
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <h4 className="font-medium text-orange-800 mb-2">What happens when you cancel:</h4>
+            <h4 className="font-medium text-orange-800 mb-2">
+              What happens when you cancel:
+            </h4>
             <ul className="text-sm text-orange-800 space-y-1">
               <li>• You'll be switched to the Free plan</li>
               <li>• You'll keep access until your billing period ends</li>

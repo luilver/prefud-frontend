@@ -76,10 +76,12 @@ interface AuthUser {
 
 interface AuthContextType {
   user: AuthUser | null;
+  setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
+   updateSubscription: (subscription: AuthUser['subscription']) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -220,12 +222,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('Session cleanup completed');
   };
 
+//update subscription
+const updateSubscription = (newSubscription: AuthUser['subscription']) => {
+  setUser(prevUser => 
+    prevUser ? { ...prevUser, subscription: newSubscription } : prevUser
+  );
+
+  // Keep session persistence updated
+  const savedUser = localStorage.getItem('authUser');
+  if (savedUser) {
+    const parsedUser = JSON.parse(savedUser);
+    parsedUser.subscription = newSubscription;
+    localStorage.setItem('authUser', JSON.stringify(parsedUser));
+  }
+
+  // Trigger subscription-sync event
+  window.dispatchEvent(
+    new CustomEvent('subscription-sync', { detail: { subscription: newSubscription } })
+  );
+};
+
+
   const value = {
     user,
+    setUser,
     isAuthenticated: !!user,
     login,
     logout,
-    isLoading
+    isLoading,
+    updateSubscription
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
