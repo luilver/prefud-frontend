@@ -566,7 +566,7 @@ export const subscribeUser = async (
 ): Promise<SubscribeUserResponse> => {
   try {
     const response = await axios.post(
-      `http://localhost:3001/subscription/subscribe/${userId}`,
+      `${BASE_URL}/subscription/subscribe/${userId}`,
       {
         subscriptionTypeId,
         rukusubscriptionID,
