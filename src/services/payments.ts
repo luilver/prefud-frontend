@@ -80,7 +80,6 @@ export async function createPaymentMethod(
   }
 }
 
-
 interface StripePaymentMethod {
   id: string;
   object: string;
@@ -332,12 +331,14 @@ export interface ApiSubscriptionType {
   specialMeals: number;
   generatedMeals: number;
   updatedAt?: string;
-  description:string;
+  description: string;
 }
 
-export async function getAllSubscriptionTypes(): Promise<ApiSubscriptionType[]> {
+export async function getAllSubscriptionTypes(): Promise<
+  ApiSubscriptionType[]
+> {
   const config = {
-    method: 'get',
+    method: "get",
     maxBodyLength: Infinity,
     url: `${BASE_URL}/subscriptionType/all`,
     headers: {},
@@ -345,10 +346,13 @@ export async function getAllSubscriptionTypes(): Promise<ApiSubscriptionType[]> 
 
   try {
     const response = await axios.request<ApiSubscriptionType[]>(config);
-    console.log('Subscription types:', response.data);
+    console.log("Subscription types:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error('Error fetching subscription types:', error.response?.data || error.message);
+    console.error(
+      "Error fetching subscription types:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 }
@@ -365,9 +369,6 @@ interface SetDefaultPaymentMethodResponse {
   };
   // Puedes agregar más campos según la respuesta esperada
 }
-
-
-
 
 export async function setDefaultPaymentMethod(
   paymentMethodId: string,
@@ -389,7 +390,9 @@ export async function setDefaultPaymentMethod(
   };
 
   try {
-    const response = await axios.request<SetDefaultPaymentMethodResponse>(config);
+    const response = await axios.request<SetDefaultPaymentMethodResponse>(
+      config
+    );
     console.log("Customer updated:", response.data);
     return response.data;
   } catch (error: any) {
@@ -401,9 +404,6 @@ export async function setDefaultPaymentMethod(
     return null;
   }
 }
-
-
-
 
 //persist subscription in Pantry DB
 
@@ -430,9 +430,9 @@ export async function persistUserSubscription(
 ): Promise<SubscriptionResponse> {
   const data = JSON.stringify({
     subscriptionTypeId,
-    rukusubscriptionID: responseCreateSubscription
+    rukusubscriptionID: responseCreateSubscription,
   });
-console.log('data to send to persist subscription ', data);
+  console.log("data to send to persist subscription ", data);
   const config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -466,9 +466,11 @@ export interface UserPaymentMethod {
 }
 
 //get user payment methods
-export async function getUserPaymentMethods(rukuClientId: string): Promise<UserPaymentMethod[]> {
+export async function getUserPaymentMethods(
+  rukuClientId: string
+): Promise<UserPaymentMethod[]> {
   const config = {
-    method: 'get',
+    method: "get",
     maxBodyLength: Infinity,
     url: `${API_PAYMENTS}/stripe/methods/${rukuClientId}`,
     headers: {},
@@ -476,20 +478,30 @@ export async function getUserPaymentMethods(rukuClientId: string): Promise<UserP
 
   try {
     const response = await axios.request<UserPaymentMethod[]>(config);
-    console.log('Payment methods:', response.data);
+    console.log("Payment methods:", response.data);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 400) {
-      console.error('Customer not found:', error.response?.data?.message);
+      console.error("Customer not found:", error.response?.data?.message);
       return [];
     }
-    console.error('Error fetching payment methods:', error.response?.data || error.message);
+    console.error(
+      "Error fetching payment methods:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 }
 
 //cancel subscription
-export async function cancelUserSubscription(userId: string): Promise<{ success: boolean; message?: string; subscription?: any, code: string }> {
+export async function cancelUserSubscription(
+  userId: string
+): Promise<{
+  success: boolean;
+  message?: string;
+  subscription?: any;
+  code: string;
+}> {
   const config = {
     method: "delete",
     maxBodyLength: Infinity,
@@ -500,21 +512,27 @@ export async function cancelUserSubscription(userId: string): Promise<{ success:
   try {
     const response = await axios.request(config);
     console.log("Subscription cancelled:", response.data);
-    
+
     if (response.status === 200 && response.data.code === "01") {
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: response.data.message,
-        subscription: response.data.return 
+        subscription: response.data.subscription,
       };
     } else {
       return { success: false, message: "Unexpected response status" };
     }
   } catch (error: any) {
-    console.error("Error cancelling subscription:", error.response?.data || error.message);
-    return { 
-      success: false, 
-      message: error.response?.data?.message || error.message || "Failed to cancel subscription"
+    console.error(
+      "Error cancelling subscription:",
+      error.response?.data || error.message
+    );
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to cancel subscription",
     };
   }
 }
@@ -551,18 +569,20 @@ export const subscribeUser = async (
       `http://localhost:3001/subscription/subscribe/${userId}`,
       {
         subscriptionTypeId,
-        rukusubscriptionID
+        rukusubscriptionID,
       },
       {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
-    
+
     return response.data;
   } catch (error: any) {
-    console.error('Error subscribing user:', error);
-    throw new Error(error.response?.data?.message || 'Failed to subscribe user');
+    console.error("Error subscribing user:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to subscribe user"
+    );
   }
 };
