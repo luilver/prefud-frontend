@@ -87,8 +87,8 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
 
       // Check for specific error codes first (even with 201 status)
       if (data.code === "03") {
-        console.log('Meal subscription limit reached - code 03 detected');
-        const error = new Error(data.message || "No meal plans available according to your subscription");
+        console.log('Special meal subscription limit reached - code 03 detected');
+        const error = new Error(data.message || "No special meals available according to your subscription");
         (error as any).code = "03";
         throw error;
       }
@@ -129,9 +129,9 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       if (
         error?.code === "03" ||
         error?.response?.data?.code === "03" ||
-        (typeof error?.message === "string" && error.message.includes("No meal plans available according to your subscription"))
+        (typeof error?.message === "string" && error.message.includes("No special meals available according to your subscription"))
       ) {
-        console.log('Showing upgrade modal for meal code 03');
+        console.log('Showing upgrade modal for special meal code 03');
         setShowUpgradeModal(true);
       } else {
         toast.error(t("aiMealGenerator.error") || "Failed to generate meal. Please try again.");
