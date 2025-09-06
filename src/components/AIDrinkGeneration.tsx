@@ -7,6 +7,7 @@ import { Clock, Users, Zap, Droplets, RefreshCw, Save, ShoppingCart, Check, Pack
 import { toast } from "sonner";
 import CocktailAnimation from "./CocktailAnimation";
 import OrderOnlineModal from "./OrderOnlineModal";
+import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
 import { createHealthyDrink, ApiDrinkPlan } from "@/services/drinkService";
 import { addIngredientsToPantry } from "@/services/pantryService";
 import { useUser } from "@/contexts/UserContext";
@@ -24,6 +25,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
   const [shoppingList, setShoppingList] = useState<any[]>([]);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const { user, addPantryItem } = useUser();
   const { language } = useLanguage();
@@ -118,7 +120,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       
       // Handle specific subscription error
       if (error.code === "03") {
-        toast.error(error.message || "No healthy drinks available according to your subscription");
+        setShowUpgradeModal(true);
       } else {
         toast.error("Failed to generate drink. Please try again.");
       }
@@ -517,6 +519,12 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           mealPlanName={generatedDrink?.name || 'Healthy Drink Recipe'}
         />
       )}
+
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureType="drinks"
+      />
     </div>
   );
 };
