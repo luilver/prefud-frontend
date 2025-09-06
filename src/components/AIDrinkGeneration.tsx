@@ -116,10 +116,12 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       
     } catch (error: any) {
       console.error('Error generating drink:', error);
+      console.log('Error code:', error.code);
       setIsGenerating(false);
       
       // Handle specific subscription error
       if (error.code === "03") {
+        console.log('Showing upgrade modal for code 03');
         setShowUpgradeModal(true);
       } else {
         toast.error("Failed to generate drink. Please try again.");

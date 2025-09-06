@@ -124,9 +124,11 @@ export const createHealthyDrink = async (drinkData: CreateDrinkRequest): Promise
     });
 
     const data = await response.json();
+    console.log('API Response:', data);
     
-    // Check for specific error codes
+    // Check for specific error codes first
     if (data.code === "03") {
+      console.log('Subscription limit reached - code 03 detected');
       const error = new Error(data.message || "No healthy drinks available according to your subscription");
       (error as any).code = "03";
       throw error;
