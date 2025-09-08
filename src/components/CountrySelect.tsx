@@ -11,6 +11,7 @@ export interface Country {
 
 const countries: Country[] = [
   { code: 'US', name: 'United States', prefix: '+1', flag: '🇺🇸' },
+  { code: 'EC', name: 'Ecuador', prefix: '+593', flag: '🇪🇨' },
   { code: 'CA', name: 'Canada', prefix: '+1', flag: '🇨🇦' },
   { code: 'GB', name: 'United Kingdom', prefix: '+44', flag: '🇬🇧' },
   { code: 'ES', name: 'Spain', prefix: '+34', flag: '🇪🇸' },
