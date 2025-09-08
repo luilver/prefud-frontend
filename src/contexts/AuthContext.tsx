@@ -78,7 +78,7 @@ interface AuthContextType {
   user: AuthUser | null;
   setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void | any>;
   logout: () => void;
   isLoading: boolean;
    updateSubscription: (subscription: AuthUser['subscription']) => void;

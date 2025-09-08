@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Utensils, ArrowLeft, Eye, EyeOff } from "lucide-react";
@@ -11,6 +17,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import PasswordRecovery from "@/components/PasswordRecovery";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Toaster } from "@/components/ui/toaster";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -19,48 +26,69 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordRecovery, setShowPasswordRecovery] = useState(false);
   const { login } = useUser();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, setLanguage } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await login(email, password);
+      const responseLogin = await login(email, password);
+      //set language for context and translations
+      console.log("what i receive from login", user.profile);
+      if (user.profile.languages) {
+        console.log(
+          "it has a selected language! and it is ",
+          user.profile.languages
+        );
+        setLanguage(user.profile.languages);
+      }
+
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
-      navigate('/'); // Navigate to dashboard after successful login
+      navigate("/"); // Navigate to dashboard after successful login
     } catch (error) {
-      console.log('Login error caught:', error);
-      
+      console.log("Login error caught:", error);
+
       // Handle specific error messages from the API
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      console.log('Error message:', errorMessage);
-      
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+      console.log("Error message:", errorMessage);
+
       let title = "Sign in failed";
       let description = "Please check your credentials and try again.";
-      
+
       // Handle specific error cases
       if (errorMessage.includes("No user exists with email")) {
         title = "Account not found";
-        description = "No account found with this email address. Please check your email or create a new account.";
+        description =
+          "No account found with this email address. Please check your email or create a new account.";
       } else if (errorMessage.includes("Invalid email or password")) {
         title = "Invalid credentials";
-        description = "The email or password you entered is incorrect. Please try again.";
-      } else if (errorMessage.includes("password must be longer than or equal to 8 characters")) {
+        description =
+          "The email or password you entered is incorrect. Please try again.";
+      } else if (
+        errorMessage.includes(
+          "password must be longer than or equal to 8 characters"
+        )
+      ) {
         title = "Password too short";
         description = "Password must be at least 8 characters long.";
-      } else if (errorMessage.includes("email") || errorMessage.includes("password")) {
+      } else if (
+        errorMessage.includes("email") ||
+        errorMessage.includes("password")
+      ) {
         // Generic handling for other email/password related errors
         title = "Login failed";
         description = errorMessage;
       }
-      
-      console.log('Showing toast with:', { title, description });
-      
+
+      console.log("Showing toast with:", { title, description });
+
       toast({
         title,
         description,
@@ -95,13 +123,15 @@ const SignIn = () => {
           </div>
           <div className="flex items-center space-x-3">
             <LanguageSelector variant="button" />
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')} 
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/")}
               className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>{t('common.back')} to {t('nav.home')}</span>
+              <span>
+                {t("common.back")} to {t("nav.home")}
+              </span>
             </Button>
           </div>
         </div>
@@ -116,17 +146,20 @@ const SignIn = () => {
                 <Utensils className="h-8 w-8 text-primary-foreground" />
               </div>
               <CardTitle className="text-2xl md:text-3xl text-foreground font-bold">
-                {t('signin.title')}
+                {t("signin.title")}
               </CardTitle>
               <CardDescription className="text-base md:text-lg text-muted-foreground">
-                {t('signin.subtitle')}
+                {t("signin.subtitle")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <form onSubmit={handleLogin} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-base font-medium text-foreground">
-                    {t('signin.email')}
+                  <Label
+                    htmlFor="email"
+                    className="text-base font-medium text-foreground"
+                  >
+                    {t("signin.email")}
                   </Label>
                   <Input
                     id="email"
@@ -135,12 +168,15 @@ const SignIn = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="border-border/50 focus:border-primary bg-background/50 h-12 text-base transition-colors"
-                    placeholder={t('signin.email.placeholder')}
+                    placeholder={t("signin.email.placeholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-base font-medium text-foreground">
-                    {t('signin.password')}
+                  <Label
+                    htmlFor="password"
+                    className="text-base font-medium text-foreground"
+                  >
+                    {t("signin.password")}
                   </Label>
                   <div className="relative">
                     <Input
@@ -150,7 +186,7 @@ const SignIn = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       className="border-border/50 focus:border-primary bg-background/50 h-12 text-base pr-12 transition-colors"
-                      placeholder={t('signin.password.placeholder')}
+                      placeholder={t("signin.password.placeholder")}
                     />
                     <Button
                       type="button"
@@ -168,33 +204,33 @@ const SignIn = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <Button 
+                  <Button
                     type="button"
-                    variant="link" 
+                    variant="link"
                     className="text-primary hover:text-primary/80 p-0 font-medium"
                     onClick={() => setShowPasswordRecovery(true)}
                   >
-                    {t('signin.forgot-password')}
+                    {t("signin.forgot-password")}
                   </Button>
                 </div>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isLoading}
                 >
-                  {isLoading ? t('signin.signing-in') : t('signin.button')}
+                  {isLoading ? t("signin.signing-in") : t("signin.button")}
                 </Button>
               </form>
-              
+
               <div className="text-center pt-4 border-t border-border/50">
                 <p className="text-muted-foreground">
-                  {t('signin.no-account')}{' '}
+                  {t("signin.no-account")}{" "}
                   <Button
                     variant="link"
-                    onClick={() => navigate('/signup')}
+                    onClick={() => navigate("/signup")}
                     className="text-primary hover:text-primary/80 p-0 font-semibold"
                   >
-                    {t('signin.create-here')}
+                    {t("signin.create-here")}
                   </Button>
                 </p>
               </div>
@@ -202,7 +238,7 @@ const SignIn = () => {
           </Card>
         </div>
       </section>
-      
+
       <Toaster />
     </div>
   );
