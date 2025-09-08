@@ -265,13 +265,12 @@ const UserProfile = () => {
                 ) : (
                   <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
                     <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
-                    {countryDisplay ? (
+                    {authUser.profile ? (
                       <>
-                        <span className="text-base sm:text-lg">
-                          {countryDisplay.flag}
-                        </span>
+                       
                         <span className="text-sm truncate">
-                          {countryDisplay.name}
+                          {authUser.profile.country
+}
                         </span>
                       </>
                     ) : (
