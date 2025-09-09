@@ -15,6 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { addIngredientsToPantry } from "@/services/pantryService";
 import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
+import { createAIMeal, SubscriptionLimitError } from "@/services/aiMealService";
 
 interface AIMealGenerationProps {
   mealData: any;
@@ -51,7 +52,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const generateMeal = async () => {
     showLoader(t("aiMealGenerator.loaderMessage") || "Creating your personalized meal with AI...");
     try {
-      // Map the mealData to match the API expected format
       const apiPayload = {
         dislikes: mealData.dislikes || "",
         cookingSkillLevel: mealData.cookingSkillLevel || "intermediate",
@@ -65,37 +65,16 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         maxCookingTime: mealData.cookingTime || 30,
         specialRequest: mealData.specialRequests || "",
         dietaryRestrictions: mealData.dietaryRestrictions?.map((r: string) => r.toLowerCase().replace("-", " ")) || [],
+        userId: user?.id || "687e6b38bc111405da8cb671",
         cuisinePreferences: mealData.cuisinePreferences?.map((c: string) => c.toLowerCase()) || [],
         allergiesIntolerance: mealData.allergiesIntolerances?.map((a: string) => a.toLowerCase()) || [],
         customIntolerance: mealData.customAllergies || "",
         nameOfMeal: mealData.nameOfMeal || "",
-
       };
 
       console.log("Sending API request with payload:", apiPayload);
 
-      const response = await fetch('https://pantry-ms-brain.onrender.com/meal-plan/special', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(apiPayload)
-      });
-
-      const data = await response.json();
-      console.log("API response:", data);
-
-      // Check for specific error codes first (even with 201 status)
-      if (data.code === "03") {
-        console.log('Special meal subscription limit reached - code 03 detected');
-        const error = new Error(data.message || "No special meals available according to your subscription");
-        (error as any).code = "03";
-        throw error;
-      }
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
-      }
+      const data = await createAIMeal(apiPayload);
 
       // Transform the API response to match our expected meal format
       const generatedMeal = {
@@ -125,17 +104,14 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       console.log('Error code:', error.code);
       hideLoader();
       
-      // Handle specific subscription error
-      if (
-        error?.code === "03" ||
-        error?.response?.data?.code === "03" ||
-        (typeof error?.message === "string" && error.message.includes("No special meals available according to your subscription"))
-      ) {
-        console.log('Showing upgrade modal for special meal code 03');
+      // Handle subscription limit error
+      if (error instanceof SubscriptionLimitError) {
+        console.log('Showing upgrade modal for special meal subscription limit');
         setShowUpgradeModal(true);
-      } else {
-        toast.error(t("aiMealGenerator.error") || "Failed to generate meal. Please try again.");
+        return;
       }
+      
+      toast.error(t("aiMealGenerator.error") || "Failed to generate meal. Please try again.");
       const fallbackMeal = {
         id: Date.now().toString(),
         name: t("aiMealGenerator.mealNamePlaceholder") || "Healthy Veggie Bowl",

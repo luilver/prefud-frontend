@@ -29,6 +29,8 @@ interface AuthUser {
     userId: string;
     ruku_client_id: string;
     suscription_id: string;
+    languages?: string;
+    country?: string;
     addressId: string;
     createdAt: string;
     updatedAt: string;

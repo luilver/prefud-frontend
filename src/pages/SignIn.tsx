@@ -14,6 +14,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Language } from "@/contexts/LanguageContext";
 import PasswordRecovery from "@/components/PasswordRecovery";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Toaster } from "@/components/ui/toaster";
@@ -38,12 +39,12 @@ const SignIn = () => {
       const responseLogin = await login(email, password);
       //set language for context and translations
       console.log("what i receive from login", user.profile);
-      if (user.profile.languages) {
+      if (user.profile.languages && (user.profile.languages === "en" || user.profile.languages === "es" || user.profile.languages === "pt")) {
         console.log(
           "it has a selected language! and it is ",
           user.profile.languages
         );
-        setLanguage(user.profile.languages);
+        setLanguage(user.profile.languages as Language);
       }
 
       toast({
