@@ -38,7 +38,7 @@ const MealPlanSuccessModal = ({ isOpen, onClose, onViewPlan, mealPlan }: MealPla
         
         <div className="space-y-4 text-center">
           <p className="text-gray-600">
-            {t('mealPlanSuccess.yourPersonalized') || 'Your personalized AI meal plan'} <strong>"{mealPlan?.name}"</strong> {t('mealPlanSuccess.readyToUse') || 'has been generated and is ready to use!'}
+            {t('mealPlanSuccess.yourPersonalized') || 'Your personalized AI meal plan'} {t('mealPlanSuccess.readyToUse') || 'has been generated and is ready to use!'}
           </p>
           
           {mealPlan && (

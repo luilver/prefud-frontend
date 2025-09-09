@@ -1151,7 +1151,7 @@ const MealPlanCreatorStepper = ({
       // Show success toast
       toast({
         title: "Meal Plan Created Successfully!",
-        description: `Your ${planData.numberOfDays}-day meal plan "${planData.planName}" is ready to explore.`,
+        description: `Your  meal plan is ready to explore.`,
         duration: 5000,
       });
 

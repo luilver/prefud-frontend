@@ -238,7 +238,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       // Show success toast immediately
       toast({
         title: "🎉 Meal Plan Created Successfully!",
-        description: `Your meal plan "${planName}" is ready to explore.`,
+        description: `Your meal plan is ready to explore.`,
         duration: 8000,
       });
 

@@ -96,7 +96,7 @@ const MealPlanner = () => {
     // Show success toast
     toast({
       title: "🎉 Meal Plan Created Successfully!",
-      description: `Your meal plan "${successPlanData.name}" is ready to explore.`,
+      description: `Your meal plan is ready to explore.`,
       duration: 8000,
     });
     
