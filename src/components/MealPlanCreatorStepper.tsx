@@ -68,6 +68,7 @@ const MealPlanCreatorStepper = ({
     numberKidsLessThan5: initialData?.preferences?.numberKidsLessThan5 || 0,
     numberKids5To12: initialData?.preferences?.numberKids5To12 || 0,
   });
+  const [customCuisines, setCustomCuisines] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
@@ -133,6 +134,17 @@ const MealPlanCreatorStepper = ({
 
   const handleDataChange = (stepData: any) => {
     setPlanData((prev) => ({ ...prev, ...stepData }));
+  };
+
+  const addCustomCuisine = (country: string) => {
+    const formattedCountry = country.trim();
+    const predefinedCuisines = ["Italian", "Mexican", "Asian", "American", "Ecuadorian", "Chinese", "Indian"];
+    if (formattedCountry && !predefinedCuisines.includes(formattedCountry) && !customCuisines.includes(formattedCountry)) {
+      setCustomCuisines(prev => [...prev, formattedCountry]);
+      // Also add to cuisinePreferences
+      const updatedCuisines = [...planData.cuisinePreferences, formattedCountry];
+      handleDataChange({ cuisinePreferences: updatedCuisines });
+    }
   };
 
   const validateStep = (step: number) => {
@@ -604,6 +616,10 @@ const MealPlanCreatorStepper = ({
                       key: "Indian",
                       label: t("mealPlanCreator.cuisine.indian") || "Indian",
                     },
+                    ...customCuisines.map((cuisine) => ({
+                      key: cuisine,
+                      label: cuisine,
+                    })),
                   ].map((option) => (
                     <div key={option.key} className="flex items-center">
                       <input
@@ -632,6 +648,28 @@ const MealPlanCreatorStepper = ({
                       </label>
                     </div>
                   ))}
+                </div>
+                
+                {/* Custom Country Cuisine Input */}
+                <div className="mt-4">
+                  <label
+                    htmlFor="customCountry"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    {t("mealPlanCreator.cuisine.customCountry") || "Add Country Cuisine"}
+                  </label>
+                  <input
+                    type="text"
+                    id="customCountry"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                    placeholder={t("mealPlanCreator.cuisine.customCountryPlaceholder") || "Enter a country for its cuisine (e.g., Brazil, Morocco)"}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                        addCustomCuisine(e.currentTarget.value.trim());
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                  />
                 </div>
               </div>
 
