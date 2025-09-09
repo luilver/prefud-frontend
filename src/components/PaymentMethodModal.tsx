@@ -28,7 +28,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Plan } from "@/utils/mapSubscriptionPlans";
 import PaymentForm2 from "./PaymentForm2";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
+
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
+    "pk_test_51R1tN0QtxIPdrkdTWoyJxB3qmuoh8FVEpRSQFEfCkGQFScfq8TRzCZz4ZJbXxkvhjwTw3vEuyrCizyg1APYcQcrJ00YgxWKyQ5"
+);
 
 interface PaymentMethodModalProps {
   isOpen: boolean;

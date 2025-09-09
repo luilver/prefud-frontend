@@ -42,7 +42,10 @@ import axios from "axios";
 import { getAllSubscriptionTypes } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
+    "pk_test_51R1tN0QtxIPdrkdTWoyJxB3qmuoh8FVEpRSQFEfCkGQFScfq8TRzCZz4ZJbXxkvhjwTw3vEuyrCizyg1APYcQcrJ00YgxWKyQ5"
+);
 
 interface SignupData {
   email: string;
@@ -211,7 +214,8 @@ const SignupSteps = () => {
         console.warn("Free subscription aborted: missing userId");
         toast({
           title: "❌ Subscription Failed",
-          description: "We couldn't find your user ID. Please complete your profile and try again.",
+          description:
+            "We couldn't find your user ID. Please complete your profile and try again.",
           variant: "destructive",
           duration: 5000,
         });
@@ -239,7 +243,8 @@ const SignupSteps = () => {
       if (response.data) {
         toast({
           title: "✅ Free Subscription Activated!",
-          description: "Your free subscription has been activated successfully.",
+          description:
+            "Your free subscription has been activated successfully.",
           duration: 5000,
         });
 
@@ -251,11 +256,13 @@ const SignupSteps = () => {
       console.error("Free subscription failed:", error);
 
       const errorMessage =
-        error.response?.data?.message ||
-        "Failed to activate free subscription";
+        error.response?.data?.message || "Failed to activate free subscription";
       toast({
         title: "❌ Subscription Failed",
-        description: typeof errorMessage === "string" ? errorMessage : "Failed to activate free subscription",
+        description:
+          typeof errorMessage === "string"
+            ? errorMessage
+            : "Failed to activate free subscription",
         variant: "destructive",
         duration: 5000,
       });
@@ -603,7 +610,7 @@ const SignupSteps = () => {
                         <span
                           className={`bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}
                         >
-                          ${plan.price/100}
+                          ${plan.price / 100}
                         </span>
                       )}
                       {plan.price > 0 && (
