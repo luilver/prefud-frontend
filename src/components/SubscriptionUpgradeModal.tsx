@@ -17,6 +17,8 @@ const SubscriptionUpgradeModal = ({
   featureType = "drinks" 
 }: SubscriptionUpgradeModalProps) => {
   const { t } = useLanguage();
+  
+  console.log('SubscriptionUpgradeModal rendered with:', { isOpen, featureType });
 
   const featureMessages = {
     drinks: {
