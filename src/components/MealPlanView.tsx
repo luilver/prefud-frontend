@@ -10,6 +10,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   ArrowLeft,
   Calendar,
   Users,
@@ -486,180 +492,184 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {days.map((day, dayIndex) => {
-            const dayMeals = mealsByDay[day] || [];
-            const { dayName, dateString } = getDayInfo(dayIndex);
+          <Accordion type="multiple" className="space-y-4">
+            {days.map((day, dayIndex) => {
+              const dayMeals = mealsByDay[day] || [];
+              const { dayName, dateString } = getDayInfo(dayIndex);
 
-            return (
-              <Card key={day}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-500" />
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg font-semibold">{dayName}</span>
-                      <Badge variant="outline" className="text-sm">
-                        {dateString}
-                      </Badge>
+              return (
+                <AccordionItem key={day} value={day} className="border rounded-lg bg-card">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center gap-2 w-full">
+                      <Calendar className="h-5 w-5 text-blue-500" />
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-semibold">{dayName}</span>
+                          <Badge variant="outline" className="text-sm">
+                            {dateString}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground mr-4">
+                          {dayMeals.length} {t("mealPlanView.meal") || "meal"}
+                          {dayMeals.length !== 1 ? "s" : ""}{" "}
+                          {t("mealPlanView.planned") || "planned"}
+                        </div>
+                      </div>
                     </div>
-                  </CardTitle>
-                  <CardDescription>
-                    {dayMeals.length} {t("mealPlanView.meal") || "meal"}
-                    {dayMeals.length !== 1 ? "s" : ""}{" "}
-                    {t("mealPlanView.planned") || "planned"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {dayMeals.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {dayMeals.map((meal: any, mealIndex: number) => {
-                        const isCompleted = isMealCompleted(meal.id, day);
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6 pt-0">
+                    {dayMeals.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {dayMeals.map((meal: any, mealIndex: number) => {
+                          const isCompleted = isMealCompleted(meal.id, day);
 
-                        return (
-                          <Card
-                            key={`${meal.id}-${mealIndex}`}
-                            className={`relative hover:shadow-md transition-all cursor-pointer ${
-                              mealCompletionStatus[meal.id]
-                                ? "bg-green-50 border-green-200"
-                                : "hover:shadow-lg"
-                            }`}
-                            onClick={() => handleMealClick(meal)}
-                          >
-                            <CardHeader className="pb-3">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                   <CardTitle className="text-lg flex items-center gap-2">
-                                     {meal.name}
-                                     {mealCompletionStatus[meal.id] && (
-                                       <CheckCircle className="h-4 w-4 text-green-500" />
-                                     )}
-                                   </CardTitle>
-                                  <div className="flex flex-wrap gap-1 mt-2">
-                                    <Badge
-                                      variant="secondary"
-                                      className={`text-xs ${
-                                        meal.type?.toLowerCase() === "breakfast"
-                                          ? "bg-orange-100 text-orange-800"
-                                          : meal.type?.toLowerCase() === "lunch"
-                                          ? "bg-blue-100 text-blue-800"
-                                          : meal.type?.toLowerCase() ===
-                                            "dinner"
-                                          ? "bg-purple-100 text-purple-800"
-                                          : "bg-gray-100 text-gray-800"
-                                      }`}
-                                    >
-                                      {meal.type || "Meal"}
-                                    </Badge>
-                                    {meal.cuisine && (
+                          return (
+                            <Card
+                              key={`${meal.id}-${mealIndex}`}
+                              className={`relative hover:shadow-md transition-all cursor-pointer ${
+                                mealCompletionStatus[meal.id]
+                                  ? "bg-green-50 border-green-200"
+                                  : "hover:shadow-lg"
+                              }`}
+                              onClick={() => handleMealClick(meal)}
+                            >
+                              <CardHeader className="pb-3">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                     <CardTitle className="text-lg flex items-center gap-2">
+                                       {meal.name}
+                                       {mealCompletionStatus[meal.id] && (
+                                         <CheckCircle className="h-4 w-4 text-green-500" />
+                                       )}
+                                     </CardTitle>
+                                    <div className="flex flex-wrap gap-1 mt-2">
                                       <Badge
-                                        variant="outline"
-                                        className="text-xs"
+                                        variant="secondary"
+                                        className={`text-xs ${
+                                          meal.type?.toLowerCase() === "breakfast"
+                                            ? "bg-orange-100 text-orange-800"
+                                            : meal.type?.toLowerCase() === "lunch"
+                                            ? "bg-blue-100 text-blue-800"
+                                            : meal.type?.toLowerCase() ===
+                                              "dinner"
+                                            ? "bg-purple-100 text-purple-800"
+                                            : "bg-gray-100 text-gray-800"
+                                        }`}
                                       >
-                                        {meal.cuisine}
+                                        {meal.type || "Meal"}
                                       </Badge>
-                                    )}
+                                      {meal.cuisine && (
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs"
+                                        >
+                                          {meal.cuisine}
+                                        </Badge>
+                                      )}
+                                    </div>
                                   </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteMeal(meal.id);
+                                    }}
+                                    className="text-red-500 hover:text-red-700 p-1 h-auto"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
                                 </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteMeal(meal.id);
-                                  }}
-                                  className="text-red-500 hover:text-red-700 p-1 h-auto"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="pt-0">
-                              <div className="space-y-2 text-sm text-gray-600">
-                                {meal.prepTime && (
-                                  <div className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4" />
-                                    <span>
-                                      {meal.prepTime}{" "}
-                                      {t("mealPlanView.min") || "min"}
-                                    </span>
-                                  </div>
-                                )}
-                                {meal.difficulty && (
-                                  <div className="flex items-center gap-2">
-                                    <ChefHat className="h-4 w-4" />
-                                    <span>{meal.difficulty}</span>
-                                  </div>
-                                )}
-                                {meal.calories && (
-                                  <div className="text-xs text-orange-600">
-                                    {meal.calories}{" "}
-                                    {t("mealPlanView.calories") || "calories"}
-                                  </div>
-                                )}
-                              </div>
+                              </CardHeader>
+                              <CardContent className="pt-0">
+                                <div className="space-y-2 text-sm text-gray-600">
+                                  {meal.prepTime && (
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="h-4 w-4" />
+                                      <span>
+                                        {meal.prepTime}{" "}
+                                        {t("mealPlanView.min") || "min"}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {meal.difficulty && (
+                                    <div className="flex items-center gap-2">
+                                      <ChefHat className="h-4 w-4" />
+                                      <span>{meal.difficulty}</span>
+                                    </div>
+                                  )}
+                                  {meal.calories && (
+                                    <div className="text-xs text-orange-600">
+                                      {meal.calories}{" "}
+                                      {t("mealPlanView.calories") || "calories"}
+                                    </div>
+                                  )}
+                                </div>
 
-                              {meal.description && (
-                                <p className="text-sm text-gray-600 mt-3 line-clamp-2">
-                                  {meal.description}
-                                </p>
-                              )}
+                                {meal.description && (
+                                  <p className="text-sm text-gray-600 mt-3 line-clamp-2">
+                                    {meal.description}
+                                  </p>
+                                )}
 
-                              <div className="flex items-center justify-between mt-4">
-                                 {mealCompletionStatus[meal.id] || meal.consumed == true ? (
-                                   <Button
-                                     variant="ghost"
-                                     size="sm"
-                                     onClick={(e) => {
-                                       e.stopPropagation();
-                                       console.log("Clicking completed button for meal:", meal.id, "current consumed:", mealCompletionStatus[meal.id]);
-                                       handleToggleCompletion(
-                                         meal.id,
-                                         day,
-                                         false
-                                       );
-                                     }}
-                                     className="text-xs text-green-600 hover:text-green-700"
-                                   >
-                                     <CheckCircle className="h-3 w-3 mr-1" />
-                                     {t("mealPlanView.completed") || "Completed"}
-                                   </Button>
-                                 ) : (
-                                   <Button
-                                     variant="ghost"
-                                     size="sm"
-                                     onClick={(e) => {
-                                       e.stopPropagation();
-                                       console.log("Clicking mark as done button for meal:", meal.id, "current consumed:", mealCompletionStatus[meal.id]);
-                                       handleToggleCompletion(
-                                         meal.id,
-                                         day,
-                                         true
-                                       );
-                                     }}
-                                     className="text-xs text-gray-500 hover:text-gray-700"
-                                   >
-                                     <Circle className="h-3 w-3 mr-1" />
-                                     {t("mealPlanView.markAsDone") || "Mark as Done"}
-                                   </Button>
-                                 )}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <ChefHat className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>
-                        {t("mealPlanView.noMealsPlanned") ||
-                          "No meals planned for this day"}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
+                                <div className="flex items-center justify-between mt-4">
+                                   {mealCompletionStatus[meal.id] || meal.consumed == true ? (
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         console.log("Clicking completed button for meal:", meal.id, "current consumed:", mealCompletionStatus[meal.id]);
+                                         handleToggleCompletion(
+                                           meal.id,
+                                           day,
+                                           false
+                                         );
+                                       }}
+                                       className="text-xs text-green-600 hover:text-green-700"
+                                     >
+                                       <CheckCircle className="h-3 w-3 mr-1" />
+                                       {t("mealPlanView.completed") || "Completed"}
+                                     </Button>
+                                   ) : (
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={(e) => {
+                                         e.stopPropagation();
+                                         console.log("Clicking mark as done button for meal:", meal.id, "current consumed:", mealCompletionStatus[meal.id]);
+                                         handleToggleCompletion(
+                                           meal.id,
+                                           day,
+                                           true
+                                         );
+                                       }}
+                                       className="text-xs text-gray-500 hover:text-gray-700"
+                                     >
+                                       <Circle className="h-3 w-3 mr-1" />
+                                       {t("mealPlanView.markAsDone") || "Mark as Done"}
+                                     </Button>
+                                   )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <ChefHat className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>
+                          {t("mealPlanView.noMealsPlanned") ||
+                            "No meals planned for this day"}
+                        </p>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         </TabsContent>
 
         <TabsContent value="shopping" className="space-y-6">
