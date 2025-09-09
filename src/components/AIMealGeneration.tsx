@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,6 +45,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const { showLoader, hideLoader, isLoading, LoaderComponent } = useCookingLoader();
   const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
   const { language, t } = useLanguage();
+  const navigate = useNavigate();
 
   useEffect(() => {
     generateMeal();
@@ -412,7 +414,10 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         </div>
         <SubscriptionUpgradeModal
           isOpen={showUpgradeModal}
-          onClose={() => setShowUpgradeModal(false)}
+          onClose={() => {
+            setShowUpgradeModal(false);
+            navigate('/#profile');
+          }}
           featureType="meals"
         />
       </>
@@ -649,7 +654,10 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       </div>
       <SubscriptionUpgradeModal
         isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
+        onClose={() => {
+          setShowUpgradeModal(false);
+          navigate('/#profile');
+        }}
         featureType="meals"
       />
       </>
@@ -1023,7 +1031,10 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
 
       <SubscriptionUpgradeModal
         isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
+        onClose={() => {
+          setShowUpgradeModal(false);
+          navigate('/#profile');
+        }}
         featureType="meals"
       />
     </>
