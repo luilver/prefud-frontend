@@ -131,7 +131,9 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         (typeof error?.message === "string" && error.message.includes("No healthy drinks available according to your subscription"))
       ) {
         console.log('Showing upgrade modal for drinks - code 03 detected');
+        console.log('showUpgradeModal state before update:', showUpgradeModal);
         setShowUpgradeModal(true);
+        console.log('setShowUpgradeModal(true) called');
         return; // Don't show the error toast
       } else {
         console.log('Not showing upgrade modal, error does not match criteria');
@@ -249,6 +251,8 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       toast.success("Drink recipe saved to your collection!");
     }
   };
+
+  console.log('AIDrinkGeneration render - showUpgradeModal:', showUpgradeModal);
 
   // Show generation interface if no drink has been generated yet
   if (!isGenerating && !generatedDrink) {
