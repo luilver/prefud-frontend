@@ -80,7 +80,7 @@ const MealPlanner = () => {
     // Extract success modal data from the actual plan structure
     // The newPlan should have the transformed structure from the service
     const successPlanData = {
-      name: newPlan.name || newPlan.plan_name || 'AI Generated Meal Plan',
+      name: newPlan.name || newPlan.plan_name || newPlan.planName || 'AI Generated Meal Plan',
       numberOfDays: newPlan.duration ? parseInt(newPlan.duration.replace(' days', '')) : 
                    (newPlan.preferences?.numberOfWeeks ? newPlan.preferences.numberOfWeeks * 7 : 7),
       numberOfPersons: newPlan.preferences?.numberOfPersons || 
