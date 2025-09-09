@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -29,6 +29,28 @@ const DashboardContent = () => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const { isCollapsed } = useSidebar();
+
+  // Handle hash navigation to switch tabs
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'profile') {
+        setActiveTab('profile');
+        // Clear the hash after navigation
+        window.location.hash = '';
+      }
+    };
+
+    // Check hash on mount
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
 
   // Calculate dynamic margin based on sidebar state
   const getSidebarWidth = () => {

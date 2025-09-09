@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -31,7 +30,6 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
   const { user, addPantryItem } = useUser();
   const { language } = useLanguage();
   const { t } = useLanguage();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Don't auto-generate on mount, wait for user to trigger
@@ -281,7 +279,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           isOpen={showUpgradeModal}
           onClose={() => {
             setShowUpgradeModal(false);
-            navigate('/#profile');
+            window.location.hash = 'profile';
           }}
           featureType="drinks"
         />
@@ -307,7 +305,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           isOpen={showUpgradeModal}
           onClose={() => {
             setShowUpgradeModal(false);
-            navigate('/#profile');
+            window.location.hash = 'profile';
           }}
           featureType="drinks"
         />
@@ -330,7 +328,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
           isOpen={showUpgradeModal}
           onClose={() => {
             setShowUpgradeModal(false);
-            navigate('/#profile');
+            window.location.hash = 'profile';
           }}
           featureType="drinks"
         />
@@ -573,7 +571,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         isOpen={showUpgradeModal}
         onClose={() => {
           setShowUpgradeModal(false);
-          navigate('/#profile');
+          window.location.hash = 'profile';
         }}
         featureType="drinks"
       />
