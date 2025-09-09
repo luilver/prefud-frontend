@@ -101,16 +101,21 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       toast.success(t("aiMealGenerator.createAIMealTitle") || "Your AI-generated meal is ready!");
     } catch (error: any) {
       console.error("Error generating meal:", error);
-      console.log('Error code:', error.code);
+      console.log('Error details:', { 
+        code: error?.code, 
+        message: error?.message, 
+        isSubscriptionLimitError: error instanceof SubscriptionLimitError 
+      });
       hideLoader();
       
       // Handle subscription limit error
       if (error instanceof SubscriptionLimitError) {
-        console.log('Showing upgrade modal for special meal subscription limit');
+        console.log('Showing upgrade modal for AI meal - SubscriptionLimitError detected');
         setShowUpgradeModal(true);
         return;
       }
       
+      console.log('Not showing upgrade modal, error does not match criteria');
       toast.error(t("aiMealGenerator.error") || "Failed to generate meal. Please try again.");
       const fallbackMeal = {
         id: Date.now().toString(),

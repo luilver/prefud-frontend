@@ -116,7 +116,12 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
       
     } catch (error: any) {
       console.error('Error generating drink:', error);
-      console.log('Error code:', error.code);
+      console.log('Error details:', { 
+        code: error?.code, 
+        message: error?.message, 
+        responseCode: error?.response?.data?.code,
+        responseMessage: error?.response?.data?.message 
+      });
       setIsGenerating(false);
       
       // Handle specific subscription error
@@ -125,9 +130,11 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
         error?.response?.data?.code === "03" ||
         (typeof error?.message === "string" && error.message.includes("No healthy drinks available according to your subscription"))
       ) {
-        console.log('Showing upgrade modal for code 03');
+        console.log('Showing upgrade modal for drinks - code 03 detected');
         setShowUpgradeModal(true);
+        return; // Don't show the error toast
       } else {
+        console.log('Not showing upgrade modal, error does not match criteria');
         toast.error("Failed to generate drink. Please try again.");
       }
     }
