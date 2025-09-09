@@ -20,6 +20,7 @@ const AIMealPreferences = ({ onDataChange, initialData }: AIMealPreferencesProps
   const [selectedCuisine, setSelectedCuisine] = useState(
     initialData.cuisinePreference || user?.preferences?.cuisinePreferences?.[0] || ""
   );
+  const [customCuisines, setCustomCuisines] = useState<string[]>([]);
   const [allergies, setAllergies] = useState<string[]>(
     initialData.allergies || user?.preferences?.allergies || []
   );
@@ -58,6 +59,13 @@ const AIMealPreferences = ({ onDataChange, initialData }: AIMealPreferencesProps
     );
   };
 
+  const addCustomCuisine = (country: string) => {
+    const formattedCountry = country.trim();
+    if (formattedCountry && !cuisineOptions.includes(formattedCountry) && !customCuisines.includes(formattedCountry)) {
+      setCustomCuisines(prev => [...prev, formattedCountry]);
+    }
+  };
+
   const toggleAllergy = (allergy: string) => {
     setAllergies(prev => 
       prev.includes(allergy) 
@@ -65,6 +73,9 @@ const AIMealPreferences = ({ onDataChange, initialData }: AIMealPreferencesProps
         : [...prev, allergy]
     );
   };
+
+  // Combine default and custom cuisines
+  const allCuisineOptions = [...cuisineOptions, ...customCuisines];
 
   return (
     <div className="space-y-6">
@@ -108,7 +119,7 @@ const AIMealPreferences = ({ onDataChange, initialData }: AIMealPreferencesProps
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-            {cuisineOptions.map((cuisine) => (
+            {allCuisineOptions.map((cuisine) => (
               <Button
                 key={cuisine}
                 type="button"
@@ -119,6 +130,19 @@ const AIMealPreferences = ({ onDataChange, initialData }: AIMealPreferencesProps
                 {cuisine}
               </Button>
             ))}
+          </div>
+          <div className="mt-4">
+            <Label htmlFor="customCountry">Country Cuisine</Label>
+            <Input
+              id="customCountry"
+              placeholder="Enter a country for its cuisine (e.g., Brazil, Morocco)"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                  addCustomCuisine(e.currentTarget.value.trim());
+                  e.currentTarget.value = '';
+                }
+              }}
+            />
           </div>
         </CardContent>
       </Card>
