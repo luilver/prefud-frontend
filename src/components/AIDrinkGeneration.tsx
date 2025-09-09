@@ -257,52 +257,73 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
   // Show generation interface if no drink has been generated yet
   if (!isGenerating && !generatedDrink) {
     return (
-      <div className="text-center space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-green-800 mb-2">
-            {t("aiDrinkGeneration.readyTitle") || "Ready to Generate Your Drink"}
-          </h2>
-          <p className="text-green-600">
-            {t("aiDrinkGeneration.readyDesc") || "Click below to create your personalized healthy drink"}
-          </p>
+      <>
+        <div className="text-center space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-green-800 mb-2">
+              {t("aiDrinkGeneration.readyTitle") || "Ready to Generate Your Drink"}
+            </h2>
+            <p className="text-green-600">
+              {t("aiDrinkGeneration.readyDesc") || "Click below to create your personalized healthy drink"}
+            </p>
+          </div>
+          <Button
+            onClick={generateDrink}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+          >
+            <Zap className="h-5 w-5 mr-2" />
+            {t("aiDrinkGeneration.generateBtn") || "Generate AI Drink"}
+          </Button>
         </div>
-        <Button
-          onClick={generateDrink}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
-        >
-          <Zap className="h-5 w-5 mr-2" />
-          {t("aiDrinkGeneration.generateBtn") || "Generate AI Drink"}
-        </Button>
-      </div>
+        <SubscriptionUpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          featureType="drinks"
+        />
+      </>
     );
   }
 
   if (isGenerating) {
     return (
-      <div className="text-center space-y-8">
-        <div>
-          <h2 className="text-2xl font-bold text-green-800 mb-2">
-            {t("aiDrinkGeneration.creatingTitle") || "AI is Creating Your Drink"}
-          </h2>
-          <p className="text-green-600">
-            {t("aiDrinkGeneration.creatingDesc") || "Analyzing your preferences to create the perfect healthy drink..."}
-          </p>
+      <>
+        <div className="text-center space-y-8">
+          <div>
+            <h2 className="text-2xl font-bold text-green-800 mb-2">
+              {t("aiDrinkGeneration.creatingTitle") || "AI is Creating Your Drink"}
+            </h2>
+            <p className="text-green-600">
+              {t("aiDrinkGeneration.creatingDesc") || "Analyzing your preferences to create the perfect healthy drink..."}
+            </p>
+          </div>
+          <CocktailAnimation />
         </div>
-        <CocktailAnimation />
-      </div>
+        <SubscriptionUpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          featureType="drinks"
+        />
+      </>
     );
   }
 
   if (!generatedDrink) {
     return (
-      <div className="text-center">
-        <p className="text-red-600">
-          {t("aiDrinkGeneration.failed") || "Failed to generate drink. Please try again."}
-        </p>
-        <Button onClick={generateDrink} className="mt-4">
-          {t("aiDrinkGeneration.retry") || "Retry Generation"}
-        </Button>
-      </div>
+      <>
+        <div className="text-center">
+          <p className="text-red-600">
+            {t("aiDrinkGeneration.failed") || "Failed to generate drink. Please try again."}
+          </p>
+          <Button onClick={generateDrink} className="mt-4">
+            {t("aiDrinkGeneration.retry") || "Retry Generation"}
+          </Button>
+        </div>
+        <SubscriptionUpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          featureType="drinks"
+        />
+      </>
     );
   }
 
