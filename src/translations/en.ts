@@ -217,5 +217,11 @@ export const en = {
       "bag": "Bag",
       "box": "Box"
     }
+  },
+  "mealPlanCreator": {
+    "cuisine": {
+      "customCountry": "Add Country Cuisine",
+      "customCountryPlaceholder": "Enter a country for its cuisine (e.g., Brazil, Morocco)"
+    }
   }
 };

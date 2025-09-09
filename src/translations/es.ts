@@ -222,5 +222,11 @@ export const es = {
       "bag": "Bolsa",
       "box": "Caja"
     }
+  },
+  "mealPlanCreator": {
+    "cuisine": {
+      "customCountry": "Agregar Cocina de País",
+      "customCountryPlaceholder": "Ingresa un país para su cocina (ej., Brasil, Marruecos)"
+    }
   }
 };

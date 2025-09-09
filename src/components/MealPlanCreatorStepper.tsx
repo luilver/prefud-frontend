@@ -138,12 +138,23 @@ const MealPlanCreatorStepper = ({
 
   const addCustomCuisine = (country: string) => {
     const formattedCountry = country.trim();
-    const predefinedCuisines = ["Italian", "Mexican", "Asian", "American", "Ecuadorian", "Chinese", "Indian"];
-    if (formattedCountry && !predefinedCuisines.includes(formattedCountry) && !customCuisines.includes(formattedCountry)) {
-      setCustomCuisines(prev => [...prev, formattedCountry]);
-      // Also add to cuisinePreferences
-      const updatedCuisines = [...planData.cuisinePreferences, formattedCountry];
-      handleDataChange({ cuisinePreferences: updatedCuisines });
+    if (formattedCountry) {
+      // Check if it's not already in the list (case insensitive)
+      const existingCuisines = [...planData.cuisinePreferences];
+      const isAlreadySelected = existingCuisines.some(cuisine => 
+        cuisine.toLowerCase() === formattedCountry.toLowerCase()
+      );
+      
+      if (!isAlreadySelected) {
+        // Add to custom cuisines for display
+        if (!customCuisines.some(c => c.toLowerCase() === formattedCountry.toLowerCase())) {
+          setCustomCuisines(prev => [...prev, formattedCountry]);
+        }
+        
+        // Add to cuisinePreferences
+        const updatedCuisines = [...existingCuisines, formattedCountry];
+        handleDataChange({ cuisinePreferences: updatedCuisines });
+      }
     }
   };
 
@@ -663,8 +674,9 @@ const MealPlanCreatorStepper = ({
                     id="customCountry"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                     placeholder={t("mealPlanCreator.cuisine.customCountryPlaceholder") || "Enter a country for its cuisine (e.g., Brazil, Morocco)"}
-                    onKeyPress={(e) => {
+                    onKeyDown={(e) => {
                       if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                        e.preventDefault();
                         addCustomCuisine(e.currentTarget.value.trim());
                         e.currentTarget.value = '';
                       }
