@@ -138,6 +138,9 @@ const MealPlanCreatorStepper = ({
 
   const addCustomCuisine = (country: string) => {
     const formattedCountry = country.trim();
+    console.log('🔍 Adding custom cuisine:', formattedCountry);
+    console.log('🔍 Current cuisinePreferences:', planData.cuisinePreferences);
+    
     if (formattedCountry) {
       // Check if it's not already in the list (case insensitive)
       const existingCuisines = [...planData.cuisinePreferences];
@@ -145,15 +148,29 @@ const MealPlanCreatorStepper = ({
         cuisine.toLowerCase() === formattedCountry.toLowerCase()
       );
       
+      console.log('🔍 Is already selected:', isAlreadySelected);
+      
       if (!isAlreadySelected) {
         // Add to custom cuisines for display
         if (!customCuisines.some(c => c.toLowerCase() === formattedCountry.toLowerCase())) {
           setCustomCuisines(prev => [...prev, formattedCountry]);
+          console.log('🔍 Added to customCuisines');
         }
         
         // Add to cuisinePreferences
         const updatedCuisines = [...existingCuisines, formattedCountry];
+        console.log('🔍 Updated cuisines array:', updatedCuisines);
         handleDataChange({ cuisinePreferences: updatedCuisines });
+        
+        toast({
+          title: "Cuisine Added",
+          description: `${formattedCountry} cuisine has been added to your preferences.`,
+        });
+      } else {
+        toast({
+          title: "Already Added",
+          description: `${formattedCountry} cuisine is already in your preferences.`,
+        });
       }
     }
   };
@@ -1129,6 +1146,7 @@ const MealPlanCreatorStepper = ({
       };
 
       console.log("📤 Sending API request with data:", requestData);
+      console.log("🍽️ cuisinePreferences in payload:", requestData.cuisinePreferences);
 
       const apiResponse = await createMealPlan(requestData);
 

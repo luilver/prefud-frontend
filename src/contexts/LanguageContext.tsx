@@ -260,6 +260,8 @@ const translations = {
     "mealPlanCreator.cuisine.ecuadorian": "Ecuadorian",
     "mealPlanCreator.cuisine.chinese": "Chinese",
     "mealPlanCreator.cuisine.indian": "Indian",
+    "mealPlanCreator.cuisine.customCountry": "Add Country Cuisine",
+    "mealPlanCreator.cuisine.customCountryPlaceholder": "Enter a country for its cuisine (e.g., Brazil, Morocco)",
     "mealPlanCreator.generate.btn": "Generate Plan with AI",
     "mealPlanCreator.generate.btnLoad": "Generating Plan with AI...",
 
@@ -1500,6 +1502,8 @@ const translations = {
     "mealPlanCreator.cuisine.ecuadorian": "Ecuatoriana",
     "mealPlanCreator.cuisine.chinese": "China",
     "mealPlanCreator.cuisine.indian": "India",
+    "mealPlanCreator.cuisine.customCountry": "Agregar Cocina de País",
+    "mealPlanCreator.cuisine.customCountryPlaceholder": "Ingresa un país para su cocina (ej: Brasil, Marruecos)",
     "mealPlanCreator.generate.btn": "Generar plan con IA",
     "mealPlanCreator.generate.btnLoad": "Generando plan con IA...",
 
@@ -2776,6 +2780,8 @@ const translations = {
     "mealPlanCreator.cuisine.indian": "India",
     "mealPlanCreator.cuisine.ecuadorian": "Ecuatoriana",
     "mealPlanCreator.cuisine.chinese": "China",
+    "mealPlanCreator.cuisine.customCountry": "Adicionar Culinária de País",
+    "mealPlanCreator.cuisine.customCountryPlaceholder": "Digite um país para sua culinária (ex: Brasil, Marrocos)",
     "mealPlanCreator.generate.btn": "Gerar Plano com IA",
     "mealPlanCreator.generate.btnLoad": "Criando plano com IA...",
 
