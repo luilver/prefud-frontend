@@ -194,6 +194,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           detail: { subscription: response.subscription } 
         }));
       }
+
+      // Return the user data so it can be used immediately
+      return userData;
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

@@ -36,15 +36,15 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const responseLogin = await login(email, password);
+      const userData = await login(email, password);
       //set language for context and translations
-      console.log("what i receive from login", user.profile);
-      if (user.profile.languages && (user.profile.languages === "en" || user.profile.languages === "es" || user.profile.languages === "pt")) {
+      console.log("what i receive from login", userData?.profile);
+      if (userData?.profile?.languages && (userData.profile.languages === "en" || userData.profile.languages === "es" || userData.profile.languages === "pt")) {
         console.log(
           "it has a selected language! and it is ",
-          user.profile.languages
+          userData.profile.languages
         );
-        setLanguage(user.profile.languages as Language);
+        setLanguage(userData.profile.languages as Language);
       }
 
       toast({

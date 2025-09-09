@@ -147,7 +147,7 @@ interface UserContextType {
   subscriptionInfo: SubscriptionInfo | null;
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
   logout: () => void;
   signup: (userData: any) => Promise<void>;
   updateUserProfile: (updates: Partial<User>) => void;
@@ -570,9 +570,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Authentication methods - now using AuthContext
   const login = async (email: string, password: string) => {
-    await authLogin(email, password);
+    const userData = await authLogin(email, password);
     // User profile will be created in the useEffect above
     await checkSubscription();
+    return userData;
   };
 
   const logout = () => {
