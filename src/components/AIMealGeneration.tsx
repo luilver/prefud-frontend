@@ -427,7 +427,8 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
       .reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100;
 
     return (
-      <div className="max-w-4xl mx-auto space-y-6 p-4">
+      <>
+        <div className="max-w-4xl mx-auto space-y-6 p-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
@@ -646,6 +647,12 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
           </DialogContent>
         </Dialog>
       </div>
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureType="meals"
+      />
+      </>
     );
   }
 
