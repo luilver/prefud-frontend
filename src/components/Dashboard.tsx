@@ -106,12 +106,15 @@ const DashboardContent = () => {
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-green-50 to-orange-50 rounded-lg border border-green-200/50">
+                <button
+                  onClick={() => setActiveTab("profile")}
+                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-green-50 to-orange-50 rounded-lg border border-green-200/50 hover:bg-gradient-to-r hover:from-green-100 hover:to-orange-100 transition-colors cursor-pointer"
+                >
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-sm text-green-700 font-medium">
                     {t('dashboard.header.welcome')} {user?.name?.split(' ')[0] || 'Chef'}!
                   </span>
-                </div>
+                </button>
               </div>
               
               <div className="flex items-center space-x-4">
