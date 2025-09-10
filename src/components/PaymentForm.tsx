@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -247,9 +246,10 @@ const PaymentForm = ({
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Label>Card Details</Label>
-            <div className="p-3 border rounded-md bg-white">
+            <div className="p-3 border rounded-md bg-white flex flex-wrap">
               <CardElement
                 options={{ style: { base: { fontSize: "16px" } } }}
+                className="flex-1 min-w-[200px]"
               />
             </div>
 
