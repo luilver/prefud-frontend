@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -81,6 +81,7 @@ const MealPlanCreatorStepper = ({
   const { toast } = useToast();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
   const { t } = useLanguage();
+  const customCountryRef = useRef<HTMLInputElement | null>(null);
 
   const steps = [
     {
@@ -699,12 +700,20 @@ const MealPlanCreatorStepper = ({
                   <input
                     type="text"
                     id="customCountry"
+                    ref={customCountryRef}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                     placeholder={t("mealPlanCreator.cuisine.customCountryPlaceholder") || "Enter a country for its cuisine (e.g., Brazil, Morocco)"}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                         e.preventDefault();
                         addCustomCuisine(e.currentTarget.value.trim());
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const val = e.currentTarget.value.trim();
+                      if (val) {
+                        addCustomCuisine(val);
                         e.currentTarget.value = '';
                       }
                     }}
@@ -1132,6 +1141,20 @@ const MealPlanCreatorStepper = ({
         return languageMap[languageCode.toLowerCase()] || "english";
       };
 
+      // Ensure any pending custom country input is added
+      let cuisinePrefs = planData.cuisinePreferences;
+      const pendingCustom = customCountryRef.current?.value?.trim();
+      if (pendingCustom) {
+        const exists = cuisinePrefs.some(
+          (c) => c.toLowerCase() === pendingCustom.toLowerCase()
+        );
+        if (!exists) {
+          cuisinePrefs = [...cuisinePrefs, pendingCustom];
+          handleDataChange({ cuisinePreferences: cuisinePrefs });
+        }
+        customCountryRef.current.value = '';
+      }
+
       const requestData = {
         duration: planData.numberOfDays,
         numberPeople: planData.numberOfPersons,
@@ -1139,7 +1162,7 @@ const MealPlanCreatorStepper = ({
         numberKidsLessThan5: planData.numberKidsLessThan5,
         mealsPerDay: planData.mealsPerDay,
         dietaryRestrictions: planData.dietaryRestrictions,
-        cuisinePreferences: planData.cuisinePreferences,
+        cuisinePreferences: cuisinePrefs,
         allergiesIntolerance: planData.allergiesIntolerances,
         dislikes: [...planData.dislikes, planData.additionalAllergies]
           .filter((item) => item.trim())
