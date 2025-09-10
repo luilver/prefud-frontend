@@ -493,6 +493,10 @@ const MealPlanCreatorStepper = ({
                       key: "Paleo",
                       label: t("mealPlanCreator.dietary.paleo") || "Paleo",
                     },
+                     {
+                      key: "Austism",
+                      label: t("mealPlanCreator.dietary.autism") || "Autism",
+                    },
                   ].map((option) => (
                     <div key={option.key} className="flex items-center">
                       <input

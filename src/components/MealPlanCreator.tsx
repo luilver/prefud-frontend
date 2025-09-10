@@ -53,7 +53,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
 
   const availableDiets = [
     "vegetarian", "vegan", "keto", "paleo", "mediterranean", 
-    "low-carb", "gluten-free", "dairy-free", "pescatarian"
+    "low-carb", "gluten-free", "dairy-free", "pescatarian", "autism"
   ];
 
   const availableCuisines = [

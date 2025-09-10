@@ -211,7 +211,8 @@ const translations = {
     "mealPlanCreator.dietary.vegan": "Vegan",
     "mealPlanCreator.dietary.glutenFree": "Gluten-Free",
     "mealPlanCreator.dietary.keto": "Keto",
-    "mealPlanCreator.dietary.paleo": "Paleo",
+    "mealPlanCreator.dietary.paleo": "Autism",
+    "mealPlanCreator.dietary.autism": "Paleo",
     "mealPlanCreator.dietary.dairyFree": "Dairy-Free",
     "mealPlanCreator.cuisine.label": "Cuisine & Cooking",
     "mealPlanCreator.cuisine.label.desc":
@@ -1452,6 +1453,7 @@ const translations = {
     "mealPlanCreator.dietary.glutenFree": "Sin Gluten",
     "mealPlanCreator.dietary.keto": "Keto",
     "mealPlanCreator.dietary.paleo": "Paleo",
+    "mealPlanCreator.dietary.autism": "Autismo",
     "mealPlanCreator.dietary.dairyFree": "Sin Lácteos",
     "mealPlanCreator.cuisine.label": "Cocina y Cocina",
     "mealPlanCreator.cuisine.label.desc":
@@ -2730,6 +2732,7 @@ const translations = {
     "mealPlanCreator.dietary.glutenFree": "Sem Glúten",
     "mealPlanCreator.dietary.keto": "Keto",
     "mealPlanCreator.dietary.paleo": "Paleo",
+    "mealPlanCreator.dietary.autism": "Autismo",
     "mealPlanCreator.dietary.dairyFree": "Sem Laticínios",
     "mealPlanCreator.cuisine.label": "Culinária e Cozinha",
     "mealPlanCreator.cuisine.label.desc":
