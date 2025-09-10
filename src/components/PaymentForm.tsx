@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+import {
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+} from "@stripe/react-stripe-js";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -65,10 +71,18 @@ const PaymentForm = ({
 
     try {
       // Create a Stripe token from card info
-      const cardElement = elements.getElement(CardElement);
-      if (!cardElement) throw new Error("Card element not found");
+      const cardNumberElement = elements.getElement(CardNumberElement);
+      if (!cardNumberElement) throw new Error("Card element not found");
 
-      const { token, error } = await stripe.createToken(cardElement);
+      const { error, token } = await stripe.createToken(cardNumberElement);
+
+      if (error) {
+        console.error("[Token Error]", error);
+        alert(error.message);
+        return;
+      }
+
+      console.log("[Token]", token);
 
       if (error) {
         console.error("Stripe token error:", error);
@@ -246,11 +260,29 @@ const PaymentForm = ({
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Label>Card Details</Label>
-            <div className="p-3 border rounded-md bg-white flex flex-wrap">
-              <CardElement
-                options={{ style: { base: { fontSize: "16px" } } }}
-                className="flex-1 min-w-[200px]"
-              />
+            <div className="space-y-4">
+              <div className="p-3 border rounded-md bg-white">
+                <CardNumberElement
+                  options={{ style: { base: { fontSize: "16px" } } }}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 border rounded-md bg-white">
+                  <CardExpiryElement
+                    options={{ style: { base: { fontSize: "16px" } } }}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="p-3 border rounded-md bg-white">
+                  <CardCvcElement
+                    options={{ style: { base: { fontSize: "16px" } } }}
+                    className="w-full"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center space-x-2 text-sm text-gray-600">
