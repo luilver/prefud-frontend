@@ -379,14 +379,14 @@ const SignupSteps = () => {
 
                   <span
                     className={`mt-2 text-xs font-medium transition-all duration-300 ${
-                      isMobile ? "text-center max-w-[60px] leading-tight" : ""
+                      isMobile ? "hidden" : ""
                     } ${
                       currentStep >= step
                         ? "text-foreground font-semibold"
                         : "text-muted-foreground"
                     }`}
                   >
-                    {isMobile && title.length > 6 ? title.slice(0, 6) : title}
+                    {title}
                   </span>
                 </div>
 
