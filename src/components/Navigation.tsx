@@ -68,8 +68,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                   getButtonStyles(item, isActive)
                 )}
               >
-                <Icon className="h-5 w-5 mb-1" />
-                <span className="text-xs font-medium truncate">{item.label}</span>
+                <Icon className="h-6 w-6" />
               </Button>
             );
           })}
