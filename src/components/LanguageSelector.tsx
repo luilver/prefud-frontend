@@ -23,7 +23,7 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
   if (variant === "button") {
     return (
       <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'es' | 'pt')}>
-        <SelectTrigger className={`w-auto bg-transparent border-none shadow-none focus:ring-0 ${className}`}>
+        <SelectTrigger className={`w-auto bg-transparent border-none shadow-none focus:ring-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent ${className}`}>
           <div className="flex items-center">
             <Languages className="h-4 w-4" />
           </div>
