@@ -492,7 +492,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <Accordion type="multiple" className="space-y-4">
+          <Accordion type="multiple" defaultValue={days.length > 0 ? [days[0]] : []} className="space-y-4">
             {days.map((day, dayIndex) => {
               const dayMeals = mealsByDay[day] || [];
               const { dayName, dateString } = getDayInfo(dayIndex);
