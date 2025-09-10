@@ -17,7 +17,6 @@ import {
   Plus,
   Search,
   Trash2,
-  RefreshCw,
 } from "lucide-react";
 import AddIngredientForm from "./AddIngredientForm";
 import AIMealSuggestions from "./AIMealSuggestions";
@@ -28,7 +27,6 @@ import { useToast } from "@/hooks/use-toast";
 const IngredientTracker = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const { ingredients, deleteIngredient, addIngredient, user, setPantryItems } =
     useUser();
   const { toast } = useToast();
@@ -55,7 +53,6 @@ const IngredientTracker = () => {
       return;
     }
 
-    setIsRefreshing(true);
     try {
       console.log("Fetching pantry items for user:", user.id);
       const response = await getPantry(user.id);
@@ -118,8 +115,6 @@ const IngredientTracker = () => {
         description: "Failed to fetch pantry items. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsRefreshing(false);
     }
   };
 
@@ -243,17 +238,6 @@ const IngredientTracker = () => {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button
-            onClick={fetchPantryItems}
-            disabled={isRefreshing}
-            variant="outline"
-            className="flex items-center space-x-2"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
-            />
-            <span>Refresh</span>
-          </Button>
           <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
