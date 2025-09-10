@@ -111,6 +111,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const parsedUser = JSON.parse(savedUser);
           
           // Check if token is expired
+          console.log('Checking token expiration:', {
+            expirationToken: parsedUser.expirationToken,
+            isExpired: authService.isTokenExpired(parsedUser.expirationToken),
+            currentTime: new Date().toISOString()
+          });
+          
           if (authService.isTokenExpired(parsedUser.expirationToken)) {
             // Token expired, clear storage
             localStorage.removeItem('authUser');
