@@ -139,32 +139,38 @@ const MealPlanCreatorStepper = ({
   const addCustomCuisine = (country: string) => {
     const formattedCountry = country.trim();
     console.log('🔍 Adding custom cuisine:', formattedCountry);
-    console.log('🔍 Current cuisinePreferences:', planData.cuisinePreferences);
+    console.log('🔍 Current cuisinePreferences before:', planData.cuisinePreferences);
+    console.log('🔍 Current customCuisines before:', customCuisines);
     
     if (formattedCountry) {
-      // Check if it's not already in the list (case insensitive)
-      const existingCuisines = [...planData.cuisinePreferences];
-      const isAlreadySelected = existingCuisines.some(cuisine => 
+      // Check if it's not already in cuisinePreferences (case insensitive)
+      const isAlreadyInPreferences = planData.cuisinePreferences.some(cuisine => 
         cuisine.toLowerCase() === formattedCountry.toLowerCase()
       );
       
-      console.log('🔍 Is already selected:', isAlreadySelected);
+      // Check if it's not already in customCuisines (case insensitive)
+      const isAlreadyInCustom = customCuisines.some(c => 
+        c.toLowerCase() === formattedCountry.toLowerCase()
+      );
       
-      if (!isAlreadySelected) {
-        // Add to custom cuisines for display
-        if (!customCuisines.some(c => c.toLowerCase() === formattedCountry.toLowerCase())) {
-          setCustomCuisines(prev => [...prev, formattedCountry]);
-          console.log('🔍 Added to customCuisines');
-        }
+      console.log('🔍 Is already in preferences:', isAlreadyInPreferences);
+      console.log('🔍 Is already in custom:', isAlreadyInCustom);
+      
+      if (!isAlreadyInPreferences && !isAlreadyInCustom) {
+        // Add to custom cuisines for display first
+        const newCustomCuisines = [...customCuisines, formattedCountry];
+        setCustomCuisines(newCustomCuisines);
         
-        // Add to cuisinePreferences
-        const updatedCuisines = [...existingCuisines, formattedCountry];
-        console.log('🔍 Updated cuisines array:', updatedCuisines);
+        // Add to cuisinePreferences immediately and automatically select it
+        const updatedCuisines = [...planData.cuisinePreferences, formattedCountry];
         handleDataChange({ cuisinePreferences: updatedCuisines });
         
+        console.log('🔍 Updated customCuisines:', newCustomCuisines);
+        console.log('🔍 Updated cuisinePreferences:', updatedCuisines);
+        
         toast({
-          title: "Cuisine Added",
-          description: `${formattedCountry} cuisine has been added to your preferences.`,
+          title: "Cuisine Added & Selected",
+          description: `${formattedCountry} cuisine has been added and selected automatically.`,
         });
       } else {
         toast({
