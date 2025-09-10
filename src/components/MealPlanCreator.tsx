@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign, Globe } from "lucide-react";
+import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign, Globe, ArrowLeft } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -346,7 +346,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack}>
-          ← {t('mealPlanCreator.backToMeal') || 'Back to Meal Planner'}
+          <ArrowLeft className="h-4 w-4" />
         </Button>
         <h2 className="text-2xl font-bold text-gray-800">{t('mealPlanCreator.title') || 'Create AI Meal Plan'}</h2>
         <div></div>

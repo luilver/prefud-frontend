@@ -1285,12 +1285,8 @@ const MealPlanCreatorStepper = ({
         <Button
           variant="ghost"
           onClick={onBack}
-          className="flex items-center space-x-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>
-            {t("mealPlanCreator.backToMeal") || "Back to Meal Planner"}
-          </span>
         </Button>
         <div className="flex items-center space-x-2">
           <Sparkles className="h-5 w-5 text-purple-600" />
