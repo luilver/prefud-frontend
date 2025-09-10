@@ -170,7 +170,7 @@ const DashboardContent = () => {
                 <Button 
                   variant="ghost" 
                   onClick={logout} 
-                  className="text-green-700 hover:bg-green-100/60 text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 rounded-lg transition-all duration-200"
+                  className="text-green-700 hover:bg-green-100/60 text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hidden md:block"
                 >
                   {t('dashboard.header.logout')}
                 </Button>

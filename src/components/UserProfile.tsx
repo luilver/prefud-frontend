@@ -21,11 +21,13 @@ import {
   X,
   Languages,
   XCircle,
+  LogOut,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import PasswordUpdate from "./PasswordUpdate";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import axios from "axios";
@@ -41,9 +43,10 @@ interface SubscriptionType {
 }
 
 const UserProfile = () => {
-  const { user, updateUserProfile } = useUser();
+  const { user, updateUserProfile, logout } = useUser();
   const { user: authUser } = useAuth();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const [isEditing, setIsEditing] = useState(false);
   const [subscriptionTypes, setSubscriptionTypes] = useState<
     SubscriptionType[]
@@ -357,6 +360,22 @@ const UserProfile = () => {
           <Separator />
         </CardContent>
       </Card>
+
+      {/* Mobile Logout Button */}
+      {isMobile && (
+        <Card>
+          <CardContent className="p-4">
+            <Button
+              variant="outline"
+              onClick={logout}
+              className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 flex items-center justify-center space-x-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>{t('dashboard.header.logout')}</span>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Password Update Section */}
       <PasswordUpdate />
