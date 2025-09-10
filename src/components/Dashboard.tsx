@@ -157,11 +157,10 @@ const DashboardContent = () => {
                 {/* Mobile Welcome - Now clickable to navigate to profile */}
                 <button
                   onClick={handleUserNameClick}
-                  className="flex items-center space-x-1 px-2 py-1 bg-green-50 rounded-md hover:bg-green-100 transition-colors"
+                  className="flex items-center justify-center w-8 h-8 bg-green-50 rounded-full hover:bg-green-100 transition-colors"
                 >
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                   <span className="text-xs text-green-700 font-medium">
-                    {user?.name?.split(' ')[0] || 'Chef'}
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'C'}
                   </span>
                 </button>
                 

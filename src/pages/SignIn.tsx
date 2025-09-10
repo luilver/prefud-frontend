@@ -130,7 +130,7 @@ const SignIn = () => {
               className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>
+              <span className="hidden md:inline">
                 {t("common.back")} to {t("nav.home")}
               </span>
             </Button>
