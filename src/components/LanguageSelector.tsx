@@ -24,9 +24,8 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
     return (
       <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'es' | 'pt')}>
         <SelectTrigger className={`w-auto bg-transparent border-none shadow-none focus:ring-0 ${className}`}>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             <Languages className="h-4 w-4" />
-            <span className="text-sm font-medium">{currentLanguage?.flag}</span>
           </div>
         </SelectTrigger>
         <SelectContent className="bg-white">
