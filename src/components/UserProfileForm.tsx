@@ -255,14 +255,18 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
                   />
                 </div>
                 <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="Enter phone number"
-                  required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1"
-                />
+  id="phone"
+  type="tel"
+  value={formData.phone}
+  onChange={(e) => {
+    // Solo permitir números y máximo 10 caracteres
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setFormData((prev) => ({ ...prev, phone: value }));
+  }}
+  placeholder="Enter phone number"
+  required
+  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1"
+/>
               </div>
             </div>
 

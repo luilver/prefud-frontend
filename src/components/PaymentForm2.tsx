@@ -223,7 +223,7 @@ const PaymentForm2 = ({
               <h4 className="font-semibold">Monthly</h4>
               <span className="text-2xl font-bold">${monthlyPrice / 100}</span>
             </div>
-            <div
+            {/* <div
               className={`p-4 border-2 rounded-lg cursor-pointer ${
                 billingCycle === "yearly"
                   ? "border-green-500 bg-green-50"
@@ -236,7 +236,7 @@ const PaymentForm2 = ({
                 ${(yearlyPrice / 100).toFixed(2)}
               </span>
               <p className="text-sm text-green-600">Save {yearlyDiscount}%</p>
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>
