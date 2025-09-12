@@ -90,7 +90,9 @@ const UserProfile = () => {
     fetchSubscriptionTypes();
   }, []);
 
-  // Find current subscription name based on subscriptionTypeId
+  // Find current subscription name and type based on subscriptionTypeId
+  const [currentSubscriptionType, setCurrentSubscriptionType] = useState<SubscriptionType | null>(null);
+  
   useEffect(() => {
     const subId = (authUser?.subscription?.subscriptionTypeId ?? "")
       .toString()
@@ -109,9 +111,11 @@ const UserProfile = () => {
         );
         console.log("[UserProfile] matched subscription:", currentSubscription);
         setCurrentSubscriptionName(currentSubscription?.name || "Free");
+        setCurrentSubscriptionType(currentSubscription || null);
       } else {
         // User has no subscription ID, they're on Free plan
         setCurrentSubscriptionName("Free");
+        setCurrentSubscriptionType(null);
       }
     }
   }, [subscriptionTypes, authUser?.subscription?.subscriptionTypeId]);
@@ -402,9 +406,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-green-100">
               <div className="flex items-center justify-between mb-2">
                 <Calendar className="h-5 w-5 text-green-600" />
-                <span className="text-2xl font-bold text-green-600">
-                  {authUser?.subscription?.mealPlans || 0}
-                </span>
+                <div className="text-right">
+                  <span className="text-xl font-bold text-green-600">
+                    {authUser?.subscription?.mealPlans || 0}
+                  </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.mealPlans}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Meal Plans</p>
               <p className="text-xs text-gray-500">Available this month</p>
@@ -414,9 +425,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-blue-100">
               <div className="flex items-center justify-between mb-2">
                 <Star className="h-5 w-5 text-blue-600" />
-                <span className="text-2xl font-bold text-blue-600">
-                  {authUser?.subscription?.specialMeals || 0}
-                </span>
+                <div className="text-right">
+                  <span className="text-xl font-bold text-blue-600">
+                    {authUser?.subscription?.specialMeals || 0}
+                  </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.specialMeals}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Special Meals</p>
               <p className="text-xs text-gray-500">Premium recipes</p>
@@ -426,9 +444,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-purple-100">
               <div className="flex items-center justify-between mb-2">
                 <Coffee className="h-5 w-5 text-purple-600" />
-                <span className="text-2xl font-bold text-purple-600">
-                  {authUser?.subscription?.healthyDrinks || 0}
-                </span>
+                <div className="text-right">
+                  <span className="text-xl font-bold text-purple-600">
+                    {authUser?.subscription?.healthyDrinks || 0}
+                  </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.healthyDrinks}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Healthy Drinks</p>
               <p className="text-xs text-gray-500">Custom beverages</p>
@@ -438,9 +463,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-orange-100">
               <div className="flex items-center justify-between mb-2">
                 <ChefHat className="h-5 w-5 text-orange-600" />
-                <span className="text-2xl font-bold text-orange-600">
-                  {authUser?.subscription?.generateMeals || 0}
-                </span>
+                <div className="text-right">
+                  <span className="text-xl font-bold text-orange-600">
+                    {authUser?.subscription?.generateMeals || 0}
+                  </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.generatedMeals}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Generated Meals</p>
               <p className="text-xs text-gray-500">AI-powered recipes</p>
