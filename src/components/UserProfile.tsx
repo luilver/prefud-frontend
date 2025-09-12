@@ -55,22 +55,6 @@ interface SubscriptionType {
   generatedMeals: number;
 }
 
-interface UserSubscriptionInfo {
-  userId: string;
-  subscriptionTypeId: string;
-  dayOfTheMonth: number;
-  dateStarted: string;
-  status: boolean;
-  mealPlans: number;
-  specialMeals: number;
-  healthyDrinks: number;
-  generateMeals: number;
-  _id: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
-
 const UserProfile = () => {
   const { user, updateUserProfile, logout } = useUser();
   const { user: authUser } = useAuth();
@@ -80,7 +64,6 @@ const UserProfile = () => {
   const [subscriptionTypes, setSubscriptionTypes] = useState<
     SubscriptionType[]
   >([]);
-  const [userSubscription, setUserSubscription] = useState<UserSubscriptionInfo | null>(null);
   const [currentSubscriptionName, setCurrentSubscriptionName] =
     useState<string>("");
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -91,40 +74,31 @@ const UserProfile = () => {
     country: user?.country || "",
   });
 
-  // Fetch subscription types and user subscription on component mount
+  // Fetch subscription types on component mount
   useEffect(() => {
-    const fetchSubscriptionData = async () => {
+    const fetchSubscriptionTypes = async () => {
       try {
-        // Fetch subscription types
-        const typesResponse = await axios.get(
+        const response = await axios.get(
           "https://pantry-auth-1.onrender.com/subscriptionType/all"
         );
-        setSubscriptionTypes(typesResponse.data);
-
-        // Fetch user subscription
-        if (authUser?.userId) {
-          const userSubResponse = await axios.get(
-            `https://pantry-auth-1.onrender.com/subscription/user/${authUser.userId}`
-          );
-          setUserSubscription(userSubResponse.data);
-        }
+        setSubscriptionTypes(response.data);
       } catch (error) {
-        console.error("Error fetching subscription data:", error);
+        console.error("Error fetching subscription types:", error);
       }
     };
 
-    fetchSubscriptionData();
-  }, [authUser?.userId]);
+    fetchSubscriptionTypes();
+  }, []);
 
   // Find current subscription name and type based on subscriptionTypeId
   const [currentSubscriptionType, setCurrentSubscriptionType] = useState<SubscriptionType | null>(null);
   
   useEffect(() => {
-    const subId = (userSubscription?.subscriptionTypeId ?? "")
+    const subId = (authUser?.subscription?.subscriptionTypeId ?? "")
       .toString()
       .trim();
     console.log(
-      "[UserProfile] userSubscription.subscriptionTypeId:",
+      "[UserProfile] authUser.subscription.subscriptionTypeId:",
       subId
     );
     console.log("[UserProfile] fetched subscriptionTypes:", subscriptionTypes);
@@ -144,7 +118,7 @@ const UserProfile = () => {
         setCurrentSubscriptionType(null);
       }
     }
-  }, [subscriptionTypes, userSubscription?.subscriptionTypeId]);
+  }, [subscriptionTypes, authUser?.subscription?.subscriptionTypeId]);
 
   if (!user) return null;
 
@@ -413,127 +387,118 @@ const UserProfile = () => {
         </CardContent>
       </Card>
 
-      {/* Subscription Information Accordion */}
+      {/* Subscription Information */}
       <Card className="bg-gradient-to-br from-green-50 to-blue-50">
-        <CardContent className="p-0">
-          <Accordion type="single" collapsible>
-            <AccordionItem value="subscription-info" className="border-none">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  <span className="text-lg sm:text-xl font-semibold">
-                    {t("profile.subscription") || "My Subscription"}
+        <CardHeader>
+          <div className="flex items-center space-x-2">
+            <Trophy className="h-5 w-5 text-green-600" />
+            <CardTitle className="text-xl">
+              {t("profile.subscription") || "My Subscription"}
+            </CardTitle>
+          </div>
+          <CardDescription>
+            {currentSubscriptionName} Plan - {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Meal Plans */}
+            <div className="bg-white rounded-lg p-4 border border-green-100">
+              <div className="flex items-center justify-between mb-2">
+                <Calendar className="h-5 w-5 text-green-600" />
+                <div className="text-right">
+                  <span className="text-xl font-bold text-green-600">
+                    {authUser?.subscription?.mealPlans || 0}
                   </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.mealPlans}
+                    </span>
+                  )}
                 </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6">
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    {currentSubscriptionName} Plan - {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
-                  </p>
-                  
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Meal Plans */}
-                    <div className="bg-white rounded-lg p-4 border border-green-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <Calendar className="h-5 w-5 text-green-600" />
-                        <div className="text-right">
-                          <span className="text-xl font-bold text-green-600">
-                            {userSubscription?.mealPlans || 0}
-                          </span>
-                          {currentSubscriptionType && (
-                            <span className="text-lg text-gray-400">
-                              /{currentSubscriptionType.mealPlans}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium text-gray-700">Meal Plans</p>
-                      <p className="text-xs text-gray-500">Available this month</p>
-                    </div>
+              </div>
+              <p className="text-sm font-medium text-gray-700">Meal Plans</p>
+              <p className="text-xs text-gray-500">Available this month</p>
+            </div>
 
-                    {/* Special Meals */}
-                    <div className="bg-white rounded-lg p-4 border border-blue-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <Star className="h-5 w-5 text-blue-600" />
-                        <div className="text-right">
-                          <span className="text-xl font-bold text-blue-600">
-                            {userSubscription?.specialMeals || 0}
-                          </span>
-                          {currentSubscriptionType && (
-                            <span className="text-lg text-gray-400">
-                              /{currentSubscriptionType.specialMeals}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium text-gray-700">Special Meals</p>
-                      <p className="text-xs text-gray-500">Premium recipes</p>
-                    </div>
-
-                    {/* Healthy Drinks */}
-                    <div className="bg-white rounded-lg p-4 border border-purple-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <Coffee className="h-5 w-5 text-purple-600" />
-                        <div className="text-right">
-                          <span className="text-xl font-bold text-purple-600">
-                            {userSubscription?.healthyDrinks || 0}
-                          </span>
-                          {currentSubscriptionType && (
-                            <span className="text-lg text-gray-400">
-                              /{currentSubscriptionType.healthyDrinks}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium text-gray-700">Healthy Drinks</p>
-                      <p className="text-xs text-gray-500">Custom beverages</p>
-                    </div>
-
-                    {/* Generated Meals */}
-                    <div className="bg-white rounded-lg p-4 border border-orange-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <ChefHat className="h-5 w-5 text-orange-600" />
-                        <div className="text-right">
-                          <span className="text-xl font-bold text-orange-600">
-                            {userSubscription?.generateMeals || 0}
-                          </span>
-                          {currentSubscriptionType && (
-                            <span className="text-lg text-gray-400">
-                              /{currentSubscriptionType.generatedMeals}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium text-gray-700">Generated Meals</p>
-                      <p className="text-xs text-gray-500">AI-powered recipes</p>
-                    </div>
-                  </div>
-
-                  {/* Subscription Status */}
-                  <div className="mt-6 p-4 bg-white rounded-lg border">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Target className="h-4 w-4 text-green-600" />
-                        <span className="font-medium">Plan Status</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-2 h-2 rounded-full ${userSubscription?.status ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        <span className={`text-sm font-medium ${userSubscription?.status ? 'text-green-600' : 'text-red-600'}`}>
-                          {userSubscription?.status ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                    </div>
-                    {userSubscription?.dateStarted && (
-                      <p className="text-xs text-gray-500 mt-2">
-                        Started: {new Date(userSubscription.dateStarted).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
+            {/* Special Meals */}
+            <div className="bg-white rounded-lg p-4 border border-blue-100">
+              <div className="flex items-center justify-between mb-2">
+                <Star className="h-5 w-5 text-blue-600" />
+                <div className="text-right">
+                  <span className="text-xl font-bold text-blue-600">
+                    {authUser?.subscription?.specialMeals || 0}
+                  </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.specialMeals}
+                    </span>
+                  )}
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+              </div>
+              <p className="text-sm font-medium text-gray-700">Special Meals</p>
+              <p className="text-xs text-gray-500">Premium recipes</p>
+            </div>
+
+            {/* Healthy Drinks */}
+            <div className="bg-white rounded-lg p-4 border border-purple-100">
+              <div className="flex items-center justify-between mb-2">
+                <Coffee className="h-5 w-5 text-purple-600" />
+                <div className="text-right">
+                  <span className="text-xl font-bold text-purple-600">
+                    {authUser?.subscription?.healthyDrinks || 0}
+                  </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.healthyDrinks}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-700">Healthy Drinks</p>
+              <p className="text-xs text-gray-500">Custom beverages</p>
+            </div>
+
+            {/* Generated Meals */}
+            <div className="bg-white rounded-lg p-4 border border-orange-100">
+              <div className="flex items-center justify-between mb-2">
+                <ChefHat className="h-5 w-5 text-orange-600" />
+                <div className="text-right">
+                  <span className="text-xl font-bold text-orange-600">
+                    {authUser?.subscription?.generateMeals || 0}
+                  </span>
+                  {currentSubscriptionType && (
+                    <span className="text-lg text-gray-400">
+                      /{currentSubscriptionType.generatedMeals}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-700">Generated Meals</p>
+              <p className="text-xs text-gray-500">AI-powered recipes</p>
+            </div>
+          </div>
+
+          {/* Subscription Status */}
+          <div className="mt-6 p-4 bg-white rounded-lg border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Target className="h-4 w-4 text-green-600" />
+                <span className="font-medium">Plan Status</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${authUser?.subscription?.status ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <span className={`text-sm font-medium ${authUser?.subscription?.status ? 'text-green-600' : 'text-red-600'}`}>
+                  {authUser?.subscription?.status ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+            </div>
+            {authUser?.subscription?.dateStarted && (
+              <p className="text-xs text-gray-500 mt-2">
+                Started: {new Date(authUser.subscription.dateStarted).toLocaleDateString()}
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
