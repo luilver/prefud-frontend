@@ -43,6 +43,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PasswordUpdate from "./PasswordUpdate";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
+import { authService } from "@/services/authService";
 import axios from "axios";
 
 interface SubscriptionType {
@@ -53,6 +54,19 @@ interface SubscriptionType {
   healthyDrinks: number;
   specialMeals: number;
   generatedMeals: number;
+}
+
+interface CurrentSubscriptionInfo {
+  userId: string;
+  subscriptionTypeId: string;
+  dayOfTheMonth: number;
+  dateStarted: string;
+  status: boolean;
+  mealPlans: number;
+  specialMeals: number;
+  healthyDrinks: number;
+  generateMeals: number;
+  _id: string;
 }
 
 const UserProfile = () => {
@@ -66,6 +80,8 @@ const UserProfile = () => {
   >([]);
   const [currentSubscriptionName, setCurrentSubscriptionName] =
     useState<string>("");
+  const [currentSubscriptionInfo, setCurrentSubscriptionInfo] = 
+    useState<CurrentSubscriptionInfo | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || "",
@@ -74,21 +90,28 @@ const UserProfile = () => {
     country: user?.country || "",
   });
 
-  // Fetch subscription types on component mount
+  // Fetch subscription types and current subscription data on component mount
   useEffect(() => {
-    const fetchSubscriptionTypes = async () => {
+    const fetchSubscriptionData = async () => {
       try {
-        const response = await axios.get(
+        // Fetch subscription types
+        const typesResponse = await axios.get(
           "https://pantry-auth-1.onrender.com/subscriptionType/all"
         );
-        setSubscriptionTypes(response.data);
+        setSubscriptionTypes(typesResponse.data);
+
+        // Fetch current subscription data using authService
+        if (authUser?.userId) {
+          const subscriptionData = await authService.getSubscription(authUser.userId);
+          setCurrentSubscriptionInfo(subscriptionData);
+        }
       } catch (error) {
-        console.error("Error fetching subscription types:", error);
+        console.error("Error fetching subscription data:", error);
       }
     };
 
-    fetchSubscriptionTypes();
-  }, []);
+    fetchSubscriptionData();
+  }, [authUser?.userId]);
 
   // Find current subscription name and type based on subscriptionTypeId
   const [currentSubscriptionType, setCurrentSubscriptionType] = useState<SubscriptionType | null>(null);
@@ -406,16 +429,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-green-100">
               <div className="flex items-center justify-between mb-2">
                 <Calendar className="h-5 w-5 text-green-600" />
-                <div className="text-right">
-                  <span className="text-xl font-bold text-green-600">
-                    {authUser?.subscription?.mealPlans || 0}
-                  </span>
-                  {currentSubscriptionType && (
-                    <span className="text-lg text-gray-400">
-                      /{currentSubscriptionType.mealPlans}
-                    </span>
-                  )}
-                </div>
+                 <div className="text-right">
+                   <span className="text-xl font-bold text-green-600">
+                     {currentSubscriptionInfo?.mealPlans || 0}
+                   </span>
+                   {currentSubscriptionType && (
+                     <span className="text-lg text-gray-400">
+                       /{currentSubscriptionType.mealPlans}
+                     </span>
+                   )}
+                 </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Meal Plans</p>
               <p className="text-xs text-gray-500">Available this month</p>
@@ -425,16 +448,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-blue-100">
               <div className="flex items-center justify-between mb-2">
                 <Star className="h-5 w-5 text-blue-600" />
-                <div className="text-right">
-                  <span className="text-xl font-bold text-blue-600">
-                    {authUser?.subscription?.specialMeals || 0}
-                  </span>
-                  {currentSubscriptionType && (
-                    <span className="text-lg text-gray-400">
-                      /{currentSubscriptionType.specialMeals}
-                    </span>
-                  )}
-                </div>
+                 <div className="text-right">
+                   <span className="text-xl font-bold text-blue-600">
+                     {currentSubscriptionInfo?.specialMeals || 0}
+                   </span>
+                   {currentSubscriptionType && (
+                     <span className="text-lg text-gray-400">
+                       /{currentSubscriptionType.specialMeals}
+                     </span>
+                   )}
+                 </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Special Meals</p>
               <p className="text-xs text-gray-500">Premium recipes</p>
@@ -444,16 +467,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-purple-100">
               <div className="flex items-center justify-between mb-2">
                 <Coffee className="h-5 w-5 text-purple-600" />
-                <div className="text-right">
-                  <span className="text-xl font-bold text-purple-600">
-                    {authUser?.subscription?.healthyDrinks || 0}
-                  </span>
-                  {currentSubscriptionType && (
-                    <span className="text-lg text-gray-400">
-                      /{currentSubscriptionType.healthyDrinks}
-                    </span>
-                  )}
-                </div>
+                 <div className="text-right">
+                   <span className="text-xl font-bold text-purple-600">
+                     {currentSubscriptionInfo?.healthyDrinks || 0}
+                   </span>
+                   {currentSubscriptionType && (
+                     <span className="text-lg text-gray-400">
+                       /{currentSubscriptionType.healthyDrinks}
+                     </span>
+                   )}
+                 </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Healthy Drinks</p>
               <p className="text-xs text-gray-500">Custom beverages</p>
@@ -463,16 +486,16 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg p-4 border border-orange-100">
               <div className="flex items-center justify-between mb-2">
                 <ChefHat className="h-5 w-5 text-orange-600" />
-                <div className="text-right">
-                  <span className="text-xl font-bold text-orange-600">
-                    {authUser?.subscription?.generateMeals || 0}
-                  </span>
-                  {currentSubscriptionType && (
-                    <span className="text-lg text-gray-400">
-                      /{currentSubscriptionType.generatedMeals}
-                    </span>
-                  )}
-                </div>
+                 <div className="text-right">
+                   <span className="text-xl font-bold text-orange-600">
+                     {currentSubscriptionInfo?.generateMeals || 0}
+                   </span>
+                   {currentSubscriptionType && (
+                     <span className="text-lg text-gray-400">
+                       /{currentSubscriptionType.generatedMeals}
+                     </span>
+                   )}
+                 </div>
               </div>
               <p className="text-sm font-medium text-gray-700">Generated Meals</p>
               <p className="text-xs text-gray-500">AI-powered recipes</p>
@@ -486,18 +509,18 @@ const UserProfile = () => {
                 <Target className="h-4 w-4 text-green-600" />
                 <span className="font-medium">Plan Status</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${authUser?.subscription?.status ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className={`text-sm font-medium ${authUser?.subscription?.status ? 'text-green-600' : 'text-red-600'}`}>
-                  {authUser?.subscription?.status ? 'Active' : 'Inactive'}
-                </span>
-              </div>
+               <div className="flex items-center space-x-2">
+                 <div className={`w-2 h-2 rounded-full ${currentSubscriptionInfo?.status ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                 <span className={`text-sm font-medium ${currentSubscriptionInfo?.status ? 'text-green-600' : 'text-red-600'}`}>
+                   {currentSubscriptionInfo?.status ? 'Active' : 'Inactive'}
+                 </span>
+               </div>
             </div>
-            {authUser?.subscription?.dateStarted && (
-              <p className="text-xs text-gray-500 mt-2">
-                Started: {new Date(authUser.subscription.dateStarted).toLocaleDateString()}
-              </p>
-            )}
+             {currentSubscriptionInfo?.dateStarted && (
+               <p className="text-xs text-gray-500 mt-2">
+                 Started: {new Date(currentSubscriptionInfo.dateStarted).toLocaleDateString()}
+               </p>
+             )}
           </div>
         </CardContent>
       </Card>
