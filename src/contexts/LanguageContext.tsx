@@ -131,6 +131,7 @@ const translations = {
     "profile.plan": "Plan",
     "profile.active": "Active",
     "profile.cancelSubscription": "Cancel Subscription",
+    "profile.subscriptionDesc":"Your current plan usage and limits",
 
     // Meal Planner
     "mealPlanner.title": "Meal Planner",
@@ -1387,6 +1388,7 @@ const translations = {
     "profile.plan": "Plan",
     "profile.active": "Activo",
     "profile.cancelSubscription": "Cancelar suscripción",
+    "profile.subscriptionDesc":"Límites y uso de su plan actual",
 
     // Meal Planner
     "mealPlanner.title": "Planificador de Comidas",
@@ -2687,6 +2689,7 @@ const translations = {
     "profile.plan": "Plano",
     "profile.active": "Ativo",
     "profile.cancelSubscription": "Cancelar Assinatura",
+    "profile.subscriptionDesc":"Limites e uso do seu plano atual",
 
     // Meal Planner
     "mealPlanner.title": "Planejador de Refeições",
