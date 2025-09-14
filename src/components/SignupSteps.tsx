@@ -312,18 +312,18 @@ const SignupSteps = () => {
   };
 
   const stepItems = [
-    { step: 1, title: "Account", icon: User, color: "from-primary to-accent" },
+    { step: 1, title: t("signup.account") || "Account", icon: User, color: "from-primary to-accent" },
     {
       step: 2,
-      title: "Verify",
+      title: t("signup.verify") || "Verify",
       icon: Mail,
       color: "from-primary to-secondary",
     },
-    { step: 3, title: "Profile", icon: User, color: "from-accent to-primary" },
-    { step: 4, title: "Plan", icon: Crown, color: "from-primary to-accent" },
+    { step: 3, title: t("signup.profile") || "Profile", icon: User, color: "from-accent to-primary" },
+    { step: 4, title: t("signup.plan") || "Plan", icon: Crown, color: "from-primary to-accent" },
     {
       step: 5,
-      title: "Payment",
+      title: t("signup.payment") || "Payment",
       icon: CreditCard,
       color: "from-secondary to-primary",
     },
@@ -452,7 +452,7 @@ const SignupSteps = () => {
                       }
                       required
                       className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background"
-                      placeholder="Enter your email address"
+                      placeholder={t("signup.emailPlaceholder") || "Enter your email address"}
                     />
                   </div>
                 </div>
@@ -477,7 +477,7 @@ const SignupSteps = () => {
                       }
                       required
                       className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background pr-12"
-                      placeholder="Create a secure password"
+                      placeholder={t("signup.passwordPlaceholder") || "Create a secure password"}
                     />
                     <Button
                       type="button"
@@ -546,11 +546,11 @@ const SignupSteps = () => {
               </div>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-              Choose your plan
+              {t("signup.choosePlan") || "Choose your plan"}
             </h2>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto">
-              Select the perfect plan to start your personalized meal planning
-              journey
+              {t("signup.selectPlanDescription") || "Select the perfect plan to start your personalized meal planning"}  
+              {t("signup.journey") || "journey"}
             </p>
           </div>
 
@@ -583,7 +583,7 @@ const SignupSteps = () => {
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
                       <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center space-x-1">
                         <Star className="h-3 w-3 fill-current" />
-                        <span>Most Popular</span>
+                        <span>{t("signup.mostPopular") || "Most Popular"}</span>
                       </div>
                     </div>
                   )}
@@ -604,7 +604,7 @@ const SignupSteps = () => {
                     <div className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
                       {plan.price === 0 ? (
                         <span className="bg-gradient-to-r from-muted-foreground to-foreground bg-clip-text text-transparent">
-                          Free
+                          {t("signup.plan.free") || "Free"}
                         </span>
                       ) : (
                         <span
@@ -628,7 +628,7 @@ const SignupSteps = () => {
                   <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col justify-between flex-1">
                     <div className="mb-4">
                       <h4 className="font-bold text-foreground mb-3 text-center">
-                        What's included
+                        {t("signup.plan.whatsIncluded") || "What's included"}
                       </h4>
                       <ul className="space-y-2">
                         {plan.features.map((feature, featureIndex) => (
@@ -657,7 +657,7 @@ const SignupSteps = () => {
                       }`}
                     >
                       <div className="flex items-center space-x-2">
-                        <span>Choose {plan.name}</span>
+                        <span>{t("signup.plan.choose") || "Choose"} {plan.name}</span>
                         <Sparkles className="h-4 w-4" />
                       </div>
                     </Button>

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PartyPopper, Sparkles, ChefHat, Calendar, TrendingUp, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -13,40 +14,41 @@ interface WelcomeModalProps {
 const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
+  const { language, setLanguage, t } = useLanguage();
 
   const slides = [
     {
       icon: PartyPopper,
-      title: "Welcome to Pantry!",
-      description: "Your smart kitchen companion is ready to transform your cooking experience.",
+      title: t("welcome.message") || "Welcome to Pantry!",
+      description: t("welcome.subtitle") || "Your smart kitchen companion is ready to transform your cooking experience.",
       color: "text-purple-600",
       image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=250&fit=crop"
     },
     {
       icon: ChefHat,
-      title: "AI-Powered Meal Planning",
-      description: "Get personalized meal suggestions based on your preferences and pantry items.",
+      title: t("welcome.aiMealPlanning") || "AI-Powered Meal Planning",
+      description: t("welcome.personalizedMeals") || "Get personalized meal suggestions based on your preferences and pantry items.",
       color: "text-green-600",
       image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=250&fit=crop"
     },
     {
       icon: Calendar,
-      title: "Weekly Planning Made Easy",
-      description: "Plan your entire week with smart suggestions and automated shopping lists.",
+      title: t("welcome.weeklyPlanning") || "Weekly Planning Made Easy",
+      description: t("welcome.planWeekDescription") || "Plan your entire week with smart suggestions and automated shopping lists.",
       color: "text-blue-600",
       image: "https://images.unsplash.com/photo-1588514727390-91fd5ebaef81?w=400&h=250&fit=crop"
     },
     {
       icon: Camera,
-      title: "Smart Pantry Scanning",
-      description: "Use your camera to scan ingredients and automatically add them to your pantry.",
+      title: t("welcome.smartPantry") || "Smart Pantry Scanning",
+      description: t("welcome.scanIngredients") || "Use your camera to scan ingredients and automatically add them to your pantry.",
       color: "text-orange-600",
       image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop"
     },
     {
       icon: TrendingUp,
-      title: "Track Your Progress",
-      description: "Monitor your nutrition goals and see your healthy habits grow over time.",
+      title: t("welcome.trackProgress") || "Track Your Progress",
+      description: t("welcome.monitorGoals") || "Monitor your nutrition goals and see your healthy habits grow over time",
       color: "text-orange-600",
       image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop"
     }

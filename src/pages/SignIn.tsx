@@ -131,7 +131,7 @@ const SignIn = () => {
             >
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden md:inline">
-                {t("common.back")} to {t("nav.home")}
+                {t("signup.backToStart") || "Atrás para Comenzar"}
               </span>
             </Button>
           </div>

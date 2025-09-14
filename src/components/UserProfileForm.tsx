@@ -46,17 +46,28 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
   });
 
   const healthGoalsOptions = [
-    "Lose weight", "Gain muscle", "Maintain weight", "Improve energy",
-    "Better digestion", "Heart health", "Lower cholesterol", "Manage diabetes"
+    t("signup.healthGoals.loseWeight") || "Lose weight", t("signup.healthGoals.gainMuscle") || "Gain muscle",
+    t("signup.healthGoals.maintainWeight") || "Maintain weight", t("signup.healthGoals.improveEnergy") || "Improve energy",
+    t("signup.healthGoals.betterDigestion") || "Better digestion", t("signup.healthGoals.heartHealth") || "Heart health",
+    t("signup.healthGoals.lowerCholesterol") || "Lower cholesterol", t("signup.healthGoals.manageDiabetes") || "Manage diabetes",
   ];
 
   const dietTypesOptions = [
-    "Vegetarian", "Vegan", "Pescatarian", "Keto", "Paleo", "Mediterranean",
-    "Low-carb", "Gluten-free", "Dairy-free", "No restrictions"
+    t("signup.diet.vegetarian") || "Vegetarian", t("signup.diet.vegan") || "Vegan",
+    t("signup.diet.pescatarian") || "Pescatarian", t("signup.diet.keto") || "Keto",
+    t("signup.diet.paleo") || "Paleo", t("signup.diet.mediterranean") || "Mediterranean",
+    t("signup.diet.lowCarb") || "Low-carb", t("signup.diet.glutenFree") || "Gluten-free",
+    t("signup.diet.dairyFree") || "Dairy-free", t("signup.diet.noRestrictions") || "No restrictions"
+
   ];
 
   const allergiesOptions = [
-    "Nuts", "Shellfish", "Dairy", "Eggs", "Soy", "Gluten", "Fish", "Sesame", "None"
+    t("signup.allergy.nuts") || "Nuts", t("signup.allergy.shellfish") || "Shellfish",
+    t("signup.allergy.dairy") || "Dairy", t("signup.allergy.eggs") || "Eggs",
+    t("signup.allergy.soy") || "Soy", t("signup.allergy.gluten") || "Gluten",
+    t("signup.allergy.fish") || "Fish", t("signup.allergy.sesame") || "Sesame",
+    t("signup.allergy.none") || "None"
+
   ];
 
   const languageOptions = [
@@ -200,20 +211,20 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
       <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
         <div className="flex items-center space-x-2 mb-2">
           <User className="h-5 w-5 text-green-600" />
-          <CardTitle className="text-lg sm:text-xl">Tell us about yourself</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">{t("signup.aboutYourself") || "Tell us about yourself"}</CardTitle>
         </div>
         <CardDescription className="text-sm sm:text-base">
-          Help us personalize your meal planning experience
+          {t("signup.personalizeMealPlan") || "Help us personalize your meal planning experience"}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Personal Information */}
           <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Personal Information</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t("signup.personalInformation") || "Personal Information"}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="name" className="text-sm sm:text-base">First Name</Label>
+                <Label htmlFor="name" className="text-sm sm:text-base">{t("signup.firstName") || "First Name"}</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -223,7 +234,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" className="text-sm sm:text-base">Last Name</Label>
+                <Label htmlFor="lastName" className="text-sm sm:text-base">{t("signup.lastName") || "Last Name"} </Label>
                 <Input
                   id="lastName"
                   value={formData.lastName}
@@ -235,17 +246,17 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
             </div>
 
             <div>
-              <Label htmlFor="country" className="text-sm sm:text-base">Country</Label>
+              <Label htmlFor="country" className="text-sm sm:text-base">{t("signup.country") || "Country"}</Label>
               <CountrySelect
                 value={formData.country}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, country: value }))}
-                placeholder="Select your country"
+                placeholder={t("signup.countryPlaceholder") || "Select your country"}
                 className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="phone" className="text-sm sm:text-base">Phone Number</Label>
+              <Label htmlFor="phone" className="text-sm sm:text-base">{t("signup.phoneNumber") || "Phone Number"}</Label>
               <div className="flex space-x-2 mt-1">
                 <div className="w-20 sm:w-24">
                   <Input
@@ -255,23 +266,23 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
                   />
                 </div>
                 <Input
-  id="phone"
-  type="tel"
-  value={formData.phone}
-  onChange={(e) => {
-    // Solo permitir números y máximo 10 caracteres
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setFormData((prev) => ({ ...prev, phone: value }));
-  }}
-  placeholder="Enter phone number"
-  required
-  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1"
-/>
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => {
+                  // Solo permitir números y máximo 10 caracteres
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  setFormData((prev) => ({ ...prev, phone: value }));
+                  }}
+                  placeholder={t("signup.phoneNumberPlaceholder") || "Enter phone number"}
+                  required
+                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1"
+                />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="birthday" className="text-sm sm:text-base">Birthday</Label>
+              <Label htmlFor="birthday" className="text-sm sm:text-base">{t("signup.birthday") || "Birthday"}</Label>
               <Input
                 id="birthday"
                 type="date"
@@ -312,10 +323,10 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
 
           {/* Physical Information */}
           <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Physical Information</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t("signup.physicalInfo") || "Physical Information"}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="weight" className="text-sm sm:text-base">Weight (lbs)</Label>
+                <Label htmlFor="weight" className="text-sm sm:text-base">{t("signup.weight") || "Weight (lbs)"}</Label>
                 <Input
                   id="weight"
                   type="number"
@@ -325,14 +336,14 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
                 />
               </div>
               <div>
-                <Label htmlFor="heightMeters" className="text-sm sm:text-base">Height (meters)</Label>
+                <Label htmlFor="heightMeters" className="text-sm sm:text-base">{t("signup.heightPlaceholder") || "Height (meters)"}</Label>
                 <Input
                   id="heightMeters"
                   type="number"
                   step="0.01"
                   min="0"
                   max="3"
-                  placeholder="e.g., 1.75"
+                  placeholder={t("signup.heightExample") || "e.g., 1.75"}
                   value={formData.heightMeters}
                   onChange={(e) => setFormData(prev => ({ ...prev, heightMeters: e.target.value }))}
                   className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
@@ -343,7 +354,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
 
           {/* Health Goals */}
           <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Health Goals</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t("signup.healthGoals") || "Health Goals"}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {healthGoalsOptions.map((goal) => (
                 <div key={goal} className="flex items-center space-x-2">
@@ -362,26 +373,26 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
             
             {/* Daily Calories Goal */}
             <div className="mt-4">
-              <Label htmlFor="dailyCalories" className="text-sm sm:text-base">Daily Calories Goal</Label>
+              <Label htmlFor="dailyCalories" className="text-sm sm:text-base">{t("signup.dailyCaloriesGoal") || "Daily Calories Goal"}</Label>
               <Input
                 id="dailyCalories"
                 type="number"
                 min="800"
                 max="5000"
-                placeholder="e.g., 2000"
+                placeholder={t("signup.dailyCaloriesExample") || "e.g., 2000"}
                 value={formData.dailyCalories}
                 onChange={(e) => setFormData(prev => ({ ...prev, dailyCalories: e.target.value }))}
                 className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Recommended range: 1200-3000 calories per day
+                {t("signup.caloriesRange") || "Recommended range: 1200-3000 calories per day"}              
               </p>
             </div>
           </div>
 
           {/* Diet Types */}
           <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Dietary Preferences</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t("signup.dietaryPreferences") || "Dietary Preferences"}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {dietTypesOptions.map((diet) => (
                 <div key={diet} className="flex items-center space-x-2">
@@ -401,7 +412,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
 
           {/* Allergies */}
           <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Allergies & Restrictions</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t("signup.allergiesRestrictions") || "Allergies & Restrictions"}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {allergiesOptions.map((allergy) => (
                 <div key={allergy} className="flex items-center space-x-2">
@@ -421,7 +432,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
 
           {/* Terms and Conditions */}
           <div className="space-y-3 sm:space-y-4 border-t pt-4 sm:pt-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Agreement</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t("signup.agreement") || "Agreement"}</h3>
             <div className="flex items-start space-x-3">
               <Checkbox
                 id="terms"
@@ -431,18 +442,18 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
               />
               <div className="space-y-1">
                 <Label htmlFor="terms" className="text-sm sm:text-base cursor-pointer leading-relaxed">
-                  I agree to the{' '}
+                 {t("signup.agreementText") || "I agree to the "}{' '}
                   <button
                     type="button"
                     onClick={() => navigate('/terms-and-conditions')}
                     className="text-green-600 hover:text-green-700 underline inline-flex items-center gap-1"
                   >
-                    Terms and Conditions
+                    {t("signup.termsAndConditions") || "Terms and Conditions"}
                     <ExternalLink className="h-3 w-3" />
                   </button>
                 </Label>
                 <p className="text-xs text-gray-500">
-                  By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning.
+                  {t("signup.agreementDescription") || "By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning."}
                 </p>
               </div>
             </div>

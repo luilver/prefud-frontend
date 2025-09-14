@@ -27,7 +27,7 @@ const WhyPantry = () => {
             <LanguageSelector variant="button" />
             <Button variant="outline" onClick={() => navigate('/')} className="flex items-center space-x-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
               <ArrowLeft className="h-4 w-4" />
-              <span>{t('common.back')} to {t('nav.home')}</span>
+              <span>{t("signup.backToStart") || "Back to Start"}</span>
             </Button>
           </div>
         </div>
