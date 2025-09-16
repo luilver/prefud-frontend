@@ -1329,13 +1329,13 @@ const MealPlanCreatorStepper = ({
             disabled={currentStep === 1}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Previous
+            {t("mealPlanner.previous") || "Previous"}
           </Button>
           <Button
             onClick={handleNext}
             className="bg-purple-600 hover:bg-purple-700"
           >
-            Next
+            {t("mealPlanner.next") || "Next"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

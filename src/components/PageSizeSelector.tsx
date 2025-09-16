@@ -1,5 +1,6 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PageSizeSelectorProps {
   pageSize: number;
@@ -8,9 +9,10 @@ interface PageSizeSelectorProps {
 }
 
 const PageSizeSelector = ({ pageSize, onPageSizeChange, className = "" }: PageSizeSelectorProps) => {
+  const { t } = useLanguage();
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
-      <span className="text-sm text-gray-600">Show:</span>
+      <span className="text-sm text-gray-600"> {t("pagination.show") || "Show"}</span>
       <Select value={pageSize.toString()} onValueChange={(value) => onPageSizeChange(parseInt(value))}>
         <SelectTrigger className="w-20">
           <SelectValue />
@@ -21,7 +23,7 @@ const PageSizeSelector = ({ pageSize, onPageSizeChange, className = "" }: PageSi
           <SelectItem value="10">10</SelectItem>
         </SelectContent>
       </Select>
-      <span className="text-sm text-gray-600">per page</span>
+      <span className="text-sm text-gray-600"> {t("pagination.perPage") || "per page"}</span>
     </div>
   );
 };

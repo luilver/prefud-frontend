@@ -353,6 +353,15 @@ const translations = {
     "mealPlanCreator.generate.btn": "Generate Plan with AI",
     "mealPlanCreator.generate.btnLoad": "Generating Plan with AI...",
 
+    // Meal Plan Creator
+    "levels.beginner": "Beginner",
+    "levels.intermediate": "Intermediate",
+    "levels.advanced": "Advanced",
+    "levels.expert": "Expert",
+    "intensity.low": "Low",
+    "intensity.medium": "Medium",
+    "intensity.high": "High",
+
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "Meal Plan Created Successfully! 🎉",
     "mealPlanSuccess.yourPersonalized": "Your personalized AI meal plan",
@@ -1369,6 +1378,13 @@ const translations = {
     "subscription.monthly": "Monthly",
     "subscription.paymentInfo": "Payment Information",
     "subscription.cardDetails": "Card Details",
+
+    // Meal Planner
+    "pagination.show": "Show",
+    "pagination.perPage": "per page",
+    "mealPlanner.previous": "Previous",
+    "mealPlanner.next": "Next",
+
   },
   es: {
     // Language names
@@ -1721,6 +1737,15 @@ const translations = {
     "mealPlanCreator.cuisine.customCountryPlaceholder": "Ingresa un país para su cocina (ej: Brasil, Marruecos)",
     "mealPlanCreator.generate.btn": "Generar plan con IA",
     "mealPlanCreator.generate.btnLoad": "Generando plan con IA...",
+
+    // Meal Plan Creator
+    "levels.beginner": "Principiante",
+    "levels.intermediate": "Intermedio",
+    "levels.advanced": "Avanzado",
+    "levels.expert": "Experto",
+    "intensity.low": "Baja",
+    "intensity.medium": "Media",
+    "intensity.high": "Alta",
 
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "¡Plan de Comidas Creado Exitosamente! 🎉",
@@ -2775,6 +2800,15 @@ const translations = {
     "subscription.paymentInfo": "Información de Pago",
     "subscription.cardDetails": "Detalles de la Tarjeta",
 
+    "mealPlanner.pagination.previous": "Anterior",
+    "mealPlanner.pagination.next": "Siguiente",
+
+    // Meal Planner
+    "pagination.show": "Mostrar",
+    "pagination.perPage": "por página",
+    "mealPlanner.previous": "Anterior",
+    "mealPlanner.next": "Siguiente",
+    
   },
   pt: {
     // Language names
@@ -3134,6 +3168,15 @@ const translations = {
     "mealPlanCreator.cuisine.customCountryPlaceholder": "Digite um país para sua culinária (ex: Brasil, Marrocos)",
     "mealPlanCreator.generate.btn": "Gerar Plano com IA",
     "mealPlanCreator.generate.btnLoad": "Criando plano com IA...",
+
+    // Meal Plan Creator
+    "levels.beginner": "Iniciante",
+    "levels.intermediate": "Intermediário",
+    "levels.advanced": "Avançado",
+    "levels.expert": "Especialista",
+    "intensity.low": "Baixa",
+    "intensity.medium": "Média",
+    "intensity.high": "Alta",
 
     // Meal Plan Success Modal
     "mealPlanSuccess.title": "Plano de Refeições Criado com Sucesso! 🎉",
@@ -4186,6 +4229,11 @@ const translations = {
     "subscription.paymentInfo": "Informações de Pagamento",
     "subscription.cardDetails": "Detalhes do Cartão",
 
+    // Meal Planner
+    "pagination.show": "Mostrar",
+    "pagination.perPage": "por página",
+    "mealPlanner.previous": "Anterior",
+    "mealPlanner.next": "Próximo",
   },
 };
 
