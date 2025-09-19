@@ -40,7 +40,7 @@ const SignUp = () => {
               className="flex items-center space-x-2 text-sm sm:text-base px-3 sm:px-4 py-2 rounded-xl hover:bg-muted/80 transition-all duration-200 backdrop-blur-sm"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('common.back')} to {t('nav.home')}</span>
+              <span className="hidden sm:inline">{t("signup.backToStart") || "Back to Start"}</span>
               <span className="sm:hidden">{t('common.back')}</span>
             </Button>
           </div>

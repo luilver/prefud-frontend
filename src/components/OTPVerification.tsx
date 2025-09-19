@@ -7,6 +7,7 @@ import { ArrowLeft, Mail, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
 import axios from "axios";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface OTPVerificationProps {
   email: string;
@@ -19,7 +20,9 @@ const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrende
 const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationProps) => {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isResending, setIsResending] = useState(false);
+  const [isResending, setIsResending] = useState(false);  
+  const { t } = useLanguage();
+  
 
   const handleVerify = async () => {
     if (otp.length !== 6 || !userId) return;
@@ -145,10 +148,10 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
           <div>
             <CardTitle className="flex items-center space-x-2">
               <Mail className="h-5 w-5" />
-              <span>Verify Your Email</span>
+              <span>{t("signup.verify.title") || "Verify Your Email"}</span>
             </CardTitle>
             <CardDescription>
-              We've sent a 6-digit code to {email}
+              {t("signup.otpSent") || "We've sent a 6-digit code to"} {email}
             </CardDescription>
           </div>
         </div>
@@ -156,7 +159,7 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
       <CardContent className="space-y-6">
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-4">
-            Enter the verification code sent to your email
+            {t("signup.enterOTP") || "Enter the verification code sent to your email"}
           </p>
           
           <div className="flex justify-center mb-6">
@@ -181,12 +184,12 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
             disabled={otp.length !== 6 || isLoading || !userId}
             className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 mb-4"
           >
-            {isLoading ? 'Verifying...' : 'Verify Email'}
+            {isLoading ? 'Verifying...' : t("signup.verifyEmail") || "Verify Email"}
           </Button>
 
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-2">
-              Didn't receive the code?
+              {t("signup.didntReceiveCode") || "Didn't receive the code?"}
             </p>
             <Button 
               variant="ghost" 
@@ -200,7 +203,7 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
                   Sending...
                 </>
               ) : (
-                'Resend Code'
+                t("signup.resendCode") || "Resend Code"
               )}
             </Button>
           </div>

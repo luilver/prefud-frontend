@@ -7,6 +7,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Mail, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PasswordRecoveryProps {
   onBack: () => void;
@@ -23,7 +24,9 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { toast } = useToast();    
+  const { t } = useLanguage();
+  
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,20 +138,20 @@ const PasswordRecovery = ({ onBack }: PasswordRecoveryProps) => {
         <CardHeader>
           <CardTitle className="text-center text-green-700 flex items-center justify-center">
             <Mail className="h-5 w-5 mr-2" />
-            Recover Password
+              {t('signup.emailStep.title') || "Recover Password"}          
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your email address and we'll send you a verification code
+            {t('signup.emailStep.description') || "Enter your email address and we'll send you a verification code"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="recovery-email">Email Address</Label>
+              <Label htmlFor="recovery-email">{t('signup.emailStep.label') || "Email Address"}</Label>
               <Input
                 id="recovery-email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('signup.emailStep.placeholder') || "Enter your email"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

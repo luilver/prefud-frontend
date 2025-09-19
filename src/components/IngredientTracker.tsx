@@ -23,6 +23,7 @@ import AIMealSuggestions from "./AIMealSuggestions";
 import { useUser } from "@/contexts/UserContext";
 import { getPantry } from "@/services/pantryService";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const IngredientTracker = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,6 +31,8 @@ const IngredientTracker = () => {
   const { ingredients, deleteIngredient, addIngredient, user, setPantryItems } =
     useUser();
   const { toast } = useToast();
+    const { t } = useLanguage();
+
 
   // Helper function to map API category to UI category
   const mapApiCategoryToUI = (category: string): string => {
@@ -232,9 +235,9 @@ const IngredientTracker = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Pantry Tracker</h2>
+          <h2 className="text-2xl font-bold text-gray-800"> {t('ingredientTracker.title') || 'Pantry Tracker'}</h2>
           <p className="text-gray-600">
-            Keep track of your ingredients and their expiration dates
+            {t('ingredientTracker.description') || 'Keep track of your ingredients and their expiration dates'}
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -242,7 +245,7 @@ const IngredientTracker = () => {
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Ingredient
+                {t('ingredientTracker.addIngredient') || 'Add Ingredient'}              
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -267,7 +270,7 @@ const IngredientTracker = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Items</p>
+                <p className="text-sm text-gray-600">{t('ingredientTracker.totalItems') || 'Total Items'}</p>
                 <p className="text-2xl font-bold text-green-700">
                   {ingredients.length}
                 </p>
@@ -281,7 +284,7 @@ const IngredientTracker = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Expiring Soon</p>
+                <p className="text-sm text-gray-600"> {t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</p>
                 <p className="text-2xl font-bold text-orange-700">
                   {expiringIngredients.length}
                 </p>
@@ -295,7 +298,7 @@ const IngredientTracker = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Categories</p>
+                <p className="text-sm text-gray-600">{t('ingredientTracker.categories') || 'Categories'}</p>
                 <p className="text-2xl font-bold text-blue-700">
                   {Object.keys(categorizedIngredients).length}
                 </p>
@@ -309,7 +312,7 @@ const IngredientTracker = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Low Stock</p>
+                <p className="text-sm text-gray-600"> {t('ingredientTracker.lowStock') || 'Low Stock'}</p>
                 <p className="text-2xl font-bold text-red-700">
                   {ingredients.filter((i) => i.quantity <= 1).length}
                 </p>
@@ -326,10 +329,10 @@ const IngredientTracker = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-orange-700">
               <AlertTriangle className="h-5 w-5" />
-              <span>Expiring Soon</span>
+              <span>{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</span>
             </CardTitle>
             <CardDescription className="text-orange-600">
-              Use these ingredients first to avoid waste
+              {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}            
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -374,7 +377,7 @@ const IngredientTracker = () => {
               {expiringIngredients.length === 0 && (
                 <div className="text-center py-6 text-gray-500">
                   <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">All ingredients are fresh!</p>
+                  <p className="text-sm">{t('ingredientTracker.allFresh') || 'All ingredients are fresh!'}</p>
                 </div>
               )}
             </div>
@@ -386,15 +389,15 @@ const IngredientTracker = () => {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Package className="h-5 w-5 text-green-600" />
-              <span>Your Pantry</span>
+              <span>{t('ingredientTracker.yourPantry') || 'Your Pantry'}</span>
             </CardTitle>
             <CardDescription>
-              All your ingredients organized by category
+              {t('ingredientTracker.organizedByCategory') || 'All your ingredients organized by category'}            
             </CardDescription>
             <div className="relative">
               <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
-                placeholder="Search ingredients..."
+                placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 border-green-200 focus:border-green-400"
@@ -481,13 +484,13 @@ const IngredientTracker = () => {
               {Object.keys(categorizedIngredients).length === 0 && (
                 <div className="text-center py-12 text-gray-500">
                   <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">No ingredients found</p>
+                  <p className="text-lg"> {t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
                   <p className="text-sm">
                     {searchTerm
-                      ? "Try a different search term"
+                      ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
                       : ingredients.length === 0
-                      ? "Your pantry is empty. Try refreshing or add some ingredients."
-                      : "Start by adding some ingredients to your pantry"}
+                      ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
+                      : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
                   </p>
                 </div>
               )}
