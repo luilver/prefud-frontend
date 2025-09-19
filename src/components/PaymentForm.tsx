@@ -25,6 +25,7 @@ import {
   persistUserSubscription,
   setDefaultPaymentMethod,
 } from "@/services/payments";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SubscriptionPlan {
   id: string;
@@ -55,6 +56,7 @@ const PaymentForm = ({
 }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
+  const { t } = useLanguage();
 
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -200,14 +202,14 @@ const PaymentForm = ({
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center space-x-4 mb-6">
         <Button variant="ghost" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back
+          <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.back") || "Back"}
         </Button>
         <div>
           <h2 className="text-2xl font-bold text-gray-800">
-            Complete Your Subscription
+            {t("subscription.complete") || "Complete Your Subscription"}        
           </h2>
           <p className="text-gray-600">
-            Secure payment processing for {selectedPlan.name}
+            {t("subscription.securePayment") || "Secure payment processing for"} {selectedPlan.name}
           </p>
         </div>
       </div>
@@ -215,8 +217,8 @@ const PaymentForm = ({
       {/* Billing Cycle Selection */}
       <Card>
         <CardHeader>
-          <CardTitle>Choose your billing cycle</CardTitle>
-          <CardDescription>Select how you'd like to be billed</CardDescription>
+          <CardTitle>{t("subscription.chooseBillingCycle") || "Choose your billing cycle"}</CardTitle>
+          <CardDescription>{t("subscription.selectBillingMethod") || "Select how you'd like to be billed"}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
@@ -228,7 +230,7 @@ const PaymentForm = ({
               }`}
               onClick={() => setBillingCycle("monthly")}
             >
-              <h4 className="font-semibold">Monthly</h4>
+              <h4 className="font-semibold">{t("subscription.monthly") || "Monthly"},</h4>
               <span className="text-2xl font-bold">${monthlyPrice / 100}</span>
             </div>
             {/* <div
@@ -254,12 +256,12 @@ const PaymentForm = ({
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <CreditCard className="h-5 w-5" />
-            <span>Payment Information</span>
+            <span>{t("subscription.paymentInfo") || "Payment Information"}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Label>Card Details</Label>
+            <Label>{t("subscription.cardDetails") || "Card Details"},</Label>
             <div className="space-y-4">
               <div className="p-3 border rounded-md bg-white">
                 <CardNumberElement
@@ -287,7 +289,7 @@ const PaymentForm = ({
 
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <Lock className="h-4 w-4" />
-              <span>Your payment is secure by Rukupay LLC</span>
+              <span>{t("subscription.paymentSecure") || "Your payment is secure by Rukupay LLC"}</span>
             </div>
 
             <Button
@@ -296,7 +298,7 @@ const PaymentForm = ({
               disabled={isProcessing || !stripe}
             >
               {isProcessing
-                ? "Processing..."
+                ? t("subscription.processing") || "Processing..."
                 : `Subscribe for $${
                     billingCycle === "monthly"
                       ? (monthlyPrice / 100).toFixed(2)

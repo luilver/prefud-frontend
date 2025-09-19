@@ -72,8 +72,10 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   ];
 
   const cookTimesOptions = [15, 30, 45, 60];
-  const cookingSkillLevels = ["beginner", "intermediate", "advanced", "expert"];
-  const budgetRanges = ["low", "medium", "high"];
+  const cookingSkillLevels = [t('levels.beginner') || 'Beginner', t('levels.intermediate') || 'Intermediate',  
+  t('levels.advanced') || 'Advanced', t('levels.expert') || 'Expert',  ];
+  const budgetRanges = [t('intensity.low') || 'Low', t('intensity.medium') || 'Medium',  
+  t('intensity.high') || 'High' ];
 
   const addDislike = () => {
     if (newDislike.trim() && !dislikes.includes(newDislike.trim().toLowerCase())) {
