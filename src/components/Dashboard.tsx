@@ -24,7 +24,7 @@ import Reels from "./Reels";
 import LanguageSelector from "./LanguageSelector";
 
 const DashboardContent = () => {
-  const [activeTab, setActiveTab] = useState("reels");
+  const [activeTab, setActiveTab] = useState("planner");
   const { user, logout } = useUser();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
