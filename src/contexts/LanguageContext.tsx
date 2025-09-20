@@ -151,6 +151,34 @@ const translations = {
     "signup.healthGoals.lowerCholesterol": "Lower cholesterol",
     "signup.healthGoals.manageDiabetes": "Manage diabetes",
     
+    // Calorie Tracking
+    "profile.calorieTracking.title": "Calorie Tracking",
+    "profile.calorieTracking.description": "Track your monthly calorie consumption and goals",
+    "profile.calorieTracking.dailyGoal": "Daily Goal",
+    "profile.calorieTracking.caloriesPerDay": "Calories per day",
+    "profile.calorieTracking.thisMonth": "This Month",
+    "profile.calorieTracking.caloriesConsumed": "Calories consumed",
+    "profile.calorieTracking.dailyAverage": "Daily Average",
+    "profile.calorieTracking.healthGoalsProgress": "Health Goals Progress",
+    "profile.calorieTracking.noHealthGoals": "No health goals set",
+    
+    // Environmental Impact
+    "profile.environmental.title": "Environmental Impact",
+    "profile.environmental.description": "Track your monthly carbon emissions from ingredients and meals",
+    "profile.environmental.expiredIngredients": "Expired Ingredients",
+    "profile.environmental.carbonWasted": "Carbon footprint wasted",
+    "profile.environmental.consumedMeals": "Consumed Meals",
+    "profile.environmental.carbonUsed": "Carbon footprint used",
+    "profile.environmental.totalMonthly": "Total Monthly Impact",
+    "profile.environmental.combinedFootprint": "Combined carbon footprint",
+    "profile.environmental.sustainabilityTips": "Sustainability Tips",
+    "profile.environmental.reduceFoodWaste": "Reduce Food Waste",
+    "profile.environmental.preventedWaste": "You've prevented 2.1 kg CO₂ by using ingredients before expiration",
+    "profile.environmental.mealPlanBenefits": "Meal Planning Benefits",
+    "profile.environmental.wasteReduction": "Your meal planning has reduced food waste by 78% this month",
+    "profile.environmental.improvementOpportunity": "Improvement Opportunity",
+    "profile.environmental.checkExpiration": "Check expiration dates more frequently to reduce waste by 15%",
+    
     // Diet Types
     "signup.diet.vegetarian": "Vegetarian",
     "signup.diet.vegan": "Vegan",
@@ -1528,6 +1556,34 @@ const translations = {
     "signup.healthGoals.heartHealth": "Salud del corazón",
     "signup.healthGoals.lowerCholesterol": "Reducir colesterol",
     "signup.healthGoals.manageDiabetes": "Controlar diabetes",
+    
+    // Calorie Tracking
+    "profile.calorieTracking.title": "Seguimiento de Calorías",
+    "profile.calorieTracking.description": "Rastrea tu consumo mensual de calorías y objetivos",
+    "profile.calorieTracking.dailyGoal": "Objetivo Diario",
+    "profile.calorieTracking.caloriesPerDay": "Calorías por día",
+    "profile.calorieTracking.thisMonth": "Este Mes",
+    "profile.calorieTracking.caloriesConsumed": "Calorías consumidas",
+    "profile.calorieTracking.dailyAverage": "Promedio Diario",
+    "profile.calorieTracking.healthGoalsProgress": "Progreso de Objetivos de Salud",
+    "profile.calorieTracking.noHealthGoals": "No hay objetivos de salud establecidos",
+    
+    // Environmental Impact
+    "profile.environmental.title": "Impacto Ambiental",
+    "profile.environmental.description": "Rastrea tus emisiones mensuales de carbono de ingredientes y comidas",
+    "profile.environmental.expiredIngredients": "Ingredientes Vencidos",
+    "profile.environmental.carbonWasted": "Huella de carbono desperdiciada",
+    "profile.environmental.consumedMeals": "Comidas Consumidas",
+    "profile.environmental.carbonUsed": "Huella de carbono utilizada",
+    "profile.environmental.totalMonthly": "Impacto Mensual Total",
+    "profile.environmental.combinedFootprint": "Huella de carbono combinada",
+    "profile.environmental.sustainabilityTips": "Consejos de Sostenibilidad",
+    "profile.environmental.reduceFoodWaste": "Reducir Desperdicio de Alimentos",
+    "profile.environmental.preventedWaste": "Has evitado 2.1 kg CO₂ al usar ingredientes antes de su vencimiento",
+    "profile.environmental.mealPlanBenefits": "Beneficios de la Planificación de Comidas",
+    "profile.environmental.wasteReduction": "Tu planificación de comidas ha reducido el desperdicio de alimentos en 78% este mes",
+    "profile.environmental.improvementOpportunity": "Oportunidad de Mejora",
+    "profile.environmental.checkExpiration": "Revisa las fechas de vencimiento más frecuentemente para reducir el desperdicio en 15%",
 
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",
@@ -2953,6 +3009,34 @@ const translations = {
     "signup.healthGoals.heartHealth": "Saúde do coração",
     "signup.healthGoals.lowerCholesterol": "Reduzir colesterol",
     "signup.healthGoals.manageDiabetes": "Controlar diabetes",
+    
+    // Calorie Tracking
+    "profile.calorieTracking.title": "Rastreamento de Calorias",
+    "profile.calorieTracking.description": "Acompanhe seu consumo mensal de calorias e objetivos",
+    "profile.calorieTracking.dailyGoal": "Meta Diária",
+    "profile.calorieTracking.caloriesPerDay": "Calorias por dia",
+    "profile.calorieTracking.thisMonth": "Este Mês",
+    "profile.calorieTracking.caloriesConsumed": "Calorias consumidas",
+    "profile.calorieTracking.dailyAverage": "Média Diária",
+    "profile.calorieTracking.healthGoalsProgress": "Progresso dos Objetivos de Saúde",
+    "profile.calorieTracking.noHealthGoals": "Nenhum objetivo de saúde definido",
+    
+    // Environmental Impact
+    "profile.environmental.title": "Impacto Ambiental",
+    "profile.environmental.description": "Acompanhe suas emissões mensais de carbono de ingredientes e refeições",
+    "profile.environmental.expiredIngredients": "Ingredientes Vencidos",
+    "profile.environmental.carbonWasted": "Pegada de carbono desperdiçada",
+    "profile.environmental.consumedMeals": "Refeições Consumidas",
+    "profile.environmental.carbonUsed": "Pegada de carbono utilizada",
+    "profile.environmental.totalMonthly": "Impacto Mensal Total",
+    "profile.environmental.combinedFootprint": "Pegada de carbono combinada",
+    "profile.environmental.sustainabilityTips": "Dicas de Sustentabilidade",
+    "profile.environmental.reduceFoodWaste": "Reduzir Desperdício de Alimentos",
+    "profile.environmental.preventedWaste": "Você evitou 2.1 kg CO₂ ao usar ingredientes antes do vencimento",
+    "profile.environmental.mealPlanBenefits": "Benefícios do Planejamento de Refeições",
+    "profile.environmental.wasteReduction": "Seu planejamento de refeições reduziu o desperdício de alimentos em 78% este mês",
+    "profile.environmental.improvementOpportunity": "Oportunidade de Melhoria",
+    "profile.environmental.checkExpiration": "Verifique as datas de validade com mais frequência para reduzir o desperdício em 15%",
     
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",

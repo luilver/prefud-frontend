@@ -547,13 +547,13 @@ const UserProfile = () => {
                 <div className="flex items-center space-x-2">
                   <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                   <span className="text-lg sm:text-xl font-semibold">
-                    Calorie Tracking
+                    {t("profile.calorieTracking.title") || "Calorie Tracking"}
                   </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Track your monthly calorie consumption and goals
+                  {t("profile.calorieTracking.description") || "Track your monthly calorie consumption and goals"}
                 </p>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -565,8 +565,8 @@ const UserProfile = () => {
                         {authUser?.profile?.healthGoals?.dailyCaloriesGoal || 2000}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-700">Daily Goal</p>
-                    <p className="text-xs text-gray-500">Calories per day</p>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyGoal") || "Daily Goal"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesPerDay") || "Calories per day"}</p>
                   </div>
 
                   {/* Monthly Consumed */}
@@ -577,8 +577,8 @@ const UserProfile = () => {
                         24,680
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-700">This Month</p>
-                    <p className="text-xs text-gray-500">Calories consumed</p>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.thisMonth") || "This Month"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesConsumed") || "Calories consumed"}</p>
                   </div>
 
                   {/* Average Daily */}
@@ -589,13 +589,13 @@ const UserProfile = () => {
                         1,956
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-700">Daily Average</p>
-                    <p className="text-xs text-gray-500">This month</p>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyAverage") || "Daily Average"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.thisMonth") || "This month"}</p>
                   </div>
                 </div>
 
                 <div className="mt-6">
-                  <h4 className="text-base font-medium mb-3">Health Goals Progress</h4>
+                  <h4 className="text-base font-medium mb-3">{t("profile.calorieTracking.healthGoalsProgress") || "Health Goals Progress"}</h4>
                   <div className="space-y-2">
                     {["Gain muscle", "Lose weight", "Better digestion", "Heart health"].map((goal, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -630,13 +630,13 @@ const UserProfile = () => {
                 <div className="flex items-center space-x-2">
                   <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                   <span className="text-lg sm:text-xl font-semibold">
-                    Environmental Impact
+                    {t("profile.environmental.title") || "Environmental Impact"}
                   </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Track your monthly carbon emissions from ingredients and meals
+                  {t("profile.environmental.description") || "Track your monthly carbon emissions from ingredients and meals"}
                 </p>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
@@ -649,8 +649,8 @@ const UserProfile = () => {
                         <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-gray-700">Expired Ingredients</p>
-                    <p className="text-xs text-gray-500">Carbon footprint wasted</p>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.expiredIngredients") || "Expired Ingredients"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonWasted") || "Carbon footprint wasted"}</p>
                   </div>
 
                   {/* Consumed Meals Impact */}
@@ -662,8 +662,8 @@ const UserProfile = () => {
                         <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-gray-700">Consumed Meals</p>
-                    <p className="text-xs text-gray-500">Carbon footprint used</p>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.consumedMeals") || "Consumed Meals"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonUsed") || "Carbon footprint used"}</p>
                   </div>
                 </div>
 
@@ -676,30 +676,30 @@ const UserProfile = () => {
                       <span className="text-lg text-gray-500 ml-1">kg CO₂</span>
                     </div>
                   </div>
-                  <p className="text-base font-medium text-gray-700">Total Monthly Impact</p>
-                  <p className="text-sm text-gray-500">Combined carbon footprint</p>
+                  <p className="text-base font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
+                  <p className="text-sm text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
                 </div>
 
                 {/* Environmental Tips */}
                 <div className="space-y-3">
-                  <h4 className="text-base font-medium">💡 Sustainability Tips</h4>
+                  <h4 className="text-base font-medium">💡 {t("profile.environmental.sustainabilityTips") || "Sustainability Tips"}</h4>
                   <div className="grid grid-cols-1 gap-3">
                     <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-                      <p className="text-sm font-medium text-green-800">Reduce Food Waste</p>
+                      <p className="text-sm font-medium text-green-800">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
                       <p className="text-xs text-green-600">
-                        You've prevented 2.1 kg CO₂ by using ingredients before expiration
+                        {t("profile.environmental.preventedWaste") || "You've prevented 2.1 kg CO₂ by using ingredients before expiration"}
                       </p>
                     </div>
                     <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                      <p className="text-sm font-medium text-blue-800">Meal Planning Benefits</p>
+                      <p className="text-sm font-medium text-blue-800">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
                       <p className="text-xs text-blue-600">
-                        Your meal planning has reduced food waste by 78% this month
+                        {t("profile.environmental.wasteReduction") || "Your meal planning has reduced food waste by 78% this month"}
                       </p>
                     </div>
                     <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
-                      <p className="text-sm font-medium text-yellow-800">Improvement Opportunity</p>
+                      <p className="text-sm font-medium text-yellow-800">{t("profile.environmental.improvementOpportunity") || "Improvement Opportunity"}</p>
                       <p className="text-xs text-yellow-600">
-                        Check expiration dates more frequently to reduce waste by 15%
+                        {t("profile.environmental.checkExpiration") || "Check expiration dates more frequently to reduce waste by 15%"}
                       </p>
                     </div>
                   </div>
