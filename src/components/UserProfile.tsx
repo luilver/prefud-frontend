@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -35,6 +36,11 @@ import {
   ChefHat,
   Trophy,
   Target,
+  Flame,
+  Leaf,
+  TrendingDown,
+  Activity,
+  Heart,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -70,6 +76,7 @@ interface CurrentSubscriptionInfo {
 }
 
 const UserProfile = () => {
+  const navigate = useNavigate();
   const { user, updateUserProfile, logout } = useUser();
   const { user: authUser } = useAuth();
   const { t } = useLanguage();
@@ -410,20 +417,26 @@ const UserProfile = () => {
         </CardContent>
       </Card>
 
-      {/* Subscription Information */}
-      <Card className="bg-gradient-to-br from-green-50 to-blue-50">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Trophy className="h-5 w-5 text-green-600" />
-            <CardTitle className="text-xl">
-              {t("profile.subscription") || "My Subscription"}
-            </CardTitle>
-          </div>
-          <CardDescription>
-            {currentSubscriptionName} Plan - {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Subscription Information Accordion */}
+      <Card>
+        <CardContent className="p-0">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="subscription-info" className="border-none">
+              <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                <div className="flex items-center space-x-2">
+                  <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  <span className="text-lg sm:text-xl font-semibold">
+                    {t("profile.subscription") || "My Subscription"}
+                  </span>
+                  <div className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    {currentSubscriptionName} Plan
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
+                </p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Meal Plans */}
             <div className="bg-white rounded-lg p-4 border border-green-100">
@@ -521,7 +534,195 @@ const UserProfile = () => {
                  Started: {new Date(currentSubscriptionInfo.dateStarted).toLocaleDateString()}
                </p>
              )}
-          </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* Calorie Tracking Accordion */}
+      <Card>
+        <CardContent className="p-0">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="calorie-tracking" className="border-none">
+              <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                <div className="flex items-center space-x-2">
+                  <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
+                  <span className="text-lg sm:text-xl font-semibold">
+                    {t("profile.calorieTracking.title") || "Calorie Tracking"}
+                  </span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t("profile.calorieTracking.description") || "Track your monthly calorie consumption and goals"}
+                </p>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Daily Goal */}
+                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Target className="h-5 w-5 text-orange-600" />
+                      <span className="text-2xl font-bold text-orange-600">
+                        {authUser?.profile?.healthGoals?.dailyCaloriesGoal || 2000}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyGoal") || "Daily Goal"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesPerDay") || "Calories per day"}</p>
+                  </div>
+
+                  {/* Monthly Consumed */}
+                  <div className="bg-red-50 rounded-lg p-4 border border-red-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Activity className="h-5 w-5 text-red-600" />
+                      <span className="text-2xl font-bold text-red-600">
+                        24,680
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.thisMonth") || "This Month"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesConsumed") || "Calories consumed"}</p>
+                  </div>
+
+                  {/* Average Daily */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <TrendingDown className="h-5 w-5 text-blue-600" />
+                      <span className="text-2xl font-bold text-blue-600">
+                        1,956
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyAverage") || "Daily Average"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.thisMonth") || "This month"}</p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h4 className="text-base font-medium mb-3">{t("profile.calorieTracking.healthGoalsProgress") || "Health Goals Progress"}</h4>
+                  <div className="space-y-2">
+                    {["Gain muscle", "Lose weight", "Better digestion", "Heart health"].map((goal, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium">{goal}</span>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-green-600 h-2 rounded-full" 
+                              style={{ width: `${Math.floor(Math.random() * 100)}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {Math.floor(Math.random() * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* Environmental Impact Accordion */}
+      <Card>
+        <CardContent className="p-0">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="environmental-impact" className="border-none">
+              <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                <div className="flex items-center space-x-2">
+                  <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  <span className="text-lg sm:text-xl font-semibold">
+                    {t("profile.environmental.title") || "Environmental Impact"}
+                  </span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t("profile.environmental.description") || "Track your monthly carbon emissions from ingredients and meals"}
+                </p>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                  {/* Expired Ingredients Impact */}
+                  <div className="bg-red-50 rounded-lg p-4 border border-red-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <XCircle className="h-5 w-5 text-red-600" />
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-red-600">2.4</span>
+                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.expiredIngredients") || "Expired Ingredients"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonWasted") || "Carbon footprint wasted"}</p>
+                  </div>
+
+                  {/* Consumed Meals Impact */}
+                  <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Utensils className="h-5 w-5 text-green-600" />
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-green-600">8.7</span>
+                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.consumedMeals") || "Consumed Meals"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonUsed") || "Carbon footprint used"}</p>
+                  </div>
+                </div>
+
+                {/* Total Monthly Impact */}
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-100 mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <Leaf className="h-6 w-6 text-blue-600" />
+                    <div className="text-right">
+                      <span className="text-3xl font-bold text-blue-600">11.1</span>
+                      <span className="text-lg text-gray-500 ml-1">kg CO₂</span>
+                    </div>
+                  </div>
+                  <p className="text-base font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
+                  <p className="text-sm text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
+                </div>
+
+                {/* Environmental Tips */}
+                <div className="space-y-3">
+                  <h4 className="text-base font-medium">💡 {t("profile.environmental.sustainabilityTips") || "Sustainability Tips"}</h4>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                      <p className="text-sm font-medium text-green-800">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
+                      <p className="text-xs text-green-600">
+                        {t("profile.environmental.preventedWaste") || "You've prevented 2.1 kg CO₂ by using ingredients before expiration"}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <p className="text-sm font-medium text-blue-800">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
+                      <p className="text-xs text-blue-600">
+                        {t("profile.environmental.wasteReduction") || "Your meal planning has reduced food waste by 78% this month"}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+                      <p className="text-sm font-medium text-yellow-800">{t("profile.environmental.improvementOpportunity") || "Improvement Opportunity"}</p>
+                      <p className="text-xs text-yellow-600">
+                        {t("profile.environmental.checkExpiration") || "Check expiration dates more frequently to reduce waste by 15%"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* Check Favorites Button */}
+      <Card>
+        <CardContent className="p-4">
+          <Button
+            onClick={() => navigate("/favorites")}
+            className="w-full bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:from-primary/90 hover:to-secondary/90 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+          >
+            <Heart className="h-4 w-4" />
+            <span>{t("profile.checkFavorites")}</span>
+          </Button>
         </CardContent>
       </Card>
 

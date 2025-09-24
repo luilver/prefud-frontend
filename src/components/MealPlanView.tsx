@@ -316,7 +316,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
   // If a meal is selected, show the RecipeView
   if (selectedMeal) {
-    return <RecipeView meal={selectedMeal} onBack={handleBackFromMeal} />;
+    return <RecipeView meal={selectedMeal} plan={plan} onBack={handleBackFromMeal} />;
   }
 
   // Calculate plan statistics with better fallbacks
