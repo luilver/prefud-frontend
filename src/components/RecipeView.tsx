@@ -23,22 +23,27 @@ import {
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { updateMealConsumed } from "@/services/pantryService";
 import MealShoppingModal from "./MealShoppingModal";
 
 interface RecipeViewProps {
   meal: any;
+  plan?: any;
   onBack: () => void;
 }
 
-const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
+const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
   console.log("this is the meal prop in RecipeView:", meal);
   console.log("meal.ingredientsData:", meal.ingredientsData);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const [isCooked, setIsCooked] = useState(meal.consumed || false);
   const { addShoppingItem } = useUser();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -87,6 +92,62 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
       toast({
         title: "Error",
         description: "Failed to create shopping list. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMarkAsCooked = async () => {
+    if (!plan?.id || !meal.id) {
+      toast({
+        title: t("recipeView.updateError") || "Update failed",
+        description: t("recipeView.missingDataError") || "Missing plan or meal information. Please try again from the meal plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newCookedStatus = !isCooked;
+    const dayParsed = meal.day || 1;
+
+    console.log("Marking meal as cooked:", meal.id, "Day:", dayParsed, "Cooked:", newCookedStatus);
+
+    try {
+      const response = await updateMealConsumed(
+        plan.id,
+        meal.id,
+        newCookedStatus,
+        dayParsed
+      );
+
+      console.log("Response from updating meal consumed:", response);
+
+      if (response?.success) {
+        // Update local state
+        setIsCooked(newCookedStatus);
+        
+        // Update the meal object
+        meal.consumed = newCookedStatus;
+
+        // Show success toast
+        toast({
+          title: newCookedStatus ? 
+            (t("recipeView.mealCooked") || "Recipe completed!") : 
+            (t("recipeView.mealUncooked") || "Recipe marked as not cooked"),
+          description: newCookedStatus ? 
+            (t("recipeView.mealCookedDesc") || "Great job on completing this recipe!") : 
+            (t("recipeView.mealUncookedDesc") || "Recipe status updated successfully"),
+        });
+      } else {
+        throw new Error("Failed to update meal");
+      }
+    } catch (error) {
+      console.log("Error updating meal consumed:", error);
+      
+      // Show error toast
+      toast({
+        title: t("recipeView.updateError") || "Update failed",
+        description: t("recipeView.updateErrorDesc") || "Failed to update recipe status. Please try again.",
         variant: "destructive",
       });
     }
@@ -496,9 +557,13 @@ const RecipeView = ({ meal, onBack }: RecipeViewProps) => {
                   <BookOpen className="h-4 w-4 mr-2" />
                   Mark as Favorite
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  onClick={handleMarkAsCooked}
+                  className={`w-full justify-start ${isCooked ? 'bg-green-50 text-green-700 border-green-200' : ''}`} 
+                  variant="outline"
+                >
                   <ChefHat className="h-4 w-4 mr-2" />
-                  Mark as Cooked
+                  {isCooked ? (t("recipeView.markedAsCooked") || "✓ Cooked") : (t("recipeView.markAsCooked") || "Mark as Cooked")}
                 </Button>
               </CardContent>
             </Card>
