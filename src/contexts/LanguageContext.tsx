@@ -179,6 +179,14 @@ const translations = {
     "profile.environmental.improvementOpportunity": "Improvement Opportunity",
     "profile.environmental.checkExpiration": "Check expiration dates more frequently to reduce waste by 15%",
     
+    // Favorites
+    "profile.checkFavorites": "Check Favorites",
+    "favorites.title": "My Favorite Recipes",
+    "favorites.subtitle": "Your collection of beloved recipes",
+    "favorites.empty.title": "No favorite recipes yet",
+    "favorites.empty.description": "Start exploring recipes and mark your favorites to see them here!",
+    "favorites.empty.cta": "Discover Recipes",
+    
     // Diet Types
     "signup.diet.vegetarian": "Vegetarian",
     "signup.diet.vegan": "Vegan",
@@ -1592,6 +1600,14 @@ const translations = {
     "profile.environmental.wasteReduction": "Tu planificación de comidas ha reducido el desperdicio de alimentos en 78% este mes",
     "profile.environmental.improvementOpportunity": "Oportunidad de Mejora",
     "profile.environmental.checkExpiration": "Revisa las fechas de vencimiento más frecuentemente para reducir el desperdicio en 15%",
+
+    // Favorites
+    "profile.checkFavorites": "Ver Favoritos",
+    "favorites.title": "Mis Recetas Favoritas",
+    "favorites.subtitle": "Tu colección de recetas favoritas",
+    "favorites.empty.title": "Aún no tienes recetas favoritas",
+    "favorites.empty.description": "¡Comienza a explorar recetas y marca tus favoritas para verlas aquí!",
+    "favorites.empty.cta": "Descubrir Recetas",
 
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",
@@ -3053,6 +3069,14 @@ const translations = {
     "profile.environmental.wasteReduction": "Seu planejamento de refeições reduziu o desperdício de alimentos em 78% este mês",
     "profile.environmental.improvementOpportunity": "Oportunidade de Melhoria",
     "profile.environmental.checkExpiration": "Verifique as datas de validade com mais frequência para reduzir o desperdício em 15%",
+    
+    // Favorites
+    "profile.checkFavorites": "Ver Favoritos",
+    "favorites.title": "Minhas Receitas Favoritas",
+    "favorites.subtitle": "Sua coleção de receitas queridas",
+    "favorites.empty.title": "Ainda não há receitas favoritas",
+    "favorites.empty.description": "Comece a explorar receitas e marque suas favoritas para vê-las aqui!",
+    "favorites.empty.cta": "Descobrir Receitas",
     
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",

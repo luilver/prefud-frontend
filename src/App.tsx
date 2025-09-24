@@ -14,6 +14,7 @@ import SignIn from "@/pages/SignIn";
 import Pricing from "@/pages/Pricing";
 import WhyPantry from "@/pages/WhyPantry";
 import TermsAndConditions from "@/pages/TermsAndConditions";
+import Favorites from "@/pages/Favorites";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/why-pantry" element={<WhyPantry />} />
                   <Route path="/terms" element={<TermsAndConditions />} />
+                  <Route path="/favorites" element={<Favorites />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>

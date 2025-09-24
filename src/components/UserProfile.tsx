@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,6 +40,7 @@ import {
   Leaf,
   TrendingDown,
   Activity,
+  Heart,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -74,6 +76,7 @@ interface CurrentSubscriptionInfo {
 }
 
 const UserProfile = () => {
+  const navigate = useNavigate();
   const { user, updateUserProfile, logout } = useUser();
   const { user: authUser } = useAuth();
   const { t } = useLanguage();
@@ -707,6 +710,19 @@ const UserProfile = () => {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+        </CardContent>
+      </Card>
+
+      {/* Check Favorites Button */}
+      <Card>
+        <CardContent className="p-4">
+          <Button
+            onClick={() => navigate("/favorites")}
+            className="w-full bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:from-primary/90 hover:to-secondary/90 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+          >
+            <Heart className="h-4 w-4" />
+            <span>{t("profile.checkFavorites")}</span>
+          </Button>
         </CardContent>
       </Card>
 
