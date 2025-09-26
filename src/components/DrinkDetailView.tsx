@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import DrinkShoppingModal from "./DrinkShoppingModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAddToCart } from "@/hooks/useAddToCart";
 import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
 
 interface DrinkDetailViewProps {
@@ -740,7 +741,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                         {t("drinkDetailView.addToPantry") || "Add to Pantry"}
                       </Button>
                       <Button
-                        onClick={handleAddToCart}
+                        onClick={() => handleAddToCart()}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                         size="sm"
                       >

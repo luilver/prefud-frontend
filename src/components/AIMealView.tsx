@@ -30,6 +30,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
 import { useCart } from "@/contexts/CartContext";
 import AddToCartButton from "./AddToCartButton";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 interface AIMealViewProps {
   meal: any;
@@ -198,28 +199,14 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     }
   };
 
-  const handleAddToCart = () => {
-    const ingredientsToAdd = getIngredientsForShopping().filter(
-      (ingredient) => selectedIngredients.includes(ingredient.name)
-    );
-    
-    if (ingredientsToAdd.length === 0) {
-      toast.error("Please select ingredients to add to cart");
-      return;
-    }
-
-    ingredientsToAdd.forEach((ingredient) => {
-      addItem({
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        category: ingredient.classification || "ingredient"
-      });
-    });
-
-    toast.success(`Added ${ingredientsToAdd.length} ingredients to cart!`);
-    setSelectedIngredients([]);
-  };
+  const { handleAddToCart } = useAddToCart({
+    ingredients: getIngredientsForShopping().map(ingredient => ({
+      ...ingredient,
+      category: ingredient.classification || "ingredient"
+    })),
+    selectedIngredients,
+    onSuccess: () => setSelectedIngredients([])
+  });
 
   const handleSelectAllIngredients = () => {
     const allIngredients = getIngredientsForShopping();
@@ -575,7 +562,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                         Add to Pantry ({selectedIngredients.length})
                       </Button>
                       <Button
-                        onClick={handleAddToCart}
+                        onClick={() => handleAddToCart()}
                         className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
                         size="lg"
                       >

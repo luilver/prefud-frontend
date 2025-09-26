@@ -1,9 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Plus } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { toast } from "@/hooks/use-toast";
+import { ShoppingCart } from "lucide-react";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 interface AddToCartButtonProps {
   ingredient: {
@@ -23,29 +21,16 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   size = "sm",
   className = ""
 }) => {
-  const { addItem } = useCart();
-  const { t } = useLanguage();
-
-  const handleAddToCart = () => {
-    addItem({
-      name: ingredient.name,
-      quantity: ingredient.quantity,
-      unit: ingredient.unit,
-      category: ingredient.category
-    });
-
-    toast({
-      title: "Added to Cart",
-      description: `${ingredient.name} has been added to your shopping cart.`,
-      duration: 2000,
-    });
-  };
+  const { handleAddToCart } = useAddToCart({
+    ingredients: [ingredient],
+    selectedIngredients: [ingredient.name]
+  });
 
   return (
     <Button
       variant={variant}
       size={size}
-      onClick={handleAddToCart}
+      onClick={() => handleAddToCart()}
       className={`${className} transition-all duration-200`}
     >
       <ShoppingCart className="h-4 w-4 mr-2" />

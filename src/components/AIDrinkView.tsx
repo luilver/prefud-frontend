@@ -7,6 +7,7 @@ import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAddToCart } from "@/hooks/useAddToCart";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface AIDrinkViewProps {
@@ -63,34 +64,26 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
     }
   };
 
-  const handleAddToCart = () => {
-    const ingredientsToAdd = drink.ingredients.filter((ingredient: any) => 
-      selectedIngredients.includes(ingredient.name)
-    );
+  // Transform ingredients for the hook
+  const transformedIngredients = drink.ingredients?.map((ingredient: any) => {
+    const amount = ingredient.amount || "1 unit";
+    const match = amount.match(/^(\d+(?:\.\d+)?)\s*(\w+)?/);
+    const quantity = match ? parseFloat(match[1]) : 1;
+    const unit = match && match[2] ? match[2] : "unit";
     
-    if (ingredientsToAdd.length === 0) {
-      toast.error("Please select ingredients to add to cart");
-      return;
-    }
+    return {
+      name: ingredient.name,
+      quantity: quantity,
+      unit: unit,
+      category: "beverage ingredient"
+    };
+  }) || [];
 
-    ingredientsToAdd.forEach((ingredient: any) => {
-      // Parse amount to get quantity and unit
-      const amount = ingredient.amount || "1 unit";
-      const match = amount.match(/^(\d+(?:\.\d+)?)\s*(\w+)?/);
-      const quantity = match ? parseFloat(match[1]) : 1;
-      const unit = match && match[2] ? match[2] : "unit";
-
-      addItem({
-        name: ingredient.name,
-        quantity: quantity,
-        unit: unit,
-        category: "beverage ingredient"
-      });
-    });
-
-    toast.success(`Added ${ingredientsToAdd.length} ingredients to cart!`);
-    setSelectedIngredients([]);
-  };
+  const { handleAddToCart } = useAddToCart({
+    ingredients: transformedIngredients,
+    selectedIngredients,
+    onSuccess: () => setSelectedIngredients([])
+  });
 
   const enhancedInstructions = useMemo(() => {
     const drinkTips = [
@@ -395,7 +388,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                       {selectedIngredients.length > 0 && (
                         <div className="flex justify-center pt-4 border-t mt-6">
                           <Button
-                            onClick={handleAddToCart}
+                            onClick={() => handleAddToCart()}
                             className="flex-1 bg-primary hover:bg-primary/90 h-12 max-w-xs"
                             size="lg"
                           >

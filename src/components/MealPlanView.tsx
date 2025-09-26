@@ -35,6 +35,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAddToCart } from "@/hooks/useAddToCart";
 import {
   addIngredientsToPantry,
   updateMealConsumed,
@@ -303,31 +304,43 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     setSelectAll(false);
   };
 
+  const mealPlanIngredients = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
+  
+  const { handleAddToCart: addToCartHook } = useAddToCart({
+    ingredients: mealPlanIngredients.map(item => ({
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      category: item.category || item.classification || "Other"
+    })),
+    selectedIngredients: Array.from(checkedItems),
+    onSuccess: () => {
+      setCheckedItems(new Set());
+      setSelectAll(false);
+    }
+  });
+
   const handleAddToCart = (items?: any[]) => {
-    const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
-    const itemsToAdd =
-      items ||
-      shoppingList.filter((item: any) => checkedItems.has(item.id || item.name)) ||
-      [];
-
-    itemsToAdd.forEach((ingredient) => {
-      addItem({
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        category: ingredient.category || ingredient.classification || "Other"
+    if (items) {
+      // Handle single item addition
+      items.forEach((ingredient) => {
+        addItem({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          category: ingredient.category || ingredient.classification || "Other"
+        });
       });
-    });
 
-    toast({
-      title: t("mealPlanView.addedToCart") || "Added to Cart",
-      description: `${itemsToAdd.length} ${t("mealPlanView.itemsAddedToCart") || "items added to your shopping cart"}.`,
-      duration: 2000,
-    });
-
-    // Clear checked items after adding
-    setCheckedItems(new Set());
-    setSelectAll(false);
+      toast({
+        title: t("mealPlanView.addedToCart") || "Added to Cart",
+        description: `${items.length} ${t("mealPlanView.itemsAddedToCart") || "items added to your shopping cart"}.`,
+        duration: 2000,
+      });
+    } else {
+      // Use the hook for selected items
+      addToCartHook();
+    }
   };
 
   // If a meal is selected, show the RecipeView
