@@ -25,10 +25,11 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import MealShoppingModal from "./MealShoppingModal";
-import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
+import { useCart } from "@/contexts/CartContext";
+import AddToCartButton from "./AddToCartButton";
 
 interface AIMealViewProps {
   meal: any;
@@ -40,11 +41,11 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const { deleteAIMeal, addShoppingItem, pantryItems, setPantryItems, user } =
     useUser();
   const { t } = useLanguage();
+  const { addItem } = useCart();
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -197,8 +198,36 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     }
   };
 
-  const handleOrderOnline = () => {
-    setShowOrderModal(true);
+  const handleAddToCart = () => {
+    const ingredientsToAdd = getIngredientsForShopping().filter(
+      (ingredient) => selectedIngredients.includes(ingredient.name)
+    );
+    
+    if (ingredientsToAdd.length === 0) {
+      toast.error("Please select ingredients to add to cart");
+      return;
+    }
+
+    ingredientsToAdd.forEach((ingredient) => {
+      addItem({
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || "ingredient"
+      });
+    });
+
+    toast.success(`Added ${ingredientsToAdd.length} ingredients to cart!`);
+    setSelectedIngredients([]);
+  };
+
+  const handleSelectAllIngredients = () => {
+    const allIngredients = getIngredientsForShopping();
+    if (selectedIngredients.length === allIngredients.length) {
+      setSelectedIngredients([]);
+    } else {
+      setSelectedIngredients(allIngredients.map(ingredient => ingredient.name));
+    }
   };
 
   const getSelectedIngredientsForOrder = () => {
@@ -546,12 +575,12 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                         Add to Pantry ({selectedIngredients.length})
                       </Button>
                       <Button
-                        onClick={handleOrderOnline}
+                        onClick={handleAddToCart}
                         className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
                         size="lg"
                       >
                         <ShoppingCart className="h-5 w-5 mr-2" />
-                        Order Online ({selectedIngredients.length})
+                        Add to Cart ({selectedIngredients.length})
                       </Button>
                     </div>
                   )}
@@ -765,13 +794,6 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         meal={meal}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
-      />
-
-      <OrderOnlineModal
-        isOpen={showOrderModal}
-        onClose={() => setShowOrderModal(false)}
-        items={getSelectedIngredientsForOrder()}
-        mealPlanName={meal.name}
       />
     </>
   );
