@@ -187,6 +187,19 @@ const translations = {
     "favorites.empty.description": "Start exploring recipes and mark your favorites to see them here!",
     "favorites.empty.cta": "Discover Recipes",
     
+    // Cart
+    "cart.title": "Shopping Cart",
+    "cart.items": "items",
+    "cart.unit": "Unit",
+    "cart.addedAt": "Added",
+    "cart.clearAll": "Clear All",
+    "cart.empty.title": "Your cart is empty",
+    "cart.empty.description": "Add ingredients from recipes or meal plans to start building your shopping list.",
+    "cart.empty.backButton": "Back to Dashboard",
+    "cart.actions.title": "Cart Actions",
+    "cart.actions.addToShoppingList": "Add to Shopping List",
+    "cart.actions.addToPantry": "Add to Pantry",
+    
     // Diet Types
     "signup.diet.vegetarian": "Vegetarian",
     "signup.diet.vegan": "Vegan",
@@ -1608,6 +1621,19 @@ const translations = {
     "favorites.empty.title": "Aún no tienes recetas favoritas",
     "favorites.empty.description": "¡Comienza a explorar recetas y marca tus favoritas para verlas aquí!",
     "favorites.empty.cta": "Descubrir Recetas",
+
+    // Cart
+    "cart.title": "Carrito de Compras",
+    "cart.items": "artículos",
+    "cart.unit": "Unidad",
+    "cart.addedAt": "Agregado",
+    "cart.clearAll": "Limpiar Todo",
+    "cart.empty.title": "Tu carrito está vacío",
+    "cart.empty.description": "Agrega ingredientes de recetas o planes de comida para comenzar a construir tu lista de compras.",
+    "cart.empty.backButton": "Volver al Panel",
+    "cart.actions.title": "Acciones del Carrito",
+    "cart.actions.addToShoppingList": "Agregar a Lista de Compras",
+    "cart.actions.addToPantry": "Agregar a Despensa",
 
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",
@@ -3077,6 +3103,19 @@ const translations = {
     "favorites.empty.title": "Ainda não há receitas favoritas",
     "favorites.empty.description": "Comece a explorar receitas e marque suas favoritas para vê-las aqui!",
     "favorites.empty.cta": "Descobrir Receitas",
+    
+    // Cart
+    "cart.title": "Carrinho de Compras",
+    "cart.items": "itens",
+    "cart.unit": "Unidade",
+    "cart.addedAt": "Adicionado",
+    "cart.clearAll": "Limpar Tudo",
+    "cart.empty.title": "Seu carrinho está vazio",
+    "cart.empty.description": "Adicione ingredientes de receitas ou planos de refeição para começar a construir sua lista de compras.",
+    "cart.empty.backButton": "Voltar ao Painel",
+    "cart.actions.title": "Ações do Carrinho",
+    "cart.actions.addToShoppingList": "Adicionar à Lista de Compras",
+    "cart.actions.addToPantry": "Adicionar à Despensa",
     
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",

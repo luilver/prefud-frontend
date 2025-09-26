@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Utensils, ChefHat, Sparkles, Plus } from "lucide-react";
+import { Utensils, ChefHat, Sparkles, Plus, ShoppingCart } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
+import { useNavigate } from "react-router-dom";
 import Navigation from "./Navigation";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
@@ -27,8 +29,10 @@ const DashboardContent = () => {
   const [activeTab, setActiveTab] = useState("planner");
   const { user, logout } = useUser();
   const { t } = useLanguage();
+  const { getTotalItems } = useCart();
   const isMobile = useIsMobile();
   const { isCollapsed } = useSidebar();
+  const navigate = useNavigate();
 
   // Handle hash navigation to switch tabs
   useEffect(() => {
@@ -77,6 +81,10 @@ const DashboardContent = () => {
     }
   };
 
+  const handleCartClick = () => {
+    navigate('/cart');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50/80 via-orange-25/60 to-green-75/40 relative overflow-hidden">
       {/* Kitchen Background Elements */}
@@ -119,6 +127,21 @@ const DashboardContent = () => {
               
               <div className="flex items-center space-x-4">
                 <LanguageSelector variant="button" />
+                
+                {/* Cart Icon with Badge */}
+                <Button
+                  variant="ghost"
+                  onClick={handleCartClick}
+                  className="relative text-green-700 hover:bg-green-100/60"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {getTotalItems() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {getTotalItems()}
+                    </span>
+                  )}
+                </Button>
+                
                 <Button 
                   variant="ghost" 
                   onClick={logout} 
@@ -156,6 +179,20 @@ const DashboardContent = () => {
               
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <LanguageSelector variant="button" className="mr-1 sm:mr-2" />
+                
+                {/* Cart Icon with Badge for Mobile */}
+                <Button
+                  variant="ghost"
+                  onClick={handleCartClick}
+                  className="relative text-green-700 hover:bg-green-100/60 w-8 h-8 p-0"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  {getTotalItems() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                      {getTotalItems() > 9 ? '9+' : getTotalItems()}
+                    </span>
+                  )}
+                </Button>
                 
                 {/* Mobile Welcome - Now clickable to navigate to profile */}
                 <button
