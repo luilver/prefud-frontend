@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
-  const { items, updateQuantity, removeItem, clearCart, getTotalItems } = useCart();
+  const { items, updateQuantity, removeItem, clearCart, getTotalItems, getDisplayQuantity, isUnitItem } = useCart();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -118,20 +118,25 @@ const Cart = () => {
               <CardContent className="space-y-3">
                 {categoryItems.map((item) => (
                   <div key={item.id} className="flex items-center justify-between p-4 bg-white/50 rounded-lg border border-green-100">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800 mb-1">
-                        {item.name}
-                      </h3>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1">
-                          <span className="text-lg font-bold text-green-700">{item.quantity}</span>
-                          <span className="text-sm text-gray-600">{item.unit}</span>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800 mb-1">
+                          {item.name}
+                        </h3>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1">
+                            <span className="text-lg font-bold text-green-700">{getDisplayQuantity(item)}</span>
+                            <span className="text-sm text-gray-600">{item.unit}</span>
+                          </div>
+                          {!isUnitItem(item.unit) && (
+                            <div className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                              {item.quantity}x
+                            </div>
+                          )}
+                          <span className="text-xs text-gray-500">
+                            {t('cart.addedAt')}: {item.addedAt.toLocaleDateString()}
+                          </span>
                         </div>
-                        <span className="text-xs text-gray-500">
-                          {t('cart.addedAt')}: {item.addedAt.toLocaleDateString()}
-                        </span>
                       </div>
-                    </div>
                     
                     <div className="flex items-center space-x-3">
                       {/* Quantity Controls */}

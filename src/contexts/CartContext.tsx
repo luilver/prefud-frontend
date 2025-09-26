@@ -3,7 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 export interface CartItem {
   id: string;
   name: string;
-  quantity: number;
+  quantity: number; // For unit items: actual quantity. For non-unit items: counter/multiplier
+  baseQuantity?: number; // Original quantity for non-unit items
   unit: string;
   category?: string;
   addedAt: Date;
@@ -16,6 +17,8 @@ interface CartContextType {
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
+  getDisplayQuantity: (item: CartItem) => number;
+  isUnitItem: (unit: string) => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -52,6 +55,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('pantry-cart', JSON.stringify(items));
   }, [items]);
 
+  // Helper function to check if unit is a "unit" type
+  const isUnitItem = (unit: string) => {
+    const unitTranslations = ['unit', 'unidad', 'unidade', 'pieces', 'piezas', 'peças'];
+    return unitTranslations.includes(unit.toLowerCase());
+  };
+
+  // Helper function to get display quantity
+  const getDisplayQuantity = (item: CartItem) => {
+    if (isUnitItem(item.unit)) {
+      return item.quantity;
+    } else {
+      return (item.baseQuantity || 0) * item.quantity;
+    }
+  };
+
   const addItem = (newItem: Omit<CartItem, 'id' | 'addedAt'>) => {
     const existingItem = items.find(item => 
       item.name.toLowerCase() === newItem.name.toLowerCase() && 
@@ -59,10 +77,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     if (existingItem) {
-      updateQuantity(existingItem.id, existingItem.quantity + newItem.quantity);
+      // For existing items, increment the counter
+      updateQuantity(existingItem.id, existingItem.quantity + 1);
     } else {
+      const isUnit = isUnitItem(newItem.unit);
       const item: CartItem = {
         ...newItem,
+        quantity: isUnit ? newItem.quantity : 1, // For unit items: use quantity, for others: start with counter 1
+        baseQuantity: isUnit ? undefined : newItem.quantity, // Store base quantity for non-unit items
         id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
         addedAt: new Date()
       };
@@ -100,7 +122,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       removeItem,
       updateQuantity,
       clearCart,
-      getTotalItems
+      getTotalItems,
+      getDisplayQuantity,
+      isUnitItem
     }}>
       {children}
     </CartContext.Provider>

@@ -1,4 +1,23 @@
 export const es = {
+  "common": {
+    "back": "Volver"
+  },
+  "cart": {
+    "title": "Carrito de Compras",
+    "items": "artículos",
+    "clearAll": "Limpiar Todo",
+    "addedAt": "Agregado",
+    "empty": {
+      "title": "Tu carrito está vacío",
+      "description": "Agrega ingredientes de tus planes de comida o recetas para comenzar.",
+      "backButton": "Volver al Panel"
+    },
+    "actions": {
+      "title": "Acciones del Carrito",
+      "addToShoppingList": "Agregar a Lista de Compras",
+      "addToPantry": "Agregar a la Despensa"
+    }
+  },
   signup: {
     title: "Crea tu cuenta gratis",
     name: "Nombre",

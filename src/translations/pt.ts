@@ -1,4 +1,23 @@
 export const pt = {
+  "common": {
+    "back": "Voltar"
+  },
+  "cart": {
+    "title": "Carrinho de Compras",
+    "items": "itens",
+    "clearAll": "Limpar Tudo",
+    "addedAt": "Adicionado",
+    "empty": {
+      "title": "Seu carrinho está vazio",
+      "description": "Adicione ingredientes dos seus planos de refeição ou receitas para começar.",
+      "backButton": "Voltar ao Painel"
+    },
+    "actions": {
+      "title": "Ações do Carrinho",
+      "addToShoppingList": "Adicionar à Lista de Compras",
+      "addToPantry": "Adicionar à Despensa"
+    }
+  },
   signup: {
     title: "Criar uma conta",
     name: "Nome",

@@ -26,6 +26,25 @@ export const en = {
     "send": "Send",
     "footerDescription": "Pantry - Simplifying Meal Planning with AI"
   },
+  "common": {
+    "back": "Back"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "items": "items",
+    "clearAll": "Clear All",
+    "addedAt": "Added",
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "Add ingredients from your meal plans or recipes to get started.",
+      "backButton": "Back to Dashboard"
+    },
+    "actions": {
+      "title": "Cart Actions",
+      "addToShoppingList": "Add to Shopping List",
+      "addToPantry": "Add to Pantry"
+    }
+  },
   "signup": {
     "title": "Sign Up",
     "name": "Name",
