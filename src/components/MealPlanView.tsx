@@ -33,8 +33,8 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
-import OrderOnlineModal from "./OrderOnlineModal";
-import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this import
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 import {
   addIngredientsToPantry,
   updateMealConsumed,
@@ -60,8 +60,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
-  const [orderItems, setOrderItems] = useState<any[]>([]);
   const [mealCompletionStatus, setMealCompletionStatus] = useState<Record<string, boolean>>(() => {
     // Initialize with current consumed status from the plan
     const initialStatus: Record<string, boolean> = {};
@@ -76,9 +74,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     }
     return initialStatus;
   });
-  const { t } = useLanguage(); // <-- Add this line
+  const { t } = useLanguage();
   const { toast } = useToast();
   const { pantryItems, user } = useUser();
+  const { addItem } = useCart();
   // Meal type order for sorting
   const mealTypeOrder = {
     breakfast: 1,
@@ -304,14 +303,31 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     setSelectAll(false);
   };
 
-  const handleOrderOnline = (items?: any[]) => {
+  const handleAddToCart = (items?: any[]) => {
     const shoppingList = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
-    const itemsToOrder =
+    const itemsToAdd =
       items ||
       shoppingList.filter((item: any) => checkedItems.has(item.id || item.name)) ||
       [];
-    setOrderItems(itemsToOrder);
-    setShowOrderModal(true);
+
+    itemsToAdd.forEach((ingredient) => {
+      addItem({
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.category || ingredient.classification || "Other"
+      });
+    });
+
+    toast({
+      title: t("mealPlanView.addedToCart") || "Added to Cart",
+      description: `${itemsToAdd.length} ${t("mealPlanView.itemsAddedToCart") || "items added to your shopping cart"}.`,
+      duration: 2000,
+    });
+
+    // Clear checked items after adding
+    setCheckedItems(new Set());
+    setSelectAll(false);
   };
 
   // If a meal is selected, show the RecipeView
@@ -723,11 +739,11 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                         {checkedCount})
                       </Button>
                       <Button
-                        onClick={() => handleOrderOnline()}
+                        onClick={() => handleAddToCart()}
                         className="flex items-center gap-2"
                       >
                         <ShoppingCart className="h-4 w-4" />
-                        {t("mealPlanView.orderOnline") || "Order Online"} (
+                        {t("mealPlanView.addToCart") || "Add to Cart"} (
                         {checkedCount})
                       </Button>
                     </div>
@@ -806,18 +822,18 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleOrderOnline([item])}
-                                className="h-8 w-8 p-0"
-                                title={
-                                  t("mealPlanView.orderOnlineOne") ||
-                                  "Order Online"
-                                }
-                              >
-                                <ShoppingCart className="h-4 w-4" />
-                              </Button>
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 onClick={() => handleAddToCart([item])}
+                                 className="h-8 w-8 p-0"
+                                 title={
+                                   t("mealPlanView.addToCartOne") ||
+                                   "Add to Cart"
+                                 }
+                               >
+                                 <ShoppingCart className="h-4 w-4" />
+                               </Button>
                             </div>
                           </div>
                          </div>
@@ -842,13 +858,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsContent>
       </Tabs>
 
-      {/* Order Online Modal */}
-      <OrderOnlineModal
-        isOpen={showOrderModal}
-        onClose={() => setShowOrderModal(false)}
-        items={orderItems}
-        mealPlanName={plan.name}
-      />
     </div>
   );
 };
