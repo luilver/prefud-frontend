@@ -24,8 +24,8 @@ import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import DrinkShoppingModal from "./DrinkShoppingModal";
-import OrderOnlineModal from "./OrderOnlineModal";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
 
 interface DrinkDetailViewProps {
@@ -37,10 +37,11 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   const { t } = useLanguage();
   const { addShoppingItem, addPantryItem, pantryItems, user } = useUser();
   const { toast } = useToast();
+  const { addItem } = useCart();
   const [showIngredients, setShowIngredients] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
-  const [showOrderOnlineModal, setShowOrderOnlineModal] = useState(false);
+  
   const [showIngredientsSelector, setShowIngredientsSelector] = useState(false);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -172,21 +173,9 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
     }
   };
 
-  const handleOrderOnline = () => {
+  const handleAddToCart = () => {
     const selectedIngredientsData = drink.drinkPlan.ingredientsList
-      .filter((ingredient) => selectedIngredients.includes(ingredient.name))
-      .map((ingredient) => ({
-        id: ingredient.name,
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        category: ingredient.classification || "other",
-        priority: "medium",
-        purchased: false,
-        notes: `From drink: ${drink.drink_name}`,
-        estimatedPrice: Math.random() * 10 + 1, // Mock price
-        mealName: drink.drink_name,
-      }));
+      .filter((ingredient) => selectedIngredients.includes(ingredient.name));
 
     if (selectedIngredientsData.length === 0) {
       toast({
@@ -201,7 +190,24 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
       return;
     }
 
-    setShowOrderOnlineModal(true);
+    selectedIngredientsData.forEach((ingredient) => {
+      addItem({
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || "drink-ingredient"
+      });
+    });
+
+    toast({
+      title: t("drinkDetailView.addedToCart") || "Added to Cart",
+      description: `${selectedIngredientsData.length} ${
+        t("drinkDetailView.itemsAddedToCart") || "items added to your shopping cart"
+      }.`,
+      duration: 2000,
+    });
+
+    setSelectedIngredients([]);
   };
 
   const toggleStepCompletion = (stepIndex: number) => {
@@ -656,6 +662,28 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               </CardHeader>
               {showIngredientsSelector && (
                 <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-600">
+                      {t("drinkDetailView.selectIngredients") || "Select ingredients to add to cart"}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const allIngredientNames = drink.drinkPlan.ingredientsList.map(ing => ing.name);
+                        setSelectedIngredients(
+                          selectedIngredients.length === allIngredientNames.length 
+                            ? [] 
+                            : allIngredientNames
+                        );
+                      }}
+                    >
+                      {selectedIngredients.length === drink.drinkPlan.ingredientsList.length 
+                        ? (t("drinkDetailView.deselectAll") || "Deselect All")
+                        : (t("drinkDetailView.selectAll") || "Select All")
+                      }
+                    </Button>
+                  </div>
                   <div className="space-y-3">
                     {drink.drinkPlan.ingredientsList.map(
                       (ingredient, index) => (
@@ -712,12 +740,12 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
                         {t("drinkDetailView.addToPantry") || "Add to Pantry"}
                       </Button>
                       <Button
-                        onClick={handleOrderOnline}
+                        onClick={handleAddToCart}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                         size="sm"
                       >
                         <ShoppingCart className="h-4 w-4 mr-2" />
-                        {t("drinkDetailView.orderOnline") || "Order Online"}
+                        {t("drinkDetailView.addToCart") || "Add to Cart"}
                       </Button>
                     </div>
                   )}
@@ -754,27 +782,6 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
           onClose={() => setShowShoppingModal(false)}
         />
 
-        <OrderOnlineModal
-          isOpen={showOrderOnlineModal}
-          onClose={() => setShowOrderOnlineModal(false)}
-          items={drink.drinkPlan.ingredientsList
-            .filter((ingredient) =>
-              selectedIngredients.includes(ingredient.name)
-            )
-            .map((ingredient) => ({
-              id: ingredient.name,
-              name: ingredient.name,
-              quantity: ingredient.quantity,
-              unit: ingredient.unit,
-              category: ingredient.classification || "other",
-              priority: "medium",
-              purchased: false,
-              notes: `From drink: ${drink.drink_name}`,
-              estimatedPrice: Math.random() * 10 + 1,
-              mealName: drink.drink_name,
-            }))}
-          mealPlanName={drink.drink_name}
-        />
       </div>
 
       {/* Fullscreen Video Modal */}
