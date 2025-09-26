@@ -15,6 +15,19 @@ const Cart = () => {
     navigate('/');
   };
 
+  // Group items by category
+  const groupedItems = items.reduce((acc, item) => {
+    const category = item.category || 'Other';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {} as Record<string, typeof items>);
+
+  // Get unique items count (count each item as 1 regardless of quantity)
+  const getUniqueItemsCount = () => items.length;
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50/80 via-orange-25/60 to-green-75/40 p-4">
@@ -76,7 +89,7 @@ const Cart = () => {
               {t('common.back')}
             </Button>
             <h1 className="text-2xl font-bold text-green-800">
-              {t('cart.title')} ({getTotalItems()} {t('cart.items')})
+              {t('cart.title')} ({getUniqueItemsCount()} {t('cart.items')})
             </h1>
           </div>
           <Button
@@ -89,64 +102,73 @@ const Cart = () => {
           </Button>
         </div>
 
-        {/* Cart Items */}
-        <div className="space-y-4">
-          {items.map((item) => (
-            <Card key={item.id} className="bg-white/70 backdrop-blur-sm border-green-200/50 shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800 mb-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {item.category && (
-                        <span className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs mr-2">
-                          {item.category}
+        {/* Cart Items by Category */}
+        <div className="space-y-6">
+          {Object.entries(groupedItems).map(([category, categoryItems]) => (
+            <Card key={category} className="bg-white/70 backdrop-blur-sm border-green-200/50 shadow-lg">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-green-800 flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  {category}
+                  <span className="text-sm font-normal text-gray-600 ml-2">
+                    ({categoryItems.length} {categoryItems.length === 1 ? 'item' : 'items'})
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {categoryItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between p-4 bg-white/50 rounded-lg border border-green-100">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 mb-1">
+                        {item.name}
+                      </h3>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1">
+                          <span className="text-lg font-bold text-green-700">{item.quantity}</span>
+                          <span className="text-sm text-gray-600">{item.unit}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">
+                          {t('cart.addedAt')}: {item.addedAt.toLocaleDateString()}
                         </span>
-                      )}
-                      {t('cart.unit')}: {item.unit}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {t('cart.addedAt')}: {item.addedAt.toLocaleDateString()}
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    {/* Quantity Controls */}
-                    <div className="flex items-center space-x-2 bg-green-50 rounded-lg p-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="h-8 w-8 p-0 hover:bg-green-100"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="font-semibold text-green-800 min-w-[2rem] text-center">
-                        {item.quantity}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="h-8 w-8 p-0 hover:bg-green-100"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                      </div>
                     </div>
                     
-                    {/* Remove Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:bg-red-50 h-8 w-8 p-0"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center space-x-3">
+                      {/* Quantity Controls */}
+                      <div className="flex items-center space-x-2 bg-green-50 rounded-lg p-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="h-8 w-8 p-0 hover:bg-green-100"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="font-semibold text-green-800 min-w-[2rem] text-center">
+                          {item.quantity}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="h-8 w-8 p-0 hover:bg-green-100"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      {/* Remove Button */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-600 hover:bg-red-50 h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                ))}
               </CardContent>
             </Card>
           ))}
