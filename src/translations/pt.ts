@@ -1,6 +1,8 @@
 export const pt = {
   "common": {
-    "back": "Voltar"
+    "back": "Voltar",
+    "continue": "Continuar",
+    "cancel": "Cancelar"
   },
   "cart": {
     "title": "Carrinho de Compras",
@@ -12,10 +14,102 @@ export const pt = {
       "description": "Adicione ingredientes dos seus planos de refeição ou receitas para começar.",
       "backButton": "Voltar ao Painel"
     },
-    "actions": {
-      "title": "Ações do Carrinho",
-      "addToShoppingList": "Adicionar à Lista de Compras",
-      "addToPantry": "Adicionar à Despensa"
+    "checkout": {
+      "proceedToCheckout": "Prosseguir para Pagamento"
+    }
+  },
+  "checkout": {
+    "steps": {
+      "deliveryMethod": "Método de Entrega",
+      "storeSelection": "Seleção de Loja",
+      "address": "Endereço",
+      "payment": "Pagamento",
+      "summary": "Resumo do Pedido",
+      "confirmation": "Pedido Confirmado"
+    },
+    "deliveryMethod": {
+      "title": "Como você gostaria de receber seu pedido?",
+      "subtitle": "Escolha seu método de entrega preferido",
+      "delivery": {
+        "title": "Entrega em Casa",
+        "description": "Receba suas compras na sua porta",
+        "fee": "$4.99 taxa de entrega"
+      },
+      "pickup": {
+        "title": "Retirada na Loja",
+        "description": "Retire seu pedido na loja",
+        "fee": "$1.99 taxa de serviço"
+      }
+    },
+    "storeSelection": {
+      "title": "Escolha sua loja",
+      "subtitle": "Selecione onde você gostaria de comprar"
+    },
+    "address": {
+      "delivery": {
+        "title": "Endereço de entrega",
+        "subtitle": "Onde devemos entregar seu pedido?"
+      },
+      "pickup": {
+        "title": "Local de retirada",
+        "subtitle": "Escolha um local da loja para retirada"
+      },
+      "default": "Padrão",
+      "addNew": "Adicionar Novo Endereço",
+      "form": {
+        "street": "Endereço",
+        "city": "Cidade",
+        "state": "Estado",
+        "zipCode": "CEP",
+        "country": "País",
+        "save": "Salvar Endereço"
+      }
+    },
+    "payment": {
+      "title": "Método de pagamento",
+      "subtitle": "Como você gostaria de pagar?",
+      "default": "Padrão",
+      "expires": "Expira",
+      "addNew": "Adicionar Novo Cartão",
+      "form": {
+        "name": "Nome do Portador",
+        "number": "Número do Cartão",
+        "expiry": "MM/AA",
+        "cvv": "CVV",
+        "save": "Salvar Cartão"
+      }
+    },
+    "summary": {
+      "title": "Resumo do pedido",
+      "subtitle": "Revise seu pedido antes do pagamento",
+      "items": "Itens do Pedido",
+      "delivery": "Detalhes da Entrega",
+      "pickup": "Detalhes da Retirada",
+      "payment": "Método de Pagamento",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Taxa de Entrega",
+      "serviceFee": "Taxa de Serviço",
+      "total": "Total",
+      "deliveryTime": "Entrega em 1-2 horas",
+      "pickupTime": "Pronto para retirada em 30 minutos",
+      "processPayment": "Processar Pagamento"
+    },
+    "confirmation": {
+      "title": "Pedido Confirmado!",
+      "subtitle": "Seu pedido foi realizado com sucesso",
+      "orderNumber": "Número do Pedido",
+      "estimatedDelivery": "Entrega Estimada",
+      "estimatedPickup": "Pronto para Retirada",
+      "today": "Hoje",
+      "deliveryAddress": "Endereço de Entrega",
+      "pickupLocation": "Local de Retirada",
+      "total": "Total Pago",
+      "items": "itens",
+      "nextSteps": "O Que Vem Depois?",
+      "step1": "Você receberá atualizações do pedido por email e SMS",
+      "step2": "Acompanhe o status do seu pedido em tempo real",
+      "step3": "Avalie sua experiência após a entrega/retirada",
+      "done": "Voltar ao Dashboard"
     }
   },
   signup: {

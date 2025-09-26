@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, CreditCard } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import { CheckoutFlow } from "@/components/CheckoutFlow";
 
 const Cart = () => {
   const { items, updateQuantity, removeItem, clearCart, getTotalItems, getDisplayQuantity, isUnitItem } = useCart();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const handleBackToDashboard = () => {
     navigate('/');
@@ -191,29 +193,14 @@ const Cart = () => {
           </div>
         ))}
 
-        {/* Additional Actions */}
-        <div className="pt-4 space-y-3">
+        {/* Proceed to Checkout */}
+        <div className="pt-4">
           <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => {
-              // TODO: Implement add to shopping list functionality
-              console.log('Add to shopping list:', items);
-            }}
+            className="w-full h-12"
+            onClick={() => setShowCheckout(true)}
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            {t('cart.actions.addToShoppingList')}
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => {
-              // TODO: Implement add to pantry functionality
-              console.log('Add to pantry:', items);
-            }}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t('cart.actions.addToPantry')}
+            <CreditCard className="h-4 w-4 mr-2" />
+            {t('cart.checkout.proceedToCheckout')}
           </Button>
         </div>
       </div>
@@ -223,10 +210,7 @@ const Cart = () => {
         <Button
           size="lg"
           className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
-          onClick={() => {
-            // TODO: Implement checkout functionality
-            console.log('Checkout:', items);
-          }}
+          onClick={() => setShowCheckout(true)}
         >
           <CreditCard className="h-6 w-6" />
         </Button>
@@ -251,6 +235,18 @@ const Cart = () => {
           </div>
         </div>
       </div>
+
+      {/* Checkout Flow */}
+      {showCheckout && (
+        <CheckoutFlow
+          items={items}
+          onClose={() => setShowCheckout(false)}
+          onOrderComplete={() => {
+            clearCart();
+            setShowCheckout(false);
+          }}
+        />
+      )}
     </div>
   );
 };

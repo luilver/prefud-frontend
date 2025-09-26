@@ -26,9 +26,6 @@ export const en = {
     "send": "Send",
     "footerDescription": "Pantry - Simplifying Meal Planning with AI"
   },
-  "common": {
-    "back": "Back"
-  },
   "cart": {
     "title": "Shopping Cart",
     "items": "items",
@@ -39,11 +36,108 @@ export const en = {
       "description": "Add ingredients from your meal plans or recipes to get started.",
       "backButton": "Back to Dashboard"
     },
-    "actions": {
-      "title": "Cart Actions",
-      "addToShoppingList": "Add to Shopping List",
-      "addToPantry": "Add to Pantry"
+    "checkout": {
+      "proceedToCheckout": "Proceed to Checkout"
     }
+  },
+  "checkout": {
+    "steps": {
+      "deliveryMethod": "Delivery Method",
+      "storeSelection": "Store Selection",
+      "address": "Address",
+      "payment": "Payment",
+      "summary": "Order Summary",
+      "confirmation": "Order Confirmed"
+    },
+    "deliveryMethod": {
+      "title": "How would you like to receive your order?",
+      "subtitle": "Choose your preferred delivery method",
+      "delivery": {
+        "title": "Home Delivery",
+        "description": "Get your groceries delivered to your door",
+        "fee": "$4.99 delivery fee"
+      },
+      "pickup": {
+        "title": "Store Pickup",
+        "description": "Pick up your order at the store",
+        "fee": "$1.99 service fee"
+      }
+    },
+    "storeSelection": {
+      "title": "Choose your store",
+      "subtitle": "Select where you'd like to shop"
+    },
+    "address": {
+      "delivery": {
+        "title": "Delivery address",
+        "subtitle": "Where should we deliver your order?"
+      },
+      "pickup": {
+        "title": "Pickup location",
+        "subtitle": "Choose a store location for pickup"
+      },
+      "default": "Default",
+      "addNew": "Add New Address",
+      "form": {
+        "street": "Street Address",
+        "city": "City",
+        "state": "State",
+        "zipCode": "ZIP Code",
+        "country": "Country",
+        "save": "Save Address"
+      }
+    },
+    "payment": {
+      "title": "Payment method",
+      "subtitle": "How would you like to pay?",
+      "default": "Default",
+      "expires": "Expires",
+      "addNew": "Add New Card",
+      "form": {
+        "name": "Cardholder Name",
+        "number": "Card Number",
+        "expiry": "MM/YY",
+        "cvv": "CVV",
+        "save": "Save Card"
+      }
+    },
+    "summary": {
+      "title": "Order summary",
+      "subtitle": "Review your order before payment",
+      "items": "Order Items",
+      "delivery": "Delivery Details",
+      "pickup": "Pickup Details",
+      "payment": "Payment Method",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Delivery Fee",
+      "serviceFee": "Service Fee",
+      "total": "Total",
+      "deliveryTime": "Delivery in 1-2 hours",
+      "pickupTime": "Ready for pickup in 30 minutes",
+      "processPayment": "Process Payment"
+    },
+    "confirmation": {
+      "title": "Order Confirmed!",
+      "subtitle": "Your order has been successfully placed",
+      "orderNumber": "Order Number",
+      "estimatedDelivery": "Estimated Delivery",
+      "estimatedPickup": "Ready for Pickup",
+      "today": "Today",
+      "deliveryAddress": "Delivery Address",
+      "pickupLocation": "Pickup Location",
+      "total": "Total Paid",
+      "items": "items",
+      "nextSteps": "What's Next?",
+      "step1": "You'll receive order updates via email and SMS",
+      "step2": "Track your order status in real-time",
+      "step3": "Rate your experience after delivery/pickup",
+      "done": "Back to Dashboard"
+    }
+  },
+  "common": {
+    "back": "Back",
+    "continue": "Continue",
+    "cancel": "Cancel"
   },
   "signup": {
     "title": "Sign Up",
