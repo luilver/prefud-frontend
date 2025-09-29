@@ -37,8 +37,8 @@ export const useAddToCart = ({ ingredients, selectedIngredients, onSuccess }: Us
 
     if (ingredientsToAdd.length === 0) {
       toast({
-        title: t("common.error") || "Error",
-        description: t("common.selectIngredients") || "Please select ingredients to add to cart",
+        title: t("addIngredient.error") || "Error",
+        description: "Please select ingredients to add to cart",
         variant: "destructive",
       });
       return;
@@ -57,10 +57,10 @@ export const useAddToCart = ({ ingredients, selectedIngredients, onSuccess }: Us
     // Show success toast
     const itemText = ingredientsToAdd.length === 1 
       ? ingredientsToAdd[0].name 
-      : `${ingredientsToAdd.length} ${t("common.ingredients") || "ingredients"}`;
+      : `${ingredientsToAdd.length} ingredients`;
 
     toast({
-      title: t("common.addedToCart") || "Added to Cart",
+      title: t("mealPlanView.addedToCart") || "Added to Cart",
       description: `${itemText} ${ingredientsToAdd.length === 1 ? 'has' : 'have'} been added to your cart.`,
       duration: 2000,
     });
