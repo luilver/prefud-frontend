@@ -306,6 +306,14 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
   const mealPlanIngredients = plan.plan?.plan?.ingredientsList || plan.shoppingList || [];
   
+  // Convert checked item IDs to ingredient names for the hook
+  const selectedIngredientNames = Array.from(checkedItems).map(itemId => {
+    const item = mealPlanIngredients.find((ingredient: any, index: number) => 
+      (ingredient.id || ingredient.name || index.toString()) === itemId
+    );
+    return item?.name;
+  }).filter(Boolean);
+
   const { handleAddToCart: addToCartHook } = useAddToCart({
     ingredients: mealPlanIngredients.map(item => ({
       name: item.name,
@@ -313,7 +321,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       unit: item.unit,
       category: item.category || item.classification || "Other"
     })),
-    selectedIngredients: Array.from(checkedItems),
+    selectedIngredients: selectedIngredientNames,
     onSuccess: () => {
       setCheckedItems(new Set());
       setSelectAll(false);
