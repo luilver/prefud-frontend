@@ -221,15 +221,15 @@ const Cart = () => {
         <div className="container mx-auto max-w-4xl">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              {getUniqueItemsCount()} items in cart
+              {getUniqueItemsCount()} {t('cart.items')} {t('cart.inCart')}
             </div>
             <div className="flex gap-3">
               <Button variant="outline" onClick={clearCart}>
-                Clear Cart
+                {t('cart.clearAll')}
               </Button>
-              <Button size="lg" className="px-8">
+              <Button size="lg" className="px-8" onClick={() => setShowCheckout(true)}>
                 <CreditCard className="h-4 w-4 mr-2" />
-                Checkout
+                {t('cart.checkout.proceedToCheckout')}
               </Button>
             </div>
           </div>

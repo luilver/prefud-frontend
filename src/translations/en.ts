@@ -29,6 +29,7 @@ export const en = {
   "cart": {
     "title": "Shopping Cart",
     "items": "items",
+    "inCart": "in cart",
     "clearAll": "Clear All",
     "addedAt": "Added",
     "empty": {

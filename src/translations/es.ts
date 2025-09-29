@@ -7,6 +7,7 @@ export const es = {
   "cart": {
     "title": "Carrito de Compras",
     "items": "artículos",
+    "inCart": "en el carrito",
     "clearAll": "Limpiar Todo",
     "addedAt": "Agregado",
     "empty": {

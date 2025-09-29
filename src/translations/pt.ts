@@ -7,6 +7,7 @@ export const pt = {
   "cart": {
     "title": "Carrinho de Compras",
     "items": "itens",
+    "inCart": "no carrinho",
     "clearAll": "Limpar Tudo",
     "addedAt": "Adicionado",
     "empty": {
