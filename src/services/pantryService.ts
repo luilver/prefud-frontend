@@ -109,3 +109,31 @@ export const updateMealConsumed = async (
     throw error;
   }
 };
+
+export const generateMealsFromPantry = async (
+  userId: string,
+  startDate: string,
+  servings: number,
+  language: string
+): Promise<any> => {
+  try {
+    console.log('Generating meals from pantry for user:', userId);
+    
+    const response = await axios.post(
+      `${BASE_URL}/meal-plan/generateMeals`,
+      {
+        user_id: userId,
+        start_date: startDate,
+        servings,
+        language
+      },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    
+    console.log('Generate meals response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error generating meals:", error.response?.data || error.message);
+    throw error;
+  }
+};

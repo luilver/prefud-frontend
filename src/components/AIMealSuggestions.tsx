@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sparkles, Clock, Users, AlertTriangle, Plus, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { generateMealsFromPantry } from "@/services/pantryService";
+import { Slider } from "@/components/ui/slider";
 
 interface AIMealSuggestionsProps {
   ingredients: any[];
@@ -25,8 +28,11 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
   const [showMealConflictDialog, setShowMealConflictDialog] = useState<any>(null);
   const [conflictResolution, setConflictResolution] = useState<'snack' | 'substitute'>('snack');
   const [mealToSubstitute, setMealToSubstitute] = useState<string>("");
+  const [showServingsModal, setShowServingsModal] = useState(false);
+  const [servings, setServings] = useState(4);
   const { toast } = useToast();
-  const { mealPlans, updateMealPlan, updatePantryFromIngredients } = useUser();
+  const { mealPlans, updateMealPlan, updatePantryFromIngredients, user } = useUser();
+  const { language } = useLanguage();
 
   const getDaysUntilExpiry = (expiryDate: Date) => {
     const today = new Date();
@@ -68,98 +74,94 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
   }, [selectedMealPlan]);
 
   const generateSuggestions = async () => {
-    setIsGenerating(true);
-    
-    try {
-      // Get ingredients expiring soon (prioritize within 7 days)
-      const expiringSoon = ingredients
-        .filter(ing => getDaysUntilExpiry(ing.expiryDate) <= 7)
-        .sort((a, b) => getDaysUntilExpiry(a.expiryDate) - getDaysUntilExpiry(b.expiryDate));
-
-      console.log('Generating AI suggestions with ingredients:', expiringSoon);
-      
-      // Mock AI suggestions with proper ingredient quantities
-      const mockSuggestions = [
-        {
-          id: Date.now().toString(),
-          name: "Quick Chicken Stir Fry",
-          description: "Use your expiring chicken breast and vegetables",
-          prepTime: 15,
-          difficulty: "easy",
-          calories: 420,
-          type: "dinner",
-          usesExpiringIngredients: expiringSoon.slice(0, 3),
-          ingredients: [
-            { name: "Chicken Breast", quantity: 2, unit: "lbs" },
-            { name: "Mixed Vegetables", quantity: 1, unit: "cup" },
-            { name: "Soy Sauce", quantity: 2, unit: "tbsp" },
-            { name: "Oil", quantity: 1, unit: "tbsp" }
-          ],
-          steps: [
-            "Cut chicken into bite-sized pieces",
-            "Heat oil in a large pan",
-            "Add chicken and cook for 5-7 minutes",
-            "Add vegetables and stir fry for 3-4 minutes",
-            "Add soy sauce and serve"
-          ]
-        },
-        {
-          id: (Date.now() + 1).toString(),
-          name: "Fresh Fruit Smoothie",
-          description: "Perfect way to use bananas before they expire",
-          prepTime: 5,
-          difficulty: "easy",
-          calories: 180,
-          type: "breakfast",
-          usesExpiringIngredients: expiringSoon.slice(1, 2),
-          ingredients: [
-            { name: "Bananas", quantity: 6, unit: "pieces" },
-            { name: "Greek Yogurt", quantity: 1, unit: "container" },
-            { name: "Milk", quantity: 1, unit: "cup" },
-            { name: "Honey", quantity: 1, unit: "tbsp" }
-          ],
-          steps: [
-            "Add all ingredients to blender",
-            "Blend until smooth",
-            "Serve immediately"
-          ]
-        },
-        {
-          id: (Date.now() + 2).toString(),
-          name: "Veggie Pasta Bowl",
-          description: "Fresh pasta with your seasonal vegetables",
-          prepTime: 20,
-          difficulty: "easy",
-          calories: 350,
-          type: "lunch",
-          usesExpiringIngredients: expiringSoon.slice(0, 2),
-          ingredients: [
-            { name: "Pasta", quantity: 8, unit: "oz" },
-            { name: "Mixed Vegetables", quantity: 2, unit: "cups" },
-            { name: "Olive Oil", quantity: 2, unit: "tbsp" },
-            { name: "Garlic", quantity: 1, unit: "clove" }
-          ],
-          steps: [
-            "Cook pasta according to package directions",
-            "Sauté vegetables with garlic in olive oil",
-            "Combine pasta and vegetables",
-            "Season with herbs and serve"
-          ]
-        }
-      ];
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setSuggestions(mockSuggestions);
-      toast({
-        title: "AI suggestions ready!",
-        description: `Generated ${mockSuggestions.length} meal suggestions using your expiring ingredients.`,
-      });
-    } catch (error) {
+    if (!user?.id) {
       toast({
         title: "Error",
-        description: "Failed to generate suggestions. Please try again.",
+        description: "User not found. Please sign in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    setShowServingsModal(false);
+    
+    try {
+      const today = new Date();
+      const startDate = today.toISOString().split('T')[0];
+      
+      // Map language context to API language
+      const languageMap: Record<string, string> = {
+        en: "english",
+        es: "spanish",
+        pt: "portuguese"
+      };
+      const apiLanguage = languageMap[language] || "english";
+
+      console.log('Generating AI suggestions with params:', {
+        userId: user.id,
+        startDate,
+        servings,
+        language: apiLanguage
+      });
+
+      const response = await generateMealsFromPantry(
+        user.id,
+        startDate,
+        servings,
+        apiLanguage
+      );
+
+      // Handle error codes
+      if (response.code === "03") {
+        toast({
+          title: "Subscription Limit Reached",
+          description: response.message || "No generated meals available according to your subscription.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (response.code === "02") {
+        toast({
+          title: "No Ingredients Found",
+          description: response.message || "No ingredients found in pantry to generate meals.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Process successful response
+      if (response.generatedMeals && Array.isArray(response.generatedMeals)) {
+        const transformedMeals = response.generatedMeals.map((meal: any) => ({
+          id: `meal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: meal.name,
+          description: meal.description,
+          prepTime: meal.cookingTime,
+          difficulty: "medium",
+          calories: meal.calories,
+          type: meal.mealType,
+          benefits: meal.benefits,
+          prepTip: meal.prepTip,
+          carbonFootprint: meal.carbonFootprint,
+          ingredients: meal.ingredientsList || [],
+          steps: meal.steps || [],
+          nutritionalInfo: meal.nutritionalInfo
+        }));
+
+        setSuggestions(transformedMeals);
+        toast({
+          title: "AI suggestions ready!",
+          description: `Generated ${transformedMeals.length} meal suggestions. Total carbon footprint: ${response.totalCarbonFootprint}kg CO2.`,
+        });
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error: any) {
+      console.error('Error generating suggestions:', error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to generate suggestions. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -374,14 +376,58 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
           Get personalized meal suggestions based on your expiring ingredients
         </CardDescription>
         {!suggestions.length && (
-          <Button 
-            onClick={generateSuggestions}
-            disabled={isGenerating}
-            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
-          >
-            <Sparkles className="h-4 w-4 mr-2" />
-            {isGenerating ? 'Generating...' : 'Generate AI Suggestions'}
-          </Button>
+          <>
+            <Button 
+              onClick={() => setShowServingsModal(true)}
+              disabled={isGenerating}
+              className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              {isGenerating ? 'Generating...' : 'Generate AI Suggestions'}
+            </Button>
+
+            <Dialog open={showServingsModal} onOpenChange={setShowServingsModal}>
+              <DialogContent className="w-[95vw] max-w-md mx-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-base sm:text-lg">Select Number of Servings</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="space-y-3">
+                    <Label htmlFor="servings-slider" className="text-sm">
+                      Servings: <span className="font-bold text-primary">{servings}</span>
+                    </Label>
+                    <Slider
+                      id="servings-slider"
+                      min={1}
+                      max={20}
+                      step={1}
+                      value={[servings]}
+                      onValueChange={(value) => setServings(value[0])}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowServingsModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={generateSuggestions}
+                    className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                  >
+                    Generate Meals
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
         )}
       </CardHeader>
       
