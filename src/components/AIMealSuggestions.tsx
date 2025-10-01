@@ -1,18 +1,16 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Sparkles, Clock, Users, AlertTriangle, Plus, Calendar } from "lucide-react";
+import { Sparkles, Clock, Users, Heart, ChefHat, Leaf } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { generateMealsFromPantry } from "@/services/pantryService";
 import { Slider } from "@/components/ui/slider";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AIMealSuggestionsProps {
   ingredients: any[];
@@ -22,56 +20,12 @@ interface AIMealSuggestionsProps {
 const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [selectedDay, setSelectedDay] = useState<string>("");
-  const [selectedMealPlan, setSelectedMealPlan] = useState<string>("");
-  const [showDaySelector, setShowDaySelector] = useState<any>(null);
-  const [showMealConflictDialog, setShowMealConflictDialog] = useState<any>(null);
-  const [conflictResolution, setConflictResolution] = useState<'snack' | 'substitute'>('snack');
-  const [mealToSubstitute, setMealToSubstitute] = useState<string>("");
   const [showServingsModal, setShowServingsModal] = useState(false);
   const [servings, setServings] = useState(4);
+  const [selectedMealForDetails, setSelectedMealForDetails] = useState<any>(null);
   const { toast } = useToast();
-  const { mealPlans, updateMealPlan, updatePantryFromIngredients, user } = useUser();
+  const { updatePantryFromIngredients, user, addFavoriteMeal, removeFavoriteMeal, isMealFavorite } = useUser();
   const { language } = useLanguage();
-
-  const getDaysUntilExpiry = (expiryDate: Date) => {
-    const today = new Date();
-    const diffTime = expiryDate.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
-
-  const getAvailableDaysForPlan = (planId: string) => {
-    const plan = mealPlans.find(p => p.id === planId);
-    if (!plan) return [];
-
-    const startDate = new Date(plan.startDate);
-    const endDate = new Date(plan.endDate);
-    const days = [];
-    
-    const currentDate = new Date(startDate);
-    while (currentDate <= endDate) {
-      days.push({
-        value: currentDate.toISOString().split('T')[0],
-        label: currentDate.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'short', 
-          day: 'numeric',
-          year: 'numeric'
-        }),
-        date: new Date(currentDate)
-      });
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    
-    return days;
-  };
-
-  // Reset day when meal plan changes
-  useEffect(() => {
-    if (selectedMealPlan) {
-      setSelectedDay("");
-    }
-  }, [selectedMealPlan]);
 
   const generateSuggestions = async () => {
     if (!user?.id) {
@@ -146,7 +100,8 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
           carbonFootprint: meal.carbonFootprint,
           ingredients: meal.ingredientsList || [],
           steps: meal.steps || [],
-          nutritionalInfo: meal.nutritionalInfo
+          nutritionalInfo: meal.nutritionalInfo,
+          instructions: meal.instructions
         }));
 
         setSuggestions(transformedMeals);
@@ -169,200 +124,20 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     }
   };
 
-  const getMealsForDate = (planId: string, date: string) => {
-    const plan = mealPlans.find(p => p.id === planId);
-    if (!plan) return [];
-    
-    return plan.meals.filter((meal: any) => meal.date === date) || [];
-  };
-
-  const handleAddMealWithDay = async (meal: any) => {
-    if (!selectedDay || !selectedMealPlan) {
+  const handleAddToFavorites = (meal: any) => {
+    if (isMealFavorite(meal.id)) {
+      removeFavoriteMeal(meal.id);
       toast({
-        title: "Please select a day and meal plan",
-        description: "Choose which meal plan and day to add this meal to.",
-        variant: "destructive",
+        title: "Removed from favorites",
+        description: `${meal.name} has been removed from your favorites.`,
       });
-      return;
-    }
-
-    const selectedDate = new Date(selectedDay);
-    const existingMeals = getMealsForDate(selectedMealPlan, selectedDay);
-    
-    // Check if there are already 3 meals for this day
-    if (existingMeals.length >= 3) {
-      setShowMealConflictDialog(meal);
-      return;
-    }
-
-    // Add meal directly if less than 3 meals
-    await handleAddMealToPlan(meal, selectedMealPlan, selectedDate, 'meal');
-  };
-
-  const handleConflictResolution = async () => {
-    if (!showMealConflictDialog || !selectedDay || !selectedMealPlan) return;
-
-    const selectedDate = new Date(selectedDay);
-    
-    if (conflictResolution === 'snack') {
-      await handleAddMealToPlan(showMealConflictDialog, selectedMealPlan, selectedDate, 'snack');
-    } else if (conflictResolution === 'substitute' && mealToSubstitute) {
-      await handleSubstituteMeal(showMealConflictDialog, selectedMealPlan, selectedDate, mealToSubstitute);
-    }
-
-    setShowMealConflictDialog(null);
-    setConflictResolution('snack');
-    setMealToSubstitute("");
-  };
-
-  const handleAddMealToPlan = async (meal: any, planId: string, date: Date, mealType: 'meal' | 'snack') => {
-    console.log('Adding meal to plan:', { meal, planId, date, mealType });
-    
-    try {
-      const dateString = date.toISOString().split('T')[0];
-      const newMeal = {
-        ...meal,
-        id: `meal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        date: dateString,
-        planId: planId,
-        mealType: mealType,
-        completed: false,
-        description: `${meal.description} - Planned for ${date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric',
-          year: 'numeric'
-        })}`
-      };
-
-      // Find the current plan and update it
-      const currentPlan = mealPlans.find(p => p.id === planId);
-      if (!currentPlan) {
-        throw new Error('Meal plan not found');
-      }
-
-      const updatedMeals = [...(currentPlan.meals || []), newMeal];
-      
-      // Update the meal plan in context
-      updateMealPlan(planId, { meals: updatedMeals });
-      
-      // Update pantry by removing used ingredients
-      if (meal.ingredients && Array.isArray(meal.ingredients)) {
-        const ingredientNames = meal.ingredients.map((ing: any) => 
-          typeof ing === 'string' ? ing : ing.name
-        );
-        updatePantryFromIngredients(ingredientNames);
-      }
-      
-      // Also call the original callback
-      onAddMeal(newMeal, date);
-      
-      const formattedDate = date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'short', 
-        day: 'numeric' 
-      });
-      
+    } else {
+      addFavoriteMeal(meal);
       toast({
-        title: `${mealType === 'snack' ? 'Snack' : 'Meal'} added successfully!`,
-        description: `${meal.name} has been added to your meal plan for ${formattedDate}. Pantry ingredients have been updated.`,
-      });
-      
-      setShowDaySelector(null);
-      setSelectedDay("");
-      setSelectedMealPlan("");
-    } catch (error) {
-      console.error('Error adding meal:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add meal to plan. Please try again.",
-        variant: "destructive",
+        title: "Added to favorites!",
+        description: `${meal.name} has been added to your favorites.`,
       });
     }
-  };
-
-  const handleSubstituteMeal = async (newMeal: any, planId: string, date: Date, mealIdToReplace: string) => {
-    console.log('Substituting meal:', { newMeal, planId, date, mealIdToReplace });
-    
-    try {
-      const dateString = date.toISOString().split('T')[0];
-      const substituteMeal = {
-        ...newMeal,
-        id: mealIdToReplace,
-        date: dateString,
-        planId: planId,
-        mealType: 'meal',
-        completed: false,
-        description: `${newMeal.description} - Planned for ${date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric',
-          year: 'numeric'
-        })}`
-      };
-
-      // Find the current plan and update it
-      const currentPlan = mealPlans.find(p => p.id === planId);
-      if (!currentPlan) {
-        throw new Error('Meal plan not found');
-      }
-
-      const updatedMeals = (currentPlan.meals || []).map((meal: any) => 
-        meal.id === mealIdToReplace ? substituteMeal : meal
-      );
-      
-      // Update the meal plan in context
-      updateMealPlan(planId, { meals: updatedMeals });
-      
-      // Update pantry by removing used ingredients
-      if (newMeal.ingredients && Array.isArray(newMeal.ingredients)) {
-        const ingredientNames = newMeal.ingredients.map((ing: any) => 
-          typeof ing === 'string' ? ing : ing.name
-        );
-        updatePantryFromIngredients(ingredientNames);
-      }
-      
-      // Also call the original callback
-      onAddMeal(substituteMeal, date);
-      
-      const formattedDate = date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'short', 
-        day: 'numeric' 
-      });
-      
-      toast({
-        title: "Meal substituted successfully!",
-        description: `${newMeal.name} has replaced the selected meal for ${formattedDate}. Pantry ingredients have been updated.`,
-      });
-      
-      setShowDaySelector(null);
-      setSelectedDay("");
-      setSelectedMealPlan("");
-    } catch (error) {
-      console.error('Error substituting meal:', error);
-      toast({
-        title: "Error",
-        description: "Failed to substitute meal. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleQuickAdd = (meal: any) => {
-    // Update pantry by removing used ingredients
-    if (meal.ingredients && Array.isArray(meal.ingredients)) {
-      const ingredientNames = meal.ingredients.map((ing: any) => 
-        typeof ing === 'string' ? ing : ing.name
-      );
-      updatePantryFromIngredients(ingredientNames);
-    }
-    
-    onAddMeal(meal);
-    toast({
-      title: "Meal added!",
-      description: `${meal.name} has been added to your meal plan. Pantry ingredients have been updated.`,
-    });
   };
 
   return (
@@ -448,82 +223,23 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                       <Button 
                         size="sm"
                         variant="outline"
-                        onClick={() => handleQuickAdd(meal)}
+                        onClick={() => setSelectedMealForDetails(meal)}
                         className="border-orange-300 text-orange-700 hover:bg-orange-50 text-xs sm:text-sm w-full sm:w-auto"
                       >
-                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                        Quick Add
+                        <ChefHat className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        View Details
                       </Button>
-                      <Dialog open={showDaySelector === meal.id} onOpenChange={(open) => setShowDaySelector(open ? meal.id : null)}>
-                        <DialogTrigger asChild>
-                          <Button 
-                            size="sm"
-                            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-xs sm:text-sm w-full sm:w-auto"
-                          >
-                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            Add to Day
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="w-[95vw] max-w-md mx-auto">
-                          <DialogHeader>
-                            <DialogTitle className="text-base sm:text-lg">Choose Day for {meal.name}</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <Label htmlFor="meal-plan-select" className="text-sm">Select Meal Plan</Label>
-                              <Select value={selectedMealPlan} onValueChange={setSelectedMealPlan}>
-                                <SelectTrigger className="mt-1">
-                                  <SelectValue placeholder="Choose a meal plan..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {mealPlans.map((plan) => (
-                                    <SelectItem key={plan.id} value={plan.id}>
-                                      {plan.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            {selectedMealPlan && (
-                              <div>
-                                <Label htmlFor="day-select" className="text-sm">Select Day</Label>
-                                <Select value={selectedDay} onValueChange={setSelectedDay}>
-                                  <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Choose a day..." />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {getAvailableDaysForPlan(selectedMealPlan).map((day) => (
-                                      <SelectItem key={day.value} value={day.value}>
-                                        {day.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            )}
-                            <div className="flex flex-col sm:flex-row justify-end gap-2">
-                              <Button 
-                                variant="outline" 
-                                onClick={() => {
-                                  setShowDaySelector(null);
-                                  setSelectedDay("");
-                                  setSelectedMealPlan("");
-                                }}
-                                className="text-sm w-full sm:w-auto"
-                              >
-                                Cancel
-                              </Button>
-                              <Button 
-                                onClick={() => handleAddMealWithDay(meal)}
-                                disabled={!selectedDay || !selectedMealPlan}
-                                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-sm w-full sm:w-auto"
-                              >
-                                Add Meal
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button 
+                        size="sm"
+                        variant={isMealFavorite(meal.id) ? "default" : "outline"}
+                        onClick={() => handleAddToFavorites(meal)}
+                        className={isMealFavorite(meal.id) 
+                          ? "bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm w-full sm:w-auto" 
+                          : "border-red-300 text-red-700 hover:bg-red-50 text-xs sm:text-sm w-full sm:w-auto"}
+                      >
+                        <Heart className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${isMealFavorite(meal.id) ? 'fill-current' : ''}`} />
+                        {isMealFavorite(meal.id) ? 'Favorited' : 'Add to Favorites'}
+                      </Button>
                     </div>
                   </div>
                   
@@ -537,23 +253,13 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                       <span className="capitalize">{meal.difficulty}</span>
                     </div>
                     <span>{meal.calories} cal</span>
+                    {meal.carbonFootprint && (
+                      <div className="flex items-center space-x-1">
+                        <Leaf className="h-3 w-3 text-green-600" />
+                        <span>{meal.carbonFootprint}kg CO₂</span>
+                      </div>
+                    )}
                   </div>
-
-                  {meal.usesExpiringIngredients?.length > 0 && (
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <div className="flex items-center space-x-2 shrink-0">
-                        <AlertTriangle className="h-4 w-4 text-orange-500" />
-                        <span className="text-sm text-orange-600">Uses expiring:</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {meal.usesExpiringIngredients.map((ing: any, index: number) => (
-                          <Badge key={index} variant="outline" className="text-xs border-orange-300 text-orange-700 break-all">
-                            {ing.name}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </CardHeader>
               </Card>
             ))}
@@ -571,62 +277,149 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
         </CardContent>
       )}
 
-      {/* Meal Conflict Resolution Dialog */}
-      <Dialog open={!!showMealConflictDialog} onOpenChange={(open) => !open && setShowMealConflictDialog(null)}>
-        <DialogContent className="w-[95vw] max-w-md mx-auto">
+      {/* Meal Details Dialog */}
+      <Dialog open={!!selectedMealForDetails} onOpenChange={(open) => !open && setSelectedMealForDetails(null)}>
+        <DialogContent className="w-[95vw] max-w-3xl mx-auto max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>Day Already Has 3 Meals</DialogTitle>
+            <DialogTitle className="text-xl sm:text-2xl">{selectedMealForDetails?.name}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              This day already has 3 meals planned. How would you like to add "{showMealConflictDialog?.name}"?
-            </p>
-            
-            <RadioGroup value={conflictResolution} onValueChange={(value: 'snack' | 'substitute') => setConflictResolution(value)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="snack" id="snack" />
-                <Label htmlFor="snack">Add as a snack</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="substitute" id="substitute" />
-                <Label htmlFor="substitute">Substitute an existing meal</Label>
-              </div>
-            </RadioGroup>
-
-            {conflictResolution === 'substitute' && (
+          <ScrollArea className="max-h-[70vh] pr-4">
+            <div className="space-y-6">
+              {/* Description */}
               <div>
-                <Label htmlFor="meal-to-substitute" className="text-sm">Select meal to substitute</Label>
-                <Select value={mealToSubstitute} onValueChange={setMealToSubstitute}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Choose a meal to replace..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getMealsForDate(selectedMealPlan, selectedDay).map((meal: any, index: number) => (
-                      <SelectItem key={meal.id || index} value={meal.id || `meal-${index}`}>
-                        {meal.name || `Meal ${index + 1}`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <p className="text-sm text-muted-foreground">{selectedMealForDetails?.description}</p>
               </div>
-            )}
-            
-            <div className="flex justify-end gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowMealConflictDialog(null)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleConflictResolution}
-                disabled={conflictResolution === 'substitute' && !mealToSubstitute}
-                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
-              >
-                Confirm
-              </Button>
+
+              {/* Meal Info */}
+              <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span>Prep Time: {selectedMealForDetails?.prepTime} min</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <ChefHat className="h-4 w-4 text-primary" />
+                  <span>Difficulty: {selectedMealForDetails?.difficulty}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span>Servings: {servings}</span>
+                </div>
+                {selectedMealForDetails?.carbonFootprint && (
+                  <div className="flex items-center space-x-2">
+                    <Leaf className="h-4 w-4 text-green-600" />
+                    <span>{selectedMealForDetails.carbonFootprint}kg CO₂</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Benefits */}
+              {selectedMealForDetails?.benefits && (
+                <div>
+                  <h3 className="font-semibold mb-2 text-base">Health Benefits</h3>
+                  <p className="text-sm text-muted-foreground">{selectedMealForDetails.benefits}</p>
+                </div>
+              )}
+
+              {/* Prep Tip */}
+              {selectedMealForDetails?.prepTip && (
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <h3 className="font-semibold mb-1 text-sm text-blue-900">💡 Pro Tip</h3>
+                  <p className="text-sm text-blue-800">{selectedMealForDetails.prepTip}</p>
+                </div>
+              )}
+
+              {/* Ingredients */}
+              {selectedMealForDetails?.ingredients && selectedMealForDetails.ingredients.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-base">Ingredients</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {selectedMealForDetails.ingredients.map((ing: any, index: number) => (
+                      <div key={index} className="flex items-center space-x-2 text-sm">
+                        <Badge variant="outline" className="shrink-0">{ing.quantity} {ing.unit}</Badge>
+                        <span className="capitalize">{ing.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Nutritional Info */}
+              {selectedMealForDetails?.nutritionalInfo && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-base">Nutritional Information</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                      <p className="text-xs text-muted-foreground">Calories</p>
+                      <p className="text-lg font-bold">{selectedMealForDetails.calories}</p>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                      <p className="text-xs text-muted-foreground">Protein</p>
+                      <p className="text-lg font-bold">{selectedMealForDetails.nutritionalInfo.protein}g</p>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                      <p className="text-xs text-muted-foreground">Carbs</p>
+                      <p className="text-lg font-bold">{selectedMealForDetails.nutritionalInfo.carbohydrates}g</p>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                      <p className="text-xs text-muted-foreground">Fat</p>
+                      <p className="text-lg font-bold">{selectedMealForDetails.nutritionalInfo.fat}g</p>
+                    </div>
+                  </div>
+                  {selectedMealForDetails.nutritionalInfo.vitamins && selectedMealForDetails.nutritionalInfo.vitamins.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-xs text-muted-foreground mb-2">Rich in vitamins:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedMealForDetails.nutritionalInfo.vitamins.map((vitamin: string, index: number) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            Vitamin {vitamin}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Steps */}
+              {selectedMealForDetails?.steps && selectedMealForDetails.steps.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-base">Cooking Instructions</h3>
+                  <ol className="space-y-3">
+                    {selectedMealForDetails.steps.map((step: string, index: number) => (
+                      <li key={index} className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
+                          {index + 1}
+                        </span>
+                        <span className="text-sm pt-0.5">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
             </div>
-          </div>
+          </ScrollArea>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSelectedMealForDetails(null)}
+            >
+              Close
+            </Button>
+            <Button
+              variant={isMealFavorite(selectedMealForDetails?.id) ? "default" : "outline"}
+              onClick={() => {
+                if (selectedMealForDetails) {
+                  handleAddToFavorites(selectedMealForDetails);
+                }
+              }}
+              className={isMealFavorite(selectedMealForDetails?.id) 
+                ? "bg-red-500 hover:bg-red-600 text-white" 
+                : "border-red-300 text-red-700 hover:bg-red-50"}
+            >
+              <Heart className={`h-4 w-4 mr-2 ${isMealFavorite(selectedMealForDetails?.id) ? 'fill-current' : ''}`} />
+              {isMealFavorite(selectedMealForDetails?.id) ? 'Remove from Favorites' : 'Add to Favorites'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Card>

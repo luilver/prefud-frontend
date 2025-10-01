@@ -209,6 +209,10 @@ interface UserContextType {
   convertPantryItemsToApiFormat: (items: PantryItem[]) => any[];
   updatePantryInAPI: (updatedItems: PantryItem[]) => Promise<void>;
   originalPantryResponse: any;
+  favoriteMeals: any[];
+  addFavoriteMeal: (meal: any) => void;
+  removeFavoriteMeal: (mealId: string) => void;
+  isMealFavorite: (mealId: string) => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -245,6 +249,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     useState<SubscriptionInfo | null>(null);
   const [aiMeals, setAIMeals] = useState<AIMeal[]>([]);
   const [aiDrinks, setAIDrinks] = useState<AIDrink[]>([]);
+  const [favoriteMeals, setFavoriteMeals] = useState<any[]>([]);
 
   // Computed properties
   const ingredients = pantryItems;
@@ -400,6 +405,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const savedSubscriptionInfo = localStorage.getItem("subscriptionInfo");
     const savedAIMeals = localStorage.getItem("aiMeals");
     const savedAIDrinks = localStorage.getItem("aiDrinks");
+    const savedFavoriteMeals = localStorage.getItem("favoriteMeals");
 
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -437,6 +443,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
     if (savedAIDrinks) {
       setAIDrinks(JSON.parse(savedAIDrinks));
+    }
+    if (savedFavoriteMeals) {
+      setFavoriteMeals(JSON.parse(savedFavoriteMeals));
     }
   }, []);
 
@@ -496,6 +505,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     localStorage.setItem("aiDrinks", JSON.stringify(aiDrinks));
   }, [aiDrinks]);
+
+  useEffect(() => {
+    localStorage.setItem("favoriteMeals", JSON.stringify(favoriteMeals));
+  }, [favoriteMeals]);
 
   // Sync shopping items back to active meal plan when shopping items change
   useEffect(() => {
@@ -1077,6 +1090,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setAIDrinks((prev) => prev.filter((drink) => drink.id !== id));
   };
 
+  const addFavoriteMeal = (meal: any) => {
+    setFavoriteMeals((prev) => {
+      // Check if meal is already favorited
+      if (prev.some(fav => fav.id === meal.id)) {
+        return prev;
+      }
+      return [...prev, { ...meal, favoritedAt: new Date().toISOString() }];
+    });
+  };
+
+  const removeFavoriteMeal = (mealId: string) => {
+    setFavoriteMeals((prev) => prev.filter((meal) => meal.id !== mealId));
+  };
+
+  const isMealFavorite = (mealId: string) => {
+    return favoriteMeals.some((meal) => meal.id === mealId);
+  };
+
   const value = {
     user,
     pantryItems,
@@ -1138,6 +1169,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     convertPantryItemsToApiFormat,
     updatePantryInAPI,
     originalPantryResponse,
+    favoriteMeals,
+    addFavoriteMeal,
+    removeFavoriteMeal,
+    isMealFavorite,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
