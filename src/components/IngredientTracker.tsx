@@ -50,7 +50,7 @@ const IngredientTracker = () => {
   };
 
   // Function to fetch pantry items from API
-  const fetchPantryItems = async () => {
+  const fetchPantryItems = async (showToast: boolean = false) => {
     if (!user?.id) {
       console.log("No user ID available for fetching pantry");
       return;
@@ -96,35 +96,41 @@ const IngredientTracker = () => {
         // Update pantry items in context with original response
         setPantryItems(transformedPantryItems, response);
 
-        toast({
-          title: "Pantry Updated",
-          description: `Successfully loaded ${transformedPantryItems.length} items from your pantry.`,
-        });
+        if (showToast) {
+          toast({
+            title: "Pantry Updated",
+            description: `Successfully loaded ${transformedPantryItems.length} items from your pantry.`,
+          });
+        }
       } else {
         console.log(
           "No ingredients found in response or invalid response structure"
         );
         setPantryItems([]);
-        toast({
-          title: "No Items Found",
-          description:
-            "Your pantry appears to be empty or no data was returned.",
-        });
+        if (showToast) {
+          toast({
+            title: "No Items Found",
+            description:
+              "Your pantry appears to be empty or no data was returned.",
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching pantry items:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch pantry items. Please try again.",
-        variant: "destructive",
-      });
+      if (showToast) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch pantry items. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   // Fetch pantry items on component mount
   useEffect(() => {
     console.log("IngredientTracker mounted, fetching pantry items...");
-    fetchPantryItems();
+    fetchPantryItems(true); // Show toast only on initial load
   }, [user?.id]);
 
   // Log ingredients changes for debugging
@@ -135,6 +141,8 @@ const IngredientTracker = () => {
   const handleAddIngredient = (newIngredient: any) => {
     addIngredient(newIngredient);
     setShowAddForm(false);
+    // Refresh pantry silently (no toast, as AddIngredientForm already shows success toast)
+    fetchPantryItems(false);
   };
 
   const handleDeleteIngredient = (id: string) => {
