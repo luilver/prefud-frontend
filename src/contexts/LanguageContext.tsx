@@ -100,7 +100,8 @@ const translations = {
     "signup.already-account": "Already have an account?",
     "signup.signin-here": "Sign in here",
     "signup.emailStep.title": "Recover Password",
-    "signup.emailStep.description": "Enter your email address and we'll send you a verification code.",
+    "signup.emailStep.description":
+      "Enter your email address and we'll send you a verification code.",
     "signup.emailStep.label": "Email Address",
     "signup.emailStep.placeholder": "Enter your email",
     "signup.emailPlaceholder": "Enter your email address",
@@ -117,8 +118,9 @@ const translations = {
     "signup.didntReceiveCode": "Didn't receive the code?",
     "signup.resendCode": "Resend Code",
     "signup.backToStart": "Back to Start",
-    "signup.aboutYourself":"Tell us about yourself",
-    "signup.personalizeMealPlan": "Help us personalize your meal planning experience.",
+    "signup.aboutYourself": "Tell us about yourself",
+    "signup.personalizeMealPlan":
+      "Help us personalize your meal planning experience.",
     "signup.personalInformation": "Personal Information",
     "signup.firstName": "First Name",
     "signup.lastName": "Last Name",
@@ -139,7 +141,8 @@ const translations = {
     "signup.agreement": "Agreement",
     "signup.agreementText": "I agree to the ",
     "signup.termsAndConditions": "Terms and Conditions",
-    "signup.agreementDescription": "By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning.",
+    "signup.agreementDescription":
+      "By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning.",
 
     // Health Goals
     "signup.healthGoals.loseWeight": "Lose weight",
@@ -150,10 +153,11 @@ const translations = {
     "signup.healthGoals.heartHealth": "Heart health",
     "signup.healthGoals.lowerCholesterol": "Lower cholesterol",
     "signup.healthGoals.manageDiabetes": "Manage diabetes",
-    
+
     // Calorie Tracking
     "profile.calorieTracking.title": "Calorie Tracking",
-    "profile.calorieTracking.description": "Track your monthly calorie consumption and goals",
+    "profile.calorieTracking.description":
+      "Track your monthly calorie consumption and goals",
     "profile.calorieTracking.dailyGoal": "Daily Goal",
     "profile.calorieTracking.caloriesPerDay": "Calories per day",
     "profile.calorieTracking.thisMonth": "This Month",
@@ -161,10 +165,11 @@ const translations = {
     "profile.calorieTracking.dailyAverage": "Daily Average",
     "profile.calorieTracking.healthGoalsProgress": "Health Goals Progress",
     "profile.calorieTracking.noHealthGoals": "No health goals set",
-    
-     // Environmental Impact
+
+    // Environmental Impact
     "profile.environmental.title": "Environmental Impact",
-    "profile.environmental.description": "Track your monthly carbon emissions from ingredients and meals",
+    "profile.environmental.description":
+      "Track your monthly carbon emissions from ingredients and meals",
     "profile.environmental.expiredIngredients": "Expired Ingredients",
     "profile.environmental.carbonWasted": "Carbon footprint wasted",
     "profile.environmental.consumedMeals": "Consumed Meals",
@@ -173,20 +178,24 @@ const translations = {
     "profile.environmental.combinedFootprint": "Combined carbon footprint",
     "profile.environmental.sustainabilityTips": "Sustainability Tips",
     "profile.environmental.reduceFoodWaste": "Reduce Food Waste",
-    "profile.environmental.preventedWaste": "You've prevented 2.1 kg CO₂ by using ingredients before expiration",
+    "profile.environmental.preventedWaste":
+      "You've prevented 2.1 kg CO₂ by using ingredients before expiration",
     "profile.environmental.mealPlanBenefits": "Meal Planning Benefits",
-    "profile.environmental.wasteReduction": "Your meal planning has reduced food waste by 78% this month",
+    "profile.environmental.wasteReduction":
+      "Your meal planning has reduced food waste by 78% this month",
     "profile.environmental.improvementOpportunity": "Improvement Opportunity",
-    "profile.environmental.checkExpiration": "Check expiration dates more frequently to reduce waste by 15%",
-    
+    "profile.environmental.checkExpiration":
+      "Check expiration dates more frequently to reduce waste by 15%",
+
     // Favorites
     "profile.checkFavorites": "Check Favorites",
     "favorites.title": "My Favorite Recipes",
     "favorites.subtitle": "Your collection of beloved recipes",
     "favorites.empty.title": "No favorite recipes yet",
-    "favorites.empty.description": "Start exploring recipes and mark your favorites to see them here!",
+    "favorites.empty.description":
+      "Start exploring recipes and mark your favorites to see them here!",
     "favorites.empty.cta": "Discover Recipes",
-    
+
     // Cart
     "cart.title": "Shopping Cart",
     "cart.items": "items",
@@ -194,12 +203,13 @@ const translations = {
     "cart.addedAt": "Added",
     "cart.clearAll": "Clear All",
     "cart.empty.title": "Your cart is empty",
-    "cart.empty.description": "Add ingredients from recipes or meal plans to start building your shopping list.",
+    "cart.empty.description":
+      "Add ingredients from recipes or meal plans to start building your shopping list.",
     "cart.empty.backButton": "Back to Dashboard",
     "cart.actions.title": "Cart Actions",
     "cart.actions.addToShoppingList": "Add to Shopping List",
     "cart.actions.addToPantry": "Add to Pantry",
-    
+
     // Diet Types
     "signup.diet.vegetarian": "Vegetarian",
     "signup.diet.vegan": "Vegan",
@@ -232,8 +242,8 @@ const translations = {
     "signup.plan.free": "Free",
     "signup.plan.whatsIncluded": "What's included",
     "signup.plan.choose": "Choose",
-    "signup.selectPlanDescription": "Select the perfect plan to start your personalized meal planning ",
-
+    "signup.selectPlanDescription":
+      "Select the perfect plan to start your personalized meal planning ",
 
     // Signin
     "signin.title": "Welcome Back",
@@ -266,7 +276,7 @@ const translations = {
     "profile.plan": "Plan",
     "profile.active": "Active",
     "profile.cancelSubscription": "Cancel Subscription",
-    "profile.subscriptionDesc":"Your current plan usage and limits",
+    "profile.subscriptionDesc": "Your current plan usage and limits",
 
     // Meal Planner
     "mealPlanner.title": "Meal Planner",
@@ -398,7 +408,8 @@ const translations = {
     "mealPlanCreator.cuisine.chinese": "Chinese",
     "mealPlanCreator.cuisine.indian": "Indian",
     "mealPlanCreator.cuisine.customCountry": "Add Country Cuisine",
-    "mealPlanCreator.cuisine.customCountryPlaceholder": "Enter a country for its cuisine (e.g., Brazil, Morocco)",
+    "mealPlanCreator.cuisine.customCountryPlaceholder":
+      "Enter a country for its cuisine (e.g., Brazil, Morocco)",
     "mealPlanCreator.generate.btn": "Generate Plan with AI",
     "mealPlanCreator.generate.btnLoad": "Generating Plan with AI...",
 
@@ -462,7 +473,98 @@ const translations = {
     "mealPlanView.mealUncompleted": "Meal marked as uncompleted",
     "mealPlanView.mealCompletedDesc": "Great job on completing your meal!",
     "mealPlanView.mealUncompletedDesc": "Meal has been marked as uncompleted.",
+    //new keys
+//Checkout and cart
+    "mealPlanView.addToCart": "Add to Cart",
+    "cart.checkout.proceedToCheckout": "Proceed to Checkout",
+    "cart.inCart": "in cart",
+    "checkout.steps.deliveryMethod": "Delivery Method",
+    "checkout.deliveryMethod.title":
+      "How would you like to receive your order?",
+    "checkout.deliveryMethod.subtitle":
+      " Select how you would like to receive your order",
 
+    "checkout.steps.deliveryMethod.title": "Choose Delivery Method",
+    "checkout.deliveryMethod.delivery.title": "Delivery",
+    "checkout.deliveryMethod.delivery.description":
+      "Get your groceries delivered to your doorstep",
+    "checkout.deliveryMethod.delivery.fee": "Delivery Fee",
+    "checkout.deliveryMethod.pickup.title": "Pickup",
+    "checkout.deliveryMethod.pickup.description":
+      "Pick up your order from the store",
+    "checkout.deliveryMethod.pickup.fee": "No Delivery Fee",
+
+    "mealPlanView.addedToCart": "Added to Cart",
+
+    "checkout.steps.storeSelection": "Store Selection",
+    "checkout.steps.address": "Address",
+    "checkout.steps.payment": "Payment",
+    "checkout.steps.summary": "Summary",
+    "checkout.steps.confirmation": "Confirmation",
+
+    "checkout.storeSelection.title": "Select Store",
+    "checkout.storeSelection.subtitle":
+      "Choose your preferred store for pickup or delivery",
+    "checkout.address.pickup.title": "Pickup Address",
+    "checkout.address.pickup.subtitle": "Select the store location for pickup",
+    "checkout.payment.title": "Payment Method",
+    "checkout.payment.subtitle": "Choose your payment method",
+    "checkout.payment.default": "Default",
+    "checkout.payment.expires": "Expires",
+    "checkout.payment.addNew": "Add New Payment Method",
+    "checkout.payment.form.name": "Name on Card",
+    "checkout.payment.form.number": "Card Number",
+    "checkout.payment.form.expiry": "Expiry Date (MM/YY)",
+    "checkout.payment.form.cvc": "CVC",
+    "checkout.payment.form.save": "Save Card",
+    "checkout.summary.title": "Order Summary",
+    "checkout.summary.subtitle": "Review your order details before confirming",
+    "checkout.summary.items": "Items",
+    "checkout.summary.pickup": "Pickup",
+    "checkout.summary.pickupTime": "Pickup Time",
+    "checkout.summary.payment": "Payment Method",
+    "checkout.summary.subtotal": "Subtotal",
+    "checkout.summary.serviceFee": "Service Fee",
+    "checkout.summary.total": "Total",
+    "checkout.summary.processPayment": "Process Payment",
+    "checkout.payment.form.cvv": "CVV",
+    "checkout.summary.deliveryFee": "Delivery Fee",
+    
+    //falta confirmation
+    "checkout.confirmation.title": "Order Confirmed!",
+    "checkout.confirmation.subtitle":
+      "Thank you for your order. Your order number is",
+    "checkout.confirmation.orderNumber": "Order Number",
+    "checkout.confirmation.estimatedPickup": "Estimated Pickup Time",
+    "checkout.confirmation.today": "Today at",
+    "checkout.confirmation.pickupLocation": "Pickup Location",
+    "checkout.confirmation.total": "Total Paid",
+    "checkout.confirmation.items": "Items Ordered",
+    "checkout.confirmation.nextSteps": "Next Steps",
+    "checkout.confirmation.step1":
+      "You will receive a confirmation email shortly.",
+    "checkout.confirmation.step2": "Prepare for pickup at the selected store.",
+    "checkout.confirmation.step3": "Enjoy your groceries!",
+    "checkout.confirmation.done": "Done",
+    "checkout.address.delivery.title": "Delivery Address",
+    "checkout.address.delivery.subtitle":
+      "Enter the address where you want your order delivered",
+    "checkout.address.default": "Default Address",
+    "checkout.address.addNew": "Add New Address",
+    "checkout.address.form.street": "Street Address",
+    "checkout.address.form.apartment": "Apartment, suite, etc. (optional)",
+    "checkout.address.form.state": "State/Province",
+    "checkout.address.form.city": "City",
+    "checkout.address.form.zipCode": "ZIP/Postal Code",
+    "checkout.address.form.country": "Country",
+    "checkout.address.form.save": "Save Address",
+    "checkout.summary.delivery": "Delivery",
+    "checkout.summary.deliveryTime": "Delivery Time",
+    "checkout.confirmation.estimatedDelivery": "Estimated Delivery Time",
+    "checkout.confirmation.deliveryAddress": "Delivery Address",
+    "checkout.confirmation.thankYou": "Thank you for choosing Pantry!",
+
+    //until here
     "days.sunday": "Sunday",
     "days.monday": "Monday",
     "days.tuesday": "Tuesday",
@@ -1118,8 +1220,10 @@ const translations = {
     "recipeView.mealCookedDesc": "Great job on completing this recipe!",
     "recipeView.mealUncookedDesc": "Recipe status updated successfully",
     "recipeView.updateError": "Update failed",
-    "recipeView.updateErrorDesc": "Failed to update recipe status. Please try again.",
-    "recipeView.missingDataError": "Missing plan or meal information. Please try again from the meal plan.",
+    "recipeView.updateErrorDesc":
+      "Failed to update recipe status. Please try again.",
+    "recipeView.missingDataError":
+      "Missing plan or meal information. Please try again from the meal plan.",
     "recipeView.cookingProgress": "Cooking Progress",
     "recipeView.of": "of",
     "recipeView.stepsCompleted": "steps completed",
@@ -1326,10 +1430,12 @@ const translations = {
     "addIngredient.addAllIngredients": "Add All Ingredients",
     "addIngredient.addingAllIngredients": "Adding All...",
     "addIngredient.multipleTitle": "Add Multiple Ingredients",
-    "addIngredient.multipleDescription": "Add multiple ingredients to your pantry at once",
+    "addIngredient.multipleDescription":
+      "Add multiple ingredients to your pantry at once",
     "addIngredient.ingredient": "Ingredient",
     "addIngredient.allIngredientsAdded": "All ingredients added!",
-    "addIngredient.allIngredientsAddedDesc": "ingredients have been added to your pantry.",
+    "addIngredient.allIngredientsAddedDesc":
+      "ingredients have been added to your pantry.",
     "addIngredient.scanProduct": "Scan Product with Camera",
     "addIngredient.productDetected": "Product Added!",
     "addIngredient.productDetectedDesc":
@@ -1398,7 +1504,8 @@ const translations = {
 
     //IngredientTracker
     "ingredientTracker.title": "Select the perfect plan",
-    "ingredientTracker.description": "Keep track of your ingredients and their expiration dates",
+    "ingredientTracker.description":
+      "Keep track of your ingredients and their expiration dates",
     "ingredientTracker.refresh": "Refresh",
     "ingredientTracker.addIngredient": "Add Ingredient",
     "ingredientTracker.totalItems": "Total Items",
@@ -1410,22 +1517,29 @@ const translations = {
     "ingredientTracker.today": "Today",
     "ingredientTracker.allFresh": "All ingredients are fresh!",
     "ingredientTracker.yourPantry": "Your Pantry",
-    "ingredientTracker.organizedByCategory": "All your ingredients organized by category",
+    "ingredientTracker.organizedByCategory":
+      "All your ingredients organized by category",
     "ingredientTracker.searchPlaceholder": "Search ingredients...",
     "ingredientTracker.noIngredientsFound": "No ingredients found",
     "ingredientTracker.tryDifferentSearch": "Try a different search term",
-    "ingredientTracker.pantryEmpty": "Your pantry is empty. Try refreshing or add some ingredients.",
-    "ingredientTracker.startAdding": "Start by adding some ingredients to your pantry",
+    "ingredientTracker.pantryEmpty":
+      "Your pantry is empty. Try refreshing or add some ingredients.",
+    "ingredientTracker.startAdding":
+      "Start by adding some ingredients to your pantry",
 
-     //Welcome
+    //Welcome
     "welcome.message": "Welcome to Pantry!",
-    "welcome.subtitle": "Your smart kitchen companion is ready to transform your cooking experience.",
+    "welcome.subtitle":
+      "Your smart kitchen companion is ready to transform your cooking experience.",
     "welcome.aiMealPlanning": "AI-Powered Meal Planning",
-    "welcome.personalizedMeals": "Get personalized meal suggestions based on your preferences and pantry items.",
+    "welcome.personalizedMeals":
+      "Get personalized meal suggestions based on your preferences and pantry items.",
     "welcome.weeklyPlanning": "Weekly Planning Made Easy",
-    "welcome.smartPantry": "Use your camera to scan ingredients and automatically add them to your pantry.",
+    "welcome.smartPantry":
+      "Use your camera to scan ingredients and automatically add them to your pantry.",
     "welcome.trackProgress": "Track Your Progress",
-    "welcome.monitorGoals": "Monitor your nutrition goals and see your healthy habits grow over time.",
+    "welcome.monitorGoals":
+      "Monitor your nutrition goals and see your healthy habits grow over time.",
 
     //  Subscription
     "subscription.complete": "Complete Your Subscription",
@@ -1441,7 +1555,6 @@ const translations = {
     "pagination.perPage": "per page",
     "mealPlanner.previous": "Previous",
     "mealPlanner.next": "Next",
-
   },
   es: {
     // Language names
@@ -1535,7 +1648,8 @@ const translations = {
     "signup.already-account": "¿Ya tienes una cuenta?",
     "signup.signin-here": "Inicia sesión aquí",
     "signup.emailStep.title": "Recuperar Contraseña",
-    "signup.emailStep.description": "Ingresa tu correo electrónico y te enviaremos un código de verificación.",
+    "signup.emailStep.description":
+      "Ingresa tu correo electrónico y te enviaremos un código de verificación.",
     "signup.emailStep.label": "Correo Electrónico",
     "signup.emailStep.placeholder": "Ingresa tu correo electrónico",
     "signup.emailPlaceholder": "Ingresa tu correo electrónico",
@@ -1547,13 +1661,15 @@ const translations = {
     "signup.payment": "Pago",
     "signup.verify.title": "Verifica tu correo electrónico",
     "signup.otpSent": "Hemos enviado un código de 6 dígitos a",
-    "signup.enterOTP": "Ingresa el código de verificación enviado a tu correo electrónico.",
+    "signup.enterOTP":
+      "Ingresa el código de verificación enviado a tu correo electrónico.",
     "signup.verifyEmail": "Verificar correo electrónico",
     "signup.didntReceiveCode": "¿No recibiste el código?",
     "signup.resendCode": "Reenviar código",
     "signup.backToStart": "Atrás para Comenzar",
-    "signup.aboutYourself":"Cuéntanos sobre ti",
-    "signup.personalizeMealPlan": "Ayúdanos a personalizar tu experiencia de planificación de comidas.",
+    "signup.aboutYourself": "Cuéntanos sobre ti",
+    "signup.personalizeMealPlan":
+      "Ayúdanos a personalizar tu experiencia de planificación de comidas.",
     "signup.personalInformation": "Información Personal",
     "signup.firstName": "Nombre",
     "signup.lastName": "Apellido",
@@ -1574,8 +1690,9 @@ const translations = {
     "signup.agreement": "Acuerdo",
     "signup.agreementText": "Acepto los ",
     "signup.termsAndConditions": "Términos y Condiciones",
-    "signup.agreementDescription": "Al marcar esta casilla, reconoces que has leído y aceptas nuestros términos, incluido el uso de IA para la planificación de comidas.",
-    
+    "signup.agreementDescription":
+      "Al marcar esta casilla, reconoces que has leído y aceptas nuestros términos, incluido el uso de IA para la planificación de comidas.",
+
     // Health Goals
     "signup.healthGoals.loseWeight": "Perder peso",
     "signup.healthGoals.gainMuscle": "Ganar músculo",
@@ -1585,21 +1702,25 @@ const translations = {
     "signup.healthGoals.heartHealth": "Salud del corazón",
     "signup.healthGoals.lowerCholesterol": "Reducir colesterol",
     "signup.healthGoals.manageDiabetes": "Controlar diabetes",
-    
+
     // Calorie Tracking
     "profile.calorieTracking.title": "Seguimiento de Calorías",
-    "profile.calorieTracking.description": "Rastrea tu consumo mensual de calorías y objetivos",
+    "profile.calorieTracking.description":
+      "Rastrea tu consumo mensual de calorías y objetivos",
     "profile.calorieTracking.dailyGoal": "Objetivo Diario",
     "profile.calorieTracking.caloriesPerDay": "Calorías por día",
     "profile.calorieTracking.thisMonth": "Este Mes",
     "profile.calorieTracking.caloriesConsumed": "Calorías consumidas",
     "profile.calorieTracking.dailyAverage": "Promedio Diario",
-    "profile.calorieTracking.healthGoalsProgress": "Progreso de Objetivos de Salud",
-    "profile.calorieTracking.noHealthGoals": "No hay objetivos de salud establecidos",
-    
+    "profile.calorieTracking.healthGoalsProgress":
+      "Progreso de Objetivos de Salud",
+    "profile.calorieTracking.noHealthGoals":
+      "No hay objetivos de salud establecidos",
+
     // Environmental Impact
     "profile.environmental.title": "Impacto Ambiental",
-    "profile.environmental.description": "Rastrea tus emisiones mensuales de carbono de ingredientes y comidas",
+    "profile.environmental.description":
+      "Rastrea tus emisiones mensuales de carbono de ingredientes y comidas",
     "profile.environmental.expiredIngredients": "Ingredientes Vencidos",
     "profile.environmental.carbonWasted": "Huella de carbono desperdiciada",
     "profile.environmental.consumedMeals": "Comidas Consumidas",
@@ -1608,18 +1729,23 @@ const translations = {
     "profile.environmental.combinedFootprint": "Huella de carbono combinada",
     "profile.environmental.sustainabilityTips": "Consejos de Sostenibilidad",
     "profile.environmental.reduceFoodWaste": "Reducir Desperdicio de Alimentos",
-    "profile.environmental.preventedWaste": "Has evitado 2.1 kg CO₂ al usar ingredientes antes de su vencimiento",
-    "profile.environmental.mealPlanBenefits": "Beneficios de la Planificación de Comidas",
-    "profile.environmental.wasteReduction": "Tu planificación de comidas ha reducido el desperdicio de alimentos en 78% este mes",
+    "profile.environmental.preventedWaste":
+      "Has evitado 2.1 kg CO₂ al usar ingredientes antes de su vencimiento",
+    "profile.environmental.mealPlanBenefits":
+      "Beneficios de la Planificación de Comidas",
+    "profile.environmental.wasteReduction":
+      "Tu planificación de comidas ha reducido el desperdicio de alimentos en 78% este mes",
     "profile.environmental.improvementOpportunity": "Oportunidad de Mejora",
-    "profile.environmental.checkExpiration": "Revisa las fechas de vencimiento más frecuentemente para reducir el desperdicio en 15%",
+    "profile.environmental.checkExpiration":
+      "Revisa las fechas de vencimiento más frecuentemente para reducir el desperdicio en 15%",
 
     // Favorites
     "profile.checkFavorites": "Ver Favoritos",
     "favorites.title": "Mis Recetas Favoritas",
     "favorites.subtitle": "Tu colección de recetas favoritas",
     "favorites.empty.title": "Aún no tienes recetas favoritas",
-    "favorites.empty.description": "¡Comienza a explorar recetas y marca tus favoritas para verlas aquí!",
+    "favorites.empty.description":
+      "¡Comienza a explorar recetas y marca tus favoritas para verlas aquí!",
     "favorites.empty.cta": "Descubrir Recetas",
 
     // Cart
@@ -1629,7 +1755,8 @@ const translations = {
     "cart.addedAt": "Agregado",
     "cart.clearAll": "Limpiar Todo",
     "cart.empty.title": "Tu carrito está vacío",
-    "cart.empty.description": "Agrega ingredientes de recetas o planes de comida para comenzar a construir tu lista de compras.",
+    "cart.empty.description":
+      "Agrega ingredientes de recetas o planes de comida para comenzar a construir tu lista de compras.",
     "cart.empty.backButton": "Volver al Panel",
     "cart.actions.title": "Acciones del Carrito",
     "cart.actions.addToShoppingList": "Agregar a Lista de Compras",
@@ -1667,7 +1794,8 @@ const translations = {
     "signup.plan.free": "Gratis",
     "signup.plan.whatsIncluded": "Qué incluye",
     "signup.plan.choose": "Elegir",
-    "signup.selectPlanDescription": "Selecciona el plan perfecto para comenzar tu trayectoria de planificación de comidas ",
+    "signup.selectPlanDescription":
+      "Selecciona el plan perfecto para comenzar tu trayectoria de planificación de comidas ",
 
     // Signin
     "signin.title": "Bienvenido de Vuelta",
@@ -1700,7 +1828,7 @@ const translations = {
     "profile.plan": "Plan",
     "profile.active": "Activo",
     "profile.cancelSubscription": "Cancelar suscripción",
-    "profile.subscriptionDesc":"Límites y uso de su plan actual",
+    "profile.subscriptionDesc": "Límites y uso de su plan actual",
 
     // Meal Planner
     "mealPlanner.title": "Planificador de Comidas",
@@ -1840,7 +1968,8 @@ const translations = {
     "mealPlanCreator.cuisine.chinese": "China",
     "mealPlanCreator.cuisine.indian": "India",
     "mealPlanCreator.cuisine.customCountry": "Agregar Cocina de País",
-    "mealPlanCreator.cuisine.customCountryPlaceholder": "Ingresa un país para su cocina (ej: Brasil, Marruecos)",
+    "mealPlanCreator.cuisine.customCountryPlaceholder":
+      "Ingresa un país para su cocina (ej: Brasil, Marruecos)",
     "mealPlanCreator.generate.btn": "Generar plan con IA",
     "mealPlanCreator.generate.btnLoad": "Generando plan con IA...",
 
@@ -2387,7 +2516,99 @@ const translations = {
     "aiDrinkGoals.budget.low": "Bajo",
     "aiDrinkGoals.budget.medium": "Medio",
     "aiDrinkGoals.budget.high": "Alto",
+    //Checkout and cart
+    "mealPlanView.addToCart": "Agregar al carrito",
+    "cart.checkout.proceedToCheckout": "Proceder al pago",
+    "cart.inCart": "en el carrito",
 
+    "checkout.steps.deliveryMethod": "Método de entrega",
+    "checkout.deliveryMethod.title": "¿Cómo deseas recibir tu pedido?",
+    "checkout.deliveryMethod.subtitle":
+      "Selecciona cómo deseas recibir tu pedido",
+
+    "checkout.steps.deliveryMethod.title": "Elige método de entrega",
+    "checkout.deliveryMethod.delivery.title": "Entrega a domicilio",
+    "checkout.deliveryMethod.delivery.description":
+      "Recibe tus compras en la puerta de tu casa",
+    "checkout.deliveryMethod.delivery.fee": "Costo de entrega",
+    "checkout.deliveryMethod.pickup.title": "Recoger en tienda",
+    "checkout.deliveryMethod.pickup.description":
+      "Recoge tu pedido en la tienda",
+    "checkout.deliveryMethod.pickup.fee": "Sin costo de entrega",
+
+    "mealPlanView.addedToCart": "Agregado al carrito",
+
+    "checkout.steps.storeSelection": "Selección de tienda",
+    "checkout.steps.address": "Dirección",
+    "checkout.steps.payment": "Pago",
+    "checkout.steps.summary": "Resumen",
+    "checkout.steps.confirmation": "Confirmación",
+
+    "checkout.storeSelection.title": "Seleccionar tienda",
+    "checkout.storeSelection.subtitle":
+      "Elige tu tienda preferida para recoger o recibir",
+    "checkout.address.pickup.title": "Dirección de recogida",
+    "checkout.address.pickup.subtitle":
+      "Selecciona la ubicación de la tienda para recoger",
+    "checkout.payment.title": "Método de pago",
+    "checkout.payment.subtitle": "Elige tu método de pago",
+    "checkout.payment.default": "Predeterminado",
+    "checkout.payment.expires": "Vence",
+    "checkout.payment.addNew": "Agregar nuevo método de pago",
+    "checkout.payment.form.name": "Nombre en la tarjeta",
+    "checkout.payment.form.number": "Número de tarjeta",
+    "checkout.payment.form.expiry": "Fecha de vencimiento (MM/AA)",
+    "checkout.payment.form.cvc": "CVC",
+    "checkout.payment.form.save": "Guardar tarjeta",
+
+    "checkout.summary.title": "Resumen del pedido",
+    "checkout.summary.subtitle":
+      "Revisa los detalles de tu pedido antes de confirmar",
+    "checkout.summary.items": "Artículos",
+    "checkout.summary.pickup": "Recoger en tienda",
+    "checkout.summary.pickupTime": "Hora de recogida",
+    "checkout.summary.payment": "Método de pago",
+    "checkout.summary.subtotal": "Subtotal",
+    "checkout.summary.serviceFee": "Cargo por servicio",
+    "checkout.summary.total": "Total",
+    "checkout.summary.processPayment": "Procesar pago",
+    "checkout.payment.form.cvv": "CVV",
+    "checkout.summary.deliveryFee": "Costo de entrega",
+    "checkout.summary.delivery": "Entrega a domicilio",
+    "checkout.summary.deliveryTime": "Hora de entrega",
+
+    "checkout.confirmation.title": "¡Pedido confirmado!",
+    "checkout.confirmation.subtitle":
+      "Gracias por tu pedido. Tu número de orden es",
+    "checkout.confirmation.orderNumber": "Número de orden",
+    "checkout.confirmation.estimatedPickup": "Hora estimada de recogida",
+    "checkout.confirmation.today": "Hoy a las",
+    "checkout.confirmation.pickupLocation": "Lugar de recogida",
+    "checkout.confirmation.total": "Total pagado",
+    "checkout.confirmation.items": "Artículos pedidos",
+    "checkout.confirmation.nextSteps": "Próximos pasos",
+    "checkout.confirmation.step1":
+      "Recibirás un correo de confirmación en breve.",
+    "checkout.confirmation.step2":
+      "Prepárate para recoger en la tienda seleccionada.",
+    "checkout.confirmation.step3": "¡Disfruta tus compras!",
+    "checkout.confirmation.done": "Listo",
+    "checkout.confirmation.estimatedDelivery": "Hora estimada de entrega",
+    "checkout.confirmation.deliveryAddress": "Dirección de entrega",
+    "checkout.confirmation.thankYou": "¡Gracias por elegir Pantry!",
+
+    "checkout.address.delivery.title": "Dirección de entrega",
+    "checkout.address.delivery.subtitle":
+      "Ingresa la dirección donde deseas recibir tu pedido",
+    "checkout.address.default": "Dirección predeterminada",
+    "checkout.address.addNew": "Agregar nueva dirección",
+    "checkout.address.form.street": "Calle",
+    "checkout.address.form.apartment": "Departamento, suite, etc. (opcional)",
+    "checkout.address.form.state": "Estado/Provincia",
+    "checkout.address.form.city": "Ciudad",
+    "checkout.address.form.zipCode": "Código postal",
+    "checkout.address.form.country": "País",
+    "checkout.address.form.save": "Guardar dirección",
     // AI Drink Creation
     "aiDrinkGeneration.readyTitle": "Listo para Generar tu Bebida",
     "aiDrinkGeneration.readyDesc":
@@ -2577,10 +2798,13 @@ const translations = {
     "recipeView.mealCooked": "¡Receta completada!",
     "recipeView.mealUncooked": "Receta marcada como no cocinada",
     "recipeView.mealCookedDesc": "¡Excelente trabajo completando esta receta!",
-    "recipeView.mealUncookedDesc": "Estado de la receta actualizado exitosamente",
+    "recipeView.mealUncookedDesc":
+      "Estado de la receta actualizado exitosamente",
     "recipeView.updateError": "Actualización fallida",
-    "recipeView.updateErrorDesc": "No se pudo actualizar el estado de la receta. Inténtalo de nuevo.",
-    "recipeView.missingDataError": "Falta información del plan o comida. Inténtalo de nuevo desde el plan de comidas.",
+    "recipeView.updateErrorDesc":
+      "No se pudo actualizar el estado de la receta. Inténtalo de nuevo.",
+    "recipeView.missingDataError":
+      "Falta información del plan o comida. Inténtalo de nuevo desde el plan de comidas.",
     "recipeView.cookingProgress": "Progreso de Cocina",
     "recipeView.of": "de",
     "recipeView.stepsCompleted": "pasos completados",
@@ -2802,10 +3026,12 @@ const translations = {
     "addIngredient.addAllIngredients": "Agregar Todos los Ingredientes",
     "addIngredient.addingAllIngredients": "Agregando Todos...",
     "addIngredient.multipleTitle": "Agregar Múltiples Ingredientes",
-    "addIngredient.multipleDescription": "Agrega múltiples ingredientes a tu despensa de una vez",
+    "addIngredient.multipleDescription":
+      "Agrega múltiples ingredientes a tu despensa de una vez",
     "addIngredient.ingredient": "Ingrediente",
     "addIngredient.allIngredientsAdded": "¡Todos los ingredientes agregados!",
-    "addIngredient.allIngredientsAddedDesc": "ingredientes han sido agregados a tu despensa.",
+    "addIngredient.allIngredientsAddedDesc":
+      "ingredientes han sido agregados a tu despensa.",
     "addIngredient.scanProduct": "Escanear Producto con Cámara",
     "addIngredient.productDetected": "¡Producto Agregado!",
     "addIngredient.productDetectedDesc":
@@ -2874,42 +3100,53 @@ const translations = {
     "addIngredient.units.bag.value": "bolsa",
     "addIngredient.units.box.value": "caja",
 
-     //IngredientTracker
+    //IngredientTracker
     "ingredientTracker.title": "Gestor de Despensa",
-    "ingredientTracker.description": "Lleva el control de tus ingredientes y sus fechas de caducidad",
+    "ingredientTracker.description":
+      "Lleva el control de tus ingredientes y sus fechas de caducidad",
     "ingredientTracker.refresh": "Actualizar",
     "ingredientTracker.addIngredient": "Agregar Ingrediente",
     "ingredientTracker.expiringSoon": "A punto de caducar",
-    "ingredientTracker.useFirst": "Usa estos ingredientes primero para evitar desperdicio",
+    "ingredientTracker.useFirst":
+      "Usa estos ingredientes primero para evitar desperdicio",
     "ingredientTracker.yourPantry": "Tu Despensa",
-    "ingredientTracker.organizedByCategory": "Todos tus ingredientes organizados por categoría",
+    "ingredientTracker.organizedByCategory":
+      "Todos tus ingredientes organizados por categoría",
     "ingredientTracker.searchPlaceholder": "Buscar ingredientes...",
     "ingredientTracker.totalItems": "Total de ingredientes",
     "ingredientTracker.categories": "Categorías",
     "ingredientTracker.lowStock": "Stock Bajo",
     "ingredientTracker.allFresh": "¡Todos los ingredientes están frescos!",
     "ingredientTracker.noIngredientsFound": "No se encontraron ingredientes",
-    "ingredientTracker.tryDifferentSearch": "Prueba con un término de búsqueda diferente",
-    "ingredientTracker.pantryEmpty": "Tu despensa está vacía. Intenta actualizar o agrega algunos ingredientes",
-    "ingredientTracker.startAdding": "Comienza agregando algunos ingredientes a tu despensa",
+    "ingredientTracker.tryDifferentSearch":
+      "Prueba con un término de búsqueda diferente",
+    "ingredientTracker.pantryEmpty":
+      "Tu despensa está vacía. Intenta actualizar o agrega algunos ingredientes",
+    "ingredientTracker.startAdding":
+      "Comienza agregando algunos ingredientes a tu despensa",
     "ingredientTracker.expired": "Caducado",
     "ingredientTracker.today": "Hoy",
 
     //Welcome
     "welcome.message": "¡Bienvenido a Pantry!",
-    "welcome.subtitle": "Tu compañero inteligente de cocina está listo para transformar tu experiencia culinaria.",
+    "welcome.subtitle":
+      "Tu compañero inteligente de cocina está listo para transformar tu experiencia culinaria.",
     "welcome.aiMealPlanning": "Planificación de comidas con IA",
-    "welcome.personalizedMeals":"Obtén sugerencias de comidas personalizadas según tus preferencias y los ingredientes de tu despensa.",
+    "welcome.personalizedMeals":
+      "Obtén sugerencias de comidas personalizadas según tus preferencias y los ingredientes de tu despensa.",
     "welcome.weeklyPlanning": "Planificación semanal simplificada",
-    "welcome.smartPantry": "Usa tu cámara para escanear ingredientes y agregarlos automáticamente a tu despensa.",
+    "welcome.smartPantry":
+      "Usa tu cámara para escanear ingredientes y agregarlos automáticamente a tu despensa.",
     "welcome.trackProgress": "Sigue tu progreso",
-    "welcome.monitorGoals": "Monitorea tus objetivos de nutrición y observa cómo crecen tus hábitos saludables con el tiempo",
+    "welcome.monitorGoals":
+      "Monitorea tus objetivos de nutrición y observa cómo crecen tus hábitos saludables con el tiempo",
 
     // Subscription
     "subscription.complete": "Completa tu suscripción",
     "subscription.securePayment": "Procesamiento de pago seguro para",
     "subscription.chooseBillingCycle": "Elige tu ciclo de facturación",
-    "subscription.selectBillingMethod": "Seleccione cómo desea que se le facture",
+    "subscription.selectBillingMethod":
+      "Seleccione cómo desea que se le facture",
     "subscription.monthly": "Mensual",
     "subscription.paymentInfo": "Información de Pago",
     "subscription.cardDetails": "Detalles de la Tarjeta",
@@ -2922,7 +3159,6 @@ const translations = {
     "pagination.perPage": "por página",
     "mealPlanner.previous": "Anterior",
     "mealPlanner.next": "Siguiente",
-    
   },
   pt: {
     // Language names
@@ -3015,8 +3251,9 @@ const translations = {
     "signup.account.sending": "Enviando Verificação...",
     "signup.already-account": "Já tem uma conta?",
     "signup.signin-here": "Entre aqui",
-    "signup.emailStep.title" : "Recuperar Senha",
-    "signup.emailStep.description": "Digite seu e-mail e enviaremos um código de verificação.",
+    "signup.emailStep.title": "Recuperar Senha",
+    "signup.emailStep.description":
+      "Digite seu e-mail e enviaremos um código de verificação.",
     "signup.emailStep.label": "Endereço de E-mail",
     "signup.emailStep.placeholder": "Digite seu e-mail",
     "signup.emailPlaceholder": "Digite seu e-mail",
@@ -3028,13 +3265,15 @@ const translations = {
     "signup.payment": "Pagamento",
     "signup.verify.title": "Verifique seu e-mail",
     "signup.otpSent": "Enviamos um código de 6 dígitos para",
-    "signup.enterOTP": "Digite o código de verificação enviado para o seu e-mail.",
+    "signup.enterOTP":
+      "Digite o código de verificação enviado para o seu e-mail.",
     "signup.verifyEmail": "Verificar e-mail",
     "signup.didntReceiveCode": "Não recebeu o código?",
     "signup.resendCode": "Reenviar código",
     "signup.backToStart": "Voltar para Começar",
     "signup.aboutYourself": "Fale-nos sobre você",
-    "signup.personalizeMealPlan": "Ajude-nos a personalizar sua experiência de planejamento de refeições.",
+    "signup.personalizeMealPlan":
+      "Ajude-nos a personalizar sua experiência de planejamento de refeições.",
     "signup.personalInformation": "Informações Pessoais",
     "signup.firstName": "Primeiro Nome",
     "signup.lastName": "Sobrenome",
@@ -3055,9 +3294,9 @@ const translations = {
     "signup.agreement": "Acordo",
     "signup.agreementText": "Concordo com os ",
     "signup.termsAndConditions": "Termos e Condições",
-    "signup.agreementDescription": "Ao marcar esta caixa, você reconhece que leu e concorda com nossos termos, incluindo o uso de IA para planejamento de refeições.",
+    "signup.agreementDescription":
+      "Ao marcar esta caixa, você reconhece que leu e concorda com nossos termos, incluindo o uso de IA para planejamento de refeições.",
 
-    
     // Health GoalS
     "signup.healthGoals.loseWeight": "Perder peso",
     "signup.healthGoals.gainMuscle": "Ganhar músculo",
@@ -3067,21 +3306,25 @@ const translations = {
     "signup.healthGoals.heartHealth": "Saúde do coração",
     "signup.healthGoals.lowerCholesterol": "Reduzir colesterol",
     "signup.healthGoals.manageDiabetes": "Controlar diabetes",
-    
+
     // Calorie Tracking
     "profile.calorieTracking.title": "Rastreamento de Calorias",
-    "profile.calorieTracking.description": "Acompanhe seu consumo mensal de calorias e objetivos",
+    "profile.calorieTracking.description":
+      "Acompanhe seu consumo mensal de calorias e objetivos",
     "profile.calorieTracking.dailyGoal": "Meta Diária",
     "profile.calorieTracking.caloriesPerDay": "Calorias por dia",
     "profile.calorieTracking.thisMonth": "Este Mês",
     "profile.calorieTracking.caloriesConsumed": "Calorias consumidas",
     "profile.calorieTracking.dailyAverage": "Média Diária",
-    "profile.calorieTracking.healthGoalsProgress": "Progresso dos Objetivos de Saúde",
-    "profile.calorieTracking.noHealthGoals": "Nenhum objetivo de saúde definido",
-    
+    "profile.calorieTracking.healthGoalsProgress":
+      "Progresso dos Objetivos de Saúde",
+    "profile.calorieTracking.noHealthGoals":
+      "Nenhum objetivo de saúde definido",
+
     // Environmental Impact
     "profile.environmental.title": "Impacto Ambiental",
-    "profile.environmental.description": "Acompanhe suas emissões mensais de carbono de ingredientes e refeições",
+    "profile.environmental.description":
+      "Acompanhe suas emissões mensais de carbono de ingredientes e refeições",
     "profile.environmental.expiredIngredients": "Ingredientes Vencidos",
     "profile.environmental.carbonWasted": "Pegada de carbono desperdiçada",
     "profile.environmental.consumedMeals": "Refeições Consumidas",
@@ -3090,20 +3333,25 @@ const translations = {
     "profile.environmental.combinedFootprint": "Pegada de carbono combinada",
     "profile.environmental.sustainabilityTips": "Dicas de Sustentabilidade",
     "profile.environmental.reduceFoodWaste": "Reduzir Desperdício de Alimentos",
-    "profile.environmental.preventedWaste": "Você evitou 2.1 kg CO₂ ao usar ingredientes antes do vencimento",
-    "profile.environmental.mealPlanBenefits": "Benefícios do Planejamento de Refeições",
-    "profile.environmental.wasteReduction": "Seu planejamento de refeições reduziu o desperdício de alimentos em 78% este mês",
+    "profile.environmental.preventedWaste":
+      "Você evitou 2.1 kg CO₂ ao usar ingredientes antes do vencimento",
+    "profile.environmental.mealPlanBenefits":
+      "Benefícios do Planejamento de Refeições",
+    "profile.environmental.wasteReduction":
+      "Seu planejamento de refeições reduziu o desperdício de alimentos em 78% este mês",
     "profile.environmental.improvementOpportunity": "Oportunidade de Melhoria",
-    "profile.environmental.checkExpiration": "Verifique as datas de validade com mais frequência para reduzir o desperdício em 15%",
-    
+    "profile.environmental.checkExpiration":
+      "Verifique as datas de validade com mais frequência para reduzir o desperdício em 15%",
+
     // Favorites
     "profile.checkFavorites": "Ver Favoritos",
     "favorites.title": "Minhas Receitas Favoritas",
     "favorites.subtitle": "Sua coleção de receitas queridas",
     "favorites.empty.title": "Ainda não há receitas favoritas",
-    "favorites.empty.description": "Comece a explorar receitas e marque suas favoritas para vê-las aqui!",
+    "favorites.empty.description":
+      "Comece a explorar receitas e marque suas favoritas para vê-las aqui!",
     "favorites.empty.cta": "Descobrir Receitas",
-    
+
     // Cart
     "cart.title": "Carrinho de Compras",
     "cart.items": "itens",
@@ -3111,12 +3359,13 @@ const translations = {
     "cart.addedAt": "Adicionado",
     "cart.clearAll": "Limpar Tudo",
     "cart.empty.title": "Seu carrinho está vazio",
-    "cart.empty.description": "Adicione ingredientes de receitas ou planos de refeição para começar a construir sua lista de compras.",
+    "cart.empty.description":
+      "Adicione ingredientes de receitas ou planos de refeição para começar a construir sua lista de compras.",
     "cart.empty.backButton": "Voltar ao Painel",
     "cart.actions.title": "Ações do Carrinho",
     "cart.actions.addToShoppingList": "Adicionar à Lista de Compras",
     "cart.actions.addToPantry": "Adicionar à Despensa",
-    
+
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",
     "signup.diet.vegan": "Vegano",
@@ -3149,13 +3398,8 @@ const translations = {
     "signup.plan.free": "Grátis",
     "signup.plan.whatsIncluded": "O que está incluído",
     "signup.plan.choose": "Escolher",
-    "signup.selectPlanDescription": "Selecione o plano perfeito para iniciar sua jornada de planejamento de refeições ",
-
-
-
-
-
-
+    "signup.selectPlanDescription":
+      "Selecione o plano perfeito para iniciar sua jornada de planejamento de refeições ",
 
     // Signin
     "signin.title": "Bem-vindo de Volta",
@@ -3188,7 +3432,7 @@ const translations = {
     "profile.plan": "Plano",
     "profile.active": "Ativo",
     "profile.cancelSubscription": "Cancelar Assinatura",
-    "profile.subscriptionDesc":"Limites e uso do seu plano atual",
+    "profile.subscriptionDesc": "Limites e uso do seu plano atual",
 
     // Meal Planner
     "mealPlanner.title": "Planejador de Refeições",
@@ -3328,7 +3572,8 @@ const translations = {
     "mealPlanCreator.cuisine.ecuadorian": "Ecuatoriana",
     "mealPlanCreator.cuisine.chinese": "China",
     "mealPlanCreator.cuisine.customCountry": "Adicionar Culinária de País",
-    "mealPlanCreator.cuisine.customCountryPlaceholder": "Digite um país para sua culinária (ex: Brasil, Marrocos)",
+    "mealPlanCreator.cuisine.customCountryPlaceholder":
+      "Digite um país para sua culinária (ex: Brasil, Marrocos)",
     "mealPlanCreator.generate.btn": "Gerar Plano com IA",
     "mealPlanCreator.generate.btnLoad": "Criando plano com IA...",
 
@@ -3419,6 +3664,100 @@ const translations = {
     "mealShopping.withinWeek": "Dentro de uma Semana",
     "mealShopping.ingredientCount": "ingredientes",
     "mealShopping.backToIngredients": "Voltar para Ingredientes",
+
+    //Checkout and cart
+    "mealPlanView.addToCart": "Adicionar ao carrinho",
+    "cart.checkout.proceedToCheckout": "Ir para o pagamento",
+    "cart.inCart": "no carrinho",
+
+    "checkout.steps.deliveryMethod": "Método de entrega",
+    "checkout.deliveryMethod.title":
+      "Como você gostaria de receber seu pedido?",
+    "checkout.deliveryMethod.subtitle":
+      "Selecione como você gostaria de receber seu pedido",
+
+    "checkout.steps.deliveryMethod.title": "Escolher método de entrega",
+    "checkout.deliveryMethod.delivery.title": "Entrega",
+    "checkout.deliveryMethod.delivery.description":
+      "Receba suas compras na porta da sua casa",
+    "checkout.deliveryMethod.delivery.fee": "Taxa de entrega",
+    "checkout.deliveryMethod.pickup.title": "Retirada",
+    "checkout.deliveryMethod.pickup.description": "Retire seu pedido na loja",
+    "checkout.deliveryMethod.pickup.fee": "Sem taxa de entrega",
+
+    "mealPlanView.addedToCart": "Adicionado ao carrinho",
+
+    "checkout.steps.storeSelection": "Seleção da loja",
+    "checkout.steps.address": "Endereço",
+    "checkout.steps.payment": "Pagamento",
+    "checkout.steps.summary": "Resumo",
+    "checkout.steps.confirmation": "Confirmação",
+
+    "checkout.storeSelection.title": "Selecionar loja",
+    "checkout.storeSelection.subtitle":
+      "Escolha sua loja preferida para retirada ou entrega",
+    "checkout.address.pickup.title": "Endereço de retirada",
+    "checkout.address.pickup.subtitle":
+      "Selecione o local da loja para retirada",
+    "checkout.payment.title": "Método de pagamento",
+    "checkout.payment.subtitle": "Escolha seu método de pagamento",
+    "checkout.payment.default": "Padrão",
+    "checkout.payment.expires": "Válido até",
+    "checkout.payment.addNew": "Adicionar novo método de pagamento",
+    "checkout.payment.form.name": "Nome no cartão",
+    "checkout.payment.form.number": "Número do cartão",
+    "checkout.payment.form.expiry": "Data de validade (MM/AA)",
+    "checkout.payment.form.cvc": "CVC",
+    "checkout.payment.form.save": "Salvar cartão",
+
+    "checkout.summary.title": "Resumo do pedido",
+    "checkout.summary.subtitle":
+      "Revise os detalhes do seu pedido antes de confirmar",
+    "checkout.summary.items": "Itens",
+    "checkout.summary.pickup": "Retirada",
+    "checkout.summary.pickupTime": "Hora da retirada",
+    "checkout.summary.payment": "Método de pagamento",
+    "checkout.summary.subtotal": "Subtotal",
+    "checkout.summary.serviceFee": "Taxa de serviço",
+    "checkout.summary.total": "Total",
+    "checkout.summary.processPayment": "Processar pagamento",
+    "checkout.payment.form.cvv": "CVV",
+    "checkout.summary.deliveryFee": "Taxa de entrega",
+    "checkout.summary.delivery": "Entrega",
+    "checkout.summary.deliveryTime": "Hora da entrega",
+
+    "checkout.confirmation.title": "Pedido confirmado!",
+    "checkout.confirmation.subtitle":
+      "Obrigado pelo seu pedido. Seu número de ordem é",
+    "checkout.confirmation.orderNumber": "Número do pedido",
+    "checkout.confirmation.estimatedPickup": "Hora estimada para retirada",
+    "checkout.confirmation.today": "Hoje às",
+    "checkout.confirmation.pickupLocation": "Local de retirada",
+    "checkout.confirmation.total": "Total pago",
+    "checkout.confirmation.items": "Itens do pedido",
+    "checkout.confirmation.nextSteps": "Próximos passos",
+    "checkout.confirmation.step1":
+      "Você receberá um e-mail de confirmação em breve.",
+    "checkout.confirmation.step2":
+      "Prepare-se para a retirada na loja selecionada.",
+    "checkout.confirmation.step3": "Aproveite suas compras!",
+    "checkout.confirmation.done": "Concluir",
+    "checkout.confirmation.estimatedDelivery": "Tempo estimado de entrega",
+    "checkout.confirmation.deliveryAddress": "Endereço de entrega",
+    "checkout.confirmation.thankYou": "Obrigado por escolher a Pantry!",
+
+    "checkout.address.delivery.title": "Endereço de entrega",
+    "checkout.address.delivery.subtitle":
+      "Informe o endereço onde deseja receber seu pedido",
+    "checkout.address.default": "Endereço padrão",
+    "checkout.address.addNew": "Adicionar novo endereço",
+    "checkout.address.form.street": "Rua",
+    "checkout.address.form.apartment": "Apartamento, sala, etc. (opcional)",
+    "checkout.address.form.state": "Estado/Província",
+    "checkout.address.form.city": "Cidade",
+    "checkout.address.form.zipCode": "CEP",
+    "checkout.address.form.country": "País",
+    "checkout.address.form.save": "Salvar endereço",
 
     // AI Meal Creator
     "aiMealCreator.createMealTitle": "Criar uma Refeição",
@@ -4066,8 +4405,10 @@ const translations = {
     "recipeView.mealCookedDesc": "Excelente trabalho completando esta receita!",
     "recipeView.mealUncookedDesc": "Status da receita atualizado com sucesso",
     "recipeView.updateError": "Atualização falhou",
-    "recipeView.updateErrorDesc": "Falha ao atualizar o status da receita. Tente novamente.",
-    "recipeView.missingDataError": "Informações do plano ou refeição em falta. Tente novamente a partir do plano de refeições.",
+    "recipeView.updateErrorDesc":
+      "Falha ao atualizar o status da receita. Tente novamente.",
+    "recipeView.missingDataError":
+      "Informações do plano ou refeição em falta. Tente novamente a partir do plano de refeições.",
     "recipeView.cookingProgress": "Progresso de Cozinha",
     "recipeView.of": "de",
     "recipeView.stepsCompleted": "passos concluídos",
@@ -4288,10 +4629,12 @@ const translations = {
     "addIngredient.addAllIngredients": "Adicionar Todos os Ingredientes",
     "addIngredient.addingAllIngredients": "Adicionando Todos...",
     "addIngredient.multipleTitle": "Adicionar Múltiplos Ingredientes",
-    "addIngredient.multipleDescription": "Adicione múltiplos ingredientes à sua despensa de uma vez",
+    "addIngredient.multipleDescription":
+      "Adicione múltiplos ingredientes à sua despensa de uma vez",
     "addIngredient.ingredient": "Ingrediente",
     "addIngredient.allIngredientsAdded": "Todos os ingredientes adicionados!",
-    "addIngredient.allIngredientsAddedDesc": "ingredientes foram adicionados à sua despensa.",
+    "addIngredient.allIngredientsAddedDesc":
+      "ingredientes foram adicionados à sua despensa.",
     "addIngredient.scanProduct": "Escanear Produto com Câmera",
     "addIngredient.productDetected": "Produto Adicionado!",
     "addIngredient.productDetectedDesc":
@@ -4360,37 +4703,47 @@ const translations = {
     "addIngredient.units.bag.value": "saco",
     "addIngredient.units.box.value": "caixa",
 
-     //IngredientTracker
+    //IngredientTracker
     "ingredientTracker.title": "Controle de Despensa",
-    "ingredientTracker.description": "Acompanhe seus ingredientes e suas datas de validade",
+    "ingredientTracker.description":
+      "Acompanhe seus ingredientes e suas datas de validade",
     "ingredientTracker.refresh": "Atualizar",
     "ingredientTracker.addIngredient": "Adicionar Ingrediente",
     "ingredientTracker.totalItems": "Total de Itens",
     "ingredientTracker.expiringSoon": "Vencendo em Breve",
     "ingredientTracker.categories": "Categorias",
     "ingredientTracker.lowStock": "Estoque Baixo",
-    "ingredientTracker.useFirst": "Use esses ingredientes primeiro para evitar desperdício",
+    "ingredientTracker.useFirst":
+      "Use esses ingredientes primeiro para evitar desperdício",
     "ingredientTracker.expired": "Vencido",
     "ingredientTracker.today": "Hoje",
     "ingredientTracker.allFresh": "Todos os ingredientes estão frescos!",
     "ingredientTracker.yourPantry": "Sua Despensa",
-    "ingredientTracker.organizedByCategory": "Todos os seus ingredientes organizados por categoria",
+    "ingredientTracker.organizedByCategory":
+      "Todos os seus ingredientes organizados por categoria",
     "ingredientTracker.searchPlaceholder": "Pesquisar ingredientes...",
     "ingredientTracker.noIngredientsFound": "Nenhum ingrediente encontrado",
-    "ingredientTracker.tryDifferentSearch": "Tente um termo de pesquisa diferente",
-    "ingredientTracker.pantryEmpty": "Sua despensa está vazia. Tente atualizar ou adicionar ingredientes.",
-    "ingredientTracker.startAdding": "Comece adicionando alguns ingredientes à sua despensa",
+    "ingredientTracker.tryDifferentSearch":
+      "Tente um termo de pesquisa diferente",
+    "ingredientTracker.pantryEmpty":
+      "Sua despensa está vazia. Tente atualizar ou adicionar ingredientes.",
+    "ingredientTracker.startAdding":
+      "Comece adicionando alguns ingredientes à sua despensa",
 
     //Welcome
     "welcome.message": "Bem-vindo ao Pantry!",
-    "welcome.subtitle": "Seu companheiro de cozinha inteligente está pronto para transformar sua experiência culinária.",
+    "welcome.subtitle":
+      "Seu companheiro de cozinha inteligente está pronto para transformar sua experiência culinária.",
     "welcome.aiMealPlanning": "Planejamento de refeições com IA",
-    "welcome.personalizedMeals": "Receba sugestões de refeições personalizadas com base em suas preferências e itens da despensa.",
+    "welcome.personalizedMeals":
+      "Receba sugestões de refeições personalizadas com base em suas preferências e itens da despensa.",
     "welcome.weeklyPlanning": "Planejamento semanal facilitado",
-    "welcome.smartPantry": "Use sua câmera para escanear ingredientes e adicioná-los automaticamente à sua despensa.",
+    "welcome.smartPantry":
+      "Use sua câmera para escanear ingredientes e adicioná-los automaticamente à sua despensa.",
     "welcome.trackProgress": "Acompanhe seu progresso",
-    "welcome.monitorGoals": "Monitore seus objetivos nutricionais e veja seus hábitos saudáveis crescerem ao longo do tempo",
-  
+    "welcome.monitorGoals":
+      "Monitore seus objetivos nutricionais e veja seus hábitos saudáveis crescerem ao longo do tempo",
+
     // Subscription
     "subscription.complete": "Conclua sua assinatura",
     "subscription.securePayment": "Processamento de pagamento seguro para",
