@@ -4,13 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Clock, Users, Heart, ChefHat, Leaf } from "lucide-react";
+import { Sparkles, Clock, Users, Heart, ChefHat, Leaf, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { generateMealsFromPantry } from "@/services/pantryService";
 import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCookingLoader } from "@/hooks/useCookingLoader";
 
 interface AIMealSuggestionsProps {
   ingredients: any[];
@@ -26,6 +27,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
   const { toast } = useToast();
   const { updatePantryFromIngredients, user, addFavoriteMeal, removeFavoriteMeal, isMealFavorite } = useUser();
   const { language } = useLanguage();
+  const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
 
   const generateSuggestions = async () => {
     if (!user?.id) {
@@ -39,6 +41,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
 
     setIsGenerating(true);
     setShowServingsModal(false);
+    showLoader("Creating delicious meal suggestions from your ingredients...");
     
     try {
       const today = new Date();
@@ -121,6 +124,7 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
       });
     } finally {
       setIsGenerating(false);
+      hideLoader();
     }
   };
 
@@ -140,8 +144,19 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
     }
   };
 
+  const handleMarkAsConsumed = (meal: any) => {
+    // TODO: Implement endpoint integration
+    toast({
+      title: "Marked as consumed!",
+      description: `${meal.name} has been marked as consumed.`,
+    });
+    setSelectedMealForDetails(null);
+  };
+
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-green-200">
+    <>
+      <LoaderComponent />
+      <Card className="bg-white/70 backdrop-blur-sm border-green-200">
       <CardHeader>
         <CardTitle className="flex items-center space-x-2 text-green-700">
           <Sparkles className="h-5 w-5" />
@@ -279,19 +294,19 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
 
       {/* Meal Details Dialog */}
       <Dialog open={!!selectedMealForDetails} onOpenChange={(open) => !open && setSelectedMealForDetails(null)}>
-        <DialogContent className="w-[95vw] max-w-3xl mx-auto max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl">{selectedMealForDetails?.name}</DialogTitle>
+        <DialogContent className="w-[95vw] max-w-4xl mx-auto max-h-[95vh] overflow-hidden flex flex-col">
+          <DialogHeader className="shrink-0 pb-4">
+            <DialogTitle className="text-lg sm:text-xl md:text-2xl pr-8">{selectedMealForDetails?.name}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[70vh] pr-4">
+          <ScrollArea className="flex-1 pr-2 sm:pr-4 -mr-2 sm:-mr-4">
             <div className="space-y-6">
               {/* Description */}
               <div>
-                <p className="text-sm text-muted-foreground">{selectedMealForDetails?.description}</p>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{selectedMealForDetails?.description}</p>
               </div>
 
               {/* Meal Info */}
-              <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
                 <div className="flex items-center space-x-2">
                   <Clock className="h-4 w-4 text-primary" />
                   <span>Prep Time: {selectedMealForDetails?.prepTime} min</span>
@@ -315,28 +330,28 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
               {/* Benefits */}
               {selectedMealForDetails?.benefits && (
                 <div>
-                  <h3 className="font-semibold mb-2 text-base">Health Benefits</h3>
-                  <p className="text-sm text-muted-foreground">{selectedMealForDetails.benefits}</p>
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">Health Benefits</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{selectedMealForDetails.benefits}</p>
                 </div>
               )}
 
               {/* Prep Tip */}
               {selectedMealForDetails?.prepTip && (
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <h3 className="font-semibold mb-1 text-sm text-blue-900">💡 Pro Tip</h3>
-                  <p className="text-sm text-blue-800">{selectedMealForDetails.prepTip}</p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-semibold mb-1 text-xs sm:text-sm text-blue-900 dark:text-blue-100">💡 Pro Tip</h3>
+                  <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 leading-relaxed">{selectedMealForDetails.prepTip}</p>
                 </div>
               )}
 
               {/* Ingredients */}
               {selectedMealForDetails?.ingredients && selectedMealForDetails.ingredients.length > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-3 text-base">Ingredients</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <h3 className="font-semibold mb-3 text-sm sm:text-base">Ingredients</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                     {selectedMealForDetails.ingredients.map((ing: any, index: number) => (
-                      <div key={index} className="flex items-center space-x-2 text-sm">
-                        <Badge variant="outline" className="shrink-0">{ing.quantity} {ing.unit}</Badge>
-                        <span className="capitalize">{ing.name}</span>
+                      <div key={index} className="flex items-center space-x-2 text-xs sm:text-sm">
+                        <Badge variant="outline" className="shrink-0 text-xs">{ing.quantity} {ing.unit}</Badge>
+                        <span className="capitalize truncate">{ing.name}</span>
                       </div>
                     ))}
                   </div>
@@ -346,23 +361,23 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
               {/* Nutritional Info */}
               {selectedMealForDetails?.nutritionalInfo && (
                 <div>
-                  <h3 className="font-semibold mb-3 text-base">Nutritional Information</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                  <h3 className="font-semibold mb-3 text-sm sm:text-base">Nutritional Information</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                    <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
                       <p className="text-xs text-muted-foreground">Calories</p>
-                      <p className="text-lg font-bold">{selectedMealForDetails.calories}</p>
+                      <p className="text-base sm:text-lg font-bold">{selectedMealForDetails.calories}</p>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                    <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
                       <p className="text-xs text-muted-foreground">Protein</p>
-                      <p className="text-lg font-bold">{selectedMealForDetails.nutritionalInfo.protein}g</p>
+                      <p className="text-base sm:text-lg font-bold">{selectedMealForDetails.nutritionalInfo.protein}g</p>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                    <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
                       <p className="text-xs text-muted-foreground">Carbs</p>
-                      <p className="text-lg font-bold">{selectedMealForDetails.nutritionalInfo.carbohydrates}g</p>
+                      <p className="text-base sm:text-lg font-bold">{selectedMealForDetails.nutritionalInfo.carbohydrates}g</p>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                    <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
                       <p className="text-xs text-muted-foreground">Fat</p>
-                      <p className="text-lg font-bold">{selectedMealForDetails.nutritionalInfo.fat}g</p>
+                      <p className="text-base sm:text-lg font-bold">{selectedMealForDetails.nutritionalInfo.fat}g</p>
                     </div>
                   </div>
                   {selectedMealForDetails.nutritionalInfo.vitamins && selectedMealForDetails.nutritionalInfo.vitamins.length > 0 && (
@@ -383,14 +398,14 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
               {/* Steps */}
               {selectedMealForDetails?.steps && selectedMealForDetails.steps.length > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-3 text-base">Cooking Instructions</h3>
-                  <ol className="space-y-3">
+                  <h3 className="font-semibold mb-3 text-sm sm:text-base">Cooking Instructions</h3>
+                  <ol className="space-y-3 sm:space-y-4">
                     {selectedMealForDetails.steps.map((step: string, index: number) => (
                       <li key={index} className="flex gap-3">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs sm:text-sm font-bold">
                           {index + 1}
                         </span>
-                        <span className="text-sm pt-0.5">{step}</span>
+                        <span className="text-xs sm:text-sm pt-0.5 sm:pt-1 leading-relaxed">{step}</span>
                       </li>
                     ))}
                   </ol>
@@ -398,10 +413,11 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
               )}
             </div>
           </ScrollArea>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="shrink-0 pt-4 gap-2 flex-col sm:flex-row">
             <Button
               variant="outline"
               onClick={() => setSelectedMealForDetails(null)}
+              className="w-full sm:w-auto order-3 sm:order-1"
             >
               Close
             </Button>
@@ -412,17 +428,27 @@ const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) =
                   handleAddToFavorites(selectedMealForDetails);
                 }
               }}
-              className={isMealFavorite(selectedMealForDetails?.id) 
-                ? "bg-red-500 hover:bg-red-600 text-white" 
-                : "border-red-300 text-red-700 hover:bg-red-50"}
+              className={`w-full sm:w-auto order-2 ${isMealFavorite(selectedMealForDetails?.id) ? "bg-red-500 hover:bg-red-600" : "border-red-300 text-red-700 hover:bg-red-50"}`}
             >
               <Heart className={`h-4 w-4 mr-2 ${isMealFavorite(selectedMealForDetails?.id) ? 'fill-current' : ''}`} />
-              {isMealFavorite(selectedMealForDetails?.id) ? 'Remove from Favorites' : 'Add to Favorites'}
+              {isMealFavorite(selectedMealForDetails?.id) ? 'Favorited' : 'Add to Favorites'}
+            </Button>
+            <Button
+              onClick={() => {
+                if (selectedMealForDetails) {
+                  handleMarkAsConsumed(selectedMealForDetails);
+                }
+              }}
+              className="bg-green-600 hover:bg-green-700 w-full sm:w-auto order-1 sm:order-3"
+            >
+              <Check className="h-4 w-4 mr-2" />
+              Mark as Consumed
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Card>
+      </Card>
+    </>
   );
 };
 
