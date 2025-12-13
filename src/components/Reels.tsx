@@ -80,6 +80,8 @@ const Reels = () => {
   const [showRecipeModal, setShowRecipeModal] = useState(false);
   const [loadedIds, setLoadedIds] = useState<Set<string>>(new Set());
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Initial load
   useEffect(() => {
@@ -184,6 +186,57 @@ const Reels = () => {
     });
   };
 
+  // Intersection Observer for auto-play
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const recipeId = entry.target.getAttribute('data-recipe-id');
+          if (!recipeId) return;
+
+          const video = videoRefs.current.get(recipeId);
+          if (!video) return;
+
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            // Video is in view - play it
+            if (playingVideo !== recipeId) {
+              // Pause currently playing video
+              if (playingVideo) {
+                const currentVideo = videoRefs.current.get(playingVideo);
+                currentVideo?.pause();
+              }
+              // Play new video (muted by default for autoplay)
+              video.muted = true;
+              setMutedVideos(prev => new Set(prev).add(recipeId));
+              video.play().catch(console.error);
+              setPlayingVideo(recipeId);
+            }
+          } else if (!entry.isIntersecting && playingVideo === recipeId) {
+            // Video left view - pause it
+            video.pause();
+            setPlayingVideo(null);
+          }
+        });
+      },
+      {
+        threshold: [0.6],
+        rootMargin: '0px'
+      }
+    );
+
+    // Observe all card elements
+    cardRefs.current.forEach((cardEl) => {
+      if (cardEl) {
+        observerRef.current?.observe(cardEl);
+      }
+    });
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [recipes, playingVideo]);
+
+  // Scroll event for infinite loading
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
@@ -273,7 +326,14 @@ const Reels = () => {
       {/* Recipe Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {recipes.map((recipe) => (
-          <Card key={recipe.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 bg-card/70 backdrop-blur-sm">
+          <Card 
+            key={recipe.id} 
+            ref={(el) => {
+              if (el) cardRefs.current.set(recipe.id, el);
+            }}
+            data-recipe-id={recipe.id}
+            className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 bg-card/70 backdrop-blur-sm"
+          >
             <div className="relative">
               {/* Video Thumbnail */}
               <div 
