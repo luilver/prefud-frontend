@@ -92,7 +92,7 @@ const Reels = () => {
         setLoadedIds(newIds);
         setRecipes(mappedRecipes);
         setMeta(response.meta);
-        setPage(response.meta.currentPage);
+        setPage(response.meta.currentPage); // API returns 1-based page
       } catch (error) {
         console.error('Error fetching initial reels:', error);
         toast({
@@ -113,11 +113,17 @@ const Reels = () => {
 
     setIsLoading(true);
     try {
-      const response = await getReelsPaginated(page, 8);
+      // API uses 0-based page index, so currentPage (1-based) equals next page index
+      const nextPageIndex = page;
+      console.log('Loading page:', nextPageIndex, 'Current page:', page, 'Has next:', meta?.hasNextPage);
+      
+      const response = await getReelsPaginated(nextPageIndex, 8);
       const mappedRecipes = response.data.map(mapReelToDisplayRecipe);
       
       // Filter out duplicates
       const newRecipes = mappedRecipes.filter(r => !loadedIds.has(r.id));
+      
+      console.log('Fetched recipes:', mappedRecipes.length, 'New recipes:', newRecipes.length);
       
       if (newRecipes.length > 0) {
         setLoadedIds(prev => {
