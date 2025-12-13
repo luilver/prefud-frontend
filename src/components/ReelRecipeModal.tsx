@@ -13,13 +13,13 @@ import {
   ShoppingCart, 
   X,
   Flame,
-  Timer
+  CheckSquare
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
+import { useAddToCart } from "@/hooks/useAddToCart";
 import MealShoppingModal from "./MealShoppingModal";
-import OrderOnlineModal from "./OrderOnlineModal";
 
 interface RecipeIngredient {
   name: string;
@@ -67,15 +67,26 @@ interface ReelRecipeModalProps {
 const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
   const { user, pantryItems, setPantryItems } = useUser();
 
-  if (!recipe) return null;
-
   // Use actual recipe data from API
-  const recipeIngredients = recipe.ingredients || [];
-  const recipeSteps = recipe.steps || [];
-  const recipeNutrition = recipe.nutritionalInfo || { protein: 0, fat: 0, carbohydrates: 0, fiber: 0 };
+  const recipeIngredients = recipe?.ingredients || [];
+  const recipeSteps = recipe?.steps || [];
+  const recipeNutrition = recipe?.nutritionalInfo || { protein: 0, fat: 0, carbohydrates: 0, fiber: 0 };
+
+  // Use the cart hook
+  const { handleAddToCart } = useAddToCart({
+    ingredients: recipeIngredients.map(ing => ({
+      name: ing.name,
+      quantity: ing.quantity,
+      unit: ing.unit,
+      category: ing.classification
+    })),
+    selectedIngredients,
+    onSuccess: () => setSelectedIngredients([])
+  });
+
+  if (!recipe) return null;
 
   const handleIngredientToggle = (ingredientName: string) => {
     setSelectedIngredients(prev => 
@@ -83,6 +94,14 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         ? prev.filter(name => name !== ingredientName)
         : [...prev, ingredientName]
     );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIngredients.length === recipeIngredients.length) {
+      setSelectedIngredients([]);
+    } else {
+      setSelectedIngredients(recipeIngredients.map(ing => ing.name));
+    }
   };
 
   const handleAddToPantry = async () => {
@@ -151,22 +170,12 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
     }
   };
 
-  const handleOrderOnline = () => {
-    setShowOrderModal(true);
-  };
-
-  const getSelectedIngredientsForOrder = () => {
-    return recipeIngredients
-      .filter(ingredient => selectedIngredients.includes(ingredient.name))
-      .map(ingredient => ({
-        id: `ingredient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        category: ingredient.classification || "ingredient",
-        estimatedPrice: Math.floor(Math.random() * 10) + 2,
-        mealName: recipe.title,
-      }));
+  const handleAddToCartClick = () => {
+    if (selectedIngredients.length === 0) {
+      toast.error("Please select ingredients to add to cart.");
+      return;
+    }
+    handleAddToCart();
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -235,9 +244,22 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                         <Package className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                         <span>Recipe Ingredients</span>
                       </div>
-                      <span className="text-xs sm:text-sm text-muted-foreground">
-                        {selectedIngredients.length} selected
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs sm:text-sm text-muted-foreground">
+                          {selectedIngredients.length}/{recipeIngredients.length}
+                        </span>
+                        {recipeIngredients.length > 0 && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleSelectAll}
+                            className="h-7 text-xs px-2"
+                          >
+                            <CheckSquare className="h-3 w-3 mr-1" />
+                            {selectedIngredients.length === recipeIngredients.length ? 'Deselect' : 'Select All'}
+                          </Button>
+                        )}
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0 space-y-3">
@@ -279,11 +301,11 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                           Add to Pantry ({selectedIngredients.length})
                         </Button>
                         <Button
-                          onClick={handleOrderOnline}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-9 sm:h-10"
+                          onClick={handleAddToCartClick}
+                          className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-9 sm:h-10"
                         >
                           <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                          Order Online ({selectedIngredients.length})
+                          Add to Cart ({selectedIngredients.length})
                         </Button>
                       </div>
                     )}
@@ -377,13 +399,6 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
         }}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
-      />
-
-      <OrderOnlineModal
-        isOpen={showOrderModal}
-        onClose={() => setShowOrderModal(false)}
-        items={getSelectedIngredientsForOrder()}
-        mealPlanName={recipe.title}
       />
     </>
   );
