@@ -46,17 +46,17 @@ const mapReelToDisplayRecipe = (reel: Reel): DisplayRecipe => {
     duration: `${reel.cookingTime} min`,
     difficulty,
     videoUrl: reel.videoUrl,
-    thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000',
+    thumbnail: reel.videoUrl, // Use video URL - browser will extract first frame via preload
     likes: reel.likes,
     isLiked: false,
     isSaved: false,
     description: reel.description,
     steps: reel.steps,
-    ingredients: reel.ingredientsList.map(ing => ({
+    ingredients: reel.ingredientsList?.map(ing => ({
       name: ing.name,
       quantity: ing.quantity,
       unit: ing.unit
-    })),
+    })) || [],
     calories: reel.calories,
     nutritionalInfo: reel.nutritionalInfo,
     prepTip: reel.prepTip,
@@ -282,11 +282,10 @@ const Reels = () => {
                       }}
                       src={recipe.videoUrl}
                       className="w-full h-full object-cover"
-                      muted={!mutedVideos.has(recipe.id) ? false : true}
+                      muted={mutedVideos.has(recipe.id)}
                       loop
                       playsInline
                       preload="metadata"
-                      poster={recipe.thumbnail}
                     />
                     {/* Play/Pause Overlay */}
                     <div className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity duration-300 ${playingVideo === recipe.id ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
