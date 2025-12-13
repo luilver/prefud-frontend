@@ -16,7 +16,7 @@ import {
   CheckSquare
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import MealShoppingModal from "./MealShoppingModal";
@@ -68,6 +68,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
   const { user, pantryItems, setPantryItems } = useUser();
+  const { toast } = useToast();
 
   // Use actual recipe data from API
   const recipeIngredients = recipe?.ingredients || [];
@@ -117,7 +118,11 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
       console.log('Ingredients to add:', ingredientsToAdd);
 
       if (ingredientsToAdd.length === 0) {
-        toast.error("No ingredients selected to add to pantry.");
+        toast({
+          title: "Error",
+          description: "No ingredients selected to add to pantry.",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -162,17 +167,28 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
       // Update local state (context) with the combined pantry items
       setPantryItems([...(pantryItems || []), ...newPantryItemsForState]);
       
-      toast.success(`Successfully added ${ingredientsToAdd.length} ingredients to pantry!`);
+      toast({
+        title: "Added to Pantry",
+        description: `Successfully added ${ingredientsToAdd.length} ingredient${ingredientsToAdd.length > 1 ? 's' : ''} to pantry!`,
+      });
       setSelectedIngredients([]);
     } catch (error) {
       console.error("Error adding to pantry:", error);
-      toast.error("Failed to add ingredients to pantry. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to add ingredients to pantry. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
   const handleAddToCartClick = () => {
     if (selectedIngredients.length === 0) {
-      toast.error("Please select ingredients to add to cart.");
+      toast({
+        title: "Error",
+        description: "Please select ingredients to add to cart.",
+        variant: "destructive"
+      });
       return;
     }
     handleAddToCart();
