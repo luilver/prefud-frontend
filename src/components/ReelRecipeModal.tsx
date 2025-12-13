@@ -21,6 +21,15 @@ import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantry
 import MealShoppingModal from "./MealShoppingModal";
 import OrderOnlineModal from "./OrderOnlineModal";
 
+interface RecipeIngredient {
+  name: string;
+  quantity: number;
+  unit: string;
+  classification?: string;
+  carbonFootPrintToWaste?: number;
+  daysToExpire?: number;
+}
+
 interface Recipe {
   id: string;
   title: string;
@@ -33,6 +42,20 @@ interface Recipe {
   isLiked: boolean;
   isSaved: boolean;
   description: string;
+  steps?: string[];
+  ingredients?: RecipeIngredient[];
+  calories?: number;
+  nutritionalInfo?: {
+    protein: number;
+    fat: number;
+    carbohydrates: number;
+    fiber: number;
+    vitamins?: string[];
+  };
+  prepTip?: string;
+  benefits?: string[];
+  mealType?: string;
+  servings?: number;
 }
 
 interface ReelRecipeModalProps {
@@ -49,31 +72,10 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
 
   if (!recipe) return null;
 
-  // Mock recipe data based on the recipe
-  const mockRecipeData = {
-    ingredients: [
-      { name: "Olive Oil", quantity: 2, unit: "tbsp", classification: "oil", carbonFootPrintToWaste: 0.1, daysToExpire: 90 },
-      { name: "Garlic", quantity: 3, unit: "cloves", classification: "vegetable", carbonFootPrintToWaste: 0.05, daysToExpire: 14 },
-      { name: "Onion", quantity: 1, unit: "medium", classification: "vegetable", carbonFootPrintToWaste: 0.08, daysToExpire: 21 },
-      { name: "Salt", quantity: 1, unit: "tsp", classification: "seasoning", carbonFootPrintToWaste: 0.01, daysToExpire: 365 },
-      { name: "Black Pepper", quantity: 0.5, unit: "tsp", classification: "seasoning", carbonFootPrintToWaste: 0.02, daysToExpire: 180 },
-    ],
-    instructions: [
-      "Heat olive oil in a large pan over medium heat",
-      "Add minced garlic and diced onion, cook until fragrant",
-      "Season with salt and pepper to taste",
-      "Continue cooking until ingredients are well combined",
-      "Serve hot and enjoy your delicious meal"
-    ],
-    nutrition: {
-      calories: 250,
-      protein: 8,
-      carbs: 15,
-      fat: 12,
-      fiber: 3,
-      sodium: 450
-    }
-  };
+  // Use actual recipe data from API
+  const recipeIngredients = recipe.ingredients || [];
+  const recipeSteps = recipe.steps || [];
+  const recipeNutrition = recipe.nutritionalInfo || { protein: 0, fat: 0, carbohydrates: 0, fiber: 0 };
 
   const handleIngredientToggle = (ingredientName: string) => {
     setSelectedIngredients(prev => 
@@ -86,10 +88,10 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   const handleAddToPantry = async () => {
     try {
       console.log('Selected ingredients:', selectedIngredients);
-      console.log('All available ingredients:', mockRecipeData.ingredients);
+      console.log('All available ingredients:', recipeIngredients);
 
       // Filter ingredients based on selection
-      const ingredientsToAdd = mockRecipeData.ingredients.filter(
+      const ingredientsToAdd = recipeIngredients.filter(
         ingredient => selectedIngredients.includes(ingredient.name)
       );
 
@@ -103,20 +105,21 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
       // Create new pantry items with the EXACT structure for the new endpoint
       const currentTime = new Date().toISOString();
       const newPantryItems: PantryIngredient[] = ingredientsToAdd.map(ingredient => {
-        const expiryDate = new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000).toISOString();
+        const daysToExpire = ingredient.daysToExpire || 30;
+        const expiryDate = new Date(Date.now() + daysToExpire * 24 * 60 * 60 * 1000).toISOString();
         
         return {
           id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           name: ingredient.name,
           quantity: ingredient.quantity,
           unit: ingredient.unit,
-          category: ingredient.classification,
+          category: ingredient.classification || 'other',
           purchased: true,
           purchaseDate: currentTime,
-          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
-          daysToExpire: ingredient.daysToExpire,
+          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste || 0.1,
+          daysToExpire: daysToExpire,
           expiryDate: expiryDate,
-          notes: `Carbon footprint:: ${ingredient.carbonFootPrintToWaste}`
+          notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste || 0.1}`
         };
       });
 
@@ -153,7 +156,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   };
 
   const getSelectedIngredientsForOrder = () => {
-    return mockRecipeData.ingredients
+    return recipeIngredients
       .filter(ingredient => selectedIngredients.includes(ingredient.name))
       .map(ingredient => ({
         id: `ingredient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -201,7 +204,7 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium">2 servings</span>
+                    <span className="font-medium">{recipe.servings || 2} servings</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 text-orange-600" />
@@ -243,27 +246,31 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid gap-3">
-                      {mockRecipeData.ingredients.map((ingredient, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <Checkbox
-                            id={`ingredient-${index}`}
-                            checked={selectedIngredients.includes(ingredient.name)}
-                            onCheckedChange={() => handleIngredientToggle(ingredient.name)}
-                          />
-                          <label
-                            htmlFor={`ingredient-${index}`}
-                            className="flex-1 cursor-pointer"
+                      {recipeIngredients.length > 0 ? (
+                        recipeIngredients.map((ingredient, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                           >
-                            <div className="font-medium">{ingredient.name}</div>
-                            <div className="text-sm text-gray-600">
-                              {ingredient.quantity} {ingredient.unit}
-                            </div>
-                          </label>
-                        </div>
-                      ))}
+                            <Checkbox
+                              id={`ingredient-${index}`}
+                              checked={selectedIngredients.includes(ingredient.name)}
+                              onCheckedChange={() => handleIngredientToggle(ingredient.name)}
+                            />
+                            <label
+                              htmlFor={`ingredient-${index}`}
+                              className="flex-1 cursor-pointer"
+                            >
+                              <div className="font-medium">{ingredient.name}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {ingredient.quantity} {ingredient.unit}
+                              </div>
+                            </label>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-4">No ingredients available</p>
+                      )}
                     </div>
 
                     {selectedIngredients.length > 0 && (
@@ -298,25 +305,23 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {mockRecipeData.instructions.map((instruction, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-800">{instruction}</p>
-                            <div className="mt-2 flex items-center gap-3 text-xs">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">
-                                <Timer className="h-3 w-3 mr-1" />
-                                ~{2 + (index % 5)} min
-                              </span>
+                      {recipeSteps.length > 0 ? (
+                        recipeSteps.map((instruction, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start space-x-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
+                              {index + 1}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-foreground">{instruction}</p>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-4">No instructions available</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -329,30 +334,32 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
                         <span className="font-medium">Calories</span>
-                        <span>{mockRecipeData.nutrition.calories}</span>
+                        <span className="text-primary font-bold">{recipe.calories || 0}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
                         <span>Protein</span>
-                        <span>{mockRecipeData.nutrition.protein}g</span>
+                        <span className="font-medium">{recipeNutrition.protein}g</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
                         <span>Carbs</span>
-                        <span>{mockRecipeData.nutrition.carbs}g</span>
+                        <span className="font-medium">{recipeNutrition.carbohydrates}g</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
                         <span>Fat</span>
-                        <span>{mockRecipeData.nutrition.fat}g</span>
+                        <span className="font-medium">{recipeNutrition.fat}g</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
                         <span>Fiber</span>
-                        <span>{mockRecipeData.nutrition.fiber}g</span>
+                        <span className="font-medium">{recipeNutrition.fiber}g</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Sodium</span>
-                        <span>{mockRecipeData.nutrition.sodium}mg</span>
-                      </div>
+                      {recipeNutrition.vitamins && recipeNutrition.vitamins.length > 0 && (
+                        <div className="flex justify-between p-3 bg-muted/50 rounded-lg col-span-2">
+                          <span>Vitamins</span>
+                          <span className="font-medium">{recipeNutrition.vitamins.join(', ')}</span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -365,7 +372,12 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
       <MealShoppingModal
         meal={{ 
           name: recipe.title, 
-          ingredientsList: mockRecipeData.ingredients 
+          ingredientsList: recipeIngredients.map(ing => ({
+            ...ing,
+            classification: ing.classification || 'other',
+            carbonFootPrintToWaste: ing.carbonFootPrintToWaste || 0.1,
+            daysToExpire: ing.daysToExpire || 30
+          }))
         }}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
