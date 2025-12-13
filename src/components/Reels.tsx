@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Bookmark, Play, Pause, Share2, ChefHat, Loader2, Eye, Clock, Flame } from "lucide-react";
+import { Heart, Bookmark, Play, Pause, Share2, ChefHat, Loader2, Eye, Clock, Flame, Volume2, VolumeX } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ReelRecipeModal from "./ReelRecipeModal";
 import { getReelsPaginated, Reel, ReelsMeta } from "@/services/reelsService";
@@ -19,7 +19,6 @@ interface DisplayRecipe {
   isLiked: boolean;
   isSaved: boolean;
   description: string;
-  // Extended fields from API
   steps?: string[];
   ingredients?: Array<{ name: string; quantity: number; unit: string }>;
   calories?: number;
@@ -36,7 +35,6 @@ interface DisplayRecipe {
 }
 
 const mapReelToDisplayRecipe = (reel: Reel): DisplayRecipe => {
-  // Determine difficulty based on cooking time
   let difficulty = 'Easy';
   if (reel.cookingTime > 60) difficulty = 'Hard';
   else if (reel.cookingTime > 30) difficulty = 'Medium';
@@ -48,7 +46,7 @@ const mapReelToDisplayRecipe = (reel: Reel): DisplayRecipe => {
     duration: `${reel.cookingTime} min`,
     difficulty,
     videoUrl: reel.videoUrl,
-    thumbnail: reel.videoUrl ? `${reel.videoUrl}#t=0.5` : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000',
+    thumbnail: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000',
     likes: reel.likes,
     isLiked: false,
     isSaved: false,
@@ -72,13 +70,16 @@ const Reels = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [recipes, setRecipes] = useState<DisplayRecipe[]>([]);
-  const [currentVideo, setCurrentVideo] = useState<string | null>(null);
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [meta, setMeta] = useState<ReelsMeta | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<DisplayRecipe | null>(null);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
+  const [loadedIds, setLoadedIds] = useState<Set<string>>(new Set());
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
 
   // Initial load
   useEffect(() => {
@@ -87,6 +88,8 @@ const Reels = () => {
         setIsInitialLoading(true);
         const response = await getReelsPaginated(0, 8);
         const mappedRecipes = response.data.map(mapReelToDisplayRecipe);
+        const newIds = new Set(mappedRecipes.map(r => r.id));
+        setLoadedIds(newIds);
         setRecipes(mappedRecipes);
         setMeta(response.meta);
         setPage(response.meta.currentPage);
@@ -113,7 +116,18 @@ const Reels = () => {
       const response = await getReelsPaginated(page, 8);
       const mappedRecipes = response.data.map(mapReelToDisplayRecipe);
       
-      setRecipes(prev => [...prev, ...mappedRecipes]);
+      // Filter out duplicates
+      const newRecipes = mappedRecipes.filter(r => !loadedIds.has(r.id));
+      
+      if (newRecipes.length > 0) {
+        setLoadedIds(prev => {
+          const updated = new Set(prev);
+          newRecipes.forEach(r => updated.add(r.id));
+          return updated;
+        });
+        setRecipes(prev => [...prev, ...newRecipes]);
+      }
+      
       setMeta(response.meta);
       setPage(response.meta.currentPage);
     } catch (error) {
@@ -126,7 +140,43 @@ const Reels = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, meta?.hasNextPage, page, toast]);
+  }, [isLoading, meta?.hasNextPage, page, loadedIds, toast]);
+
+  const toggleVideoPlay = (recipeId: string) => {
+    const video = videoRefs.current.get(recipeId);
+    if (!video) return;
+
+    if (playingVideo === recipeId) {
+      video.pause();
+      setPlayingVideo(null);
+    } else {
+      // Pause any currently playing video
+      if (playingVideo) {
+        const currentVideo = videoRefs.current.get(playingVideo);
+        currentVideo?.pause();
+      }
+      video.play().catch(console.error);
+      setPlayingVideo(recipeId);
+    }
+  };
+
+  const toggleMute = (recipeId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRefs.current.get(recipeId);
+    if (!video) return;
+
+    setMutedVideos(prev => {
+      const updated = new Set(prev);
+      if (updated.has(recipeId)) {
+        updated.delete(recipeId);
+        video.muted = false;
+      } else {
+        updated.add(recipeId);
+        video.muted = true;
+      }
+      return updated;
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -220,21 +270,50 @@ const Reels = () => {
           <Card key={recipe.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 bg-card/70 backdrop-blur-sm">
             <div className="relative">
               {/* Video Thumbnail */}
-              <div className="relative aspect-[9/16] overflow-hidden rounded-t-lg bg-muted">
+              <div 
+                className="relative aspect-[9/16] overflow-hidden rounded-t-lg bg-muted cursor-pointer"
+                onClick={() => recipe.videoUrl && toggleVideoPlay(recipe.id)}
+              >
                 {recipe.videoUrl ? (
-                  <video 
-                    src={recipe.videoUrl}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    onMouseEnter={(e) => e.currentTarget.play()}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.pause();
-                      e.currentTarget.currentTime = 0;
-                    }}
-                  />
+                  <>
+                    <video 
+                      ref={(el) => {
+                        if (el) videoRefs.current.set(recipe.id, el);
+                      }}
+                      src={recipe.videoUrl}
+                      className="w-full h-full object-cover"
+                      muted={!mutedVideos.has(recipe.id) ? false : true}
+                      loop
+                      playsInline
+                      preload="metadata"
+                      poster={recipe.thumbnail}
+                    />
+                    {/* Play/Pause Overlay */}
+                    <div className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity duration-300 ${playingVideo === recipe.id ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
+                      <div className="rounded-full w-16 h-16 bg-white/90 flex items-center justify-center shadow-lg">
+                        {playingVideo === recipe.id ? (
+                          <Pause className="h-6 w-6 text-black" />
+                        ) : (
+                          <Play className="h-6 w-6 text-black ml-1" />
+                        )}
+                      </div>
+                    </div>
+                    {/* Mute Button */}
+                    {playingVideo === recipe.id && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="absolute bottom-3 left-3 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border-0 z-10"
+                        onClick={(e) => toggleMute(recipe.id, e)}
+                      >
+                        {mutedVideos.has(recipe.id) ? (
+                          <VolumeX className="h-4 w-4" />
+                        ) : (
+                          <Volume2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                  </>
                 ) : (
                   <img 
                     src={recipe.thumbnail} 
@@ -242,21 +321,6 @@ const Reels = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 )}
-                
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button 
-                    size="lg" 
-                    className="rounded-full w-16 h-16 bg-white/90 hover:bg-white text-black hover:text-black shadow-lg"
-                    onClick={() => setCurrentVideo(currentVideo === recipe.id ? null : recipe.id)}
-                  >
-                    {currentVideo === recipe.id ? (
-                      <Pause className="h-6 w-6" />
-                    ) : (
-                      <Play className="h-6 w-6 ml-1" />
-                    )}
-                  </Button>
-                </div>
 
                 {/* Duration Badge */}
                 <div className="absolute top-3 left-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1">
