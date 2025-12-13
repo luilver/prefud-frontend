@@ -181,76 +181,72 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span className="text-xl font-bold">{recipe.title}</span>
-              <Button variant="ghost" size="sm" onClick={onClose}>
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] overflow-y-auto p-4 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center justify-between gap-2">
+              <span className="text-base sm:text-xl font-bold line-clamp-2 pr-2">{recipe.title}</span>
+              <Button variant="ghost" size="sm" onClick={onClose} className="flex-shrink-0">
                 <X className="h-4 w-4" />
               </Button>
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Recipe Header */}
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1">
-                <p className="text-muted-foreground mb-4">{recipe.description}</p>
-                
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-purple-600" />
-                    <span className="font-medium">{recipe.duration}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium">{recipe.servings || 2} servings</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <ChefHat className="h-4 w-4 text-orange-600" />
-                    <Badge className={getDifficultyColor(recipe.difficulty)}>
-                      {recipe.difficulty}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
+            <div className="flex flex-col gap-3">
+              <p className="text-sm sm:text-base text-muted-foreground line-clamp-3">{recipe.description}</p>
               
-              <div className="w-full lg:w-48 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
-                <img 
-                  src={recipe.thumbnail} 
-                  alt={recipe.title}
-                  className="w-full h-full object-cover rounded-lg"
-                />
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
+                  <span className="font-medium">{recipe.duration}</span>
+                </div>
+                <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                  <span className="font-medium">{recipe.servings || 2} servings</span>
+                </div>
+                <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                  <ChefHat className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+                  <Badge className={`text-xs ${getDifficultyColor(recipe.difficulty)}`}>
+                    {recipe.difficulty}
+                  </Badge>
+                </div>
+                {recipe.calories && (
+                  <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                    <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
+                    <span className="font-medium">{recipe.calories} cal</span>
+                  </div>
+                )}
               </div>
             </div>
 
             <Tabs defaultValue="ingredients" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
-                <TabsTrigger value="instructions">Instructions</TabsTrigger>
-                <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 h-auto">
+                <TabsTrigger value="ingredients" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Ingredients</TabsTrigger>
+                <TabsTrigger value="instructions" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Instructions</TabsTrigger>
+                <TabsTrigger value="nutrition" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Nutrition</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="ingredients" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
+              <TabsContent value="ingredients" className="space-y-3 mt-3">
+                <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+                  <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-4">
+                    <CardTitle className="flex items-center justify-between text-sm sm:text-base">
                       <div className="flex items-center space-x-2">
-                        <Package className="h-5 w-5 text-blue-600" />
+                        <Package className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                         <span>Recipe Ingredients</span>
                       </div>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-xs sm:text-sm text-muted-foreground">
                         {selectedIngredients.length} selected
                       </span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-3">
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0 space-y-3">
+                    <div className="grid gap-2 max-h-[30vh] overflow-y-auto">
                       {recipeIngredients.length > 0 ? (
                         recipeIngredients.map((ingredient, index) => (
                           <div
                             key={index}
-                            className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                            className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                           >
                             <Checkbox
                               id={`ingredient-${index}`}
@@ -259,34 +255,34 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                             />
                             <label
                               htmlFor={`ingredient-${index}`}
-                              className="flex-1 cursor-pointer"
+                              className="flex-1 cursor-pointer min-w-0"
                             >
-                              <div className="font-medium">{ingredient.name}</div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="font-medium text-sm truncate">{ingredient.name}</div>
+                              <div className="text-xs text-muted-foreground">
                                 {ingredient.quantity} {ingredient.unit}
                               </div>
                             </label>
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted-foreground text-center py-4">No ingredients available</p>
+                        <p className="text-muted-foreground text-center py-4 text-sm">No ingredients available</p>
                       )}
                     </div>
 
                     {selectedIngredients.length > 0 && (
-                      <div className="flex gap-3 pt-4 border-t">
+                      <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
                         <Button
                           onClick={handleAddToPantry}
-                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-xs sm:text-sm h-9 sm:h-10"
                         >
-                          <Package className="h-4 w-4 mr-2" />
+                          <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           Add to Pantry ({selectedIngredients.length})
                         </Button>
                         <Button
                           onClick={handleOrderOnline}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-9 sm:h-10"
                         >
-                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           Order Online ({selectedIngredients.length})
                         </Button>
                       </div>
@@ -295,67 +291,67 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="instructions">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Flame className="h-5 w-5 text-orange-600" />
+              <TabsContent value="instructions" className="mt-3">
+                <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+                  <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-4">
+                    <CardTitle className="flex items-center space-x-2 text-sm sm:text-base">
+                      <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                       <span>Cooking Instructions</span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                    <div className="space-y-2 sm:space-y-3 max-h-[40vh] overflow-y-auto">
                       {recipeSteps.length > 0 ? (
                         recipeSteps.map((instruction, index) => (
                           <div
                             key={index}
-                            className="flex items-start space-x-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                            className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                           >
-                            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold flex-shrink-0">
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                               {index + 1}
                             </div>
-                            <div className="flex-1">
-                              <p className="text-foreground">{instruction}</p>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-foreground text-xs sm:text-sm">{instruction}</p>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted-foreground text-center py-4">No instructions available</p>
+                        <p className="text-muted-foreground text-center py-4 text-sm">No instructions available</p>
                       )}
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="nutrition">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Nutrition Facts</CardTitle>
+              <TabsContent value="nutrition" className="mt-3">
+                <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+                  <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-4">
+                    <CardTitle className="text-sm sm:text-base">Nutrition Facts</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span className="font-medium">Calories</span>
                         <span className="text-primary font-bold">{recipe.calories || 0}</span>
                       </div>
-                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Protein</span>
                         <span className="font-medium">{recipeNutrition.protein}g</span>
                       </div>
-                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Carbs</span>
                         <span className="font-medium">{recipeNutrition.carbohydrates}g</span>
                       </div>
-                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Fat</span>
                         <span className="font-medium">{recipeNutrition.fat}g</span>
                       </div>
-                      <div className="flex justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Fiber</span>
                         <span className="font-medium">{recipeNutrition.fiber}g</span>
                       </div>
                       {recipeNutrition.vitamins && recipeNutrition.vitamins.length > 0 && (
-                        <div className="flex justify-between p-3 bg-muted/50 rounded-lg col-span-2">
+                        <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg col-span-2 text-xs sm:text-sm">
                           <span>Vitamins</span>
                           <span className="font-medium">{recipeNutrition.vitamins.join(', ')}</span>
                         </div>
