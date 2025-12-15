@@ -158,8 +158,6 @@ export const en = {
   "signin": {
     "title": "Sign In",
     "subtitle": "Enter your credentials to access your account",
-    "welcome": "Welcome Back",
-    "welcomeSubtitle": "Your healthy kitchen awaits",
     "email": "Email",
     "email.placeholder": "Enter your email",
     "password": "Password",
