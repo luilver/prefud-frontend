@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign, Globe, ArrowLeft } from "lucide-react";
+import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign, Globe, ArrowLeft, Utensils } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -330,35 +330,68 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      <LoaderComponent />
+    <div 
+      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+      }}
+    >
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-emerald-900/40" />
       
-      {/* Success Modal */}
-      <MealPlanSuccessModal
-        isOpen={showSuccessModal}
-        onClose={handleSuccessModalClose}
-        onViewPlan={handleViewSuccessPlan}
-        mealPlan={createdPlan ? {
-          name: createdPlan.name || planName,
-          numberOfDays: numberOfDays,
-          numberOfPersons: numberOfPersons,
-          mealsPerDay: mealsPerDay
-        } : undefined}
-      />
-      
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <h2 className="text-2xl font-bold text-gray-800">{t('mealPlanCreator.title') || 'Create AI Meal Plan'}</h2>
-        <div></div>
-      </div>
+      <div className="relative z-10 min-h-screen py-6 px-4">
+        <LoaderComponent />
+        
+        {/* Success Modal */}
+        <MealPlanSuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleSuccessModalClose}
+          onViewPlan={handleViewSuccessPlan}
+          mealPlan={createdPlan ? {
+            name: createdPlan.name || planName,
+            numberOfDays: numberOfDays,
+            numberOfPersons: numberOfPersons,
+            mealsPerDay: mealsPerDay
+          } : undefined}
+        />
+        
+        {/* Header */}
+        <div className="max-w-6xl mx-auto mb-6">
+          <div className="flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              onClick={onBack}
+              className="text-white/90 hover:text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center space-x-2">
+              <Utensils className="h-6 w-6 text-emerald-400" />
+              <span className="text-xl font-bold text-white">Pantry</span>
+            </div>
+            <div className="w-10" /> {/* Spacer for centering */}
+          </div>
+        </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Plan Details */}
-        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
+        {/* Main Content */}
+        <div className="max-w-6xl mx-auto">
+          <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 rounded-2xl overflow-hidden mb-6">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-amber-50 border-b border-emerald-100">
+              <CardTitle className="text-emerald-800 flex items-center space-x-2">
+                <Sparkles className="h-5 w-5" />
+                <span>{t('mealPlanCreator.title') || 'Create AI Meal Plan'}</span>
+              </CardTitle>
+              <CardDescription>
+                {t('mealPlanCreator.setUpYourMeal') || 'Set up your meal planning preferences'}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Plan Details */}
+            <Card className="bg-white/95 backdrop-blur-md shadow-xl border-0 rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-purple-700">{t('mealPlanCreator.planDetails') || 'Plan Details'}</CardTitle>
+            <CardTitle className="text-emerald-700">{t('mealPlanCreator.planDetails') || 'Plan Details'}</CardTitle>
             <CardDescription>
               {t('mealPlanCreator.setUpYourMeal') || 'Set up your meal planning preferences'}
             </CardDescription>
@@ -371,7 +404,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 placeholder={t('mealPlanCreator.planNamePlaceholder') || 'e.g., Weekly Healthy Meals'}
                 value={planName}
                 onChange={(e) => setPlanName(e.target.value)}
-                className="border-purple-200 focus:border-purple-400"
+                className="border-emerald-200 focus:border-emerald-400"
               />
             </div>
 
@@ -382,7 +415,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 placeholder={t('mealPlanCreator.planDescriptionPlaceholder') || 'Describe your meal plan goals or preferences...'}
                 value={planDescription}
                 onChange={(e) => setPlanDescription(e.target.value)}
-                className="border-purple-200 focus:border-purple-400"
+                className="border-emerald-200 focus:border-emerald-400"
                 rows={2}
               />
             </div>
@@ -394,7 +427,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="border-purple-200 focus:border-purple-400"
+                className="border-emerald-200 focus:border-emerald-400"
               />
             </div>
 
@@ -408,7 +441,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   max="30"
                   value={numberOfDays}
                   onChange={(e) => setNumberOfDays(parseInt(e.target.value) || 1)}
-                  className="border-purple-200 focus:border-purple-400"
+                  className="border-emerald-200 focus:border-emerald-400"
                 />
               </div>
               <div>
@@ -420,7 +453,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   max="10"
                   value={numberOfPersons}
                   onChange={(e) => setNumberOfPersons(parseInt(e.target.value) || 1)}
-                  className="border-purple-200 focus:border-purple-400"
+                  className="border-emerald-200 focus:border-emerald-400"
                 />
               </div>
               <div>
@@ -432,7 +465,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   max="10"
                   value={numberOfKidsLessThan5}
                   onChange={(e) => setNumberOfKidsLessThan5(parseInt(e.target.value) || 0)}
-                  className="border-purple-200 focus:border-purple-400"
+                  className="border-emerald-200 focus:border-emerald-400"
                 />
               </div>
               <div>
@@ -444,7 +477,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   max="10"
                   value={numberFrom5to12}
                   onChange={(e) => setNumberFrom5to12(parseInt(e.target.value) || 0)}
-                  className="border-purple-200 focus:border-purple-400"
+                  className="border-emerald-200 focus:border-emerald-400"
                 />
               </div>
               <div>
@@ -456,20 +489,20 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
                   max="6"
                   value={mealsPerDay}
                   onChange={(e) => setMealsPerDay(parseInt(e.target.value) || 3)}
-                  className="border-purple-200 focus:border-purple-400"
+                  className="border-emerald-200 focus:border-emerald-400"
                 />
               </div>
             </div>
 
             {startDate && (
-              <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                <p className="text-sm text-purple-700">
+              <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                <p className="text-sm text-emerald-700">
                   <strong>{t('mealPlanCreator.planDuration') || 'Plan Duration'}:</strong> {new Date(startDate).toLocaleDateString()} - {new Date(calculateEndDate(startDate, numberOfDays)).toLocaleDateString()}
                 </p>
-                <p className="text-xs text-purple-600 mt-1">
+                <p className="text-xs text-emerald-600 mt-1">
                   {numberOfDays} {t('mealPlanner.day') || 'day'}{numberOfDays > 1 ? 's' : ''} • {numberOfPersons} {t('mealPlanCreator.person') || 'person'}{numberOfPersons > 1 ? 's' : ''} • {mealsPerDay} {t('mealPlanCreator.meal') || 'meal'}{mealsPerDay > 1 ? 's' : ''} {t('mealPlanCreator.perDay') || 'per day'}
                 </p>
-                <p className="text-xs text-purple-600 mt-1 flex items-center gap-1">
+                <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
                   <Globe className="h-3 w-3" />
                   <strong>{t('mealPlanCreator.language') || 'Language'}:</strong> {getLanguageDisplayName(language)}
                 </p>
@@ -479,7 +512,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         </Card>
 
         {/* Dietary Preferences */}
-        <Card className="bg-white/70 backdrop-blur-sm border-green-200">
+        <Card className="bg-white/95 backdrop-blur-md shadow-xl border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="text-green-700">{t('mealPlanCreator.dietary.title') || 'Dietary Preferences'}</CardTitle>
             <CardDescription>
@@ -562,7 +595,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         </Card>
 
         {/* Cuisine Preferences */}
-        <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
+        <Card className="bg-white/95 backdrop-blur-md shadow-xl border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="text-orange-700 flex items-center gap-2">
               <ChefHat className="h-5 w-5" />
@@ -593,7 +626,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         </Card>
 
         {/* Cooking Preferences */}
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
+        <Card className="bg-white/95 backdrop-blur-md shadow-xl border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="text-blue-700 flex items-center gap-2">
               <Clock className="h-5 w-5" />
@@ -670,7 +703,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
         </Card>
 
         {/* Food Dislikes */}
-        <Card className="bg-white/70 backdrop-blur-sm border-red-200">
+        <Card className="bg-white/95 backdrop-blur-md shadow-xl border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="text-red-700">{t('mealPlanCreator.dislike.title') || 'Food Dislikes'}</CardTitle>
             <CardDescription>
@@ -719,31 +752,33 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
           </CardContent>
         </Card>
 
-        {/* Generate Button */}
-        <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
-          <CardHeader>
-            <CardTitle className="text-orange-700">{t('mealPlanCreator.generate.title') || 'Generate Your Plan'}</CardTitle>
-            <CardDescription>
-              {t('mealPlanCreator.generate.desc') || 'Create a personalized meal plan with AI'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={generateMealPlan}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg py-6"
-            >
-              <Sparkles className="h-5 w-5 mr-2" />
-              {t('mealPlanCreator.generate.button') || 'Generate AI Meal Plan'}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Generate Button */}
+          <Card className="bg-white/95 backdrop-blur-md shadow-xl border-0 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-emerald-700">{t('mealPlanCreator.generate.title') || 'Generate Your Plan'}</CardTitle>
+              <CardDescription>
+                {t('mealPlanCreator.generate.desc') || 'Create a personalized meal plan with AI'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={generateMealPlan}
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-lg py-6 text-white"
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                {t('mealPlanCreator.generate.button') || 'Generate AI Meal Plan'}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
 
-      <SubscriptionUpgradeModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureType="plans"
-      />
+        <SubscriptionUpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          featureType="plans"
+        />
+        </div>
+      </div>
     </div>
   );
 };
