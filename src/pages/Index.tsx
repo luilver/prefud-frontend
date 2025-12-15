@@ -138,74 +138,103 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden min-h-[90vh] flex items-center">
+      <div className="relative overflow-hidden min-h-[85vh] md:min-h-[90vh] flex items-center">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-secondary/50"></div>
           
-          {/* Floating food elements */}
-          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-accent/10 blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-40 right-20 w-48 h-48 rounded-full bg-gradient-to-br from-accent/20 to-primary/10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full bg-gradient-to-br from-primary/15 to-transparent blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          {/* Floating food elements - adjusted for mobile */}
+          <div className="absolute top-10 left-5 md:top-20 md:left-10 w-20 h-20 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-primary/20 to-accent/10 blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-5 md:bottom-40 md:right-20 w-28 h-28 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-accent/20 to-primary/10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/4 md:left-1/3 w-16 h-16 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary/15 to-transparent blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
         
-        <div className="relative z-10 container mx-auto px-4 py-16 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 container mx-auto px-4 py-8 md:py-16 lg:py-24">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
-            <div className="text-left space-y-8">
-              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary/15 to-accent/15 text-primary px-5 py-2.5 rounded-full border border-primary/25 backdrop-blur-sm animate-fade-in">
-                <ChefHat className="h-4 w-4" />
-                <span className="text-sm font-semibold tracking-wide">AI-Powered Culinary Experience</span>
+            <div className="text-center lg:text-left space-y-5 md:space-y-8">
+              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary/15 to-accent/15 text-primary px-3 py-2 md:px-5 md:py-2.5 rounded-full border border-primary/25 backdrop-blur-sm animate-fade-in">
+                <ChefHat className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                <span className="text-xs md:text-sm font-semibold tracking-wide">AI-Powered Culinary Experience</span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.1] animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.15] animate-fade-in" style={{ animationDelay: '0.1s' }}>
                 Discover the
-                <span className="block mt-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_ease-in-out_infinite]">
+                <span className="block mt-1 md:mt-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_ease-in-out_infinite]">
                   Art of Cooking
                 </span>
               </h1>
               
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-xl leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 Transform your kitchen into a culinary haven. Our AI creates personalized meal plans, reduces food waste, and helps you cook like a professional chef.
               </p>
+
+              {/* Mobile Image Showcase */}
+              <div className="lg:hidden relative mx-auto max-w-sm animate-fade-in" style={{ animationDelay: '0.25s' }}>
+                <div className="absolute -inset-3 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl opacity-60"></div>
+                <div className="relative rounded-2xl overflow-hidden shadow-xl border border-white/10">
+                  <img 
+                    src="https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=800&auto=format&fit=crop" 
+                    alt="Delicious gourmet cuisine" 
+                    className="w-full h-48 sm:h-56 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent"></div>
+                </div>
+                
+                {/* Mobile Floating Stats */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-3">
+                  <div className="bg-card/95 backdrop-blur-xl rounded-xl px-3 py-2 shadow-lg border border-border/50">
+                    <div className="flex items-center space-x-2">
+                      <Leaf className="h-4 w-4 text-green-500" />
+                      <span className="text-xs font-bold text-foreground">2.5kg CO₂</span>
+                    </div>
+                  </div>
+                  <div className="bg-card/95 backdrop-blur-xl rounded-xl px-3 py-2 shadow-lg border border-border/50">
+                    <div className="flex items-center space-x-2">
+                      <Timer className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-bold text-foreground">15 min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <Link to="/signup">
-                  <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold px-8 py-6 text-lg shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105 group">
-                    <Sparkles className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start animate-fade-in pt-4 lg:pt-0" style={{ animationDelay: '0.3s' }}>
+                <Link to="/signup" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold px-6 md:px-8 py-5 md:py-6 text-base md:text-lg shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105 group">
+                    <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5 group-hover:animate-pulse" />
                     {t('home.cta.primary')}
                   </Button>
                 </Link>
-                <Link to="/why-pantry">
-                  <Button variant="outline" size="lg" className="border-2 border-primary/40 text-foreground hover:bg-primary/10 hover:border-primary/60 font-semibold px-8 py-6 text-lg backdrop-blur-sm transition-all duration-300 hover:scale-105">
+                <Link to="/why-pantry" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-primary/40 text-foreground hover:bg-primary/10 hover:border-primary/60 font-semibold px-6 md:px-8 py-5 md:py-6 text-base md:text-lg backdrop-blur-sm transition-all duration-300 hover:scale-105">
                     Learn More
                   </Button>
                 </Link>
               </div>
 
               {/* Trust Badges */}
-              <div className="flex flex-wrap items-center gap-6 pt-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-                  <Users className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">10k+ Chefs</span>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 md:gap-6 pt-2 md:pt-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <div className="flex items-center space-x-1.5 md:space-x-2 bg-card/50 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-border/50">
+                  <Users className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
+                  <span className="text-xs md:text-sm font-medium text-foreground">10k+ Chefs</span>
                 </div>
-                <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-                  <div className="flex -space-x-1">
+                <div className="flex items-center space-x-1.5 md:space-x-2 bg-card/50 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-border/50">
+                  <div className="flex -space-x-0.5 md:-space-x-1">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+                      <Star key={i} className="h-3 w-3 md:h-3.5 md:w-3.5 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <span className="text-sm font-medium text-foreground">4.9 Rating</span>
+                  <span className="text-xs md:text-sm font-medium text-foreground">4.9</span>
                 </div>
-                <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-                  <Shield className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Secure</span>
+                <div className="flex items-center space-x-1.5 md:space-x-2 bg-card/50 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-border/50">
+                  <Shield className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
+                  <span className="text-xs md:text-sm font-medium text-foreground">Secure</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Content - Cuisine Showcase */}
+            {/* Right Content - Cuisine Showcase (Desktop only) */}
             <div className="relative hidden lg:block animate-fade-in" style={{ animationDelay: '0.3s' }}>
               {/* Main Image */}
               <div className="relative">
@@ -263,7 +292,7 @@ const Index = () => {
         </div>
         
         {/* Decorative bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 md:h-24 bg-gradient-to-t from-background to-transparent"></div>
       </div>
 
       {/* Features Section */}
