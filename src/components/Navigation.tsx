@@ -52,7 +52,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   if (isMobile) {
     // Mobile Bottom Tab Navigation
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-green-200/60 shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-t border-emerald-500/30 shadow-2xl">
         <div className="flex justify-around items-center py-2 px-2">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -64,8 +64,10 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 variant="ghost"
                 onClick={() => onTabChange(item.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1",
-                  getButtonStyles(item, isActive)
+                  "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1 rounded-xl transition-all duration-300",
+                  isActive 
+                    ? "bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30" 
+                    : "text-emerald-200/80 hover:bg-emerald-700/40 hover:text-white"
                 )}
               >
                 <Icon className="h-6 w-6" />
@@ -80,31 +82,31 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   // Desktop Sidebar Navigation with collapse functionality
   return (
     <nav className={cn(
-      "fixed left-0 top-0 h-full bg-white/90 backdrop-blur-md border-r border-green-200/60 shadow-lg z-40 flex flex-col transition-all duration-300",
+      "fixed left-0 top-0 h-full bg-gradient-to-b from-emerald-900 via-emerald-800 to-teal-900 backdrop-blur-md border-r border-emerald-500/30 shadow-2xl z-40 flex flex-col transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Sidebar Header - aligned with dashboard header height */}
       <div className={cn(
-        "border-b border-green-200/60 transition-all duration-300 h-20 flex items-center",
+        "border-b border-emerald-500/30 transition-all duration-300 h-20 flex items-center",
         isCollapsed ? "px-3 justify-center" : "px-6 justify-between"
       )}>
         {isCollapsed ? (
           <div className="flex justify-center">
-            <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+            <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg shadow-lg shadow-emerald-500/30">
               <CookingPot className="h-6 w-6 text-white" />
             </div>
           </div>
         ) : (
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-green-500 to-orange-500 rounded-lg">
+              <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg shadow-lg shadow-emerald-500/30">
                 <CookingPot className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold bg-gradient-to-r from-green-700 to-orange-600 bg-clip-text text-transparent">
+                <h2 className="text-lg font-bold text-white">
                   Pantry
                 </h2>
-                <p className="text-sm text-green-600/80">Smart Kitchen</p>
+                <p className="text-sm text-emerald-300/80">Smart Kitchen</p>
               </div>
             </div>
           </div>
@@ -120,14 +122,16 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
           return (
             <Button
               key={item.id}
-              variant={isActive ? "default" : "ghost"}
+              variant="ghost"
               onClick={() => onTabChange(item.id)}
               className={cn(
-                "transition-all duration-200 rounded-lg",
+                "transition-all duration-300 rounded-xl",
                 isCollapsed 
                   ? "w-full h-12 px-0 justify-center" 
                   : "w-full justify-start h-12 px-4",
-                getButtonStyles(item, isActive)
+                isActive 
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30" 
+                  : "text-emerald-200/80 hover:bg-emerald-700/40 hover:text-white"
               )}
               title={isCollapsed ? item.label : undefined}
             >
@@ -141,24 +145,24 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
       {/* Kitchen Decoration - moved up */}
       {!isCollapsed && (
         <div className="p-4">
-          <div className="flex items-center justify-center space-x-2 text-green-500/30">
-            <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-orange-300/40 rounded-full animate-pulse delay-500"></div>
-            <div className="w-2 h-2 bg-green-300/40 rounded-full animate-pulse delay-1000"></div>
+          <div className="flex items-center justify-center space-x-2">
+            <div className="w-2 h-2 bg-emerald-400/60 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-teal-400/60 rounded-full animate-pulse delay-500"></div>
+            <div className="w-2 h-2 bg-emerald-400/60 rounded-full animate-pulse delay-1000"></div>
           </div>
         </div>
       )}
 
       {/* Collapse/Expand Toggle - moved to bottom */}
       <div className={cn(
-        "border-t border-green-200/60",
+        "border-t border-emerald-500/30",
         isCollapsed ? "p-2" : "p-4"
       )}>
         <Button
           variant="ghost"
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            "text-green-700 hover:bg-green-100/60 transition-all duration-200",
+            "text-emerald-200 hover:bg-emerald-700/40 hover:text-white transition-all duration-300 rounded-xl",
             isCollapsed ? "w-full h-10 px-2" : "w-full justify-start h-10 px-3"
           )}
         >
