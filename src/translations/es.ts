@@ -135,8 +135,6 @@ export const es = {
   signin: {
     title: "Inicia sesión en tu cuenta",
     subtitle: "Ingresa tus credenciales para acceder a tu cuenta",
-    welcome: "Bienvenido de Nuevo",
-    welcomeSubtitle: "Tu cocina saludable te espera",
     email: "Correo electrónico",
     "email.placeholder": "Ingresa tu correo electrónico",
     password: "Contraseña",
