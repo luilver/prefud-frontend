@@ -350,6 +350,14 @@ export const es = {
       "customCountryPlaceholder": "Ingresa un país para su cocina (ej., Brasil, Marruecos)"
     }
   },
+  "mealPlanner": {
+    "title": "Planificador de Comidas",
+    "description": "Crea y gestiona tus planes de comidas semanales",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente"
+    }
+  },
   "mealPlanView": {
     "editPlan": "Editar Plan",
     "days": "Días",

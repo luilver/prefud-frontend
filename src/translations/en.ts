@@ -346,6 +346,14 @@ export const en = {
       "customCountryPlaceholder": "Enter a country for its cuisine (e.g., Brazil, Morocco)"
     }
   },
+  "mealPlanner": {
+    "title": "Meal Planner",
+    "description": "Create and manage your weekly meal plans",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
   "mealPlanView": {
     "editPlan": "Edit Plan",
     "days": "Days", 

@@ -214,10 +214,10 @@ const MealPlanner = () => {
         )}
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/30 backdrop-blur-sm rounded-xl p-4 sm:p-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('mealPlanner.title') || 'Meal Planner'}</h1>
-            <p className="text-emerald-100/80 mt-1">{t('mealPlanner.description') || 'Create and manage your weekly meal plans'}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">{t('mealPlanner.title') || 'Meal Planner'}</h1>
+            <p className="text-white/90 mt-1 drop-shadow-md">{t('mealPlanner.description') || 'Create and manage your weekly meal plans'}</p>
           </div>
           <Button 
             onClick={() => {
@@ -241,7 +241,7 @@ const MealPlanner = () => {
               pageSize={pageSize} 
               onPageSizeChange={handlePageSizeChange}
             />
-            <div className="text-sm text-emerald-100/80">
+            <div className="text-sm text-white drop-shadow-md bg-black/20 px-3 py-1 rounded-full">
               {t('mealPlanner.showingPage') || 'Showing page'} {currentPage} {t('mealPlanner.of') || 'of'} {totalPages} ({currentPagePlans.length} {t('mealPlanner.plans') || 'plans'})
             </div>
           </div>
