@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Bookmark, Play, Pause, Share2, ChefHat, Loader2, Eye, Clock, Flame, Volume2, VolumeX } from "lucide-react";
+import { Heart, Bookmark, Play, Pause, Share2, ChefHat, Loader2, Eye, Clock, Flame, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ReelRecipeModal from "./ReelRecipeModal";
 import { getReelsPaginated, Reel, ReelsMeta } from "@/services/reelsService";
@@ -84,6 +84,42 @@ const Reels = () => {
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const manuallyPausedRef = useRef<Set<string>>(new Set());
+  const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
+
+  const toggleFullscreen = async (recipeId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRefs.current.get(recipeId);
+    if (!video) return;
+
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        setFullscreenVideo(null);
+      } else {
+        await video.requestFullscreen();
+        setFullscreenVideo(recipeId);
+        // Ensure video is playing in fullscreen
+        if (video.paused) {
+          video.play().catch(console.error);
+          setPlayingVideo(recipeId);
+        }
+      }
+    } catch (error) {
+      console.error('Fullscreen error:', error);
+    }
+  };
+
+  // Listen for fullscreen change events
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setFullscreenVideo(null);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   // Initial load
   useEffect(() => {
@@ -465,6 +501,19 @@ const Reels = () => {
                     className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border-0"
                   >
                     <Share2 className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border-0"
+                    onClick={(e) => toggleFullscreen(recipe.id, e)}
+                  >
+                    {fullscreenVideo === recipe.id ? (
+                      <Minimize className="h-4 w-4" />
+                    ) : (
+                      <Maximize className="h-4 w-4" />
+                    )}
                   </Button>
                   
                   <Button
