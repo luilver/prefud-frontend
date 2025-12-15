@@ -102,143 +102,200 @@ const SignIn = () => {
 
   if (showPasswordRecovery) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted to-secondary/20 flex items-center justify-center p-4">
-        <PasswordRecovery onBack={() => setShowPasswordRecovery(false)} />
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1495195134817-aeb325a55b65?q=80&w=2076&auto=format&fit=crop')`
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-primary/20 backdrop-blur-sm" />
+        
+        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+          <PasswordRecovery onBack={() => setShowPasswordRecovery(false)} />
+        </div>
         <Toaster />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted to-secondary/20">
-      {/* Header */}
-      <header className="bg-background/95 backdrop-blur-lg border-b border-border/50 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2.5 bg-gradient-to-r from-primary to-accent rounded-xl shadow-md">
-              <Utensils className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Pantry
-            </h1>
-          </div>
-          <div className="flex items-center space-x-3">
-            <LanguageSelector variant="button" />
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/")}
-              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="hidden md:inline">
-                {t("signup.backToStart") || "Atrás para Comenzar"}
-              </span>
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Beautiful Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1495195134817-aeb325a55b65?q=80&w=2076&auto=format&fit=crop')`
+        }}
+      />
+      
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-primary/30" />
+      
+      {/* Decorative Elements */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/4 w-48 h-48 bg-secondary/30 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
+      
+      {/* Floating Food Icons */}
+      <div className="absolute top-32 right-20 text-6xl opacity-20 animate-bounce hidden lg:block" style={{ animationDuration: '3s' }}>🥗</div>
+      <div className="absolute bottom-40 left-20 text-5xl opacity-20 animate-bounce hidden lg:block" style={{ animationDuration: '4s', animationDelay: '1s' }}>🍳</div>
+      <div className="absolute top-1/2 right-32 text-4xl opacity-15 animate-bounce hidden lg:block" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🥑</div>
 
-      {/* Sign In Form */}
-      <section className="py-8 md:py-20 px-4">
-        <div className="container mx-auto max-w-md">
-          <Card className="bg-card/95 backdrop-blur-lg border-border/50 shadow-2xl">
-            <CardHeader className="text-center space-y-4 pb-8">
-              <div className="mx-auto p-3 bg-gradient-to-r from-primary to-accent rounded-xl w-fit">
-                <Utensils className="h-8 w-8 text-primary-foreground" />
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Header */}
+        <header className="bg-background/80 backdrop-blur-xl border-b border-border/30 shadow-lg">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2.5 bg-gradient-to-r from-primary to-accent rounded-xl shadow-lg shadow-primary/25">
+                <Utensils className="h-6 w-6 text-primary-foreground" />
               </div>
-              <CardTitle className="text-2xl md:text-3xl text-foreground font-bold">
-                {t("signin.title")}
-              </CardTitle>
-              <CardDescription className="text-base md:text-lg text-muted-foreground">
-                {t("signin.subtitle")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <form onSubmit={handleLogin} className="space-y-6">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="email"
-                    className="text-base font-medium text-foreground"
-                  >
-                    {t("signin.email")}
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="border-border/50 focus:border-primary bg-background/50 h-12 text-base transition-colors"
-                    placeholder={t("signin.email.placeholder")}
-                  />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Pantry
+              </h1>
+            </div>
+            <div className="flex items-center space-x-3">
+              <LanguageSelector variant="button" />
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/")}
+                className="flex items-center space-x-2 text-muted-foreground hover:text-foreground hover:bg-background/50 transition-all"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden md:inline">
+                  {t("signup.backToStart") || "Atrás para Comenzar"}
+                </span>
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        {/* Sign In Form */}
+        <section className="py-8 md:py-16 px-4 min-h-[calc(100vh-73px)] flex items-center">
+          <div className="container mx-auto max-w-md">
+            {/* Welcome Text */}
+            <div className="text-center mb-8 animate-fade-in">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+                {t("signin.welcome") || "Welcome Back"}
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                {t("signin.welcomeSubtitle") || "Your healthy kitchen awaits"}
+              </p>
+            </div>
+
+            <Card className="bg-card/90 backdrop-blur-xl border-border/30 shadow-2xl shadow-primary/10 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <CardHeader className="text-center space-y-4 pb-6">
+                <div className="mx-auto p-4 bg-gradient-to-br from-primary via-primary to-accent rounded-2xl w-fit shadow-lg shadow-primary/30">
+                  <Utensils className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="password"
-                    className="text-base font-medium text-foreground"
-                  >
-                    {t("signin.password")}
-                  </Label>
-                  <div className="relative">
+                <CardTitle className="text-2xl md:text-3xl text-foreground font-bold">
+                  {t("signin.title")}
+                </CardTitle>
+                <CardDescription className="text-base md:text-lg text-muted-foreground">
+                  {t("signin.subtitle")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <form onSubmit={handleLogin} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="email"
+                      className="text-base font-medium text-foreground"
+                    >
+                      {t("signin.email")}
+                    </Label>
                     <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="border-border/50 focus:border-primary bg-background/50 h-12 text-base pr-12 transition-colors"
-                      placeholder={t("signin.password.placeholder")}
+                      className="border-border/50 focus:border-primary bg-background/70 h-12 text-base transition-all focus:bg-background"
+                      placeholder={t("signin.email.placeholder")}
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="password"
+                      className="text-base font-medium text-foreground"
+                    >
+                      {t("signin.password")}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="border-border/50 focus:border-primary bg-background/70 h-12 text-base pr-12 transition-all focus:bg-background"
+                        placeholder={t("signin.password.placeholder")}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="text-right">
                     <Button
                       type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
+                      variant="link"
+                      className="text-primary hover:text-primary/80 p-0 font-medium"
+                      onClick={() => setShowPasswordRecovery(true)}
                     >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
-                      )}
+                      {t("signin.forgot-password")}
                     </Button>
                   </div>
-                </div>
-                <div className="text-right">
                   <Button
-                    type="button"
-                    variant="link"
-                    className="text-primary hover:text-primary/80 p-0 font-medium"
-                    onClick={() => setShowPasswordRecovery(true)}
+                    type="submit"
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02]"
+                    disabled={isLoading}
                   >
-                    {t("signin.forgot-password")}
+                    {isLoading ? t("signin.signing-in") : t("signin.button")}
                   </Button>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
-                  disabled={isLoading}
-                >
-                  {isLoading ? t("signin.signing-in") : t("signin.button")}
-                </Button>
-              </form>
+                </form>
 
-              <div className="text-center pt-4 border-t border-border/50">
-                <p className="text-muted-foreground">
-                  {t("signin.no-account")}{" "}
-                  <Button
-                    variant="link"
-                    onClick={() => navigate("/signup")}
-                    className="text-primary hover:text-primary/80 p-0 font-semibold"
-                  >
-                    {t("signin.create-here")}
-                  </Button>
-                </p>
+                <div className="text-center pt-4 border-t border-border/30">
+                  <p className="text-muted-foreground">
+                    {t("signin.no-account")}{" "}
+                    <Button
+                      variant="link"
+                      onClick={() => navigate("/signup")}
+                      className="text-primary hover:text-primary/80 p-0 font-semibold"
+                    >
+                      {t("signin.create-here")}
+                    </Button>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Trust Badges */}
+            <div className="flex justify-center gap-6 mt-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center gap-2 text-muted-foreground/80">
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <span className="text-sm">Secure Login</span>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+              <div className="flex items-center gap-2 text-muted-foreground/80">
+                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                <span className="text-sm">256-bit SSL</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <Toaster />
     </div>
