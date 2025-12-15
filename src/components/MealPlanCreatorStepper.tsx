@@ -19,6 +19,7 @@ import {
   ChefHat,
   DollarSign,
   Globe,
+  Utensils,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -255,7 +256,7 @@ const MealPlanCreatorStepper = ({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5 text-purple-600" />
+                <Calendar className="h-5 w-5 text-emerald-600" />
                 <span>
                   {t("mealPlanCreator.planDetails") || "Plan Details"}
                 </span>
@@ -278,7 +279,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="text"
                   id="planName"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.planName}
                   onChange={(e) =>
                     handleDataChange({ planName: e.target.value })
@@ -301,7 +302,7 @@ const MealPlanCreatorStepper = ({
                 </label>
                 <Textarea
                   id="planDescription"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.planDescription}
                   onChange={(e) =>
                     handleDataChange({ planDescription: e.target.value })
@@ -326,7 +327,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="date"
                   id="startDate"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.startDate || ""}
                   onChange={(e) =>
                     handleDataChange({ startDate: e.target.value })
@@ -346,7 +347,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="number"
                   id="numberOfDays"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.numberOfDays}
                   onChange={(e) =>
                     handleDataChange({ numberOfDays: parseInt(e.target.value) })
@@ -367,7 +368,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="number"
                   id="numberOfPersons"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.numberOfPersons}
                   onChange={(e) =>
                     handleDataChange({
@@ -390,7 +391,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="number"
                   id="numberKidsLessThan5"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.numberKidsLessThan5}
                   onChange={(e) =>
                     handleDataChange({
@@ -413,7 +414,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="number"
                   id="numberKids5To12"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.numberKids5To12}
                   onChange={(e) =>
                     handleDataChange({
@@ -436,7 +437,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="number"
                   id="mealsPerDay"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.mealsPerDay}
                   onChange={(e) =>
                     handleDataChange({ mealsPerDay: parseInt(e.target.value) })
@@ -509,7 +510,7 @@ const MealPlanCreatorStepper = ({
                       <input
                         id={`dietary-${option.key}`}
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                         checked={planData.dietaryRestrictions.includes(
                           option.key
                         )}
@@ -573,7 +574,7 @@ const MealPlanCreatorStepper = ({
                       <input
                         id={`allergy-${option.key}`}
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                         checked={planData.allergiesIntolerances.includes(
                           option.key
                         )}
@@ -664,7 +665,7 @@ const MealPlanCreatorStepper = ({
                       <input
                         id={`cuisine-${option.key}`}
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                         checked={planData.cuisinePreferences.includes(
                           option.key
                         )}
@@ -701,7 +702,7 @@ const MealPlanCreatorStepper = ({
                     type="text"
                     id="customCountry"
                     ref={customCountryRef}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                     placeholder={t("mealPlanCreator.cuisine.customCountryPlaceholder") || "Enter a country for its cuisine (e.g., Brazil, Morocco)"}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && e.currentTarget.value.trim()) {
@@ -733,7 +734,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="number"
                   id="maxCookTime"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.maxCookTime}
                   onChange={(e) =>
                     handleDataChange({ maxCookTime: parseInt(e.target.value) })
@@ -752,7 +753,7 @@ const MealPlanCreatorStepper = ({
                 </label>
                 <select
                   id="cookingSkillLevel"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.cookingSkillLevel}
                   onChange={(e) =>
                     handleDataChange({ cookingSkillLevel: e.target.value })
@@ -786,7 +787,7 @@ const MealPlanCreatorStepper = ({
                 </label>
                 <select
                   id="budgetRange"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.budgetRange}
                   onChange={(e) =>
                     handleDataChange({ budgetRange: e.target.value })
@@ -839,7 +840,7 @@ const MealPlanCreatorStepper = ({
                 <input
                   type="text"
                   id="dislikes"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   value={planData.dislikes}
                   onChange={(e) =>
                     handleDataChange({ dislikes: e.target.value.split(",") })
@@ -883,7 +884,7 @@ const MealPlanCreatorStepper = ({
                       <input
                         id={`health-${option.key}`}
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                         checked={planData.healthGoals.includes(option.key)}
                         onChange={(e) => {
                           const updatedGoals = e.target.checked
@@ -913,7 +914,7 @@ const MealPlanCreatorStepper = ({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5 text-purple-600" />
+                <Sparkles className="h-5 w-5 text-emerald-600" />
                 <span>
                   {t("mealPlanCreator.generate.title") || "Generate Your Plan"}
                 </span>
@@ -1012,7 +1013,7 @@ const MealPlanCreatorStepper = ({
               <Button
                 onClick={generateMealPlan}
                 disabled={isGenerating}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg py-6"
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-lg py-6 text-white"
               >
                 <Sparkles className="h-5 w-5 mr-2" />
                 {isGenerating
@@ -1023,7 +1024,7 @@ const MealPlanCreatorStepper = ({
               {isGenerating && (
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-emerald-500"></div>
                     <span>
                       {t("mealPlanCreator.generate.analyzing") ||
                         "Analyzing your preferences..."}
@@ -1277,86 +1278,115 @@ const MealPlanCreatorStepper = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <LoaderComponent />
+    <div 
+      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+      }}
+    >
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-emerald-900/40" />
+      
+      <div className="relative z-10 min-h-screen py-6 px-4">
+        <LoaderComponent />
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="flex items-center space-x-2">
-          <Sparkles className="h-5 w-5 text-purple-600" />
-          <h1 className="text-xl font-semibold">
-            {isEditing ? "Edit" : "Create"}{" "}
-            {t("mealPlanCreator.aiMealPlan") || "AI Meal Plan"}
-          </h1>
-        </div>
-      </div>
-
-      {/* Progress Steps */}
-      <div className="space-y-4">
-        <Progress
-          value={(currentStep / steps.length) * 100}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs text-gray-500">
-          {steps.map((step) => (
-            <span
-              key={step.id}
-              className={
-                currentStep >= step.id ? "text-purple-600 font-medium" : ""
-              }
+        {/* Header */}
+        <div className="max-w-4xl mx-auto mb-6">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="text-white/90 hover:text-white hover:bg-white/10"
             >
-              {step.title}
-            </span>
-          ))}
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center space-x-2">
+              <Utensils className="h-6 w-6 text-emerald-400" />
+              <span className="text-xl font-bold text-white">Pantry</span>
+            </div>
+            <div className="w-10" /> {/* Spacer for centering */}
+          </div>
         </div>
+
+        {/* Main Content Card */}
+        <div className="max-w-4xl mx-auto">
+          <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-amber-50 border-b border-emerald-100 pb-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <Sparkles className="h-5 w-5 text-emerald-600" />
+                <CardTitle className="text-emerald-800">
+                  {isEditing ? "Edit" : "Create"}{" "}
+                  {t("mealPlanCreator.aiMealPlan") || "AI Meal Plan"}
+                </CardTitle>
+              </div>
+              
+              {/* Progress Steps */}
+              <div className="space-y-3 mt-4">
+                <Progress
+                  value={(currentStep / steps.length) * 100}
+                  className="w-full h-2"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  {steps.map((step) => (
+                    <span
+                      key={step.id}
+                      className={
+                        currentStep >= step.id ? "text-emerald-600 font-medium" : ""
+                      }
+                    >
+                      {step.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-6">
+              {/* Step Content */}
+              <div className="min-h-[400px]">{renderStepContent()}</div>
+
+              {/* Navigation Buttons */}
+              {currentStep < 5 && (
+                <div className="flex justify-between mt-6 pt-6 border-t border-gray-100">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+                    disabled={currentStep === 1}
+                    className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {t("mealPlanner.previous") || "Previous"}
+                  </Button>
+                  <Button
+                    onClick={handleNext}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    {t("mealPlanner.next") || "Next"}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <MealPlanSuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleSuccessModalClose}
+          mealPlan={createdPlan}
+        />
+
+        <MealPlanTimeoutModal
+          isOpen={showTimeoutModal}
+          onClose={handleTimeoutModalClose}
+        />
+
+        <SubscriptionUpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          featureType="plans"
+        />
       </div>
-
-      {/* Step Content */}
-      <div className="min-h-[400px]">{renderStepContent()}</div>
-
-      {/* Navigation Buttons */}
-      {currentStep < 5 && (
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-            disabled={currentStep === 1}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("mealPlanner.previous") || "Previous"}
-          </Button>
-          <Button
-            onClick={handleNext}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            {t("mealPlanner.next") || "Next"}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
-      <MealPlanSuccessModal
-        isOpen={showSuccessModal}
-        onClose={handleSuccessModalClose}
-        mealPlan={createdPlan}
-      />
-
-      <MealPlanTimeoutModal
-        isOpen={showTimeoutModal}
-        onClose={handleTimeoutModalClose}
-      />
-
-      <SubscriptionUpgradeModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureType="plans"
-      />
     </div>
   );
 };
