@@ -23,17 +23,18 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
   if (variant === "button") {
     return (
       <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'es' | 'pt')}>
-        <SelectTrigger className={`w-auto bg-transparent border-none shadow-none focus:ring-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent ${className}`}>
-          <div className="flex items-center">
-            <Languages className="h-4 w-4" />
+        <SelectTrigger className={`w-auto bg-emerald-700/40 border border-emerald-500/30 shadow-none focus:ring-0 hover:bg-emerald-600/50 focus:bg-emerald-600/50 data-[state=open]:bg-emerald-600/50 rounded-lg px-3 py-2 transition-colors ${className}`}>
+          <div className="flex items-center space-x-2">
+            <Languages className="h-4 w-4 text-white" />
+            <span className="text-white text-sm font-medium">{currentLanguage?.flag}</span>
           </div>
         </SelectTrigger>
-        <SelectContent className="bg-white">
+        <SelectContent className="bg-white border border-emerald-200 shadow-xl">
           {languageOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem key={option.value} value={option.value} className="hover:bg-emerald-50 focus:bg-emerald-50">
               <div className="flex items-center space-x-2">
                 <span className="text-lg">{option.flag}</span>
-                <span>{option.label}</span>
+                <span className="text-gray-700">{option.label}</span>
               </div>
             </SelectItem>
           ))}
