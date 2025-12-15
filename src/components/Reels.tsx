@@ -85,6 +85,19 @@ const Reels = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const manuallyPausedRef = useRef<Set<string>>(new Set());
   const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
+  
+  // Use refs to track current values inside observer callback without causing re-renders
+  const playingVideoRef = useRef<string | null>(null);
+  const globalMutedRef = useRef(true);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    playingVideoRef.current = playingVideo;
+  }, [playingVideo]);
+  
+  useEffect(() => {
+    globalMutedRef.current = globalMuted;
+  }, [globalMuted]);
 
   const toggleFullscreen = async (recipeId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -228,8 +241,16 @@ const Reels = () => {
     });
   };
 
-  // Intersection Observer for auto-play
+  // Intersection Observer for auto-play - only on mobile/tablet (single column view)
   useEffect(() => {
+    // Skip auto-play on desktop where multiple videos are visible
+    const isMobileView = window.innerWidth < 640; // sm breakpoint
+    
+    if (!isMobileView) {
+      // On desktop, don't auto-play - user controls playback manually
+      return;
+    }
+    
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -243,16 +264,16 @@ const Reels = () => {
             // Skip if user manually paused this video
             if (manuallyPausedRef.current.has(recipeId)) return;
             
-            // Video is in view - play it
-            if (playingVideo !== recipeId) {
+            // Video is in view - play it (only one at a time on mobile)
+            if (playingVideoRef.current !== recipeId) {
               // Pause currently playing video
-              if (playingVideo) {
-                const currentVideo = videoRefs.current.get(playingVideo);
+              if (playingVideoRef.current) {
+                const currentVideo = videoRefs.current.get(playingVideoRef.current);
                 currentVideo?.pause();
               }
               // Play new video - use global mute preference
-              video.muted = globalMuted;
-              if (globalMuted) {
+              video.muted = globalMutedRef.current;
+              if (globalMutedRef.current) {
                 setMutedVideos(prev => new Set(prev).add(recipeId));
               } else {
                 setMutedVideos(prev => {
@@ -266,7 +287,7 @@ const Reels = () => {
             }
           } else if (!entry.isIntersecting) {
             // Video left view - pause it and clear manually paused flag
-            if (playingVideo === recipeId) {
+            if (playingVideoRef.current === recipeId) {
               video.pause();
               setPlayingVideo(null);
             }
@@ -290,7 +311,7 @@ const Reels = () => {
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [recipes, playingVideo, globalMuted]);
+  }, [recipes]); // Only recreate when recipes change, not on every state update
 
   // Scroll event for infinite loading
   useEffect(() => {
