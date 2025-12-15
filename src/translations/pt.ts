@@ -269,6 +269,20 @@ export const pt = {
       }
     }
   },
+  "mealPlanCreator": {
+    "cuisine": {
+      "customCountry": "Adicionar Cozinha de País",
+      "customCountryPlaceholder": "Digite um país para sua culinária (ex., Brasil, Marrocos)"
+    }
+  },
+  "mealPlanner": {
+    "title": "Planejador de Refeições",
+    "description": "Crie e gerencie seus planos de refeições semanais",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Próximo"
+    }
+  },
   "addIngredient": {
     "title": "Adicionar Ingrediente",
     "description": "Adicione um novo ingrediente à sua despensa",
