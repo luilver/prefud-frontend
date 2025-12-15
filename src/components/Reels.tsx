@@ -72,6 +72,7 @@ const Reels = () => {
   const [recipes, setRecipes] = useState<DisplayRecipe[]>([]);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set());
+  const [globalMuted, setGlobalMuted] = useState(true); // Track global mute preference
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -181,9 +182,11 @@ const Reels = () => {
       if (updated.has(recipeId)) {
         updated.delete(recipeId);
         video.muted = false;
+        setGlobalMuted(false); // User unmuted - remember preference
       } else {
         updated.add(recipeId);
         video.muted = true;
+        setGlobalMuted(true); // User muted - remember preference
       }
       return updated;
     });
@@ -211,9 +214,17 @@ const Reels = () => {
                 const currentVideo = videoRefs.current.get(playingVideo);
                 currentVideo?.pause();
               }
-              // Play new video (muted by default for autoplay)
-              video.muted = true;
-              setMutedVideos(prev => new Set(prev).add(recipeId));
+              // Play new video - use global mute preference
+              video.muted = globalMuted;
+              if (globalMuted) {
+                setMutedVideos(prev => new Set(prev).add(recipeId));
+              } else {
+                setMutedVideos(prev => {
+                  const updated = new Set(prev);
+                  updated.delete(recipeId);
+                  return updated;
+                });
+              }
               video.play().catch(console.error);
               setPlayingVideo(recipeId);
             }
@@ -243,7 +254,7 @@ const Reels = () => {
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [recipes, playingVideo]);
+  }, [recipes, playingVideo, globalMuted]);
 
   // Scroll event for infinite loading
   useEffect(() => {
