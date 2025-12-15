@@ -231,272 +231,300 @@ const IngredientTracker = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800"> {t('ingredientTracker.title') || 'Pantry Tracker'}</h2>
-          <p className="text-gray-600">
-            {t('ingredientTracker.description') || 'Keep track of your ingredients and their expiration dates'}
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600">
-                <Plus className="h-4 w-4 mr-2" />
-                {t('ingredientTracker.addIngredient') || 'Add Ingredient'}              
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <AddIngredientForm
-                onClose={() => setShowAddForm(false)}
-                onAdd={handleAddIngredient}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
+    <div className="min-h-screen relative">
+      {/* Beautiful Pantry Background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?q=80&w=2070&auto=format&fit=crop')`
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/85 via-emerald-800/75 to-teal-900/85" />
       </div>
 
-      {/* AI Suggestions */}
-      <AIMealSuggestions
-        ingredients={ingredients}
-        onAddMeal={handleAddMealFromAI}
-      />
+      <div className="relative z-10 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between bg-black/30 backdrop-blur-sm rounded-xl p-4 sm:p-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white drop-shadow-lg">{t('ingredientTracker.title') || 'Pantry Tracker'}</h2>
+            <p className="text-emerald-100/90">
+              {t('ingredientTracker.description') || 'Keep track of your ingredients and their expiration dates'}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/30">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('ingredientTracker.addIngredient') || 'Add Ingredient'}              
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <AddIngredientForm
+                  onClose={() => setShowAddForm(false)}
+                  onAdd={handleAddIngredient}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
 
-      {/* Quick Stats */}
-      <div className="grid md:grid-cols-4 gap-6">
-        <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{t('ingredientTracker.totalItems') || 'Total Items'}</p>
-                <p className="text-2xl font-bold text-green-700">
-                  {ingredients.length}
-                </p>
-              </div>
-              <Package className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
+        {/* AI Suggestions */}
+        <AIMealSuggestions
+          ingredients={ingredients}
+          onAddMeal={handleAddMealFromAI}
+        />
 
-        <Card className="bg-white/70 backdrop-blur-sm border-orange-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600"> {t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</p>
-                <p className="text-2xl font-bold text-orange-700">
-                  {expiringIngredients.length}
-                </p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/70 backdrop-blur-sm border-blue-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">{t('ingredientTracker.categories') || 'Categories'}</p>
-                <p className="text-2xl font-bold text-blue-700">
-                  {Object.keys(categorizedIngredients).length}
-                </p>
-              </div>
-              <Calendar className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/70 backdrop-blur-sm border-red-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600"> {t('ingredientTracker.lowStock') || 'Low Stock'}</p>
-                <p className="text-2xl font-bold text-red-700">
-                  {ingredients.filter((i) => i.quantity <= 1).length}
-                </p>
-              </div>
-              <Bell className="h-8 w-8 text-red-500" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Expiring Soon Alert */}
-        <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-orange-700">
-              <AlertTriangle className="h-5 w-5" />
-              <span>{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</span>
-            </CardTitle>
-            <CardDescription className="text-orange-600">
-              {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}            
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {expiringIngredients.slice(0, 5).map((ingredient) => {
-                const expiryInfo = getExpiryStatus(ingredient.expiryDate);
-                const daysLeft = getDaysUntilExpiry(ingredient.expiryDate);
-
-                return (
-                  <div
-                    key={ingredient.id}
-                    className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-gray-800">
-                          {ingredient.name}
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          {ingredient.quantity} {ingredient.unit}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p
-                          className={`text-sm font-medium ${expiryInfo.color}`}
-                        >
-                          {daysLeft < 0
-                            ? "Expired"
-                            : daysLeft === 0
-                            ? "Today"
-                            : `${daysLeft} day${daysLeft > 1 ? "s" : ""}`}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatExpiryDate(ingredient.expiryDate)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {expiringIngredients.length === 0 && (
-                <div className="text-center py-6 text-gray-500">
-                  <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">{t('ingredientTracker.allFresh') || 'All ingredients are fresh!'}</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Ingredients by Category */}
-        <Card className="lg:col-span-2 bg-white/70 backdrop-blur-sm border-green-200">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Package className="h-5 w-5 text-green-600" />
-              <span>{t('ingredientTracker.yourPantry') || 'Your Pantry'}</span>
-            </CardTitle>
-            <CardDescription>
-              {t('ingredientTracker.organizedByCategory') || 'All your ingredients organized by category'}            
-            </CardDescription>
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-green-200 focus:border-green-400"
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {Object.entries(categorizedIngredients).map(
-                ([category, categoryIngredients]) => (
-                  <div key={category}>
-                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center space-x-2">
-                      <span className="text-lg">
-                        {getCategoryIcon(category)}
-                      </span>
-                      <span>{category}</span>
-                      <span className="text-sm text-gray-500">
-                        ({categoryIngredients.length})
-                      </span>
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-3">
-                      {categoryIngredients.map((ingredient) => {
-                        const expiryInfo = getExpiryStatus(
-                          ingredient.expiryDate
-                        );
-                        const daysLeft = getDaysUntilExpiry(
-                          ingredient.expiryDate
-                        );
-
-                        return (
-                          <div
-                            key={ingredient.id}
-                            className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor} group`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <h4 className="font-medium text-gray-800">
-                                  {ingredient.name}
-                                </h4>
-                                <p className="text-sm text-gray-600">
-                                  {ingredient.quantity} {ingredient.unit}
-                                </p>
-                                {ingredient.location && (
-                                  <p className="text-xs text-gray-500">
-                                    {ingredient.location}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <div className="text-right">
-                                  <p
-                                    className={`text-sm font-medium ${expiryInfo.color}`}
-                                  >
-                                    {daysLeft < 0
-                                      ? "Expired"
-                                      : daysLeft === 0
-                                      ? "Today"
-                                      : `${daysLeft}d`}
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    {formatExpiryDate(ingredient.expiryDate)}
-                                  </p>
-                                </div>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() =>
-                                    handleDeleteIngredient(ingredient.id)
-                                  }
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )
-              )}
-
-              {Object.keys(categorizedIngredients).length === 0 && (
-                <div className="text-center py-12 text-gray-500">
-                  <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg"> {t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
-                  <p className="text-sm">
-                    {searchTerm
-                      ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
-                      : ingredients.length === 0
-                      ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
-                      : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
+        {/* Quick Stats */}
+        <div className="grid md:grid-cols-4 gap-6">
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t('ingredientTracker.totalItems') || 'Total Items'}</p>
+                  <p className="text-2xl font-bold text-emerald-700">
+                    {ingredients.length}
                   </p>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="p-3 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                  <Package className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</p>
+                  <p className="text-2xl font-bold text-orange-700">
+                    {expiringIngredients.length}
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-gradient-to-br from-orange-500 to-red-500">
+                  <AlertTriangle className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500" />
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t('ingredientTracker.categories') || 'Categories'}</p>
+                  <p className="text-2xl font-bold text-teal-700">
+                    {Object.keys(categorizedIngredients).length}
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-pink-500" />
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{t('ingredientTracker.lowStock') || 'Low Stock'}</p>
+                  <p className="text-2xl font-bold text-red-700">
+                    {ingredients.filter((i) => i.quantity <= 1).length}
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-gradient-to-br from-red-500 to-pink-500">
+                  <Bell className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Expiring Soon Alert */}
+          <Card className="bg-gradient-to-br from-orange-50/95 to-red-50/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-orange-700">
+                <AlertTriangle className="h-5 w-5" />
+                <span>{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</span>
+              </CardTitle>
+              <CardDescription className="text-orange-600">
+                {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}            
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {expiringIngredients.slice(0, 5).map((ingredient) => {
+                  const expiryInfo = getExpiryStatus(ingredient.expiryDate);
+                  const daysLeft = getDaysUntilExpiry(ingredient.expiryDate);
+
+                  return (
+                    <div
+                      key={ingredient.id}
+                      className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-800">
+                            {ingredient.name}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {ingredient.quantity} {ingredient.unit}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p
+                            className={`text-sm font-medium ${expiryInfo.color}`}
+                          >
+                            {daysLeft < 0
+                              ? "Expired"
+                              : daysLeft === 0
+                              ? "Today"
+                              : `${daysLeft} day${daysLeft > 1 ? "s" : ""}`}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatExpiryDate(ingredient.expiryDate)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {expiringIngredients.length === 0 && (
+                  <div className="text-center py-6 text-gray-500">
+                    <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">{t('ingredientTracker.allFresh') || 'All ingredients are fresh!'}</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Ingredients by Category */}
+          <Card className="lg:col-span-2 bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                  <Package className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800">{t('ingredientTracker.yourPantry') || 'Your Pantry'}</span>
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                {t('ingredientTracker.organizedByCategory') || 'All your ingredients organized by category'}            
+              </CardDescription>
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 border-emerald-200 focus:border-emerald-400"
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {Object.entries(categorizedIngredients).map(
+                  ([category, categoryIngredients]) => (
+                    <div key={category}>
+                      <h3 className="font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+                        <span className="text-lg">
+                          {getCategoryIcon(category)}
+                        </span>
+                        <span>{category}</span>
+                        <span className="text-sm text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                          {categoryIngredients.length}
+                        </span>
+                      </h3>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        {categoryIngredients.map((ingredient) => {
+                          const expiryInfo = getExpiryStatus(
+                            ingredient.expiryDate
+                          );
+                          const daysLeft = getDaysUntilExpiry(
+                            ingredient.expiryDate
+                          );
+
+                          return (
+                            <div
+                              key={ingredient.id}
+                              className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor} group hover:shadow-md transition-all duration-200`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <h4 className="font-medium text-gray-800">
+                                    {ingredient.name}
+                                  </h4>
+                                  <p className="text-sm text-gray-600">
+                                    {ingredient.quantity} {ingredient.unit}
+                                  </p>
+                                  {ingredient.location && (
+                                    <p className="text-xs text-gray-500">
+                                      {ingredient.location}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <div className="text-right">
+                                    <p
+                                      className={`text-sm font-medium ${expiryInfo.color}`}
+                                    >
+                                      {daysLeft < 0
+                                        ? "Expired"
+                                        : daysLeft === 0
+                                        ? "Today"
+                                        : `${daysLeft}d`}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {formatExpiryDate(ingredient.expiryDate)}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() =>
+                                      handleDeleteIngredient(ingredient.id)
+                                    }
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )
+                )}
+
+                {Object.keys(categorizedIngredients).length === 0 && (
+                  <div className="text-center py-12 text-gray-500">
+                    <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg">{t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
+                    <p className="text-sm">
+                      {searchTerm
+                        ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
+                        : ingredients.length === 0
+                        ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
+                        : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
