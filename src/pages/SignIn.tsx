@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Utensils, ArrowLeft, Eye, EyeOff, Leaf, Shield, Lock } from "lucide-react";
+import { Utensils, ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -133,7 +133,7 @@ const SignIn = () => {
               className="flex items-center gap-2.5 group"
             >
               <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
-                <Leaf className="h-5 w-5 text-emerald-400" />
+                <Utensils className="h-5 w-5 text-emerald-400" />
               </div>
               <span className="text-xl font-semibold text-white/90 tracking-tight">
                 Pantry
