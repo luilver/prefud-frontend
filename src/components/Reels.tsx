@@ -82,6 +82,7 @@ const Reels = () => {
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const manuallyPausedRef = useRef<Set<string>>(new Set());
 
   // Initial load
   useEffect(() => {
@@ -155,9 +156,13 @@ const Reels = () => {
     if (!video) return;
 
     if (playingVideo === recipeId) {
+      // User is manually pausing - track this so auto-play doesn't restart it
+      manuallyPausedRef.current.add(recipeId);
       video.pause();
       setPlayingVideo(null);
     } else {
+      // User is manually playing - remove from manually paused set
+      manuallyPausedRef.current.delete(recipeId);
       // Pause any currently playing video
       if (playingVideo) {
         const currentVideo = videoRefs.current.get(playingVideo);
@@ -198,6 +203,9 @@ const Reels = () => {
           if (!video) return;
 
           if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            // Skip if user manually paused this video
+            if (manuallyPausedRef.current.has(recipeId)) return;
+            
             // Video is in view - play it
             if (playingVideo !== recipeId) {
               // Pause currently playing video
@@ -211,10 +219,13 @@ const Reels = () => {
               video.play().catch(console.error);
               setPlayingVideo(recipeId);
             }
-          } else if (!entry.isIntersecting && playingVideo === recipeId) {
-            // Video left view - pause it
-            video.pause();
-            setPlayingVideo(null);
+          } else if (!entry.isIntersecting) {
+            // Video left view - pause it and clear manually paused flag
+            if (playingVideo === recipeId) {
+              video.pause();
+              setPlayingVideo(null);
+            }
+            manuallyPausedRef.current.delete(recipeId);
           }
         });
       },
