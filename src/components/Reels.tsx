@@ -74,7 +74,7 @@ const Reels = () => {
   const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<ReelsMeta | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<DisplayRecipe | null>(null);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
@@ -89,13 +89,14 @@ const Reels = () => {
     const fetchInitialReels = async () => {
       try {
         setIsInitialLoading(true);
-        const response = await getReelsPaginated(0, 8);
+        // Backend pagination is 1-based
+        const response = await getReelsPaginated(1, 8);
         const mappedRecipes = response.data.map(mapReelToDisplayRecipe);
-        const newIds = new Set(mappedRecipes.map(r => r.id));
+        const newIds = new Set(mappedRecipes.map((r) => r.id));
         setLoadedIds(newIds);
         setRecipes(mappedRecipes);
         setMeta(response.meta);
-        setPage(response.meta.currentPage); // API returns 1-based page
+        setPage(response.meta.currentPage);
       } catch (error) {
         console.error('Error fetching initial reels:', error);
         toast({
@@ -114,29 +115,26 @@ const Reels = () => {
   const loadMoreRecipes = useCallback(async () => {
     if (isLoading || !meta?.hasNextPage) return;
 
+    const nextPage = (meta?.currentPage ?? page) + 1;
+    if (meta?.totalPages && nextPage > meta.totalPages) return;
+
     setIsLoading(true);
     try {
-      // API uses 0-based page index, so currentPage (1-based) equals next page index
-      const nextPageIndex = page;
-      console.log('Loading page:', nextPageIndex, 'Current page:', page, 'Has next:', meta?.hasNextPage);
-      
-      const response = await getReelsPaginated(nextPageIndex, 8);
+      const response = await getReelsPaginated(nextPage, 8);
       const mappedRecipes = response.data.map(mapReelToDisplayRecipe);
-      
+
       // Filter out duplicates
-      const newRecipes = mappedRecipes.filter(r => !loadedIds.has(r.id));
-      
-      console.log('Fetched recipes:', mappedRecipes.length, 'New recipes:', newRecipes.length);
-      
+      const newRecipes = mappedRecipes.filter((r) => !loadedIds.has(r.id));
+
       if (newRecipes.length > 0) {
-        setLoadedIds(prev => {
+        setLoadedIds((prev) => {
           const updated = new Set(prev);
-          newRecipes.forEach(r => updated.add(r.id));
+          newRecipes.forEach((r) => updated.add(r.id));
           return updated;
         });
-        setRecipes(prev => [...prev, ...newRecipes]);
+        setRecipes((prev) => [...prev, ...newRecipes]);
       }
-      
+
       setMeta(response.meta);
       setPage(response.meta.currentPage);
     } catch (error) {
@@ -149,7 +147,7 @@ const Reels = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, meta?.hasNextPage, page, loadedIds, toast]);
+  }, [isLoading, meta, page, loadedIds, toast]);
 
   const toggleVideoPlay = (recipeId: string) => {
     const video = videoRefs.current.get(recipeId);
