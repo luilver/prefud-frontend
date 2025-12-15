@@ -157,12 +157,22 @@ export const en = {
   },
   "signin": {
     "title": "Sign In",
+    "subtitle": "Enter your credentials to access your account",
+    "welcome": "Welcome Back",
+    "welcomeSubtitle": "Your healthy kitchen awaits",
     "email": "Email",
+    "email.placeholder": "Enter your email",
     "password": "Password",
+    "password.placeholder": "Enter your password",
     "noAccount": "Don't have an account?",
+    "no-account": "Don't have an account?",
     "signUp": "Sign Up",
+    "create-here": "Create one here",
     "forgotPassword": "Forgot Password?",
-    "submit": "Submit"
+    "forgot-password": "Forgot Password?",
+    "submit": "Submit",
+    "button": "Sign In",
+    "signing-in": "Signing in..."
   },
   "pricing": {
     "title": "Pricing Plans",
