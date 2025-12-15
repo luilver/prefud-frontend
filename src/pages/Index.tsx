@@ -1,7 +1,7 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Utensils, Menu, X, Sparkles, Shield, Heart, TrendingUp, Users, Star } from "lucide-react";
+import { Utensils, Menu, X, Sparkles, Shield, Heart, TrendingUp, Users, Star, ChefHat, Leaf, Timer } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Dashboard from "@/components/Dashboard";
@@ -138,65 +138,132 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        {/* Background Image */}
+      <div className="relative overflow-hidden min-h-[90vh] flex items-center">
+        {/* Animated Background Elements */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-            alt="Fresh vegetables and healthy ingredients" 
-            className="w-full h-full object-cover opacity-55"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-secondary/50"></div>
+          
+          {/* Floating food elements */}
+          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-accent/10 blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-40 right-20 w-48 h-48 rounded-full bg-gradient-to-br from-accent/20 to-primary/10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full bg-gradient-to-br from-primary/15 to-transparent blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
         
-        <div className="relative z-10 container mx-auto px-4 py-20 lg:py-28 text-center">
-          <div className="max-w-4xl mx-auto">
-            <div className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6 border border-primary/20">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-sm font-medium">Smart AI-Powered Planning</span>
-            </div>
-            
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                {t('home.title')}
-              </span>
-            </h1>
-            
-            <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-              {t('home.subtitle')}
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-              <Link to="/signup">
-                <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-200">
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  {t('home.cta.primary')}
-                </Button>
-              </Link>
-              <Link to="/why-pantry">
-                <Button variant="outline" size="lg" className="border-primary/30 text-primary hover:bg-primary/10 font-semibold px-8 py-4 text-lg">
-                  Learn More
-                </Button>
-              </Link>
+        <div className="relative z-10 container mx-auto px-4 py-16 lg:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-left space-y-8">
+              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary/15 to-accent/15 text-primary px-5 py-2.5 rounded-full border border-primary/25 backdrop-blur-sm animate-fade-in">
+                <ChefHat className="h-4 w-4" />
+                <span className="text-sm font-semibold tracking-wide">AI-Powered Culinary Experience</span>
+              </div>
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.1] animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                Discover the
+                <span className="block mt-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_3s_ease-in-out_infinite]">
+                  Art of Cooking
+                </span>
+              </h1>
+              
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-xl leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                Transform your kitchen into a culinary haven. Our AI creates personalized meal plans, reduces food waste, and helps you cook like a professional chef.
+              </p>
+              
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                <Link to="/signup">
+                  <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold px-8 py-6 text-lg shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105 group">
+                    <Sparkles className="mr-2 h-5 w-5 group-hover:animate-pulse" />
+                    {t('home.cta.primary')}
+                  </Button>
+                </Link>
+                <Link to="/why-pantry">
+                  <Button variant="outline" size="lg" className="border-2 border-primary/40 text-foreground hover:bg-primary/10 hover:border-primary/60 font-semibold px-8 py-6 text-lg backdrop-blur-sm transition-all duration-300 hover:scale-105">
+                    Learn More
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="flex flex-wrap items-center gap-6 pt-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">10k+ Chefs</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
+                  <div className="flex -space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium text-foreground">4.9 Rating</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
+                  <Shield className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">Secure</span>
+                </div>
+              </div>
             </div>
 
-            {/* Social Proof */}
-            <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-1">
-                <Users className="h-4 w-4 text-primary" />
-                <span>10k+ users</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Star className="h-4 w-4 text-accent fill-current" />
-                <span>4.9 rating</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Shield className="h-4 w-4 text-primary" />
-                <span>Trusted & Secure</span>
+            {/* Right Content - Cuisine Showcase */}
+            <div className="relative hidden lg:block animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              {/* Main Image */}
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 rounded-3xl blur-2xl opacity-60"></div>
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+                  <img 
+                    src="https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=1740&auto=format&fit=crop" 
+                    alt="Delicious gourmet cuisine" 
+                    className="w-full h-[500px] object-cover hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"></div>
+                </div>
+                
+                {/* Floating Cards */}
+                <div className="absolute -left-8 top-20 bg-card/95 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-border/50 animate-fade-in hover:scale-105 transition-transform duration-300" style={{ animationDelay: '0.5s' }}>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-xl flex items-center justify-center">
+                      <Leaf className="h-6 w-6 text-green-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Carbon Saved</p>
+                      <p className="text-lg font-bold text-foreground">2.5 kg CO₂</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="absolute -right-6 top-40 bg-card/95 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-border/50 animate-fade-in hover:scale-105 transition-transform duration-300" style={{ animationDelay: '0.6s' }}>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center">
+                      <Timer className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Quick Prep</p>
+                      <p className="text-lg font-bold text-foreground">15 min</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-6 bg-card/95 backdrop-blur-xl rounded-2xl px-6 py-4 shadow-xl border border-border/50 animate-fade-in hover:scale-105 transition-transform duration-300" style={{ animationDelay: '0.7s' }}>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex -space-x-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground">A</div>
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-xs font-bold text-primary-foreground">M</div>
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center text-xs font-bold text-primary-foreground">K</div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Loved by chefs</p>
+                      <p className="text-sm font-semibold text-foreground">1,234 recipes created today</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        
+        {/* Decorative bottom wave */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent"></div>
       </div>
 
       {/* Features Section */}
