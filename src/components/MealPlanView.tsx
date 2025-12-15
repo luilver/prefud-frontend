@@ -455,66 +455,83 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     ) || 0;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={onBack} className="p-2">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-              {plan.name}
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-1">
-              {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={onEdit} variant="outline" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            {t("mealPlanView.editPlan") || "Edit Plan"}
-          </Button>
-        </div>
+    <div className="min-h-screen relative">
+      {/* Food-themed Background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
       </div>
 
-      {/* Plan Stats - Made more compact for mobile */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <Card className="bg-white/70 backdrop-blur-sm">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-            <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 mb-2 sm:mb-0 sm:mr-3" />
-            <div className="text-center sm:text-left">
-              <p className="text-lg sm:text-2xl font-bold">{totalDays}</p>
-              <p className="text-xs sm:text-sm text-gray-600">
-                {t("mealPlanView.days") || "Days"}
+      <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={onBack} className="p-2 text-white hover:bg-white/10">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+                {plan.name}
+              </h1>
+              <p className="text-sm sm:text-base text-emerald-100/80 mt-1">
+                {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
               </p>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/70 backdrop-blur-sm">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-            <Users className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 mb-2 sm:mb-0 sm:mr-3" />
-            <div className="text-center sm:text-left">
-              <p className="text-lg sm:text-2xl font-bold">{peopleCount}</p>
-              <p className="text-xs sm:text-sm text-gray-600">
-                {t("mealPlanView.persons") || "Persons"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/70 backdrop-blur-sm">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-            <ChefHat className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 mb-2 sm:mb-0 sm:mr-3" />
-            <div className="text-center sm:text-left">
-              <p className="text-lg sm:text-2xl font-bold">{mealsPerDay}</p>
-              <p className="text-xs sm:text-sm text-gray-600">
-                {t("mealPlanView.mealsPerDay") || "Meals/Day"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={onEdit} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              <Edit className="h-4 w-4 mr-2" />
+              {t("mealPlanView.editPlan") || "Edit Plan"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Plan Stats - Made more compact for mobile */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 mb-2 sm:mb-0 sm:mr-3">
+                <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              </div>
+              <div className="text-center sm:text-left">
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{totalDays}</p>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  {t("mealPlanView.days") || "Days"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 mb-2 sm:mb-0 sm:mr-3">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              </div>
+              <div className="text-center sm:text-left">
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{peopleCount}</p>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  {t("mealPlanView.persons") || "Persons"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 mb-2 sm:mb-0 sm:mr-3">
+                <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              </div>
+              <div className="text-center sm:text-left">
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{mealsPerDay}</p>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  {t("mealPlanView.mealsPerDay") || "Meals/Day"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -879,6 +896,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         </TabsContent>
       </Tabs>
 
+      </div>
     </div>
   );
 };

@@ -191,232 +191,253 @@ const MealPlanner = () => {
 
   // Default view: show meal planner dashboard
   return (
-    <div className="space-y-6">
-      {/* Success Modal */}
-      {showSuccessModal && successPlan && (
-        <MealPlanSuccessModal
-          isOpen={showSuccessModal}
-          onClose={handleCloseSuccessModal}
-          onViewPlan={handleViewSuccessPlan}
-          mealPlan={successPlan}
-        />
-      )}
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{t('mealPlanner.title') || 'Meal Planner'}</h1>
-          <p className="text-gray-600 mt-1">{t('mealPlanner.description') || 'Create and manage your weekly meal plans'}</p>
-        </div>
-        <Button 
-          onClick={() => {
-            console.log('Creating new meal plan');
-            setShowCreator(true);
-            setSelectedMealPlan(null);
-            setIsEditing(false);
-            isNavigatingBack.current = false;
-          }}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {t('mealPlanner.aiMeal') || 'Create AI Meal Plan'}
-        </Button>
+    <div className="min-h-screen relative">
+      {/* Food-themed Background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
       </div>
 
-      {/* Page Size Selector and Results Info */}
-      {!isLoadingPlans && hasLoadedInitialPlans && (
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
-          <PageSizeSelector 
-            pageSize={pageSize} 
-            onPageSizeChange={handlePageSizeChange}
+      <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Success Modal */}
+        {showSuccessModal && successPlan && (
+          <MealPlanSuccessModal
+            isOpen={showSuccessModal}
+            onClose={handleCloseSuccessModal}
+            onViewPlan={handleViewSuccessPlan}
+            mealPlan={successPlan}
           />
-          <div className="text-sm text-gray-600">
-            {t('mealPlanner.showingPage') || 'Showing page'} {currentPage} {t('mealPlanner.of') || 'of'} {totalPages} ({currentPagePlans.length} {t('mealPlanner.plans') || 'plans'})
+        )}
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('mealPlanner.title') || 'Meal Planner'}</h1>
+            <p className="text-emerald-100/80 mt-1">{t('mealPlanner.description') || 'Create and manage your weekly meal plans'}</p>
           </div>
+          <Button 
+            onClick={() => {
+              console.log('Creating new meal plan');
+              setShowCreator(true);
+              setSelectedMealPlan(null);
+              setIsEditing(false);
+              isNavigatingBack.current = false;
+            }}
+            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white w-full sm:w-auto shadow-lg"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {t('mealPlanner.aiMeal') || 'Create AI Meal Plan'}
+          </Button>
         </div>
-      )}
 
-      {/* Loading State */}
-      {isLoadingPlans && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-500" />
-            <p className="text-gray-600">{t('mealPlanner.loadingPlans') || 'Loading your meal plans...'}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Meal Plans Grid */}
-      {!isLoadingPlans && currentPagePlans.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentPagePlans.map((plan) => {
-              // Calculate days from duration string or use preferences
-              const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
-                               (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
-              const peopleCount = plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A';
-              const mealsCount = plan.preferences?.mealsPerDay || '3';
-              
-              return (
-                <Card 
-                  key={plan.id} 
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => handlePlanSelect(plan)}
-                >
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <ChefHat className="h-5 w-5 text-purple-500" />
-                      {plan.name}
-                    </CardTitle>
-                    <CardDescription>
-                      {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>{daysCount} {t('mealPlanner.day') || 'day'}{daysCount > 1 ? 's' : ''}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        <span>{t('mealPlanner.for') || 'For'} {peopleCount} {t('mealPlanner.people') || 'people'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        <span>{mealsCount} {t('mealPlanner.mealsPDay') || 'meals per day'}</span>
-                      </div>
-                      
-                      {/* Additional plan details from API */}
-                      {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
-                        <div className="text-xs text-purple-600">
-                          {t('mealPlanner.cuisine') || 'Cuisine'}: {plan.preferences.cuisinePreferences.join(', ')}
-                        </div>
-                      )}
-                      
-                      {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
-                        <div className="text-xs text-green-600">
-                          {t('mealPlanner.diet') || 'Diet'}: {plan.preferences.dietaryRestrictions.join(', ')}
-                        </div>
-                      )}
-                      
-                      {plan.preferences?.cookingSkillLevel && (
-                        <div className="text-xs text-blue-600">
-                          {t('mealPlanner.skillLevel') || 'Skill Level'}: {plan.preferences.cookingSkillLevel}
-                        </div>
-                      )}
-                      
-                      <div className="mt-3 text-xs text-gray-500">
-                        {plan.meals?.length || 0} {t('mealPlanner.totalMealsPlanned') || 'total meals planned'}
-                      </div>
-                      
-                      {plan.shoppingList && plan.shoppingList.length > 0 && (
-                        <div className="text-xs text-orange-600">
-                          {plan.shoppingList.length} {t('mealPlanner.ingreNeeded') || 'ingredients needed'} {" "}
-                          {plan.totalCarbonFootprint} CO2
-                        </div>
-                      )}
-                      {plan.totalCarbonFootprint && (
-                        <div className="text-xs text-green-600">
-                          {plan.totalCarbonFootprint} Kg CO2 
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                    if (
-                      page === 1 || 
-                      page === totalPages || 
-                      (page >= currentPage - 1 && page <= currentPage + 1)
-                    ) {
-                      return (
-                        <PaginationItem key={page}>
-                          <PaginationLink
-                            onClick={() => handlePageChange(page)}
-                            isActive={page === currentPage}
-                            className="cursor-pointer"
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    } else if (
-                      (page === currentPage - 2 && currentPage > 3) ||
-                      (page === currentPage + 2 && currentPage < totalPages - 2)
-                    ) {
-                      return (
-                        <PaginationItem key={page}>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      );
-                    }
-                    return null;
-                  })}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+        {/* Page Size Selector and Results Info */}
+        {!isLoadingPlans && hasLoadedInitialPlans && (
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
+            <PageSizeSelector 
+              pageSize={pageSize} 
+              onPageSizeChange={handlePageSizeChange}
+            />
+            <div className="text-sm text-emerald-100/80">
+              {t('mealPlanner.showingPage') || 'Showing page'} {currentPage} {t('mealPlanner.of') || 'of'} {totalPages} ({currentPagePlans.length} {t('mealPlanner.plans') || 'plans'})
             </div>
-          )}
-        </>
-      ) : (
-        !isLoadingPlans && hasLoadedInitialPlans && (
-          <Card className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-            <CardContent>
-              <div className="flex flex-col items-center space-y-4">
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-full">
-                  <Sparkles className="h-8 w-8 text-white" />
+          </div>
+        )}
+
+        {/* Loading State */}
+        {isLoadingPlans && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-emerald-400" />
+              <p className="text-emerald-100">{t('mealPlanner.loadingPlans') || 'Loading your meal plans...'}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Meal Plans Grid */}
+        {!isLoadingPlans && currentPagePlans.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentPagePlans.map((plan) => {
+                // Calculate days from duration string or use preferences
+                const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
+                                 (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
+                const peopleCount = plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A';
+                const mealsCount = plan.preferences?.mealsPerDay || '3';
+                
+                return (
+                  <Card 
+                    key={plan.id} 
+                    className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
+                    onClick={() => handlePlanSelect(plan)}
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-gray-800">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                          <ChefHat className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="truncate">{plan.name}</span>
+                      </CardTitle>
+                      <CardDescription className="text-gray-500">
+                        {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-emerald-500" />
+                          <span>{daysCount} {t('mealPlanner.day') || 'day'}{daysCount > 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-emerald-500" />
+                          <span>{t('mealPlanner.for') || 'For'} {peopleCount} {t('mealPlanner.people') || 'people'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-emerald-500" />
+                          <span>{mealsCount} {t('mealPlanner.mealsPDay') || 'meals per day'}</span>
+                        </div>
+                        
+                        {/* Additional plan details from API */}
+                        <div className="pt-2 border-t border-gray-100 space-y-1">
+                          {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
+                            <div className="text-xs text-emerald-600 font-medium">
+                              {t('mealPlanner.cuisine') || 'Cuisine'}: {plan.preferences.cuisinePreferences.join(', ')}
+                            </div>
+                          )}
+                          
+                          {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
+                            <div className="text-xs text-teal-600 font-medium">
+                              {t('mealPlanner.diet') || 'Diet'}: {plan.preferences.dietaryRestrictions.join(', ')}
+                            </div>
+                          )}
+                          
+                          {plan.preferences?.cookingSkillLevel && (
+                            <div className="text-xs text-blue-600 font-medium">
+                              {t('mealPlanner.skillLevel') || 'Skill Level'}: {plan.preferences.cookingSkillLevel}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="mt-3 pt-2 border-t border-gray-100">
+                          <div className="text-xs text-gray-500">
+                            {plan.meals?.length || 0} {t('mealPlanner.totalMealsPlanned') || 'total meals planned'}
+                          </div>
+                          
+                          {plan.shoppingList && plan.shoppingList.length > 0 && (
+                            <div className="text-xs text-orange-600 mt-1">
+                              {plan.shoppingList.length} {t('mealPlanner.ingreNeeded') || 'ingredients needed'}
+                            </div>
+                          )}
+                          {plan.totalCarbonFootprint && (
+                            <div className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                              {plan.totalCarbonFootprint} Kg CO2 
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                        if (
+                          page === 1 || 
+                          page === totalPages || 
+                          (page >= currentPage - 1 && page <= currentPage + 1)
+                        ) {
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => handlePageChange(page)}
+                                isActive={page === currentPage}
+                                className={`cursor-pointer ${page === currentPage ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'hover:bg-emerald-50'}`}
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        } else if (
+                          (page === currentPage - 2 && currentPage > 3) ||
+                          (page === currentPage + 2 && currentPage < totalPages - 2)
+                        ) {
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          );
+                        }
+                        return null;
+                      })}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    {t('mealPlanner.welcomeToAIMeal') || 'Welcome to AI Meal Planning'}, {user?.name?.split(' ')[0] || 'Chef'}!
-                  </h3>
-                  <p className="text-gray-600 max-w-md mx-auto">
-                    {t('mealPlanner.createYourPersonalized') || 'Create your first personalized meal plan with our AI assistant'}. 
-                    {t('mealPlanner.getCustomizedRecipes') || 'Get customized recipes based on your preferences, dietary needs, and cooking skills'}.
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => {
-                    console.log('Creating first meal plan');
-                    setShowCreator(true);
-                    setSelectedMealPlan(null);
-                    setIsEditing(false);
-                    isNavigatingBack.current = false;
-                  }}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white mt-4"
-                  size="lg"
-                >
-                  <Sparkles className="h-5 w-5 mr-2" />
-                  {t('mealPlanner.createYourFirstAIMeal') || 'Create Your First AI Meal Plan'}
-                </Button>
               </div>
-            </CardContent>
-          </Card>
-        )
-      )}
+            )}
+          </>
+        ) : (
+          !isLoadingPlans && hasLoadedInitialPlans && (
+            <Card className="text-center py-12 bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+              <CardContent>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 rounded-full shadow-lg">
+                    <Sparkles className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      {t('mealPlanner.welcomeToAIMeal') || 'Welcome to AI Meal Planning'}, {user?.name?.split(' ')[0] || 'Chef'}!
+                    </h3>
+                    <p className="text-gray-600 max-w-md mx-auto">
+                      {t('mealPlanner.createYourPersonalized') || 'Create your first personalized meal plan with our AI assistant'}. 
+                      {t('mealPlanner.getCustomizedRecipes') || 'Get customized recipes based on your preferences, dietary needs, and cooking skills'}.
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      console.log('Creating first meal plan');
+                      setShowCreator(true);
+                      setSelectedMealPlan(null);
+                      setIsEditing(false);
+                      isNavigatingBack.current = false;
+                    }}
+                    className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white mt-4 shadow-lg"
+                    size="lg"
+                  >
+                    <Sparkles className="h-5 w-5 mr-2" />
+                    {t('mealPlanner.createYourFirstAIMeal') || 'Create Your First AI Meal Plan'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        )}
+      </div>
     </div>
   );
 };
