@@ -17,7 +17,14 @@ import {
   Plus,
   Search,
   Trash2,
+  ChevronDown,
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import AddIngredientForm from "./AddIngredientForm";
 import AIMealSuggestions from "./AIMealSuggestions";
 import { useUser } from "@/contexts/UserContext";
@@ -432,96 +439,104 @@ const IngredientTracker = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                {Object.entries(categorizedIngredients).map(
-                  ([category, categoryIngredients]) => (
-                    <div key={category}>
-                      <h3 className="font-semibold text-gray-800 mb-3 flex items-center space-x-2">
-                        <span className="text-lg">
-                          {getCategoryIcon(category)}
-                        </span>
-                        <span>{category}</span>
-                        <span className="text-sm text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
-                          {categoryIngredients.length}
-                        </span>
-                      </h3>
-                      <div className="grid md:grid-cols-2 gap-3">
-                        {categoryIngredients.map((ingredient) => {
-                          const expiryInfo = getExpiryStatus(
-                            ingredient.expiryDate
-                          );
-                          const daysLeft = getDaysUntilExpiry(
-                            ingredient.expiryDate
-                          );
+              {Object.keys(categorizedIngredients).length > 0 ? (
+                <Accordion type="multiple" defaultValue={Object.keys(categorizedIngredients)} className="space-y-3">
+                  {Object.entries(categorizedIngredients).map(
+                    ([category, categoryIngredients]) => (
+                      <AccordionItem 
+                        key={category} 
+                        value={category}
+                        className="border border-emerald-200 rounded-xl overflow-hidden bg-gradient-to-r from-emerald-50/50 to-teal-50/50"
+                      >
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-2xl">
+                              {getCategoryIcon(category)}
+                            </span>
+                            <span className="font-semibold text-gray-800">{category}</span>
+                            <span className="text-sm text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-medium">
+                              {categoryIngredients.length} {categoryIngredients.length === 1 ? 'item' : 'items'}
+                            </span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4">
+                          <div className="grid md:grid-cols-2 gap-3 pt-2">
+                            {categoryIngredients.map((ingredient) => {
+                              const expiryInfo = getExpiryStatus(
+                                ingredient.expiryDate
+                              );
+                              const daysLeft = getDaysUntilExpiry(
+                                ingredient.expiryDate
+                              );
 
-                          return (
-                            <div
-                              key={ingredient.id}
-                              className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor} group hover:shadow-md transition-all duration-200`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <h4 className="font-medium text-gray-800">
-                                    {ingredient.name}
-                                  </h4>
-                                  <p className="text-sm text-gray-600">
-                                    {ingredient.quantity} {ingredient.unit}
-                                  </p>
-                                  {ingredient.location && (
-                                    <p className="text-xs text-gray-500">
-                                      {ingredient.location}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <div className="text-right">
-                                    <p
-                                      className={`text-sm font-medium ${expiryInfo.color}`}
-                                    >
-                                      {daysLeft < 0
-                                        ? "Expired"
-                                        : daysLeft === 0
-                                        ? "Today"
-                                        : `${daysLeft}d`}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                      {formatExpiryDate(ingredient.expiryDate)}
-                                    </p>
+                              return (
+                                <div
+                                  key={ingredient.id}
+                                  className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor} group hover:shadow-md transition-all duration-200`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <h4 className="font-medium text-gray-800">
+                                        {ingredient.name}
+                                      </h4>
+                                      <p className="text-sm text-gray-600">
+                                        {ingredient.quantity} {ingredient.unit}
+                                      </p>
+                                      {ingredient.location && (
+                                        <p className="text-xs text-gray-500">
+                                          {ingredient.location}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <div className="text-right">
+                                        <p
+                                          className={`text-sm font-medium ${expiryInfo.color}`}
+                                        >
+                                          {daysLeft < 0
+                                            ? "Expired"
+                                            : daysLeft === 0
+                                            ? "Today"
+                                            : `${daysLeft}d`}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          {formatExpiryDate(ingredient.expiryDate)}
+                                        </p>
+                                      </div>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() =>
+                                          handleDeleteIngredient(ingredient.id)
+                                        }
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
                                   </div>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() =>
-                                      handleDeleteIngredient(ingredient.id)
-                                    }
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
                                 </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )
-                )}
-
-                {Object.keys(categorizedIngredients).length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg">{t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
-                    <p className="text-sm">
-                      {searchTerm
-                        ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
-                        : ingredients.length === 0
-                        ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
-                        : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
-                    </p>
-                  </div>
-                )}
-              </div>
+                              );
+                            })}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    )
+                  )}
+                </Accordion>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">{t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
+                  <p className="text-sm">
+                    {searchTerm
+                      ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
+                      : ingredients.length === 0
+                      ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
+                      : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
