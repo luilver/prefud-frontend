@@ -1503,7 +1503,7 @@ const translations = {
     "addIngredient.units.box.value": "box",
 
     //IngredientTracker
-    "ingredientTracker.title": "Select the perfect plan",
+    "ingredientTracker.title": "My Pantry",
     "ingredientTracker.description":
       "Keep track of your ingredients and their expiration dates",
     "ingredientTracker.refresh": "Refresh",
@@ -1549,6 +1549,8 @@ const translations = {
     "subscription.monthly": "Monthly",
     "subscription.paymentInfo": "Payment Information",
     "subscription.cardDetails": "Card Details",
+    "mealPlanner.pagination.previous": "Before",
+    "mealPlanner.pagination.next": "Next",
 
     // Meal Planner
     "pagination.show": "Show",
@@ -4752,6 +4754,8 @@ const translations = {
     "subscription.monthly": "Mensal",
     "subscription.paymentInfo": "Informações de Pagamento",
     "subscription.cardDetails": "Detalhes do Cartão",
+    "mealPlanner.pagination.previous": "Antigo",
+    "mealPlanner.pagination.next": "Seguindo",
 
     // Meal Planner
     "pagination.show": "Mostrar",
