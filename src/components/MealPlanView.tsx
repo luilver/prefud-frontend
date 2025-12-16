@@ -468,22 +468,22 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
       <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-emerald-900/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={onBack} className="p-2 text-white hover:bg-white/10">
+            <Button variant="ghost" onClick={onBack} className="p-2 text-white hover:bg-white/20 border border-white/20">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white drop-shadow-lg">
                 {plan.name}
               </h1>
-              <p className="text-sm sm:text-base text-emerald-100/80 mt-1">
+              <p className="text-sm sm:text-base text-white/90 mt-1 font-medium drop-shadow">
                 {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
               </p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button onClick={onEdit} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+            <Button onClick={onEdit} size="sm" className="bg-white text-emerald-800 hover:bg-white/90 font-semibold shadow-lg">
               <Edit className="h-4 w-4 mr-2" />
               {t("mealPlanView.editPlan") || "Edit Plan"}
             </Button>
@@ -789,98 +789,111 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                 )}
               </Card>
 
-              {/* Shopping Items by Category */}
-              {Object.entries(
-                shoppingList.reduce((acc: any, item: any) => {
-                  const category = item.classification || item.category || "Other";
-                  if (!acc[category]) acc[category] = [];
-                  acc[category].push(item);
-                  return acc;
-                }, {})
-              ).map(([category, items]: [string, any]) => (
-                <Card key={category}>
-                  <CardHeader>
-                    <CardTitle className="text-lg capitalize flex items-center justify-between">
-                      <span>{category}</span>
-                      <Badge variant="secondary">
-                        {items.length} {t("mealPlanView.items") || "items"}
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                       {items.map((item: any, index: number) => {
-                         const itemId = item.id || item.name || `${category}-${index}`;
-                         return (
-                         <div
-                           key={itemId}
-                           className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
-                             checkedItems.has(itemId)
-                               ? "bg-blue-50 border-blue-200"
-                               : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                           }`}
-                         >
-                           <div className="flex items-center gap-3">
-                             <Checkbox
-                               id={`item-${itemId}`}
-                               checked={checkedItems.has(itemId)}
-                               onCheckedChange={() => handleItemCheck(itemId)}
-                             />
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium">{item.name}</p>
-                                {item.mealName && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {item.mealName}
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-gray-600">
-                                {item.quantity} {item.unit}
-                                {item.notes && ` • ${item.notes}`}
-                              </p>
-                            </div>
+              {/* Shopping Items by Category with Accordions */}
+              {(() => {
+                const categorizedItems = Object.entries(
+                  shoppingList.reduce((acc: any, item: any) => {
+                    const category = item.classification || item.category || "Other";
+                    if (!acc[category]) acc[category] = [];
+                    acc[category].push(item);
+                    return acc;
+                  }, {})
+                );
+                const firstCategory = categorizedItems.length > 0 ? categorizedItems[0][0] : "";
+                
+                return (
+                  <Accordion type="multiple" defaultValue={[firstCategory]} className="space-y-3">
+                    {categorizedItems.map(([category, items]: [string, any]) => (
+                      <AccordionItem
+                        key={category}
+                        value={category}
+                        className="border border-emerald-200 rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm shadow-sm"
+                      >
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
+                          <div className="flex items-center justify-between w-full pr-2">
+                            <span className="text-lg font-semibold capitalize text-gray-800">{category}</span>
+                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">
+                              {items.length} {t("mealPlanView.items") || "items"}
+                            </Badge>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {item.estimatedPrice && (
-                              <div className="text-sm font-medium text-green-600">
-                                ${item.estimatedPrice}
-                              </div>
-                            )}
-                            <div className="flex gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleAddToPantry([item])}
-                                className="h-8 w-8 p-0"
-                                title={
-                                  t("mealPlanView.addToPantryOne") ||
-                                  "Add to Pantry"
-                                }
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                               <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 onClick={() => handleAddToCart([item])}
-                                 className="h-8 w-8 p-0"
-                                 title={
-                                   t("mealPlanView.addToCartOne") ||
-                                   "Add to Cart"
-                                 }
-                               >
-                                 <ShoppingCart className="h-4 w-4" />
-                               </Button>
-                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4">
+                          <div className="space-y-3 pt-2">
+                            {items.map((item: any, index: number) => {
+                              const itemId = item.id || item.name || `${category}-${index}`;
+                              return (
+                                <div
+                                  key={itemId}
+                                  className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+                                    checkedItems.has(itemId)
+                                      ? "bg-emerald-50 border-emerald-200"
+                                      : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Checkbox
+                                      id={`item-${itemId}`}
+                                      checked={checkedItems.has(itemId)}
+                                      onCheckedChange={() => handleItemCheck(itemId)}
+                                    />
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2">
+                                        <p className="font-medium">{item.name}</p>
+                                        {item.mealName && (
+                                          <Badge variant="outline" className="text-xs">
+                                            {item.mealName}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <p className="text-sm text-gray-600">
+                                        {item.quantity} {item.unit}
+                                        {item.notes && ` • ${item.notes}`}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {item.estimatedPrice && (
+                                      <div className="text-sm font-medium text-green-600">
+                                        ${item.estimatedPrice}
+                                      </div>
+                                    )}
+                                    <div className="flex gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleAddToPantry([item])}
+                                        className="h-8 w-8 p-0"
+                                        title={
+                                          t("mealPlanView.addToPantryOne") ||
+                                          "Add to Pantry"
+                                        }
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleAddToCart([item])}
+                                        className="h-8 w-8 p-0"
+                                        title={
+                                          t("mealPlanView.addToCartOne") ||
+                                          "Add to Cart"
+                                        }
+                                      >
+                                        <ShoppingCart className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
-                         </div>
-                         );
-                       })}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                );
+              })()}
             </>
           ) : (
             <Card>
