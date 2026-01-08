@@ -103,7 +103,7 @@ const UserProfile = () => {
       try {
         // Fetch subscription types
         const typesResponse = await axios.get(
-          "https://pantry-auth-1.onrender.com/subscriptionType/all"
+          "https://pantry-ms-brain.onrender.com/subscriptionType/all"
         );
         setSubscriptionTypes(typesResponse.data);
 

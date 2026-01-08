@@ -58,7 +58,7 @@ const SubscriptionManager = () => {
         features.push(
           "AI Meal Recommendations",
           "Advanced Recipe Collection", 
-          "3 Free Delivery Commissions",
+         
           "Nutritional Analysis",
           "Priority Support"
         );

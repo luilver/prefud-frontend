@@ -68,7 +68,7 @@ interface SignupData {
   };
 }
 const BasicURL =
-  import.meta.env.VITE_BASE_URL || "https://pantry-auth-1.onrender.com";
+  import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
 
 const SignupSteps = () => {
   const [currentStep, setCurrentStep] = useState(1);

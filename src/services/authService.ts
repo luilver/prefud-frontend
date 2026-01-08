@@ -108,7 +108,7 @@ interface CompleteLoginResponse extends LoginResponse {
 }
 
 class AuthService {
-  private baseURL = import.meta.env.VITE_BASE_URL ||'https://pantry-auth-1.onrender.com';
+  private baseURL = import.meta.env.VITE_BASE_URL ||'https://pantry-ms-brain.onrender.com';
   private pantryURL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
 
   async login(email: string, password: string): Promise<CompleteLoginResponse> {

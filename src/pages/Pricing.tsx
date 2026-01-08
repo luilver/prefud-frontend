@@ -64,13 +64,13 @@ const Pricing = () => {
     {
       id: "family",
       nameKey: "pricing.plans.family.name",
-      price: 40,
+      price: 10.99,
       interval: "month",
       descriptionKey: "pricing.plans.family.description",
       popular: true,
       features: [
-        `5 ${t('pricing.features.meal-plans')}`,
-        `10 ${t('pricing.features.meal-creations')}`,
+        `4 ${t('pricing.features.meal-plans')}`,
+        `5 ${t('pricing.features.meal-creations')}`,
         t('pricing.features.ai-recommendations'),
         t('pricing.features.advanced-recipes'),
         `3 ${t('pricing.features.delivery-commissions')}`,
@@ -78,8 +78,8 @@ const Pricing = () => {
         t('pricing.features.priority-support')
       ],
       limits: {
-        plansPerMonth: 5,
-        mealCreations: 10,
+        plansPerMonth: 4,
+        mealCreations: 5,
         deliveryCommissions: 3
       },
       savings: {
@@ -91,7 +91,7 @@ const Pricing = () => {
     {
       id: "professional",
       nameKey: "pricing.plans.professional.name",
-      price: 120,
+      price: 24.99,
       interval: "month",
       descriptionKey: "pricing.plans.professional.description",
       features: [
@@ -108,7 +108,7 @@ const Pricing = () => {
       ],
       limits: {
         plansPerMonth: 12,
-        mealCreations: -1, // unlimited
+        mealCreations: 15, // unlimited
         deliveryCommissions: 10,
         homeDeliveries: 3
       },

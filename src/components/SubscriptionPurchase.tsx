@@ -1,13 +1,22 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Plus, CreditCard, ArrowLeft, Check, Crown } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { getAllSubscriptionTypes, ApiSubscriptionType } from "@/services/payments";
+import {
+  getAllSubscriptionTypes,
+  ApiSubscriptionType,
+} from "@/services/payments";
 import PaymentForm from "./PaymentForm";
 
 interface SubscriptionPlan {
@@ -30,64 +39,78 @@ interface SubscriptionPurchaseProps {
 }
 
 const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
-  const { paymentMethods, getPaymentMethods, createCheckoutWithPaymentMethod, acceptSubscription } = useUser();
+  const {
+    paymentMethods,
+    getPaymentMethods,
+    createCheckoutWithPaymentMethod,
+    acceptSubscription,
+  } = useUser();
   const { user } = useAuth();
   const { toast } = useToast();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
+    null
+  );
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
-  const [currentSubscriptionId, setCurrentSubscriptionId] = useState<string>("");
+  const [currentSubscriptionId, setCurrentSubscriptionId] =
+    useState<string>("");
 
   // Convert API subscription types to UI subscription plans
-  const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
-    return apiPlans.filter(plan => plan.price > 0).map((apiPlan) => {
-      const priceInDollars = apiPlan.price / 100; // Convert cents to dollars
-      
-      const features = [
-        `${apiPlan.mealPlans} Meal Plans per month`,
-        `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
-        `${apiPlan.healthyDrinks} Healthy Drinks per month`,
-        `${apiPlan.specialMeals} Special Meals per month`
-      ];
+  const convertApiToPlans = (
+    apiPlans: ApiSubscriptionType[]
+  ): SubscriptionPlan[] => {
+    return apiPlans
+      .filter((plan) => plan.price > 0)
+      .map((apiPlan) => {
+        const priceInDollars = apiPlan.price / 100; // Convert cents to dollars
 
-      if (apiPlan.name.toLowerCase() === 'family') {
-        features.push(
-          "AI Meal Recommendations",
-          "Advanced Recipe Collection", 
-          "3 Free Delivery Commissions",
-          "Nutritional Analysis",
-          "Priority Support"
-        );
-      } else if (apiPlan.name.toLowerCase() === 'professional') {
-        features.push(
-          "10 Free Delivery Commissions",
-          "3 Free Home Deliveries",
-          "Advanced AI Recommendations", 
-          "Custom Dietary Plans",
-          "Professional Analytics",
-          "Phone Support"
-        );
-      }
+        const features = [
+          `${apiPlan.mealPlans} Meal Plans per month`,
+          `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
+          `${apiPlan.healthyDrinks} Healthy Drinks per month`,
+          `${apiPlan.specialMeals} Special Meals per month`,
+        ];
 
-      return {
-        id: apiPlan._id,
-        name: apiPlan.name,
-        price: priceInDollars,
-        interval: "month",
-        features,
-        limits: {
-          plansPerMonth: apiPlan.mealPlans,
-          mealCreations: apiPlan.generatedMeals,
-          deliveryCommissions: apiPlan.name.toLowerCase() === 'family' ? 3 : 
-                              apiPlan.name.toLowerCase() === 'professional' ? 10 : 0,
-          homeDeliveries: apiPlan.name.toLowerCase() === 'professional' ? 3 : undefined
-        },
-        popular: apiPlan.name.toLowerCase() === 'family'
-      };
-    });
+        if (apiPlan.name.toLowerCase() === "family") {
+          features.push(
+            "AI Meal Recommendations",
+            "Advanced Recipe Collection",
+            "Nutritional Analysis"
+          );
+        } else if (apiPlan.name.toLowerCase() === "professional") {
+          features.push(
+            "Advanced AI Recommendations",
+            "Custom Dietary Plans",
+            "Professional Analytics",
+            "Priority Support"
+          );
+        }
+
+        return {
+          id: apiPlan._id,
+          name: apiPlan.name,
+          price: priceInDollars,
+          interval: "month",
+          features,
+          limits: {
+            plansPerMonth: apiPlan.mealPlans,
+            mealCreations: apiPlan.generatedMeals,
+            deliveryCommissions:
+              apiPlan.name.toLowerCase() === "family"
+                ? 3
+                : apiPlan.name.toLowerCase() === "professional"
+                ? 10
+                : 0,
+            homeDeliveries:
+              apiPlan.name.toLowerCase() === "professional" ? 3 : undefined,
+          },
+          popular: apiPlan.name.toLowerCase() === "family",
+        };
+      });
   };
 
   useEffect(() => {
@@ -96,33 +119,39 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
         setIsLoadingPlans(true);
         const [apiPlans] = await Promise.all([
           getAllSubscriptionTypes(),
-          getPaymentMethods()
+          getPaymentMethods(),
         ]);
-        
+
         const convertedPlans = convertApiToPlans(apiPlans);
         setPlans(convertedPlans);
 
         // Set current subscription ID for comparison
-        const userSubId = (user?.subscription?.subscriptionTypeId ?? "").toString().trim();
+        const userSubId = (user?.subscription?.subscriptionTypeId ?? "")
+          .toString()
+          .trim();
         console.log("[SubscriptionPurchase] User subscription ID:", userSubId);
         setCurrentSubscriptionId(userSubId);
-        
+
         // Set default to family plan if available and not current
-        const familyPlan = convertedPlans.find(plan => plan.name.toLowerCase() === 'family');
+        const familyPlan = convertedPlans.find(
+          (plan) => plan.name.toLowerCase() === "family"
+        );
         if (familyPlan && familyPlan.id !== userSubId) {
           setSelectedPlan(familyPlan);
         } else {
-          const availablePlan = convertedPlans.find(plan => plan.id !== userSubId);
+          const availablePlan = convertedPlans.find(
+            (plan) => plan.id !== userSubId
+          );
           if (availablePlan) {
             setSelectedPlan(availablePlan);
           }
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         toast({
           title: "Error Loading Data",
           description: "Failed to load subscription plans and payment methods.",
-          variant: "destructive"
+          variant: "destructive",
         });
       } finally {
         setIsLoadingPlans(false);
@@ -134,7 +163,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
 
   useEffect(() => {
     // Set default payment method as selected
-    const defaultMethod = paymentMethods.find(method => method.isDefault);
+    const defaultMethod = paymentMethods.find((method) => method.isDefault);
     if (defaultMethod && !selectedPaymentMethod) {
       setSelectedPaymentMethod(defaultMethod.id);
     }
@@ -145,7 +174,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
       toast({
         title: "Payment Method Required",
         description: "Please select a payment method or add a new one.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -154,24 +183,28 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
     try {
       if (selectedPaymentMethod) {
         // Use existing payment method
-        const checkoutUrl = await createCheckoutWithPaymentMethod(selectedPlan, selectedPaymentMethod);
-        window.open(checkoutUrl, '_blank');
-        
+        const checkoutUrl = await createCheckoutWithPaymentMethod(
+          selectedPlan,
+          selectedPaymentMethod
+        );
+        window.open(checkoutUrl, "_blank");
+
         // Simulate successful subscription
         await acceptSubscription(selectedPlan.id);
-        
+
         toast({
           title: "Subscription Activated!",
           description: `Welcome to ${selectedPlan.name}! Your subscription is now active.`,
         });
-        
+
         onBack();
       }
     } catch (error) {
       toast({
         title: "Purchase Failed",
-        description: "There was an error processing your subscription. Please try again.",
-        variant: "destructive"
+        description:
+          "There was an error processing your subscription. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -182,7 +215,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
     // Refresh payment methods
     await getPaymentMethods();
     setShowAddPaymentMethod(false);
-    
+
     // Proceed with subscription using the new payment method
     toast({
       title: "Payment Method Added",
@@ -199,7 +232,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
           email: user?.email || "user@example.com",
           phone: user?.profile?.phone || "+1234567890",
           customerId: user?.profile?.ruku_client_id || "",
-          userId: user?.userId || ""
+          userId: user?.userId || "",
         }}
         selectedPlan={selectedPlan}
       />
@@ -214,7 +247,9 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Choose Your Plan</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Choose Your Plan
+            </h2>
             <p className="text-gray-600">Loading subscription plans...</p>
           </div>
         </div>
@@ -247,7 +282,9 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
         </Button>
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Choose Your Plan</h2>
-          <p className="text-gray-600">Select a plan and payment method to get started</p>
+          <p className="text-gray-600">
+            Select a plan and payment method to get started
+          </p>
         </div>
       </div>
 
@@ -255,17 +292,17 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
       <div className="grid md:grid-cols-2 gap-6">
         {plans.map((plan) => {
           const isCurrentPlan = plan.id === currentSubscriptionId;
-          
+
           return (
-            <Card 
+            <Card
               key={plan.id}
               className={`relative cursor-pointer transition-all ${
                 selectedPlan?.id === plan.id
-                  ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
+                  ? "border-green-500 border-2 bg-gradient-to-b from-green-50 to-white"
                   : plan.popular
-                  ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white'
-                  : 'border-gray-200 hover:border-green-300'
-              } ${isCurrentPlan ? 'opacity-50' : ''}`}
+                  ? "border-green-500 border-2 bg-gradient-to-b from-green-50 to-white"
+                  : "border-gray-200 hover:border-green-300"
+              } ${isCurrentPlan ? "opacity-50" : ""}`}
               onClick={() => !isCurrentPlan && setSelectedPlan(plan)}
             >
               {isCurrentPlan && (
@@ -275,7 +312,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
                   </div>
                 </div>
               )}
-              
+
               {plan.popular && !isCurrentPlan && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
@@ -284,13 +321,15 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
                   </div>
                 </div>
               )}
-              
+
               <CardHeader className="text-center">
                 <CardTitle className="text-xl">{plan.name}</CardTitle>
                 <CardDescription>
                   <div className="text-3xl font-bold text-gray-800 mt-2">
                     ${plan.price}
-                    <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>
+                    <span className="text-sm font-normal text-gray-600">
+                      /{plan.interval}
+                    </span>
                   </div>
                 </CardDescription>
               </CardHeader>
@@ -305,7 +344,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
                   ))}
                 </ul>
               </CardContent>
-              
+
               {selectedPlan?.id === plan.id && !isCurrentPlan && (
                 <div className="absolute top-4 right-4">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
@@ -332,17 +371,28 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
         <CardContent>
           <div className="space-y-4">
             {paymentMethods.length > 0 ? (
-              <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+              <RadioGroup
+                value={selectedPaymentMethod}
+                onValueChange={setSelectedPaymentMethod}
+              >
                 {paymentMethods.map((method) => (
-                  <div key={method.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                  <div
+                    key={method.id}
+                    className="flex items-center space-x-3 p-3 border rounded-lg"
+                  >
                     <RadioGroupItem value={method.id} id={method.id} />
-                    <Label htmlFor={method.id} className="flex-1 cursor-pointer">
+                    <Label
+                      htmlFor={method.id}
+                      className="flex-1 cursor-pointer"
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <CreditCard className="h-5 w-5 text-gray-600" />
                           <div>
                             <div className="flex items-center space-x-2">
-                              <span className="font-medium capitalize">{method.brand}</span>
+                              <span className="font-medium capitalize">
+                                {method.brand}
+                              </span>
                               <span>•••• {method.last4}</span>
                               {method.isDefault && (
                                 <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
@@ -351,7 +401,9 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
                               )}
                             </div>
                             <p className="text-sm text-gray-500">
-                              Expires {method.expiryMonth.toString().padStart(2, '0')}/{method.expiryYear}
+                              Expires{" "}
+                              {method.expiryMonth.toString().padStart(2, "0")}/
+                              {method.expiryYear}
                             </p>
                           </div>
                         </div>
@@ -367,9 +419,9 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
                 <p className="text-sm">Add a payment method to continue</p>
               </div>
             )}
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               onClick={() => setShowAddPaymentMethod(true)}
               className="w-full"
             >
@@ -384,17 +436,21 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
       {selectedPlan && (
         <div className="flex items-center justify-between p-6 bg-gray-50 rounded-lg">
           <div>
-            <h3 className="font-semibold text-gray-800">{selectedPlan.name} Plan</h3>
+            <h3 className="font-semibold text-gray-800">
+              {selectedPlan.name} Plan
+            </h3>
             <p className="text-2xl font-bold text-green-600">
               ${selectedPlan.price}/{selectedPlan.interval}
             </p>
           </div>
-          <Button 
+          <Button
             onClick={handlePurchaseSubscription}
-            disabled={isLoading || (!selectedPaymentMethod && paymentMethods.length > 0)}
+            disabled={
+              isLoading || (!selectedPaymentMethod && paymentMethods.length > 0)
+            }
             className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
           >
-            {isLoading ? 'Processing...' : 'Subscribe Now'}
+            {isLoading ? "Processing..." : "Subscribe Now"}
           </Button>
         </div>
       )}

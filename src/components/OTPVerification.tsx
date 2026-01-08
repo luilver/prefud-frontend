@@ -15,7 +15,7 @@ interface OTPVerificationProps {
   onVerified: () => void;
   onBack: () => void;
 }
-const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
+const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
 
 const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationProps) => {
   const [otp, setOtp] = useState("");

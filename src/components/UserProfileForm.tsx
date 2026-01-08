@@ -14,7 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 
 
-const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-auth-1.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
 
 
 interface UserProfileFormProps {
