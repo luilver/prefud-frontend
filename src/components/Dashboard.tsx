@@ -157,7 +157,7 @@ const DashboardContent = () => {
 
       {/* Header for Mobile */}
       {isMobile && (
-        <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-b border-emerald-500/30 z-50 shadow-xl">
+        <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-b border-emerald-500/30 z-50 shadow-xl pt-[env(safe-area-inset-top)]">
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-teal-400/5 to-emerald-600/5"></div>
           <div className="relative container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
             <div className="flex items-center justify-between">
