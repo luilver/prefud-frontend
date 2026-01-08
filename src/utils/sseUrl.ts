@@ -1,9 +1,5 @@
 export function buildOrderSseUrl(orderId: string, token?: string) {
-  const baseUrl = import.meta.env.VITE_PANTRY_URL;
-
-  if (!baseUrl) {
-    throw new Error('VITE_PANTRY_URL is not defined');
-  }
+  const baseUrl = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
 
   const url = new URL(`${baseUrl}/stream`);
 
