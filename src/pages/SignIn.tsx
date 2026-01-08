@@ -126,32 +126,18 @@ const SignIn = () => {
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Minimal Header */}
-        <header className="py-4 px-4 md:py-6">
+        <header className="py-4 px-4 md:py-6 pt-[env(safe-area-inset-top)]">
           <div className="container mx-auto flex items-center justify-between">
-            <button 
-              onClick={() => navigate("/")}
-              className="flex items-center gap-2.5 group"
-            >
-              <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
                 <Utensils className="h-5 w-5 text-emerald-400" />
               </div>
               <span className="text-xl font-semibold text-white/90 tracking-tight">
                 Pantry
               </span>
-            </button>
-            
-            <div className="flex items-center gap-2">
-              <LanguageSelector variant="button" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/")}
-                className="text-white/70 hover:text-white hover:bg-white/10 transition-all"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1.5" />
-                <span className="hidden sm:inline">{t("signup.backToStart")}</span>
-              </Button>
             </div>
+            
+            <LanguageSelector variant="button" />
           </div>
         </header>
 
