@@ -41,6 +41,7 @@ import WelcomeModal from "./WelcomeModal";
 import axios from "axios";
 import { getAllSubscriptionTypes } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
+import { trackEvent } from "@/services/analytics";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
@@ -499,6 +500,14 @@ const SignupSteps = () => {
                   type="submit"
                   className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
                   disabled={isLoading}
+                  onClick={async () => {
+                    console.log('step 1 signup');
+                    trackEvent('button_click', {
+                              button_name: `step${currentStep}_submit`,
+                              screen: 'signup_page',
+                            })
+
+                  }}
                 >
                   {isLoading ? (
                     <div className="flex items-center space-x-2">
@@ -655,6 +664,13 @@ const SignupSteps = () => {
                           ? "bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground"
                           : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
                       }`}
+                      onClick={async () => {
+                        console.log('step 4 plan selection');
+                        trackEvent('button_click', {
+                                  button_name: `step${currentStep}_signup_plan${plan.name}_submit`,
+                                  screen: 'signup_page',
+                                })
+                      }}
                     >
                       <div className="flex items-center space-x-2">
                         <span>{t("signup.plan.choose") || "Choose"} {plan.name}</span>

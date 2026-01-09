@@ -12,6 +12,7 @@ import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
+import { trackEvent } from "@/services/analytics";
 
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
@@ -474,6 +475,12 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
               type="submit"
               disabled={!formData.acceptedTerms || isLoading}
               className="flex-1 bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed h-10 sm:h-12 text-sm sm:text-base"
+              onClick={async ()=> {
+                trackEvent('button_click', {
+                          button_name: 'step3_signup_submit',
+                          screen: 'signup_page',
+                        })
+              }}
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">

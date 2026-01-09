@@ -35,15 +35,20 @@ const SignIn = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     //firebase eventlogin
-     await trackEvent('button_click', {
-      button_name: 'login_submit',
-      screen: 'login_page',
-    })
+    await trackEvent("button_click", {
+      button_name: "login_submit",
+      screen: "login_page",
+    });
     e.preventDefault();
     setIsLoading(true);
     try {
       const userData = await login(email, password);
-      if (userData?.profile?.languages && (userData.profile.languages === "en" || userData.profile.languages === "es" || userData.profile.languages === "pt")) {
+      if (
+        userData?.profile?.languages &&
+        (userData.profile.languages === "en" ||
+          userData.profile.languages === "es" ||
+          userData.profile.languages === "pt")
+      ) {
         setLanguage(userData.profile.languages as Language);
       }
 
@@ -97,14 +102,14 @@ const SignIn = () => {
   if (showPasswordRecovery) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+            backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
           }}
         />
         <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
-        
+
         <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
           <PasswordRecovery onBack={() => setShowPasswordRecovery(false)} />
         </div>
@@ -116,16 +121,16 @@ const SignIn = () => {
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col">
       {/* Premium Food Background */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
         }}
       />
-      
+
       {/* Dark Overlay for Readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
-      
+
       {/* Subtle Warm Accent */}
       <div className="absolute inset-0 bg-gradient-to-tr from-amber-900/20 via-transparent to-emerald-900/10" />
 
@@ -134,7 +139,7 @@ const SignIn = () => {
         {/* Minimal Header */}
         <header className="py-4 px-4 md:py-6">
           <div className="container mx-auto flex items-center justify-between">
-            <button 
+            <button
               onClick={() => navigate("/")}
               className="flex items-center gap-2.5 group"
             >
@@ -145,7 +150,7 @@ const SignIn = () => {
                 Pantry
               </span>
             </button>
-            
+
             <div className="flex items-center gap-2">
               <LanguageSelector variant="button" />
               <Button
@@ -155,7 +160,9 @@ const SignIn = () => {
                 className="text-white/70 hover:text-white hover:bg-white/10 transition-all"
               >
                 <ArrowLeft className="h-4 w-4 mr-1.5" />
-                <span className="hidden sm:inline">{t("signup.backToStart")}</span>
+                <span className="hidden sm:inline">
+                  {t("signup.backToStart")}
+                </span>
               </Button>
             </div>
           </div>
@@ -176,7 +183,7 @@ const SignIn = () => {
                   {t("signin.subtitle")}
                 </CardDescription>
               </CardHeader>
-              
+
               <CardContent className="px-6 md:px-8 pb-8 pt-4">
                 <form onSubmit={handleLogin} className="space-y-5">
                   <div className="space-y-2">
@@ -196,7 +203,7 @@ const SignIn = () => {
                       placeholder={t("signin.email.placeholder")}
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label
                       htmlFor="password"
@@ -229,7 +236,7 @@ const SignIn = () => {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end">
                     <Button
                       type="button"
@@ -240,7 +247,7 @@ const SignIn = () => {
                       {t("signin.forgot-password")}
                     </Button>
                   </div>
-                  
+
                   <Button
                     type="submit"
                     className="w-full h-12 text-base font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 rounded-xl"
@@ -255,7 +262,13 @@ const SignIn = () => {
                     {t("signin.no-account")}{" "}
                     <Button
                       variant="link"
-                      onClick={() => navigate("/signup")}
+                      onClick={async () => {
+                        trackEvent("button_click", {
+                          button_name: "signup_submit",
+                          screen: "login_page",
+                        });
+                        navigate("/signup");
+                      }}
                       className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-0 h-auto font-semibold text-sm"
                     >
                       {t("signin.create-here")}

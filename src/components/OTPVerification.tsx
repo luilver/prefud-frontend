@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
 import axios from "axios";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trackEvent } from "@/services/analytics";
 
 interface OTPVerificationProps {
   email: string;
@@ -25,6 +26,10 @@ const OTPVerification = ({ email, userId, onVerified, onBack }: OTPVerificationP
   
 
   const handleVerify = async () => {
+    trackEvent('button_click', {
+              button_name: 'steptwo_otp_submit',
+              screen: 'signup_page',
+            })
     if (otp.length !== 6 || !userId) return;
     
     setIsLoading(true);
