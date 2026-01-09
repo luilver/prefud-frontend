@@ -27,6 +27,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Plan } from "@/utils/mapSubscriptionPlans";
 import PaymentForm2 from "./PaymentForm2";
+import { trackEvent } from "@/services/analytics";
 
 
 const stripePromise = loadStripe(
@@ -108,6 +109,10 @@ const PaymentMethodModal = ({
   };
 
   const handleSubscribe = async () => {
+    trackEvent('button_click', {
+          button_name: 'subscribe_submit',
+          screen: 'profile_page',
+        })
     setIsProcessing(true);
     //check for a payment method
     if (!selectedPaymentMethod) {

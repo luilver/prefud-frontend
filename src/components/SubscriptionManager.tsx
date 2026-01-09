@@ -9,6 +9,7 @@ import PaymentForm from "./PaymentForm";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import PaymentMethodModal from "./PaymentMethodModal";
 import SubscriptionSuccessModal from "./SubscriptionSuccessModal";
+import { trackEvent } from "@/services/analytics";
 
 interface SubscriptionPlan {
   id: string;
@@ -142,6 +143,10 @@ const SubscriptionManager = () => {
   };
 
   const handleCancelSubscription = () => {
+    trackEvent('button_click', {
+          button_name: 'cancel_subscription_submit',
+          screen: 'profile_page',
+        })
     // Simulate switching to free plan
     setCurrentSubscriptionId("");
     setCurrentSubscriptionName("Free");

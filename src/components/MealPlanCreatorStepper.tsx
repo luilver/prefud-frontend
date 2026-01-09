@@ -32,6 +32,7 @@ import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
 import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
+import { trackEvent } from "@/services/analytics";
 
 interface MealPlanCreatorStepperProps {
   onPlanCreated: (plan: any) => void;
@@ -1047,6 +1048,11 @@ const MealPlanCreatorStepper = ({
 
   const generateMealPlan = async () => {
     console.log("🚀 Generate Meal Plan clicked!");
+    //register generate meal plan event in analytics
+    trackEvent('button_click', {
+          button_name: 'generate_plan_submit',
+          screen: 'generate_mealplan_page',
+        })
     console.log("Current plan data:", planData);
     console.log("User:", user);
     //populate the screen of the success modal

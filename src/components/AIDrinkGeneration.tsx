@@ -12,6 +12,7 @@ import { createHealthyDrink, ApiDrinkPlan } from "@/services/drinkService";
 import { addIngredientsToPantry } from "@/services/pantryService";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trackEvent } from "@/services/analytics";
 
 interface AIDrinkGenerationProps {
   data: any;
@@ -48,6 +49,10 @@ const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => 
   };
 
   const generateDrink = async () => {
+    trackEvent('button_click', {
+          button_name: 'generate_drink_submit',
+          screen: 'generate_drink_page',
+        })
     if (!user?.id) {
       toast.error("Please log in to generate a drink");
       return;

@@ -12,6 +12,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import AIMealGeneration from "./AIMealGeneration";
+import { trackEvent } from "@/services/analytics";
 
 interface AIMealCreatorStepperProps {
   onBack: () => void;
@@ -67,9 +68,13 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
   const handleNext = async () => {
     if (currentStep === 3) {
+      
       // Show the cooking loader when transitioning to generation
       showLoader(t("aiMealCreatorStepper.loaderMessage") || "Analyzing your preferences and creating the perfect meal...");
-      
+      trackEvent('button_click', {
+            button_name: 'generate_special_meal_submit',
+            screen: 'generate_special_meal_page',
+          })
       // Simulate API processing time
       await new Promise(resolve => setTimeout(resolve, 3000));
       

@@ -19,6 +19,7 @@ import PasswordRecovery from "@/components/PasswordRecovery";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/services/analytics";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -33,6 +34,11 @@ const SignIn = () => {
   const { t, setLanguage } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
+    //firebase eventlogin
+     await trackEvent('button_click', {
+      button_name: 'login_submit',
+      screen: 'login_page',
+    })
     e.preventDefault();
     setIsLoading(true);
     try {
