@@ -23,4 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-android
+ios/App/App/GoogleService-Info.plist
