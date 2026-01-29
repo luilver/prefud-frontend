@@ -75,6 +75,38 @@ interface CurrentSubscriptionInfo {
   _id: string;
 }
 
+interface CalorieTrack {
+  _id: string;
+  year: string;
+  month: string;
+  user_id: string;
+  caloriesConsumed: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CarbonTrack {
+  _id: string;
+  year: string;
+  month: string;
+  user_id: string;
+  carbonConsumed: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface HealthGoals {
+  dailyCaloriesGoal: number;
+  goals: string[];
+  _id: string;
+}
+
+interface TrackingData {
+  caloriesTrak: CalorieTrack | null;
+  carbonTrak: CarbonTrack | null;
+  healthGoals: HealthGoals | null;
+}
+
 const UserProfile = () => {
   const navigate = useNavigate();
   const { user, updateUserProfile, logout } = useUser();
@@ -96,8 +128,9 @@ const UserProfile = () => {
     phone: user?.phone || "",
     country: user?.country || "",
   });
+  const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
 
-  // Fetch subscription types and current subscription data on component mount
+  // Fetch subscription types, current subscription, and tracking data on component mount
   useEffect(() => {
     const fetchSubscriptionData = async () => {
       try {
@@ -117,8 +150,36 @@ const UserProfile = () => {
       }
     };
 
+    const fetchTrackingData = async () => {
+      try {
+        if (authUser?.userId) {
+          const response = await axios.get(
+            `https://pantry-ms-brain.onrender.com/meal-plan/trakking/${authUser.userId}?type=all`
+          );
+          setTrackingData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching tracking data:", error);
+      }
+    };
+
     fetchSubscriptionData();
+    fetchTrackingData();
   }, [authUser?.userId]);
+
+  // Calculate daily average for calories
+  const getDaysInCurrentMonth = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  };
+
+  const caloriesConsumed = trackingData?.caloriesTrak?.caloriesConsumed ?? 0;
+  const dailyCaloriesAverage = caloriesConsumed > 0 
+    ? Math.round(caloriesConsumed / getDaysInCurrentMonth()) 
+    : 0;
+  const carbonConsumed = trackingData?.carbonTrak?.carbonConsumed ?? 0;
+  const dailyCaloriesGoal = trackingData?.healthGoals?.dailyCaloriesGoal ?? authUser?.profile?.healthGoals?.dailyCaloriesGoal ?? 2000;
+  const healthGoals = trackingData?.healthGoals?.goals ?? [];
 
   // Find current subscription name and type based on subscriptionTypeId
   const [currentSubscriptionType, setCurrentSubscriptionType] = useState<SubscriptionType | null>(null);
@@ -591,7 +652,7 @@ const UserProfile = () => {
                     <div className="flex items-center justify-between mb-2">
                       <Target className="h-5 w-5 text-orange-600" />
                       <span className="text-2xl font-bold text-orange-600">
-                        {authUser?.profile?.healthGoals?.dailyCaloriesGoal || 2000}
+                        {dailyCaloriesGoal.toLocaleString()}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyGoal") || "Daily Goal"}</p>
@@ -603,7 +664,7 @@ const UserProfile = () => {
                     <div className="flex items-center justify-between mb-2">
                       <Activity className="h-5 w-5 text-red-600" />
                       <span className="text-2xl font-bold text-red-600">
-                        24,680
+                        {caloriesConsumed.toLocaleString()}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.thisMonth") || "This Month"}</p>
@@ -615,7 +676,7 @@ const UserProfile = () => {
                     <div className="flex items-center justify-between mb-2">
                       <TrendingDown className="h-5 w-5 text-blue-600" />
                       <span className="text-2xl font-bold text-blue-600">
-                        1,956
+                        {dailyCaloriesAverage.toLocaleString()}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyAverage") || "Daily Average"}</p>
@@ -626,22 +687,23 @@ const UserProfile = () => {
                 <div className="mt-6">
                   <h4 className="text-base font-medium mb-3">{t("profile.calorieTracking.healthGoalsProgress") || "Health Goals Progress"}</h4>
                   <div className="space-y-2">
-                    {["Gain muscle", "Lose weight", "Better digestion", "Heart health"].map((goal, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm font-medium">{goal}</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-emerald-600 h-2 rounded-full" 
-                              style={{ width: `${Math.floor(Math.random() * 100)}%` }}
-                            />
+                    {healthGoals.length > 0 ? (
+                      healthGoals.map((goal, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <span className="text-sm font-medium">{goal}</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-4 h-4 bg-emerald-100 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-emerald-600 rounded-full" />
+                            </div>
+                            <span className="text-xs text-emerald-600">Active</span>
                           </div>
-                          <span className="text-xs text-gray-500">
-                            {Math.floor(Math.random() * 100)}%
-                          </span>
                         </div>
+                      ))
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-lg text-center">
+                        <span className="text-sm text-gray-500">{t("profile.calorieTracking.noGoals") || "No health goals set"}</span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </AccordionContent>
@@ -669,44 +731,31 @@ const UserProfile = () => {
                 </p>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                  {/* Expired Ingredients Impact */}
-                  <div className="bg-red-50 rounded-lg p-4 border border-red-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <XCircle className="h-5 w-5 text-red-600" />
-                      <div className="text-right">
-                        <span className="text-2xl font-bold text-red-600">2.4</span>
-                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
-                      </div>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.expiredIngredients") || "Expired Ingredients"}</p>
-                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonWasted") || "Carbon footprint wasted"}</p>
-                  </div>
-
                   {/* Consumed Meals Impact */}
                   <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
                     <div className="flex items-center justify-between mb-2">
                       <Utensils className="h-5 w-5 text-emerald-600" />
                       <div className="text-right">
-                        <span className="text-2xl font-bold text-emerald-600">8.7</span>
+                        <span className="text-2xl font-bold text-emerald-600">{carbonConsumed.toLocaleString()}</span>
                         <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
                       </div>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.environmental.consumedMeals") || "Consumed Meals"}</p>
                     <p className="text-xs text-gray-500">{t("profile.environmental.carbonUsed") || "Carbon footprint used"}</p>
                   </div>
-                </div>
 
-                {/* Total Monthly Impact */}
-                <div className="bg-blue-50 rounded-lg p-4 border border-blue-100 mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <Leaf className="h-6 w-6 text-blue-600" />
-                    <div className="text-right">
-                      <span className="text-3xl font-bold text-blue-600">11.1</span>
-                      <span className="text-lg text-gray-500 ml-1">kg CO₂</span>
+                  {/* Total Monthly Impact */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Leaf className="h-6 w-6 text-blue-600" />
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-blue-600">{carbonConsumed.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
+                      </div>
                     </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
                   </div>
-                  <p className="text-base font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
-                  <p className="text-sm text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
                 </div>
 
                 {/* Environmental Tips */}
