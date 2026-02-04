@@ -1549,6 +1549,7 @@ const translations = {
     "subscription.monthly": "Monthly",
     "subscription.paymentInfo": "Payment Information",
     "subscription.cardDetails": "Card Details",
+    "subscription.paymentSecure":"Your payment is secured by Rukupay LLC",
     "mealPlanner.pagination.previous": "Before",
     "mealPlanner.pagination.next": "Next",
 
@@ -3152,6 +3153,7 @@ const translations = {
     "subscription.monthly": "Mensual",
     "subscription.paymentInfo": "Información de Pago",
     "subscription.cardDetails": "Detalles de la Tarjeta",
+    "subscription.paymentSecure":"Tu pago esta asegurado por Rukupay LLC",
 
     "mealPlanner.pagination.previous": "Anterior",
     "mealPlanner.pagination.next": "Siguiente",
@@ -4754,6 +4756,7 @@ const translations = {
     "subscription.monthly": "Mensal",
     "subscription.paymentInfo": "Informações de Pagamento",
     "subscription.cardDetails": "Detalhes do Cartão",
+    "subscription.paymentSecure":"Seu pagamento está seguro com Rukupay LLC",
     "mealPlanner.pagination.previous": "Antigo",
     "mealPlanner.pagination.next": "Seguindo",
 

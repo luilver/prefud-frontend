@@ -1,4 +1,4 @@
-package com.bessel.pantryapp;
+package com.bessel.mypantryapp;
 
 import com.getcapacitor.BridgeActivity;
 

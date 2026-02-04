@@ -1,9 +1,9 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'com.bessel.pantryapp',
-  appName: 'Pantry AI',
-  webDir: 'dist',
+  appId: "com.bessel.mypantryapp",
+  appName: "Pantry AI",
+  webDir: "dist",
   android: {
     // Enable edge-to-edge display and respect system insets
     allowMixedContent: true,
@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   plugins: {
     StatusBar: {
       overlaysWebView: true,
-      style: 'DARK',
+      style: "DARK",
     },
   },
 };

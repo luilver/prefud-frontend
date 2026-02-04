@@ -113,9 +113,9 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor-firebase/analytics"
 
 SPEC CHECKSUMS:
-  Capacitor: ff35b0f66370b84aa238251b35b91886a3207c16
+  Capacitor: 2d8b1a05870ddb600b0e1e32b83fcf0890c244e1
   CapacitorCordova: 0d65b9bb74e995dcecb9463f34f1af2aba6f955c
-  CapacitorFirebaseAnalytics: 19a1c90af1b9eb4c290fd026418f961f3fd0e548
+  CapacitorFirebaseAnalytics: 5ea57fbddfc1af7f6078c850ef59f7c7eccbec00
   FirebaseAnalytics: e423129866107aeacf6010a280b9c9829f9ea50d
   FirebaseCore: c7b57863ce0859281a66d16ca36d665c45d332b5
   FirebaseCoreInternal: 571a2dd8c975410966199623351db3a3265c874d
