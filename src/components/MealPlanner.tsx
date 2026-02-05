@@ -403,17 +403,17 @@ const MealPlanner = () => {
           </>
         ) : (
           !isLoadingPlans && hasLoadedInitialPlans && (
-            <Card className="text-center py-12 bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="text-center py-12 bg-card backdrop-blur-sm border border-border shadow-xl">
               <CardContent>
                 <div className="flex flex-col items-center space-y-4">
-                  <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 rounded-full shadow-lg">
-                    <Sparkles className="h-8 w-8 text-white" />
+                  <div className="bg-gradient-to-r from-primary to-primary/80 p-4 rounded-full shadow-lg">
+                    <Sparkles className="h-8 w-8 text-primary-foreground" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       {t('mealPlanner.welcomeToAIMeal') || 'Welcome to AI Meal Planning'}, {user?.name?.split(' ')[0] || 'Chef'}!
                     </h3>
-                    <p className="text-gray-600 max-w-md mx-auto">
+                    <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
                       {t('mealPlanner.createYourPersonalized') || 'Create your first personalized meal plan with our AI assistant'}. 
                       {t('mealPlanner.getCustomizedRecipes') || 'Get customized recipes based on your preferences, dietary needs, and cooking skills'}.
                     </p>
@@ -426,7 +426,7 @@ const MealPlanner = () => {
                       setIsEditing(false);
                       isNavigatingBack.current = false;
                     }}
-                    className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white mt-4 shadow-lg"
+                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground mt-4 shadow-lg"
                     size="lg"
                   >
                     <Sparkles className="h-5 w-5 mr-2" />
