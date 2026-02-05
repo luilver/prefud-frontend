@@ -34,12 +34,13 @@ const SignIn = () => {
   const { t, setLanguage } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     //firebase eventlogin
     await trackEvent("button_click", {
       button_name: "login_submit",
       screen: "login_page",
     });
-    e.preventDefault();
+    
     setIsLoading(true);
     try {
       const userData = await login(email, password);
