@@ -13,7 +13,14 @@ const config: CapacitorConfig = {
       overlaysWebView: true,
       style: "DARK",
     },
+    CapacitorHttp: {
+    enabled: false, // Prueba desactivándolo
   },
+  },
+  server: {
+    androidScheme: "https", // Esto cambia el Origin a https://localhost
+    hostname: "localhost"
+  }
 };
 
 export default config;
