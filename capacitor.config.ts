@@ -14,8 +14,11 @@ const config: CapacitorConfig = {
       style: "DARK",
     },
     CapacitorHttp: {
-    enabled: false, // Prueba desactivándolo
+    enabled: true, 
   },
+  FirebaseAnalytics: {
+      enabled: true,
+    }
   },
   server: {
     androidScheme: "https", // Esto cambia el Origin a https://localhost
