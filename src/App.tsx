@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,8 +17,6 @@ import TermsAndConditions from "@/pages/TermsAndConditions";
 import Favorites from "@/pages/Favorites";
 import Cart from "@/pages/Cart";
 import NotFound from "@/pages/NotFound";
-import { OrderSSEProvider } from "./contexts/OrderSSEContext";
-
 
 const queryClient = new QueryClient();
 
@@ -54,7 +51,6 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
-      <OrderSSEProvider>
       <AuthProvider>
         <SubscriptionProvider>
           <UserProvider>
@@ -67,7 +63,6 @@ const App = () => (
           </UserProvider>
         </SubscriptionProvider>
       </AuthProvider>
-      </OrderSSEProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
