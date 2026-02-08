@@ -524,6 +524,13 @@ const Index = () => {
               </Link>
               <span className="text-border">•</span>
               <Link
+                to="/privacy"
+                className="hover:text-primary transition-colors duration-200"
+              >
+                Privacy Policy
+              </Link>
+              <span className="text-border">•</span>
+              <Link
                 to="/pricing"
                 className="hover:text-primary transition-colors duration-200"
               >
