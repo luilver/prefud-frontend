@@ -734,7 +734,30 @@ const translations = {
     "aiMealCreatorStepper.dishName": "Dish Name",
     "aiMealCreatorStepper.review.dish": " Dish",
 
-    // AI Meal Generation
+    // AI Meal Creator Chat
+    "aiMealCreatorStepper.chat.welcome": "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
+    "aiMealCreatorStepper.chat.mealName": "Great choice! 🎉 Do you have a name for this meal? (Optional - just type or skip)",
+    "aiMealCreatorStepper.chat.dishName": "🍽️ Do you have a specific dish in mind? e.g. Mac and Cheese (Optional)",
+    "aiMealCreatorStepper.chat.details": "⚡ Let's set up the details — servings, cooking time, skill level, and budget.",
+    "aiMealCreatorStepper.chat.dietary": "🥗 Any dietary restrictions? Select all that apply.",
+    "aiMealCreatorStepper.chat.cuisine": "🌍 Any cuisine preferences? Select all that sound good!",
+    "aiMealCreatorStepper.chat.healthGoals": "💪 Any health goals for this meal?",
+    "aiMealCreatorStepper.chat.allergies": "⚠️ Any allergies or food intolerances I should know about?",
+    "aiMealCreatorStepper.chat.extras": "📝 Anything else? Dislikes, special requests, or custom allergies? (Optional)",
+    "aiMealCreatorStepper.chat.none": "None",
+    "aiMealCreatorStepper.chat.skipped": "Skipped",
+    "aiMealCreatorStepper.chat.confirm": "Confirm",
+    "aiMealCreatorStepper.chat.skip": "Skip →",
+    "aiMealCreatorStepper.chat.continue": "Continue",
+    "aiMealCreatorStepper.chat.generate": "Generate My Meal",
+    "aiMealCreatorStepper.chat.letsGo": "Let's go! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle": "Here's your meal plan summary:",
+    "aiMealCreatorStepper.chat.confirmPrompt": "Looks good? Hit **Generate** to create your meal! 🚀",
+    "aiMealCreatorStepper.chat.typePlaceholder": "Type here or skip...",
+    "aiMealCreatorStepper.chat.dishPlaceholder": "e.g., Mac and Cheese",
+    "aiMealCreatorStepper.chat.servingsLabel": "servings",
+    "aiMealCreatorStepper.chat.budgetSuffix": "budget",
+
     "aiMealGenerator.loaderMessage":
       "Creating your personalized meal with AI...",
     "aiMealGenerator.createAIMealTitle": "Your AI-generated meal is ready!",
@@ -2214,7 +2237,30 @@ const translations = {
     "aiMealCreatorStepper.dishName": "Nombre del Plato",
     "aiMealCreatorStepper.review.dish": " Plato",
 
-    // AI Meal Generator
+    // AI Meal Creator Chat
+    "aiMealCreatorStepper.chat.welcome": "👋 ¡Hola! Soy tu asistente de comidas IA. ¡Creemos algo delicioso juntos! ¿Qué tipo de comida se te antoja?",
+    "aiMealCreatorStepper.chat.mealName": "¡Gran elección! 🎉 ¿Tienes un nombre para esta comida? (Opcional - escribe o salta)",
+    "aiMealCreatorStepper.chat.dishName": "🍽️ ¿Tienes un plato específico en mente? ej. Macarrones con Queso (Opcional)",
+    "aiMealCreatorStepper.chat.details": "⚡ Configuremos los detalles — porciones, tiempo de cocción, nivel de habilidad y presupuesto.",
+    "aiMealCreatorStepper.chat.dietary": "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+    "aiMealCreatorStepper.chat.cuisine": "🌍 ¿Preferencias de cocina? ¡Selecciona las que te gusten!",
+    "aiMealCreatorStepper.chat.healthGoals": "💪 ¿Algún objetivo de salud para esta comida?",
+    "aiMealCreatorStepper.chat.allergies": "⚠️ ¿Alguna alergia o intolerancia alimentaria que deba saber?",
+    "aiMealCreatorStepper.chat.extras": "📝 ¿Algo más? ¿Disgustos, solicitudes especiales o alergias personalizadas? (Opcional)",
+    "aiMealCreatorStepper.chat.none": "Ninguno",
+    "aiMealCreatorStepper.chat.skipped": "Omitido",
+    "aiMealCreatorStepper.chat.confirm": "Confirmar",
+    "aiMealCreatorStepper.chat.skip": "Saltar →",
+    "aiMealCreatorStepper.chat.continue": "Continuar",
+    "aiMealCreatorStepper.chat.generate": "Generar Mi Comida",
+    "aiMealCreatorStepper.chat.letsGo": "¡Vamos! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle": "Aquí está el resumen de tu plan de comidas:",
+    "aiMealCreatorStepper.chat.confirmPrompt": "¿Se ve bien? ¡Presiona **Generar** para crear tu comida! 🚀",
+    "aiMealCreatorStepper.chat.typePlaceholder": "Escribe aquí o salta...",
+    "aiMealCreatorStepper.chat.dishPlaceholder": "ej., Macarrones con Queso",
+    "aiMealCreatorStepper.chat.servingsLabel": "porciones",
+    "aiMealCreatorStepper.chat.budgetSuffix": "presupuesto",
+
     "aiMealGenerator.loaderMessage":
       "Creando tu comida personalizada con IA...",
     "aiMealGenerator.createAIMealTitle":
@@ -3914,7 +3960,30 @@ const translations = {
     "aiMealCreatorStepper.dishName": "Nome do Prato",
     "aiMealCreatorStepper.review.dish": "Prato",
 
-    //AI Meal Generation
+    // AI Meal Creator Chat
+    "aiMealCreatorStepper.chat.welcome": "👋 Olá! Sou seu assistente de refeições IA. Vamos criar algo delicioso juntos! Que tipo de refeição você está desejando?",
+    "aiMealCreatorStepper.chat.mealName": "Ótima escolha! 🎉 Você tem um nome para esta refeição? (Opcional - digite ou pule)",
+    "aiMealCreatorStepper.chat.dishName": "🍽️ Você tem um prato específico em mente? ex. Macarrão com Queijo (Opcional)",
+    "aiMealCreatorStepper.chat.details": "⚡ Vamos configurar os detalhes — porções, tempo de preparo, nível de habilidade e orçamento.",
+    "aiMealCreatorStepper.chat.dietary": "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
+    "aiMealCreatorStepper.chat.cuisine": "🌍 Preferências de culinária? Selecione as que te agradam!",
+    "aiMealCreatorStepper.chat.healthGoals": "💪 Algum objetivo de saúde para esta refeição?",
+    "aiMealCreatorStepper.chat.allergies": "⚠️ Alguma alergia ou intolerância alimentar que eu deva saber?",
+    "aiMealCreatorStepper.chat.extras": "📝 Mais alguma coisa? Alimentos que não gosta, pedidos especiais ou alergias personalizadas? (Opcional)",
+    "aiMealCreatorStepper.chat.none": "Nenhum",
+    "aiMealCreatorStepper.chat.skipped": "Pulado",
+    "aiMealCreatorStepper.chat.confirm": "Confirmar",
+    "aiMealCreatorStepper.chat.skip": "Pular →",
+    "aiMealCreatorStepper.chat.continue": "Continuar",
+    "aiMealCreatorStepper.chat.generate": "Gerar Minha Refeição",
+    "aiMealCreatorStepper.chat.letsGo": "Vamos lá! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle": "Aqui está o resumo do seu plano de refeição:",
+    "aiMealCreatorStepper.chat.confirmPrompt": "Parece bom? Clique em **Gerar** para criar sua refeição! 🚀",
+    "aiMealCreatorStepper.chat.typePlaceholder": "Digite aqui ou pule...",
+    "aiMealCreatorStepper.chat.dishPlaceholder": "ex., Macarrão com Queijo",
+    "aiMealCreatorStepper.chat.servingsLabel": "porções",
+    "aiMealCreatorStepper.chat.budgetSuffix": "orçamento",
+
     "aiMealGenerator.loaderMessage":
       "Criando sua refeição personalizada com IA...",
     "aiMealGenerator.createAIMealTitle":
