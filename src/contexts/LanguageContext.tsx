@@ -846,6 +846,8 @@ const translations = {
     "aiDrinkChat.allergy.wheat": "Wheat",
     "aiDrinkChat.allergy.sesame": "Sesame",
     "aiDrinkChat.allergy.sulfites": "Sulfites",
+    "aiDrinkChat.cuisine.other": "✏️ Other",
+    "aiDrinkChat.cuisine.otherPlaceholder": "Type your preference...",
 
     "aiMealGenerator.loaderMessage":
       "Creating your personalized meal with AI...",
@@ -2438,6 +2440,8 @@ const translations = {
     "aiDrinkChat.allergy.wheat": "Trigo",
     "aiDrinkChat.allergy.sesame": "Sésamo",
     "aiDrinkChat.allergy.sulfites": "Sulfitos",
+    "aiDrinkChat.cuisine.other": "✏️ Otro",
+    "aiDrinkChat.cuisine.otherPlaceholder": "Escribe tu preferencia...",
 
     "aiMealGenerator.loaderMessage":
       "Creando tu comida personalizada con IA...",
@@ -4250,6 +4254,8 @@ const translations = {
     "aiDrinkChat.allergy.wheat": "Trigo",
     "aiDrinkChat.allergy.sesame": "Gergelim",
     "aiDrinkChat.allergy.sulfites": "Sulfitos",
+    "aiDrinkChat.cuisine.other": "✏️ Outro",
+    "aiDrinkChat.cuisine.otherPlaceholder": "Digite sua preferência...",
 
     "aiMealGenerator.loaderMessage":
       "Criando sua refeição personalizada com IA...",
