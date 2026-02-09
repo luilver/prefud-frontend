@@ -51,6 +51,8 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   const [textInput, setTextInput] = useState("");
   const [multiSelected, setMultiSelected] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [customCuisine, setCustomCuisine] = useState("");
+  const [showCustomCuisineInput, setShowCustomCuisineInput] = useState(false);
   const initializedRef = useRef(false);
 
   // Stepper inputs
@@ -112,6 +114,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     { key: "mediterranean", label: t("aiDrinkChat.cuisine.mediterranean") || "Mediterranean" },
     { key: "brazilian", label: t("aiDrinkChat.cuisine.brazilian") || "Brazilian" },
     { key: "korean", label: t("aiDrinkChat.cuisine.korean") || "Korean" },
+    { key: "__other__", label: t("aiDrinkChat.cuisine.other") || "✏️ Other" },
   ];
 
   const allergiesOptions = [
@@ -240,9 +243,20 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
         );
       }, 400);
     } else if (currentStep === "cuisine") {
-      addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("aiDrinkChat.none") || "None");
-      setDrinkData((prev: any) => ({ ...prev, cuisinePreferences: [...multiSelected] }));
+      // Build final cuisine list including custom input
+      const finalCuisines = multiSelected.filter(k => k !== "__other__");
+      if (customCuisine.trim()) {
+        finalCuisines.push(customCuisine.trim());
+      }
+      const displayLabels = finalCuisines.map((k) => {
+        const found = cuisineOptions.find((o) => o.key === k);
+        return found ? found.label : k;
+      });
+      addUserMessage(displayLabels.length > 0 ? displayLabels.join(", ") : t("aiDrinkChat.none") || "None");
+      setDrinkData((prev: any) => ({ ...prev, cuisinePreferences: finalCuisines }));
       setMultiSelected([]);
+      setCustomCuisine("");
+      setShowCustomCuisineInput(false);
       setCurrentStep("allergies");
       setTimeout(() => {
         addBotMessage(
@@ -267,6 +281,10 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   };
 
   const toggleMultiSelect = (key: string) => {
+    if (key === "__other__") {
+      setShowCustomCuisineInput((prev) => !prev);
+      return;
+    }
     setMultiSelected((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
@@ -522,25 +540,43 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                       key={opt.key}
                       onClick={() => toggleMultiSelect(opt.key)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                        multiSelected.includes(opt.key)
+                        opt.key === "__other__" && showCustomCuisineInput
                           ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-                          : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
+                          : multiSelected.includes(opt.key)
+                            ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                            : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
                       }`}
                     >
-                      {multiSelected.includes(opt.key) && <Check className="inline h-3 w-3 mr-1" />}
+                      {(multiSelected.includes(opt.key) || (opt.key === "__other__" && showCustomCuisineInput)) && <Check className="inline h-3 w-3 mr-1" />}
+                      {opt.label}
                       {opt.label}
                     </button>
                   ))}
                 </div>
+                {/* Custom cuisine input */}
+                {currentStep === "cuisine" && showCustomCuisineInput && (
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      value={customCuisine}
+                      onChange={(e) => setCustomCuisine(e.target.value.slice(0, 30))}
+                      placeholder={t("aiDrinkChat.cuisine.otherPlaceholder") || "Type your preference..."}
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                      maxLength={30}
+                    />
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button
                     size="sm"
                     onClick={handleMultiSelectConfirm}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4"
                   >
-                    {multiSelected.length > 0
-                      ? `${t("aiDrinkChat.confirm") || "Confirm"} (${multiSelected.length})`
-                      : t("aiDrinkChat.skip") || "Skip"}
+                    {(() => {
+                      const count = multiSelected.filter(k => k !== "__other__").length + (currentStep === "cuisine" && customCuisine.trim() ? 1 : 0);
+                      return count > 0
+                        ? `${t("aiDrinkChat.confirm") || "Confirm"} (${count})`
+                        : t("aiDrinkChat.skip") || "Skip";
+                    })()}
                   </Button>
                 </div>
               </div>
