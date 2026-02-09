@@ -349,6 +349,12 @@ export const en = {
   "mealPlanner": {
     "title": "Meal Planner",
     "description": "Create and manage your weekly meal plans",
+    "days": "Days",
+    "people": "People",
+    "mealsDay": "Meals/Day",
+    "kidsUnder5": "under 5",
+    "kids5to12": "ages 5-12",
+    "ingredients": "items",
     "pagination": {
       "previous": "Previous",
       "next": "Next"
