@@ -848,6 +848,10 @@ const translations = {
     "aiDrinkChat.allergy.sulfites": "Sulfites",
     "aiDrinkChat.cuisine.other": "✏️ Other",
     "aiDrinkChat.cuisine.otherPlaceholder": "Type your preference...",
+    "aiDrinkChat.allergy.other": "✏️ Other",
+    "aiDrinkChat.allergy.otherPlaceholder": "Type your allergy...",
+    "aiDrinkChat.drinkCreatedSuccess": "Healthy drink created successfully!",
+    "aiDrinkChat.drinkCreatedError": "Failed to generate drink. Please try again.",
 
     "aiMealGenerator.loaderMessage":
       "Creating your personalized meal with AI...",
@@ -2442,6 +2446,10 @@ const translations = {
     "aiDrinkChat.allergy.sulfites": "Sulfitos",
     "aiDrinkChat.cuisine.other": "✏️ Otro",
     "aiDrinkChat.cuisine.otherPlaceholder": "Escribe tu preferencia...",
+    "aiDrinkChat.allergy.other": "✏️ Otro",
+    "aiDrinkChat.allergy.otherPlaceholder": "Escribe tu alergia...",
+    "aiDrinkChat.drinkCreatedSuccess": "¡Bebida saludable creada exitosamente!",
+    "aiDrinkChat.drinkCreatedError": "Error al generar la bebida. Inténtalo de nuevo.",
 
     "aiMealGenerator.loaderMessage":
       "Creando tu comida personalizada con IA...",
@@ -4256,6 +4264,10 @@ const translations = {
     "aiDrinkChat.allergy.sulfites": "Sulfitos",
     "aiDrinkChat.cuisine.other": "✏️ Outro",
     "aiDrinkChat.cuisine.otherPlaceholder": "Digite sua preferência...",
+    "aiDrinkChat.allergy.other": "✏️ Outro",
+    "aiDrinkChat.allergy.otherPlaceholder": "Digite sua alergia...",
+    "aiDrinkChat.drinkCreatedSuccess": "Bebida saudável criada com sucesso!",
+    "aiDrinkChat.drinkCreatedError": "Falha ao gerar bebida. Tente novamente.",
 
     "aiMealGenerator.loaderMessage":
       "Criando sua refeição personalizada com IA...",
