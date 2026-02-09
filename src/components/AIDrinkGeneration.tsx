@@ -18,12 +18,13 @@ interface AIDrinkGenerationProps {
   data: any;
   onUpdate: (key: string, value: any) => void;
   onDrinkCreated?: (drink: any) => void;
+  initialDrink?: any;
 }
 
-const AIDrinkGeneration = ({ data, onDrinkCreated }: AIDrinkGenerationProps) => {
+const AIDrinkGeneration = ({ data, onDrinkCreated, initialDrink }: AIDrinkGenerationProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedDrink, setGeneratedDrink] = useState<any>(null);
-  const [shoppingList, setShoppingList] = useState<any[]>([]);
+  const [generatedDrink, setGeneratedDrink] = useState<any>(initialDrink || null);
+  const [shoppingList, setShoppingList] = useState<any[]>(initialDrink?.ingredients || []);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);

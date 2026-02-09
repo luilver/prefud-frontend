@@ -5,7 +5,10 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import AIDrinkGeneration from "./AIDrinkGeneration";
+import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
+import { createHealthyDrink } from "@/services/drinkService";
 import { trackEvent } from "@/services/analytics";
+import { useToast } from "@/hooks/use-toast";
 
 interface AIDrinkCreatorStepperProps {
   onBack: () => void;
@@ -43,6 +46,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   const { user } = useUser();
   const { language, t } = useLanguage();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { toast } = useToast();
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -51,8 +55,12 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   const [textInput, setTextInput] = useState("");
   const [multiSelected, setMultiSelected] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedDrink, setGeneratedDrink] = useState<any>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [customCuisine, setCustomCuisine] = useState("");
   const [showCustomCuisineInput, setShowCustomCuisineInput] = useState(false);
+  const [customAllergy, setCustomAllergy] = useState("");
+  const [showCustomAllergyInput, setShowCustomAllergyInput] = useState(false);
   const initializedRef = useRef(false);
 
   // Stepper inputs
@@ -127,6 +135,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     { key: "wheat", label: t("aiDrinkChat.allergy.wheat") || "Wheat" },
     { key: "sesame", label: t("aiDrinkChat.allergy.sesame") || "Sesame" },
     { key: "sulfites", label: t("aiDrinkChat.allergy.sulfites") || "Sulfites" },
+    { key: "__other__", label: t("aiDrinkChat.allergy.other") || "✏️ Other" },
   ];
 
   const skillOptions = [
@@ -140,6 +149,14 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     { key: "medium", label: t("aiDrinkChat.budget.medium") || "Medium" },
     { key: "high", label: t("aiDrinkChat.budget.high") || "High" },
   ];
+
+  const getLanguageName = (languageCode: string) => {
+    const languageMap: { [key: string]: string } = {
+      'en': 'english', 'es': 'spanish', 'pt': 'portuguese',
+      'fr': 'french', 'de': 'german', 'it': 'italian'
+    };
+    return languageMap[languageCode.toLowerCase()] || 'english';
+  };
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -213,12 +230,8 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   };
 
   const handleMultiSelectConfirm = () => {
-    const labels = multiSelected.map((k) => {
-      const allOpts = [...healthGoalsOptions, ...dietaryOptions, ...cuisineOptions, ...allergiesOptions];
-      return allOpts.find((o) => o.key === k)?.label || k;
-    });
-
     if (currentStep === "healthGoals") {
+      const labels = multiSelected.map((k) => healthGoalsOptions.find((o) => o.key === k)?.label || k);
       addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("aiDrinkChat.none") || "None");
       setDrinkData((prev: any) => ({ ...prev, healthGoals: [...multiSelected] }));
       setMultiSelected([]);
@@ -231,6 +244,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
         );
       }, 400);
     } else if (currentStep === "dietary") {
+      const labels = multiSelected.map((k) => dietaryOptions.find((o) => o.key === k)?.label || k);
       addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("aiDrinkChat.none") || "None");
       setDrinkData((prev: any) => ({ ...prev, dietaryRestrictions: [...multiSelected] }));
       setMultiSelected([]);
@@ -243,11 +257,8 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
         );
       }, 400);
     } else if (currentStep === "cuisine") {
-      // Build final cuisine list including custom input
       const finalCuisines = multiSelected.filter(k => k !== "__other__");
-      if (customCuisine.trim()) {
-        finalCuisines.push(customCuisine.trim());
-      }
+      if (customCuisine.trim()) finalCuisines.push(customCuisine.trim());
       const displayLabels = finalCuisines.map((k) => {
         const found = cuisineOptions.find((o) => o.key === k);
         return found ? found.label : k;
@@ -266,9 +277,17 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
         );
       }, 400);
     } else if (currentStep === "allergies") {
-      addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("aiDrinkChat.none") || "None");
-      setDrinkData((prev: any) => ({ ...prev, allergiesIntolerance: [...multiSelected] }));
+      const finalAllergies = multiSelected.filter(k => k !== "__other__");
+      if (customAllergy.trim()) finalAllergies.push(customAllergy.trim());
+      const displayLabels = finalAllergies.map((k) => {
+        const found = allergiesOptions.find((o) => o.key === k);
+        return found ? found.label : k;
+      });
+      addUserMessage(displayLabels.length > 0 ? displayLabels.join(", ") : t("aiDrinkChat.none") || "None");
+      setDrinkData((prev: any) => ({ ...prev, allergiesIntolerance: finalAllergies }));
       setMultiSelected([]);
+      setCustomAllergy("");
+      setShowCustomAllergyInput(false);
       setCurrentStep("extras");
       setTimeout(() => {
         addBotMessage(
@@ -282,7 +301,11 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
 
   const toggleMultiSelect = (key: string) => {
     if (key === "__other__") {
-      setShowCustomCuisineInput((prev) => !prev);
+      if (currentStep === "cuisine") {
+        setShowCustomCuisineInput((prev) => !prev);
+      } else if (currentStep === "allergies") {
+        setShowCustomAllergyInput((prev) => !prev);
+      }
       return;
     }
     setMultiSelected((prev) =>
@@ -365,32 +388,99 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   };
 
   const handleGenerate = async () => {
+    if (!user?.id) {
+      toast({ title: "Error", description: "Please log in to generate a drink", variant: "destructive" });
+      return;
+    }
+
     addUserMessage(t("aiDrinkChat.letsGo") || "Let's go! 🚀");
     showLoader(t("aiDrinkChat.loaderMessage") || "Mixing the perfect healthy drink for you...");
     trackEvent("button_click", {
       button_name: "generate_drink_submit",
       screen: "generate_drink_chat",
     });
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    hideLoader();
-    setIsGenerating(true);
+
+    try {
+      const requestData = {
+        user_id: user.id,
+        drink_name: drinkData.drink_name || `Healthy ${drinkData.type || 'Drink'}`,
+        numberPeople: drinkData.numberPeople || 1,
+        dietaryRestrictions: drinkData.dietaryRestrictions || [],
+        cuisinePreferences: drinkData.cuisinePreferences || [],
+        allergiesIntolerance: drinkData.allergiesIntolerance || [],
+        dislikes: drinkData.dislikes || "",
+        maxCookingTime: drinkData.maxCookingTime || 30,
+        cookingSkillLevel: drinkData.cookingSkillLevel || "intermediate",
+        budgetRange: drinkData.budgetRange || "medium",
+        drinkType: drinkData.type || "smoothie",
+        language: getLanguageName(language),
+        healthGoals: drinkData.healthGoals || [],
+      };
+
+      const apiResponse = await createHealthyDrink(requestData);
+
+      const transformedDrink = {
+        name: apiResponse.healthyDrink.name,
+        type: apiResponse.healthyDrink.drinkType,
+        description: apiResponse.healthyDrink.description,
+        prepTime: `${apiResponse.healthyDrink.cookingTime} minutes`,
+        servings: drinkData.numberPeople || 1,
+        calories: apiResponse.healthyDrink.calories,
+        ingredients: apiResponse.healthyDrink.ingredients.map((ing: any) => ({
+          name: ing.name,
+          amount: `${ing.quantity} ${ing.unit}`,
+          category: apiResponse.ingredientsList.find((item: any) => item.name === ing.name)?.classification || 'Other',
+          price: `$${(Math.random() * 5 + 1).toFixed(2)}`
+        })),
+        instructions: apiResponse.healthyDrink.steps,
+        nutritionHighlights: [
+          apiResponse.healthyDrink.benefits,
+          `Rich in vitamins: ${apiResponse.healthyDrink.nutritionalInfo.vitamins.join(', ')}`,
+          `${apiResponse.healthyDrink.nutritionalInfo.protein}g protein, ${apiResponse.healthyDrink.nutritionalInfo.fiber}g fiber`
+        ],
+        tips: [
+          apiResponse.healthyDrink.prepTip,
+          apiResponse.healthyDrink.instructions,
+        ],
+        healthGoals: drinkData.healthGoals || [],
+        dietaryRestrictions: drinkData.dietaryRestrictions || [],
+        servingSize: drinkData.numberPeople || 1,
+        apiData: apiResponse,
+      };
+
+      hideLoader();
+      setGeneratedDrink(transformedDrink);
+      setIsGenerating(true);
+      toast({ title: "✅", description: t("aiDrinkChat.drinkCreatedSuccess") || "Healthy drink created successfully!" });
+
+    } catch (error: any) {
+      hideLoader();
+      console.error('Error generating drink:', error);
+
+      if (
+        error?.code === "03" ||
+        error?.response?.data?.code === "03" ||
+        (typeof error?.message === "string" && error.message.includes("No healthy drinks available according to your subscription"))
+      ) {
+        setShowUpgradeModal(true);
+        return;
+      }
+
+      toast({
+        title: "Error",
+        description: t("aiDrinkChat.drinkCreatedError") || "Failed to generate drink. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRestart = () => {
     setMessages([]);
     setDrinkData({
-      type: "",
-      drinkType: "",
-      drink_name: "",
-      numberPeople: 1,
-      maxCookingTime: 15,
-      cookingSkillLevel: "intermediate",
-      budgetRange: "medium",
-      healthGoals: [],
-      dietaryRestrictions: [],
-      cuisinePreferences: [],
-      allergiesIntolerance: [],
-      dislikes: "",
+      type: "", drinkType: "", drink_name: "", numberPeople: 1,
+      maxCookingTime: 15, cookingSkillLevel: "intermediate", budgetRange: "medium",
+      healthGoals: [], dietaryRestrictions: [], cuisinePreferences: [],
+      allergiesIntolerance: [], dislikes: "",
     });
     setMultiSelected([]);
     setTextInput("");
@@ -398,6 +488,11 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     setCookingTime(15);
     setCurrentStep("drinkType");
     setIsGenerating(false);
+    setGeneratedDrink(null);
+    setCustomCuisine("");
+    setShowCustomCuisineInput(false);
+    setCustomAllergy("");
+    setShowCustomAllergyInput(false);
     initializedRef.current = false;
     setTimeout(() => {
       initializedRef.current = true;
@@ -408,8 +503,8 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
     }, 100);
   };
 
-  // If generating, show the generation component
-  if (isGenerating) {
+  // If generated, show the result component directly (skip "Ready to Generate")
+  if (isGenerating && generatedDrink) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <LoaderComponent />
@@ -417,6 +512,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
           data={drinkData}
           onUpdate={(key: string, value: any) => setDrinkData((prev: any) => ({ ...prev, [key]: value }))}
           onDrinkCreated={onDrinkCreated}
+          initialDrink={generatedDrink}
         />
       </div>
     );
@@ -455,16 +551,40 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   };
 
   const handleStepperSubmit = () => {
-    if (currentStep === "servings") {
-      handleServingsSubmit();
-    } else {
-      handleCookingTimeSubmit();
-    }
+    if (currentStep === "servings") handleServingsSubmit();
+    else handleCookingTimeSubmit();
+  };
+
+  // Determine if "Other" custom input should show
+  const showOtherInput = (currentStep === "cuisine" && showCustomCuisineInput) || (currentStep === "allergies" && showCustomAllergyInput);
+  const otherValue = currentStep === "cuisine" ? customCuisine : customAllergy;
+  const otherPlaceholder = currentStep === "cuisine"
+    ? (t("aiDrinkChat.cuisine.otherPlaceholder") || "Type your preference...")
+    : (t("aiDrinkChat.allergy.otherPlaceholder") || "Type your allergy...");
+  const onOtherChange = (val: string) => {
+    if (currentStep === "cuisine") setCustomCuisine(val.slice(0, 30));
+    else setCustomAllergy(val.slice(0, 30));
+  };
+
+  // Count for confirm button
+  const getConfirmCount = () => {
+    const base = multiSelected.filter(k => k !== "__other__").length;
+    if (currentStep === "cuisine" && customCuisine.trim()) return base + 1;
+    if (currentStep === "allergies" && customAllergy.trim()) return base + 1;
+    return base;
   };
 
   return (
     <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px] bg-black/50 backdrop-blur-sm rounded-2xl border border-white/40 shadow-xl my-2 md:bg-black/40 md:my-4">
       <LoaderComponent />
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => {
+          setShowUpgradeModal(false);
+          window.location.hash = 'profile';
+        }}
+        featureType="drinks"
+      />
 
       {/* Header */}
       <div className="flex items-center justify-between px-2 py-3 shrink-0">
@@ -495,11 +615,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                   ? "bg-gradient-to-r from-emerald-500 to-teal-500"
                   : "bg-white/20"
               }`}>
-                {msg.role === "bot" ? (
-                  <Bot className="h-4 w-4 text-white" />
-                ) : (
-                  <User className="h-4 w-4 text-white" />
-                )}
+                {msg.role === "bot" ? <Bot className="h-4 w-4 text-white" /> : <User className="h-4 w-4 text-white" />}
               </div>
 
               <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
@@ -509,7 +625,6 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
               }`}>
                 {msg.text}
 
-                {/* Drink type selection */}
                 {msg.options && !msg.multiSelect && msg.role === "bot" && currentStep === "drinkType" && (
                   <div className="flex flex-wrap gap-2 mt-3">
                     {msg.options.map((opt) => (
@@ -535,31 +650,35 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
               <div className="shrink-0 w-7 h-7" />
               <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md w-full">
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {currentMultiOptions.map((opt) => (
-                    <button
-                      key={opt.key}
-                      onClick={() => toggleMultiSelect(opt.key)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                        opt.key === "__other__" && showCustomCuisineInput
-                          ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-                          : multiSelected.includes(opt.key)
+                  {currentMultiOptions.map((opt) => {
+                    const isOtherActive = opt.key === "__other__" && (
+                      (currentStep === "cuisine" && showCustomCuisineInput) ||
+                      (currentStep === "allergies" && showCustomAllergyInput)
+                    );
+                    const isSelected = multiSelected.includes(opt.key) || isOtherActive;
+                    return (
+                      <button
+                        key={opt.key}
+                        onClick={() => toggleMultiSelect(opt.key)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                          isSelected
                             ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
                             : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                      }`}
-                    >
-                      {(multiSelected.includes(opt.key) || (opt.key === "__other__" && showCustomCuisineInput)) && <Check className="inline h-3 w-3 mr-1" />}
-                      {opt.label}
-                      {opt.label}
-                    </button>
-                  ))}
+                        }`}
+                      >
+                        {isSelected && <Check className="inline h-3 w-3 mr-1" />}
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
-                {/* Custom cuisine input */}
-                {currentStep === "cuisine" && showCustomCuisineInput && (
-                  <div className="flex gap-2 mt-2">
+                {/* Custom input for "Other" */}
+                {showOtherInput && (
+                  <div className="flex gap-2 mt-2 mb-2">
                     <input
-                      value={customCuisine}
-                      onChange={(e) => setCustomCuisine(e.target.value.slice(0, 30))}
-                      placeholder={t("aiDrinkChat.cuisine.otherPlaceholder") || "Type your preference..."}
+                      value={otherValue}
+                      onChange={(e) => onOtherChange(e.target.value)}
+                      placeholder={otherPlaceholder}
                       className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
                       maxLength={30}
                     />
@@ -571,12 +690,9 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                     onClick={handleMultiSelectConfirm}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4"
                   >
-                    {(() => {
-                      const count = multiSelected.filter(k => k !== "__other__").length + (currentStep === "cuisine" && customCuisine.trim() ? 1 : 0);
-                      return count > 0
-                        ? `${t("aiDrinkChat.confirm") || "Confirm"} (${count})`
-                        : t("aiDrinkChat.skip") || "Skip";
-                    })()}
+                    {getConfirmCount() > 0
+                      ? `${t("aiDrinkChat.confirm") || "Confirm"} (${getConfirmCount()})`
+                      : t("aiDrinkChat.skip") || "Skip"}
                   </Button>
                 </div>
               </div>
@@ -606,7 +722,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
           </div>
         )}
 
-        {/* Stepper input for servings / cooking time */}
+        {/* Stepper input */}
         {isStepperStep && (
           <div className="flex justify-start">
             <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
@@ -621,9 +737,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                   >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <span className="text-2xl font-bold text-gray-800 min-w-[60px] text-center">
-                    {stepperValue}
-                  </span>
+                  <span className="text-2xl font-bold text-gray-800 min-w-[60px] text-center">{stepperValue}</span>
                   <button
                     onClick={() => handleStepperChange(1)}
                     disabled={stepperValue >= stepperMax}
