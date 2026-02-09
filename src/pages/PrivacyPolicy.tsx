@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield, Globe, FileText, Database, Mail, Users } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import privacyTabsBg from '@/assets/privacy-tabs-bg.jpg';
 
 const PrivacyPolicy = () => {
   const dataCollected = [
@@ -75,7 +76,13 @@ const PrivacyPolicy = () => {
           </section>
 
           {/* Tabs for US and EU */}
-          <Tabs defaultValue="us" className="w-full">
+          <Tabs defaultValue="us" className="w-full relative rounded-2xl overflow-hidden">
+            {/* Background image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15 pointer-events-none"
+              style={{ backgroundImage: `url(${privacyTabsBg})` }}
+            />
+            <div className="relative z-10 p-6 md:p-8">
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="us" className="flex items-center gap-2">
                 <span className="text-lg">🇺🇸</span> United States
@@ -267,6 +274,7 @@ const PrivacyPolicy = () => {
                 </div>
               </section>
             </TabsContent>
+          </div>
           </Tabs>
 
           {/* Common Sections */}
