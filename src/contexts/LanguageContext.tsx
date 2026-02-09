@@ -757,6 +757,10 @@ const translations = {
     "aiMealCreatorStepper.chat.dishPlaceholder": "e.g., Mac and Cheese",
     "aiMealCreatorStepper.chat.servingsLabel": "servings",
     "aiMealCreatorStepper.chat.budgetSuffix": "budget",
+    "aiMealCreatorStepper.chat.servings": "👥 How many servings do you need?",
+    "aiMealCreatorStepper.chat.cookTime": "⏱️ What's the maximum cooking time (in minutes)?",
+    "aiMealCreatorStepper.chat.skill": "👨‍🍳 What's your cooking skill level?",
+    "aiMealCreatorStepper.chat.budget": "💰 What's your budget range for this meal?",
 
     "aiMealGenerator.loaderMessage":
       "Creating your personalized meal with AI...",
@@ -2260,6 +2264,10 @@ const translations = {
     "aiMealCreatorStepper.chat.dishPlaceholder": "ej., Macarrones con Queso",
     "aiMealCreatorStepper.chat.servingsLabel": "porciones",
     "aiMealCreatorStepper.chat.budgetSuffix": "presupuesto",
+    "aiMealCreatorStepper.chat.servings": "👥 ¿Cuántas porciones necesitas?",
+    "aiMealCreatorStepper.chat.cookTime": "⏱️ ¿Cuál es el tiempo máximo de cocción (en minutos)?",
+    "aiMealCreatorStepper.chat.skill": "👨‍🍳 ¿Cuál es tu nivel de habilidad en la cocina?",
+    "aiMealCreatorStepper.chat.budget": "💰 ¿Cuál es tu rango de presupuesto para esta comida?",
 
     "aiMealGenerator.loaderMessage":
       "Creando tu comida personalizada con IA...",
@@ -3983,6 +3991,10 @@ const translations = {
     "aiMealCreatorStepper.chat.dishPlaceholder": "ex., Macarrão com Queijo",
     "aiMealCreatorStepper.chat.servingsLabel": "porções",
     "aiMealCreatorStepper.chat.budgetSuffix": "orçamento",
+    "aiMealCreatorStepper.chat.servings": "👥 Quantas porções você precisa?",
+    "aiMealCreatorStepper.chat.cookTime": "⏱️ Qual o tempo máximo de cozimento (em minutos)?",
+    "aiMealCreatorStepper.chat.skill": "👨‍🍳 Qual é o seu nível de habilidade na cozinha?",
+    "aiMealCreatorStepper.chat.budget": "💰 Qual é a sua faixa de orçamento para esta refeição?",
 
     "aiMealGenerator.loaderMessage":
       "Criando sua refeição personalizada com IA...",

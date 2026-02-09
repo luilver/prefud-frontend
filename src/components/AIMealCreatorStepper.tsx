@@ -1,14 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, Sparkles, ChefHat, Bot, User, Check, RotateCcw } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ChefHat, Bot, User, Check, RotateCcw, Plus, Minus } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import AIMealGeneration from "./AIMealGeneration";
 import { trackEvent } from "@/services/analytics";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AIMealCreatorStepperProps {
   onBack: () => void;
@@ -19,7 +16,10 @@ type ChatStep =
   | "mealType"
   | "mealName"
   | "dishName"
-  | "servingsAndTime"
+  | "servings"
+  | "cookingTime"
+  | "skillLevel"
+  | "budgetRange"
   | "dietary"
   | "cuisine"
   | "healthGoals"
@@ -34,7 +34,7 @@ interface ChatMessage {
   text: string;
   options?: { key: string; label: string }[];
   multiSelect?: boolean;
-  inputType?: "text" | "number" | "textarea" | "compound";
+  inputType?: "text" | "number" | "textarea" | "stepper";
   step?: ChatStep;
   selected?: string[];
   skippable?: boolean;
@@ -52,8 +52,9 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   const [textInput, setTextInput] = useState("");
   const [multiSelected, setMultiSelected] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
-  // Compound inputs for servings step
+  // Stepper inputs
   const [servings, setServings] = useState(2);
   const [cookingTime, setCookingTime] = useState(30);
   const [skillLevel, setSkillLevel] = useState("intermediate");
@@ -150,8 +151,10 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, currentStep]);
 
-  // Initialize first bot message
+  // Initialize first bot message (guard against StrictMode double-run)
   useEffect(() => {
+    if (initialized) return;
+    setInitialized(true);
     addBotMessage(
       t("aiMealCreatorStepper.chat.welcome") || "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
       mealTypeOptions
@@ -188,6 +191,29 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
           t("aiMealCreatorStepper.chat.mealName") || "Great choice! 🎉 Do you have a name for this meal? (Optional - just type or skip)",
           undefined,
           { inputType: "text", skippable: true }
+        );
+      }, 400);
+    } else if (currentStep === "skillLevel") {
+      addUserMessage(label);
+      setSkillLevel(key);
+      setMealData((prev: any) => ({ ...prev, cookingSkillLevel: key }));
+      setCurrentStep("budgetRange");
+      setTimeout(() => {
+        addBotMessage(
+          t("aiMealCreatorStepper.chat.budget") || "💰 What's your budget range for this meal?",
+          budgetOptions
+        );
+      }, 400);
+    } else if (currentStep === "budgetRange") {
+      addUserMessage(label);
+      setBudgetRange(key);
+      setMealData((prev: any) => ({ ...prev, budgetRange: key }));
+      setCurrentStep("dietary");
+      setTimeout(() => {
+        addBotMessage(
+          t("aiMealCreatorStepper.chat.dietary") || "🥗 Any dietary restrictions? Select all that apply.",
+          dietaryOptions,
+          { multiSelect: true, skippable: true }
         );
       }, 400);
     }
@@ -258,7 +284,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
   const handleTextSubmit = () => {
     const value = textInput.trim();
-    
+
     if (currentStep === "mealName") {
       addUserMessage(value || (t("aiMealCreatorStepper.chat.skipped") || "Skipped"));
       setMealData((prev: any) => ({ ...prev, mealName: value }));
@@ -275,12 +301,12 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
       addUserMessage(value || (t("aiMealCreatorStepper.chat.skipped") || "Skipped"));
       setMealData((prev: any) => ({ ...prev, nameOfMeal: value }));
       setTextInput("");
-      setCurrentStep("servingsAndTime");
+      setCurrentStep("servings");
       setTimeout(() => {
         addBotMessage(
-          t("aiMealCreatorStepper.chat.details") || "⚡ Let's set up the details — servings, cooking time, skill level, and budget.",
+          t("aiMealCreatorStepper.chat.servings") || "👥 How many servings do you need?",
           undefined,
-          { inputType: "compound" }
+          { inputType: "stepper" }
         );
       }, 400);
     } else if (currentStep === "extras") {
@@ -292,23 +318,27 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     }
   };
 
-  const handleCompoundSubmit = () => {
-    addUserMessage(
-      `${servings} ${t("aiMealCreatorStepper.chat.servingsLabel") || "servings"}, ${cookingTime} min, ${skillOptions.find(o => o.key === skillLevel)?.label}, ${budgetOptions.find(o => o.key === budgetRange)?.label} ${t("aiMealCreatorStepper.chat.budgetSuffix") || "budget"}`
-    );
-    setMealData((prev: any) => ({
-      ...prev,
-      servings,
-      cookingTime,
-      cookingSkillLevel: skillLevel,
-      budgetRange,
-    }));
-    setCurrentStep("dietary");
+  const handleServingsSubmit = () => {
+    addUserMessage(`${servings} ${t("aiMealCreatorStepper.chat.servingsLabel") || "servings"}`);
+    setMealData((prev: any) => ({ ...prev, servings }));
+    setCurrentStep("cookingTime");
     setTimeout(() => {
       addBotMessage(
-        t("aiMealCreatorStepper.chat.dietary") || "🥗 Any dietary restrictions? Select all that apply.",
-        dietaryOptions,
-        { multiSelect: true, skippable: true }
+        t("aiMealCreatorStepper.chat.cookTime") || "⏱️ What's the maximum cooking time (in minutes)?",
+        undefined,
+        { inputType: "stepper" }
+      );
+    }, 400);
+  };
+
+  const handleCookingTimeSubmit = () => {
+    addUserMessage(`${cookingTime} min`);
+    setMealData((prev: any) => ({ ...prev, cookingTime }));
+    setCurrentStep("skillLevel");
+    setTimeout(() => {
+      addBotMessage(
+        t("aiMealCreatorStepper.chat.skill") || "👨‍🍳 What's your cooking skill level?",
+        skillOptions
       );
     }, 400);
   };
@@ -397,7 +427,8 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
 
   const isMultiSelectStep = ["dietary", "cuisine", "healthGoals", "allergies"].includes(currentStep);
   const isTextStep = ["mealName", "dishName", "extras"].includes(currentStep);
-  const isCompoundStep = currentStep === "servingsAndTime";
+  const isStepperStep = currentStep === "servings" || currentStep === "cookingTime";
+  const isSingleSelectStep = currentStep === "skillLevel" || currentStep === "budgetRange";
   const isSummaryStep = currentStep === "summary";
 
   // Get current options for multi-select
@@ -406,6 +437,36 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     currentStep === "cuisine" ? cuisineOptions :
     currentStep === "healthGoals" ? healthGoalsOptions :
     currentStep === "allergies" ? allergiesOptions : [];
+
+  // Get current options for single-select (skill/budget shown as options in messages)
+  const currentSingleOptions =
+    currentStep === "skillLevel" ? skillOptions :
+    currentStep === "budgetRange" ? budgetOptions : [];
+
+  // Stepper config
+  const stepperValue = currentStep === "servings" ? servings : cookingTime;
+  const stepperMin = currentStep === "servings" ? 1 : 5;
+  const stepperMax = currentStep === "servings" ? 20 : 180;
+  const stepperIncrement = currentStep === "servings" ? 1 : 5;
+  const stepperLabel = currentStep === "servings"
+    ? (t("aiMealCreatorStepper.servingsLabel") || "Servings")
+    : (t("aiMealCreatorStepper.cookingTimeLabel") || "Time (min)");
+
+  const handleStepperChange = (delta: number) => {
+    if (currentStep === "servings") {
+      setServings((prev) => Math.max(stepperMin, Math.min(stepperMax, prev + delta)));
+    } else {
+      setCookingTime((prev) => Math.max(stepperMin, Math.min(stepperMax, prev + delta * stepperIncrement)));
+    }
+  };
+
+  const handleStepperSubmit = () => {
+    if (currentStep === "servings") {
+      handleServingsSubmit();
+    } else {
+      handleCookingTimeSubmit();
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px] md:bg-black/10 md:backdrop-blur-sm md:rounded-2xl md:border md:border-white/10 md:shadow-xl md:my-4">
@@ -513,82 +574,57 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
           </div>
         )}
 
-        {/* Compound inputs (servings, time, skill, budget) */}
-        {isCompoundStep && (
+        {/* Single-select for skill level / budget (shown inline like meal type) */}
+        {isSingleSelectStep && (
           <div className="flex justify-start">
             <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
               <div className="shrink-0 w-7 h-7" />
-              <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md space-y-3 w-full">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">
-                      {t("aiMealCreatorStepper.servingsLabel") || "Servings"}
-                    </label>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={20}
-                      value={servings}
-                      onChange={(e) => setServings(parseInt(e.target.value) || 1)}
-                      className="h-9 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">
-                      {t("aiMealCreatorStepper.cookingTimeLabel") || "Time (min)"}
-                    </label>
-                    <Input
-                      type="number"
-                      min={5}
-                      value={cookingTime}
-                      onChange={(e) => setCookingTime(parseInt(e.target.value) || 5)}
-                      className="h-9 text-sm"
-                    />
-                  </div>
+              <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md w-full">
+                <div className="flex flex-wrap gap-2">
+                  {currentSingleOptions.map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => handleOptionSelect(opt.key, opt.label)}
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border border-emerald-200"
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1.5 block">
-                    {t("aiMealCreatorStepper.skillLevelLabel") || "Skill Level"}
-                  </label>
-                  <div className="flex gap-2">
-                    {skillOptions.map((o) => (
-                      <button
-                        key={o.key}
-                        onClick={() => setSkillLevel(o.key)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                          skillLevel === o.key
-                            ? "bg-emerald-500 text-white border-emerald-500"
-                            : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                        }`}
-                      >
-                        {o.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1.5 block">
-                    {t("aiMealCreatorStepper.budgetLabel") || "Budget"}
-                  </label>
-                  <div className="flex gap-2">
-                    {budgetOptions.map((o) => (
-                      <button
-                        key={o.key}
-                        onClick={() => setBudgetRange(o.key)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                          budgetRange === o.key
-                            ? "bg-emerald-500 text-white border-emerald-500"
-                            : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
-                        }`}
-                      >
-                        {o.label}
-                      </button>
-                    ))}
-                  </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stepper input for servings / cooking time */}
+        {isStepperStep && (
+          <div className="flex justify-start">
+            <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
+              <div className="shrink-0 w-7 h-7" />
+              <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md w-full">
+                <label className="text-xs font-medium text-gray-500 mb-2 block">{stepperLabel}</label>
+                <div className="flex items-center justify-center gap-4 mb-3">
+                  <button
+                    onClick={() => handleStepperChange(-1)}
+                    disabled={stepperValue <= stepperMin}
+                    className="w-10 h-10 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="text-2xl font-bold text-gray-800 min-w-[60px] text-center">
+                    {stepperValue}
+                  </span>
+                  <button
+                    onClick={() => handleStepperChange(1)}
+                    disabled={stepperValue >= stepperMax}
+                    className="w-10 h-10 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
                 </div>
                 <Button
                   size="sm"
-                  onClick={handleCompoundSubmit}
+                  onClick={handleStepperSubmit}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4 w-full"
                 >
                   {t("aiMealCreatorStepper.chat.continue") || "Continue"} →
