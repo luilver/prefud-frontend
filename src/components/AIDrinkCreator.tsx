@@ -189,24 +189,14 @@ const AIDrinkCreator = () => {
             </h2>
             
             {/* Pagination Controls */}
-            <div className="flex items-center justify-between gap-3 bg-black/20 backdrop-blur-sm rounded-full px-4 py-2">
-              <div className="flex items-center gap-2 text-sm text-white/90">
-                <span>{t("pagination.show") || "Show"}</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
-                  className="bg-white/20 text-white border border-white/30 rounded-md px-2 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400 cursor-pointer appearance-none text-center w-14"
-                >
-                  <option value={3} className="text-gray-800">3</option>
-                  <option value={5} className="text-gray-800">5</option>
-                  <option value={10} className="text-gray-800">10</option>
-                </select>
-                <span>{t("pagination.perPage") || "per page"}</span>
-              </div>
-              <div className="text-sm text-white/80">
-                {currentPage}/{totalPages} ({apiDrinks.length} {t("aiDrinkCreator.drinks") || 'drinks'})
-              </div>
-            </div>
+            <PageSizeSelector
+              pageSize={pageSize}
+              onPageSizeChange={handlePageSizeChange}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemCount={apiDrinks.length}
+              itemLabel={t("aiDrinkCreator.drinks") || "drinks"}
+            />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {apiDrinks.map((drink) => (
