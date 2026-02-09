@@ -184,7 +184,7 @@ const AIDrinkCreator = () => {
           </Card>
         ) : hasApiDrinks ? (
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center text-white drop-shadow-lg">
+            <h2 className="text-2xl font-semibold text-center text-black drop-shadow-lg">
               {t("aiDrinkCreator.yourCreatedDrinks") || "Your Created Drinks"}
             </h2>
             
@@ -314,7 +314,7 @@ const AIDrinkCreator = () => {
         {/* Local AI Drinks List (from context) */}
         {aiDrinks.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center text-white drop-shadow-lg">
+            <h2 className="text-2xl font-semibold text-center text-black drop-shadow-lg">
               {t("aiDrinkCreator.yourAIDrinks") || "Your AI Created Drinks"}
             </h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

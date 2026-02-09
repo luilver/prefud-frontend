@@ -224,7 +224,7 @@ const AIMealCreator = () => {
 
         {!isLoadingMeals && totalMealsCount > 0 && (
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center text-white drop-shadow-lg">{t("aiMealCreator.yourAIMealsTitle") || "Your AI Created Meals"}</h2>
+            <h2 className="text-2xl font-semibold text-center text-black drop-shadow-lg">{t("aiMealCreator.yourAIMealsTitle") || "Your AI Created Meals"}</h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {/* Local AI Meals */}
               {currentPageLocalMeals.map((meal, index) => (
