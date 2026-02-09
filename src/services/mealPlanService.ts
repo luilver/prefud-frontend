@@ -75,6 +75,8 @@ interface ApiMealPlan {
   };
   duration: number;
   numberPeople: number;
+  numberKidsLessThan5: number;
+  numberKids5To12: number;
   mealsPerDay: number;
   dietaryRestrictions?: string[];
   cuisinePreferences?: string[];
@@ -337,6 +339,8 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
     duration,
     preferences: {
       numberOfPersons: apiPlan.numberPeople || 1,
+      kidsbelow5: apiPlan.numberKidsLessThan5|| 0,
+      kidsover5: apiPlan.numberKids5To12 || 0,
       numberOfDays: durationDays,
       mealsPerDay: apiPlan.mealsPerDay || 3,
       numberOfWeeks,

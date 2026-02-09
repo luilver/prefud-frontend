@@ -1,13 +1,31 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Calendar, Users, ChefHat, Clock, Sparkles, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Plus,
+  Calendar,
+  Users,
+  ChefHat,
+  Clock,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Baby,
+  Smile,
+} from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import PageSizeSelector from "./PageSizeSelector";
-import { 
+import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -32,7 +50,13 @@ const MealPlanner = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successPlan, setSuccessPlan] = useState<any>(null);
   const isNavigatingBack = useRef(false);
-  const { user, mealPlans, addMealPlan, getMealPlanById, fetchMealPlansFromAPI } = useUser();
+  const {
+    user,
+    mealPlans,
+    addMealPlan,
+    getMealPlanById,
+    fetchMealPlansFromAPI,
+  } = useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -50,15 +74,15 @@ const MealPlanner = () => {
     try {
       console.log(`Loading meal plans for page: ${page}, limit: ${limit}`);
       const response = await fetchMealPlansFromAPI(user.id, page, limit);
-      console.log('this si the data of meal plans ',response.data)
+      console.log("this si the data of meal plans ", response.data);
       // Set the current page plans from the API response
       setCurrentPagePlans(response.data || []);
       setTotalPages(response.totalPages || 1);
       setHasLoadedInitialPlans(true);
-      
-      console.log('Loaded meal plans for current page:', response);
+
+      console.log("Loaded meal plans for current page:", response);
     } catch (error) {
-      console.error('Error loading meal plans:', error);
+      console.error("Error loading meal plans:", error);
       toast({
         title: "Error loading meal plans",
         description: "Failed to load your meal plans. Please try again.",
@@ -71,35 +95,44 @@ const MealPlanner = () => {
   };
 
   const handlePlanCreated = (newPlan: any) => {
-    console.log('New plan created - full object:', newPlan);
+    console.log("New plan created - full object:", newPlan);
     addMealPlan(newPlan);
     setShowCreator(false);
     setIsEditing(false);
     isNavigatingBack.current = false;
-    
+
     // Extract success modal data from the actual plan structure
     // The newPlan should have the transformed structure from the service
     const successPlanData = {
-      name: newPlan.name || newPlan.plan_name || newPlan.planName || 'AI Generated Meal Plan',
-      numberOfDays: newPlan.duration ? parseInt(newPlan.duration.replace(' days', '')) : 
-                   (newPlan.preferences?.numberOfWeeks ? newPlan.preferences.numberOfWeeks * 7 : 7),
-      numberOfPersons: newPlan.preferences?.numberOfPersons || 
-                      newPlan.preferences?.people || 
-                      newPlan.numberPeople || 1,
-      mealsPerDay: newPlan.preferences?.mealsPerDay || newPlan.mealsPerDay || 3
+      name:
+        newPlan.name ||
+        newPlan.plan_name ||
+        newPlan.planName ||
+        "AI Generated Meal Plan",
+      numberOfDays: newPlan.duration
+        ? parseInt(newPlan.duration.replace(" days", ""))
+        : newPlan.preferences?.numberOfWeeks
+          ? newPlan.preferences.numberOfWeeks * 7
+          : 7,
+      numberOfPersons:
+        newPlan.preferences?.numberOfPersons ||
+        newPlan.preferences?.people ||
+        newPlan.numberPeople ||
+        1,
+      mealsPerDay: newPlan.preferences?.mealsPerDay || newPlan.mealsPerDay || 3,
     };
-    
-    console.log('Setting success plan data:', successPlanData);
+
+    console.log("Setting success plan data:", successPlanData);
     setSuccessPlan(successPlanData);
     setShowSuccessModal(true);
-    
+
     // Show success toast
     toast({
       title: "🎉 Meal Plan Created Successfully!",
       description: `Your meal plan is ready to explore.`,
       duration: 8000,
     });
-    
+
     // Refresh the first page to show the new plan
     setCurrentPage(1);
     loadMealPlans(1, pageSize);
@@ -112,7 +145,7 @@ const MealPlanner = () => {
   };
 
   const handleBackToPlanner = () => {
-    console.log('Navigating back to meal planner - resetting all states');
+    console.log("Navigating back to meal planner - resetting all states");
     isNavigatingBack.current = true;
     setShowCreator(false);
     setSelectedMealPlan(null);
@@ -122,9 +155,9 @@ const MealPlanner = () => {
   const handlePlanSelect = (plan: any) => {
     // Get the most up-to-date version of the plan from context
     const updatedPlan = getMealPlanById(plan.id) || plan;
-    console.log('this is the updated plan object',updatedPlan);
-    console.log('this is the normal plan object',plan);
-    console.log('Selecting plan:', updatedPlan);
+    console.log("this is the updated plan object", updatedPlan);
+    console.log("this is the normal plan object", plan);
+    console.log("Selecting plan:", updatedPlan);
     setSelectedMealPlan(updatedPlan);
     setShowCreator(false);
     setIsEditing(false);
@@ -169,8 +202,8 @@ const MealPlanner = () => {
   // Show meal plan view when a plan is selected and not in creator mode
   if (selectedMealPlan && !showCreator) {
     return (
-      <MealPlanView 
-        plan={selectedMealPlan} 
+      <MealPlanView
+        plan={selectedMealPlan}
         onBack={handleBackToPlanner}
         onEdit={handleEditPlan}
       />
@@ -193,10 +226,10 @@ const MealPlanner = () => {
   return (
     <div className="min-h-screen relative">
       {/* Food-themed Background */}
-      <div 
+      <div
         className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
@@ -216,12 +249,17 @@ const MealPlanner = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/30 backdrop-blur-sm rounded-xl p-4 sm:p-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">{t('mealPlanner.title') || 'Meal Planner'}</h1>
-            <p className="text-white/90 mt-1 drop-shadow-md">{t('mealPlanner.description') || 'Create and manage your weekly meal plans'}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
+              {t("mealPlanner.title") || "Meal Planner"}
+            </h1>
+            <p className="text-white/90 mt-1 drop-shadow-md">
+              {t("mealPlanner.description") ||
+                "Create and manage your weekly meal plans"}
+            </p>
           </div>
-          <Button 
+          <Button
             onClick={() => {
-              console.log('Creating new meal plan');
+              console.log("Creating new meal plan");
               setShowCreator(true);
               setSelectedMealPlan(null);
               setIsEditing(false);
@@ -230,7 +268,7 @@ const MealPlanner = () => {
             className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white w-full sm:w-auto shadow-lg"
           >
             <Plus className="h-4 w-4 mr-2" />
-            {t('mealPlanner.aiMeal') || 'Create AI Meal Plan'}
+            {t("mealPlanner.aiMeal") || "Create AI Meal Plan"}
           </Button>
         </div>
 
@@ -242,7 +280,7 @@ const MealPlanner = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             itemCount={currentPagePlans.length}
-            itemLabel={t('mealPlanner.plans') || 'plans'}
+            itemLabel={t("mealPlanner.plans") || "plans"}
           />
         )}
 
@@ -251,7 +289,9 @@ const MealPlanner = () => {
           <div className="flex items-center justify-center py-12">
             <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8">
               <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-emerald-400" />
-              <p className="text-emerald-100">{t('mealPlanner.loadingPlans') || 'Loading your meal plans...'}</p>
+              <p className="text-emerald-100">
+                {t("mealPlanner.loadingPlans") || "Loading your meal plans..."}
+              </p>
             </div>
           </div>
         )}
@@ -262,14 +302,25 @@ const MealPlanner = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentPagePlans.map((plan) => {
                 // Calculate days from duration string or use preferences
-                const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
-                                 (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
-                const peopleCount = plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A';
-                const mealsCount = plan.preferences?.mealsPerDay || '3';
-                
+                const daysCount = plan.duration
+                  ? parseInt(plan.duration.replace(" days", ""))
+                  : plan.preferences?.numberOfWeeks
+                    ? plan.preferences.numberOfWeeks * 7
+                    : 7;
+
+                //kids below 5
+                const kidsbelow5Count = plan.preferences?.kidsbelow5 || "0";
+                //kids over 5
+                const kidsover5Count = plan.preferences?.kidsover5 || "0";
+                const peopleCount =
+                  plan.preferences?.numberOfPersons ||
+                  plan.preferences?.people ||
+                  "N/A";
+                const mealsCount = plan.preferences?.mealsPerDay || "3";
+
                 return (
-                  <Card 
-                    key={plan.id} 
+                  <Card
+                    key={plan.id}
                     className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
                     onClick={() => handlePlanSelect(plan)}
                   >
@@ -282,59 +333,105 @@ const MealPlanner = () => {
                         <span className="truncate">{plan.name}</span>
                       </CardTitle>
                       <CardDescription className="text-gray-500">
-                        {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
+                        {plan.startDate} -{" "}
+                        {new Date(plan.endDate).toLocaleDateString()}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-emerald-500" />
-                          <span>{daysCount} {t('mealPlanner.day') || 'day'}{daysCount > 1 ? 's' : ''}</span>
+                          <span>
+                            {daysCount} {t("mealPlanner.day") || "day"}
+                            {daysCount > 1 ? "s" : ""}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4 text-emerald-500" />
-                          <span>{t('mealPlanner.for') || 'For'} {peopleCount} {t('mealPlanner.people') || 'people'}</span>
+                          <span>
+                            {t("mealPlanner.for") || "For"} {peopleCount}{" "}
+                            {t("mealPlanner.people") || "people"}
+                          </span>
                         </div>
+
+                        {
+                          kidsbelow5Count > 0 && (
+                            <div className="flex items-center gap-2">
+                              <Baby className="h-4 w-4 text-emerald-500" />
+                              <span>
+                                {t("mealPlanner.for") || "For"} {kidsbelow5Count}{" "}
+                                {t("mealPlanner.kidsbelow5") || "kids below 5"}
+                              </span>
+                            </div>
+                          )
+                        }
+                        {
+                          kidsover5Count > 0 && (
+                            <div className="flex items-center gap-2">
+                              <Smile className="h-4 w-4 text-emerald-500" />
+                              <span>
+                                {t("mealPlanner.for") || "For"} {kidsover5Count}{" "}
+                                {t("mealPlanner.kidsover5") || "kids over 5"}
+                              </span>
+                            </div>
+                          )
+                        }
+                        
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-emerald-500" />
-                          <span>{mealsCount} {t('mealPlanner.mealsPDay') || 'meals per day'}</span>
+                          <span>
+                            {mealsCount}{" "}
+                            {t("mealPlanner.mealsPDay") || "meals per day"}
+                          </span>
                         </div>
-                        
+
                         {/* Additional plan details from API */}
                         <div className="pt-2 border-t border-gray-100 space-y-1">
-                          {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
-                            <div className="text-xs text-emerald-600 font-medium">
-                              {t('mealPlanner.cuisine') || 'Cuisine'}: {plan.preferences.cuisinePreferences.join(', ')}
-                            </div>
-                          )}
-                          
-                          {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
-                            <div className="text-xs text-teal-600 font-medium">
-                              {t('mealPlanner.diet') || 'Diet'}: {plan.preferences.dietaryRestrictions.join(', ')}
-                            </div>
-                          )}
-                          
+                          {plan.preferences?.cuisinePreferences &&
+                            plan.preferences.cuisinePreferences.length > 0 && (
+                              <div className="text-xs text-emerald-600 font-medium">
+                                {t("mealPlanner.cuisine") || "Cuisine"}:{" "}
+                                {plan.preferences.cuisinePreferences.join(", ")}
+                              </div>
+                            )}
+
+                          {plan.preferences?.dietaryRestrictions &&
+                            plan.preferences.dietaryRestrictions.length > 0 && (
+                              <div className="text-xs text-teal-600 font-medium">
+                                {t("mealPlanner.diet") || "Diet"}:{" "}
+                                {plan.preferences.dietaryRestrictions.join(
+                                  ", ",
+                                )}
+                              </div>
+                            )}
+
                           {plan.preferences?.cookingSkillLevel && (
                             <div className="text-xs text-blue-600 font-medium">
-                              {t('mealPlanner.skillLevel') || 'Skill Level'}: {plan.preferences.cookingSkillLevel}
+                              {t("mealPlanner.skillLevel") || "Skill Level"}:{" "}
+                              {plan.preferences.cookingSkillLevel}
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="mt-3 pt-2 border-t border-gray-100">
                           <div className="text-xs text-gray-500">
-                            {plan.meals?.length || 0} {t('mealPlanner.totalMealsPlanned') || 'total meals planned'}
+                            {plan.meals?.length || 0}{" "}
+                            {t("mealPlanner.totalMealsPlanned") ||
+                              "total meals planned"}
                           </div>
-                          
-                          {plan.shoppingList && plan.shoppingList.length > 0 && (
-                            <div className="text-xs text-orange-600 mt-1">
-                              {plan.shoppingList.length} {t('mealPlanner.ingreNeeded') || 'ingredients needed'}
-                            </div>
-                          )}
+
+                          {plan.shoppingList &&
+                            plan.shoppingList.length > 0 && (
+                              <div className="text-xs text-orange-600 mt-1">
+                                {plan.shoppingList.length}{" "}
+                                {t("mealPlanner.ingreNeeded") ||
+                                  "ingredients needed"}
+                              </div>
+                            )}
                           {plan.totalCarbonFootprint && (
                             <div className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
                               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                              {plan.totalCarbonFootprint} Kg CO2 
+                              {plan.totalCarbonFootprint} Kg CO2
                             </div>
                           )}
                         </div>
@@ -352,46 +449,57 @@ const MealPlanner = () => {
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
-                        <PaginationPrevious 
+                        <PaginationPrevious
                           onClick={() => handlePageChange(currentPage - 1)}
-                          className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                          className={
+                            currentPage <= 1
+                              ? "pointer-events-none opacity-50"
+                              : "cursor-pointer hover:bg-emerald-50"
+                          }
                         />
                       </PaginationItem>
-                      
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                        if (
-                          page === 1 || 
-                          page === totalPages || 
-                          (page >= currentPage - 1 && page <= currentPage + 1)
-                        ) {
-                          return (
-                            <PaginationItem key={page}>
-                              <PaginationLink
-                                onClick={() => handlePageChange(page)}
-                                isActive={page === currentPage}
-                                className={`cursor-pointer ${page === currentPage ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'hover:bg-emerald-50'}`}
-                              >
-                                {page}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        } else if (
-                          (page === currentPage - 2 && currentPage > 3) ||
-                          (page === currentPage + 2 && currentPage < totalPages - 2)
-                        ) {
-                          return (
-                            <PaginationItem key={page}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          );
-                        }
-                        return null;
-                      })}
-                      
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => {
+                          if (
+                            page === 1 ||
+                            page === totalPages ||
+                            (page >= currentPage - 1 && page <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={page}>
+                                <PaginationLink
+                                  onClick={() => handlePageChange(page)}
+                                  isActive={page === currentPage}
+                                  className={`cursor-pointer ${page === currentPage ? "bg-emerald-500 text-white hover:bg-emerald-600" : "hover:bg-emerald-50"}`}
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            (page === currentPage - 2 && currentPage > 3) ||
+                            (page === currentPage + 2 &&
+                              currentPage < totalPages - 2)
+                          ) {
+                            return (
+                              <PaginationItem key={page}>
+                                <PaginationEllipsis />
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        },
+                      )}
+
                       <PaginationItem>
-                        <PaginationNext 
+                        <PaginationNext
                           onClick={() => handlePageChange(currentPage + 1)}
-                          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                          className={
+                            currentPage >= totalPages
+                              ? "pointer-events-none opacity-50"
+                              : "cursor-pointer hover:bg-emerald-50"
+                          }
                         />
                       </PaginationItem>
                     </PaginationContent>
@@ -401,7 +509,8 @@ const MealPlanner = () => {
             )}
           </>
         ) : (
-          !isLoadingPlans && hasLoadedInitialPlans && (
+          !isLoadingPlans &&
+          hasLoadedInitialPlans && (
             <Card className="text-center py-12 bg-card backdrop-blur-sm border border-border shadow-xl">
               <CardContent>
                 <div className="flex flex-col items-center space-y-4">
@@ -410,16 +519,22 @@ const MealPlanner = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {t('mealPlanner.welcomeToAIMeal') || 'Welcome to AI Meal Planning'}, {user?.name?.split(' ')[0] || 'Chef'}!
+                      {t("mealPlanner.welcomeToAIMeal") ||
+                        "Welcome to AI Meal Planning"}
+                      , {user?.name?.split(" ")[0] || "Chef"}!
                     </h3>
                     <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
-                      {t('mealPlanner.createYourPersonalized') || 'Create your first personalized meal plan with our AI assistant'}. 
-                      {t('mealPlanner.getCustomizedRecipes') || 'Get customized recipes based on your preferences, dietary needs, and cooking skills'}.
+                      {t("mealPlanner.createYourPersonalized") ||
+                        "Create your first personalized meal plan with our AI assistant"}
+                      .
+                      {t("mealPlanner.getCustomizedRecipes") ||
+                        "Get customized recipes based on your preferences, dietary needs, and cooking skills"}
+                      .
                     </p>
                   </div>
-                  <Button 
+                  <Button
                     onClick={() => {
-                      console.log('Creating first meal plan');
+                      console.log("Creating first meal plan");
                       setShowCreator(true);
                       setSelectedMealPlan(null);
                       setIsEditing(false);
@@ -429,7 +544,8 @@ const MealPlanner = () => {
                     size="lg"
                   >
                     <Sparkles className="h-5 w-5 mr-2" />
-                    {t('mealPlanner.createYourFirstAIMeal') || 'Create Your First AI Meal Plan'}
+                    {t("mealPlanner.createYourFirstAIMeal") ||
+                      "Create Your First AI Meal Plan"}
                   </Button>
                 </div>
               </CardContent>
