@@ -60,6 +60,11 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   const [skillLevel, setSkillLevel] = useState("intermediate");
   const [budgetRange, setBudgetRange] = useState("medium");
 
+  const [customCuisine, setCustomCuisine] = useState("");
+  const [showCustomCuisineInput, setShowCustomCuisineInput] = useState(false);
+  const [customAllergy, setCustomAllergy] = useState("");
+  const [showCustomAllergyInput, setShowCustomAllergyInput] = useState(false);
+
   const [mealData, setMealData] = useState<any>({
     mealName: "",
     mealType: "",
@@ -110,6 +115,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     { key: "Chinese", label: t("aiMealCreatorStepper.cuisine.chinese") || "Chinese" },
     { key: "Spanish", label: t("aiMealCreatorStepper.cuisine.spanish") || "Spanish" },
     { key: "Greek", label: t("aiMealCreatorStepper.cuisine.greek") || "Greek" },
+    { key: "__other__", label: t("aiMealCreatorStepper.cuisine.other") || "Other" },
   ];
 
   const healthGoalsOptions = [
@@ -132,6 +138,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     { key: "Soy", label: t("aiMealCreatorStepper.allergy.soy") || "Soy" },
     { key: "Wheat", label: t("aiMealCreatorStepper.allergy.wheat") || "Wheat" },
     { key: "Sesame", label: t("aiMealCreatorStepper.allergy.sesame") || "Sesame" },
+    { key: "__other__", label: t("aiMealCreatorStepper.allergy.other") || "Other" },
   ];
 
   const skillOptions = [
@@ -230,6 +237,8 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
       setMealData((prev: any) => ({ ...prev, dietaryRestrictions: [...multiSelected] }));
       setMultiSelected([]);
       setCurrentStep("cuisine");
+      setShowCustomCuisineInput(false);
+      setCustomCuisine("");
       setTimeout(() => {
         addBotMessage(
           t("aiMealCreatorStepper.chat.cuisine") || "🌍 Any cuisine preferences? Select all that sound good!",
@@ -238,9 +247,17 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
         );
       }, 400);
     } else if (currentStep === "cuisine") {
-      addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("aiMealCreatorStepper.chat.none") || "None");
-      setMealData((prev: any) => ({ ...prev, cuisinePreferences: [...multiSelected] }));
+      const finalCuisine = [...multiSelected.filter(k => k !== "__other__")];
+      if (customCuisine.trim()) finalCuisine.push(customCuisine.trim());
+      const displayLabels = finalCuisine.map((k) => {
+        const found = cuisineOptions.find((o) => o.key === k);
+        return found ? found.label : k;
+      });
+      addUserMessage(displayLabels.length > 0 ? displayLabels.join(", ") : t("aiMealCreatorStepper.chat.none") || "None");
+      setMealData((prev: any) => ({ ...prev, cuisinePreferences: finalCuisine }));
       setMultiSelected([]);
+      setShowCustomCuisineInput(false);
+      setCustomCuisine("");
       setCurrentStep("healthGoals");
       setTimeout(() => {
         addBotMessage(
@@ -262,9 +279,17 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
         );
       }, 400);
     } else if (currentStep === "allergies") {
-      addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("aiMealCreatorStepper.chat.none") || "None");
-      setMealData((prev: any) => ({ ...prev, allergiesIntolerances: [...multiSelected] }));
+      const finalAllergies = [...multiSelected.filter(k => k !== "__other__")];
+      if (customAllergy.trim()) finalAllergies.push(customAllergy.trim());
+      const displayAllergyLabels = finalAllergies.map((k) => {
+        const found = allergiesOptions.find((o) => o.key === k);
+        return found ? found.label : k;
+      });
+      addUserMessage(displayAllergyLabels.length > 0 ? displayAllergyLabels.join(", ") : t("aiMealCreatorStepper.chat.none") || "None");
+      setMealData((prev: any) => ({ ...prev, allergiesIntolerances: finalAllergies }));
       setMultiSelected([]);
+      setShowCustomAllergyInput(false);
+      setCustomAllergy("");
       setCurrentStep("extras");
       setTimeout(() => {
         addBotMessage(
@@ -277,6 +302,16 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   };
 
   const toggleMultiSelect = (key: string) => {
+    if (key === "__other__") {
+      if (currentStep === "cuisine") {
+        setShowCustomCuisineInput((prev) => !prev);
+        if (showCustomCuisineInput) setCustomCuisine("");
+      } else if (currentStep === "allergies") {
+        setShowCustomAllergyInput((prev) => !prev);
+        if (showCustomAllergyInput) setCustomAllergy("");
+      }
+      return;
+    }
     setMultiSelected((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
@@ -548,7 +583,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                       key={opt.key}
                       onClick={() => toggleMultiSelect(opt.key)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-                        multiSelected.includes(opt.key)
+                        multiSelected.includes(opt.key) || (opt.key === "__other__" && ((currentStep === "cuisine" && showCustomCuisineInput) || (currentStep === "allergies" && showCustomAllergyInput)))
                           ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
                           : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
                       }`}
@@ -558,14 +593,38 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                     </button>
                   ))}
                 </div>
-                <div className="flex gap-2">
+                {/* Custom input for cuisine "Other" */}
+                {currentStep === "cuisine" && showCustomCuisineInput && (
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      value={customCuisine}
+                      onChange={(e) => setCustomCuisine(e.target.value.slice(0, 30))}
+                      placeholder={t("aiMealCreatorStepper.cuisine.otherPlaceholder") || "Type your cuisine..."}
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                      maxLength={30}
+                    />
+                  </div>
+                )}
+                {/* Custom input for allergies "Other" */}
+                {currentStep === "allergies" && showCustomAllergyInput && (
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      value={customAllergy}
+                      onChange={(e) => setCustomAllergy(e.target.value.slice(0, 30))}
+                      placeholder={t("aiMealCreatorStepper.allergy.otherPlaceholder") || "Type your allergy..."}
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                      maxLength={30}
+                    />
+                  </div>
+                )}
+                <div className="flex gap-2 mt-3">
                   <Button
                     size="sm"
                     onClick={handleMultiSelectConfirm}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4"
                   >
-                    {multiSelected.length > 0
-                      ? `${t("aiMealCreatorStepper.chat.confirm") || "Confirm"} (${multiSelected.length})`
+                    {(multiSelected.filter(k => k !== "__other__").length > 0 || (currentStep === "cuisine" && customCuisine.trim()) || (currentStep === "allergies" && customAllergy.trim()))
+                      ? `${t("aiMealCreatorStepper.chat.confirm") || "Confirm"} (${multiSelected.filter(k => k !== "__other__").length + ((currentStep === "cuisine" && customCuisine.trim()) || (currentStep === "allergies" && customAllergy.trim()) ? 1 : 0)})`
                       : t("aiMealCreatorStepper.chat.skip") || "Skip"}
                   </Button>
                 </div>
