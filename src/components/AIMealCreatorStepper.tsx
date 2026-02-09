@@ -408,7 +408,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     currentStep === "allergies" ? allergiesOptions : [];
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px]">
+    <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px] md:bg-black/10 md:backdrop-blur-sm md:rounded-2xl md:border md:border-white/10 md:shadow-xl md:my-4">
       <LoaderComponent />
 
       {/* Header */}
@@ -434,7 +434,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
       <div className="flex-1 overflow-y-auto px-3 space-y-3 pb-3" ref={scrollRef}>
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`flex gap-2 max-w-[85%] ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+            <div className={`flex gap-2 max-w-[85%] md:max-w-[70%] ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
               {/* Avatar */}
               <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 ${
                 msg.role === "bot"
@@ -478,7 +478,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
         {/* Active multi-select chips */}
         {isMultiSelectStep && (
           <div className="flex justify-start">
-            <div className="flex gap-2 max-w-[85%]">
+            <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
               <div className="shrink-0 w-7 h-7" />
               <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md w-full">
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -516,7 +516,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
         {/* Compound inputs (servings, time, skill, budget) */}
         {isCompoundStep && (
           <div className="flex justify-start">
-            <div className="flex gap-2 max-w-[85%]">
+            <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
               <div className="shrink-0 w-7 h-7" />
               <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md space-y-3 w-full">
                 <div className="grid grid-cols-2 gap-3">

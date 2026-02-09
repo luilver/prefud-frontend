@@ -358,6 +358,116 @@ export const es = {
       "next": "Siguiente"
     }
   },
+  "aiMealCreatorStepper": {
+    "backToMeals": "Volver",
+    "createAIMealTitle": "Creador de Comida IA",
+    "loaderMessage": "Analizando tus preferencias y creando la comida perfecta...",
+    "servingsLabel": "Porciones",
+    "cookingTimeLabel": "Tiempo (min)",
+    "skillLevelLabel": "Nivel de Habilidad",
+    "budgetLabel": "Presupuesto",
+    "mealNamePlaceholder": "ej., Mi Cena Especial del Domingo",
+    "mealType": {
+      "breakfast": "Desayuno",
+      "lunch": "Almuerzo",
+      "dinner": "Cena",
+      "snack": "Merienda",
+      "dessert": "Postre",
+      "appetizer": "Aperitivo"
+    },
+    "dietary": {
+      "vegetarian": "Vegetariano",
+      "vegan": "Vegano",
+      "glutenfree": "Sin Gluten",
+      "dairyfree": "Sin Lácteos",
+      "keto": "Keto",
+      "paleo": "Paleo",
+      "lowcarb": "Bajo en Carbohidratos",
+      "pescatarian": "Pescatariano"
+    },
+    "cuisine": {
+      "italian": "Italiana",
+      "mexican": "Mexicana",
+      "asian": "Asiática",
+      "mediterranean": "Mediterránea",
+      "indian": "India",
+      "american": "Americana",
+      "french": "Francesa",
+      "japanese": "Japonesa",
+      "thai": "Tailandesa",
+      "chinese": "China",
+      "spanish": "Española",
+      "greek": "Griega"
+    },
+    "health": {
+      "weightloss": "Pérdida de Peso",
+      "musclegain": "Ganancia Muscular",
+      "hearthealth": "Salud del Corazón",
+      "energyboost": "Aumento de Energía",
+      "immunesupport": "Apoyo Inmunológico",
+      "digestivehealth": "Salud Digestiva",
+      "antiinflammatory": "Antiinflamatorio",
+      "detox": "Desintoxicación"
+    },
+    "allergy": {
+      "nuts": "Frutos Secos",
+      "peanuts": "Cacahuetes",
+      "shellfish": "Mariscos",
+      "eggs": "Huevos",
+      "dairy": "Lácteos",
+      "soy": "Soja",
+      "wheat": "Trigo",
+      "sesame": "Sésamo"
+    },
+    "skillLevel": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    },
+    "budget": {
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto"
+    },
+    "chat": {
+      "welcome": "👋 ¡Hola! Soy tu asistente de comidas IA. ¡Creemos algo delicioso juntos! ¿Qué tipo de comida se te antoja?",
+      "mealName": "¡Gran elección! 🎉 ¿Tienes un nombre para esta comida? (Opcional - escribe o salta)",
+      "dishName": "🍽️ ¿Tienes un plato específico en mente? ej. Macarrones con Queso (Opcional)",
+      "details": "⚡ Configuremos los detalles — porciones, tiempo de cocción, nivel de habilidad y presupuesto.",
+      "dietary": "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+      "cuisine": "🌍 ¿Preferencias de cocina? ¡Selecciona las que te gusten!",
+      "healthGoals": "💪 ¿Algún objetivo de salud para esta comida?",
+      "allergies": "⚠️ ¿Alguna alergia o intolerancia alimentaria que deba saber?",
+      "extras": "📝 ¿Algo más? ¿Disgustos, solicitudes especiales o alergias personalizadas? (Opcional)",
+      "none": "Ninguno",
+      "skipped": "Omitido",
+      "confirm": "Confirmar",
+      "skip": "Saltar →",
+      "continue": "Continuar",
+      "generate": "Generar Mi Comida",
+      "letsGo": "¡Vamos! 🚀",
+      "readyTitle": "Aquí está el resumen de tu plan de comidas:",
+      "confirmPrompt": "¿Se ve bien? ¡Presiona **Generar** para crear tu comida! 🚀",
+      "typePlaceholder": "Escribe aquí o salta...",
+      "dishPlaceholder": "ej., Macarrones con Queso",
+      "servingsLabel": "porciones",
+      "budgetSuffix": "presupuesto"
+    },
+    "review": {
+      "mealType": "Tipo",
+      "mealName": "Nombre",
+      "dish": "Plato",
+      "servings": "Porciones",
+      "cookingTime": "Tiempo",
+      "skillLevel": "Habilidad",
+      "budget": "Presupuesto",
+      "dietaryRestrictions": "Dieta",
+      "cuisinePreferences": "Cocina",
+      "healthGoals": "Objetivos",
+      "allergies": "Alergias",
+      "specialRequests": "Notas"
+    }
+  },
   "mealPlanView": {
     "editPlan": "Editar Plan",
     "days": "Días",

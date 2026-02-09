@@ -354,6 +354,116 @@ export const en = {
       "next": "Next"
     }
   },
+  "aiMealCreatorStepper": {
+    "backToMeals": "Back",
+    "createAIMealTitle": "AI Meal Creator",
+    "loaderMessage": "Analyzing your preferences and creating the perfect meal...",
+    "servingsLabel": "Servings",
+    "cookingTimeLabel": "Time (min)",
+    "skillLevelLabel": "Skill Level",
+    "budgetLabel": "Budget",
+    "mealNamePlaceholder": "e.g., My Special Sunday Dinner",
+    "mealType": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack",
+      "dessert": "Dessert",
+      "appetizer": "Appetizer"
+    },
+    "dietary": {
+      "vegetarian": "Vegetarian",
+      "vegan": "Vegan",
+      "glutenfree": "Gluten-Free",
+      "dairyfree": "Dairy-Free",
+      "keto": "Keto",
+      "paleo": "Paleo",
+      "lowcarb": "Low-Carb",
+      "pescatarian": "Pescatarian"
+    },
+    "cuisine": {
+      "italian": "Italian",
+      "mexican": "Mexican",
+      "asian": "Asian",
+      "mediterranean": "Mediterranean",
+      "indian": "Indian",
+      "american": "American",
+      "french": "French",
+      "japanese": "Japanese",
+      "thai": "Thai",
+      "chinese": "Chinese",
+      "spanish": "Spanish",
+      "greek": "Greek"
+    },
+    "health": {
+      "weightloss": "Weight Loss",
+      "musclegain": "Muscle Gain",
+      "hearthealth": "Heart Health",
+      "energyboost": "Energy Boost",
+      "immunesupport": "Immune Support",
+      "digestivehealth": "Digestive Health",
+      "antiinflammatory": "Anti-Inflammatory",
+      "detox": "Detox"
+    },
+    "allergy": {
+      "nuts": "Nuts",
+      "peanuts": "Peanuts",
+      "shellfish": "Shellfish",
+      "eggs": "Eggs",
+      "dairy": "Dairy",
+      "soy": "Soy",
+      "wheat": "Wheat",
+      "sesame": "Sesame"
+    },
+    "skillLevel": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "budget": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "chat": {
+      "welcome": "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
+      "mealName": "Great choice! 🎉 Do you have a name for this meal? (Optional - just type or skip)",
+      "dishName": "🍽️ Do you have a specific dish in mind? e.g. Mac and Cheese (Optional)",
+      "details": "⚡ Let's set up the details — servings, cooking time, skill level, and budget.",
+      "dietary": "🥗 Any dietary restrictions? Select all that apply.",
+      "cuisine": "🌍 Any cuisine preferences? Select all that sound good!",
+      "healthGoals": "💪 Any health goals for this meal?",
+      "allergies": "⚠️ Any allergies or food intolerances I should know about?",
+      "extras": "📝 Anything else? Dislikes, special requests, or custom allergies? (Optional)",
+      "none": "None",
+      "skipped": "Skipped",
+      "confirm": "Confirm",
+      "skip": "Skip →",
+      "continue": "Continue",
+      "generate": "Generate My Meal",
+      "letsGo": "Let's go! 🚀",
+      "readyTitle": "Here's your meal plan summary:",
+      "confirmPrompt": "Looks good? Hit **Generate** to create your meal! 🚀",
+      "typePlaceholder": "Type here or skip...",
+      "dishPlaceholder": "e.g., Mac and Cheese",
+      "servingsLabel": "servings",
+      "budgetSuffix": "budget"
+    },
+    "review": {
+      "mealType": "Type",
+      "mealName": "Name",
+      "dish": "Dish",
+      "servings": "Servings",
+      "cookingTime": "Time",
+      "skillLevel": "Skill",
+      "budget": "Budget",
+      "dietaryRestrictions": "Diet",
+      "cuisinePreferences": "Cuisine",
+      "healthGoals": "Goals",
+      "allergies": "Allergies",
+      "specialRequests": "Notes"
+    }
+  },
   "mealPlanView": {
     "editPlan": "Edit Plan",
     "days": "Days", 
