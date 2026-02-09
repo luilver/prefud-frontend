@@ -52,7 +52,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   const [textInput, setTextInput] = useState("");
   const [multiSelected, setMultiSelected] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [initialized, setInitialized] = useState(false);
+  const initializedRef = useRef(false);
 
   // Stepper inputs
   const [servings, setServings] = useState(2);
@@ -151,10 +151,10 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, currentStep]);
 
-  // Initialize first bot message (guard against StrictMode double-run)
+  // Initialize first bot message (ref guard against StrictMode double-run)
   useEffect(() => {
-    if (initialized) return;
-    setInitialized(true);
+    if (initializedRef.current) return;
+    initializedRef.current = true;
     addBotMessage(
       t("aiMealCreatorStepper.chat.welcome") || "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
       mealTypeOptions
