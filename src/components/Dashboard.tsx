@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import dashboardTabsBg from "@/assets/dashboard-tabs-bg.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -226,7 +227,12 @@ const DashboardContent = () => {
           {/* Kitchen-inspired content wrapper */}
           <div className="relative">
             {/* Subtle content background */}
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl"></div>
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10"
+                style={{ backgroundImage: `url(${dashboardTabsBg})` }}
+              />
+            </div>
             
             {/* Tab Content */}
             <div className="relative p-4 sm:p-6 lg:p-8">
