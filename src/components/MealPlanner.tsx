@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Sparkles, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import MealPlanCard from "./MealPlanCard";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Calendar, Users, ChefHat, Clock, Sparkles, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
@@ -261,9 +260,89 @@ const MealPlanner = () => {
         {!isLoadingPlans && currentPagePlans.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentPagePlans.map((plan) => (
-                <MealPlanCard key={plan.id} plan={plan} onClick={handlePlanSelect} />
-              ))}
+              {currentPagePlans.map((plan) => {
+                // Calculate days from duration string or use preferences
+                const daysCount = plan.duration ? parseInt(plan.duration.replace(' days', '')) : 
+                                 (plan.preferences?.numberOfWeeks ? plan.preferences.numberOfWeeks * 7 : 7);
+                const peopleCount = plan.preferences?.numberOfPersons || plan.preferences?.people || 'N/A';
+                const mealsCount = plan.preferences?.mealsPerDay || '3';
+                
+                return (
+                  <Card 
+                    key={plan.id} 
+                    className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
+                    onClick={() => handlePlanSelect(plan)}
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-gray-800">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                          <ChefHat className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="truncate">{plan.name}</span>
+                      </CardTitle>
+                      <CardDescription className="text-gray-500">
+                        {plan.startDate} - {new Date(plan.endDate).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-emerald-500" />
+                          <span>{daysCount} {t('mealPlanner.day') || 'day'}{daysCount > 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-emerald-500" />
+                          <span>{t('mealPlanner.for') || 'For'} {peopleCount} {t('mealPlanner.people') || 'people'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-emerald-500" />
+                          <span>{mealsCount} {t('mealPlanner.mealsPDay') || 'meals per day'}</span>
+                        </div>
+                        
+                        {/* Additional plan details from API */}
+                        <div className="pt-2 border-t border-gray-100 space-y-1">
+                          {plan.preferences?.cuisinePreferences && plan.preferences.cuisinePreferences.length > 0 && (
+                            <div className="text-xs text-emerald-600 font-medium">
+                              {t('mealPlanner.cuisine') || 'Cuisine'}: {plan.preferences.cuisinePreferences.join(', ')}
+                            </div>
+                          )}
+                          
+                          {plan.preferences?.dietaryRestrictions && plan.preferences.dietaryRestrictions.length > 0 && (
+                            <div className="text-xs text-teal-600 font-medium">
+                              {t('mealPlanner.diet') || 'Diet'}: {plan.preferences.dietaryRestrictions.join(', ')}
+                            </div>
+                          )}
+                          
+                          {plan.preferences?.cookingSkillLevel && (
+                            <div className="text-xs text-blue-600 font-medium">
+                              {t('mealPlanner.skillLevel') || 'Skill Level'}: {plan.preferences.cookingSkillLevel}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="mt-3 pt-2 border-t border-gray-100">
+                          <div className="text-xs text-gray-500">
+                            {plan.meals?.length || 0} {t('mealPlanner.totalMealsPlanned') || 'total meals planned'}
+                          </div>
+                          
+                          {plan.shoppingList && plan.shoppingList.length > 0 && (
+                            <div className="text-xs text-orange-600 mt-1">
+                              {plan.shoppingList.length} {t('mealPlanner.ingreNeeded') || 'ingredients needed'}
+                            </div>
+                          )}
+                          {plan.totalCarbonFootprint && (
+                            <div className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                              {plan.totalCarbonFootprint} Kg CO2 
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
 
             {/* Pagination */}

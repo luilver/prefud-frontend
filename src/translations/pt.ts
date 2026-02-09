@@ -278,12 +278,6 @@ export const pt = {
   "mealPlanner": {
     "title": "Planejador de Refeições",
     "description": "Crie e gerencie seus planos de refeições semanais",
-    "days": "Dias",
-    "people": "Pessoas",
-    "mealsDay": "Refeições/Dia",
-    "kidsUnder5": "menores de 5",
-    "kids5to12": "de 5 a 12 anos",
-    "ingredients": "itens",
     "pagination": {
       "previous": "Anterior",
       "next": "Próximo"

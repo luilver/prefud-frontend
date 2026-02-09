@@ -353,12 +353,6 @@ export const es = {
   "mealPlanner": {
     "title": "Planificador de Comidas",
     "description": "Crea y gestiona tus planes de comidas semanales",
-    "days": "Días",
-    "people": "Personas",
-    "mealsDay": "Comidas/Día",
-    "kidsUnder5": "menores de 5",
-    "kids5to12": "de 5 a 12 años",
-    "ingredients": "ingredientes",
     "pagination": {
       "previous": "Anterior",
       "next": "Siguiente"
