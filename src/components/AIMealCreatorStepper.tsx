@@ -469,7 +469,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   };
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px] md:bg-black/40 md:backdrop-blur-sm md:rounded-2xl md:border md:border-white/40 md:shadow-xl md:my-4">
+    <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px] bg-black/40 backdrop-blur-sm md:rounded-2xl md:border md:border-white/40 md:shadow-xl md:my-4">
       <LoaderComponent />
 
       {/* Header */}
