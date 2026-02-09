@@ -379,7 +379,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
           </Card>
           {/* Mobile-first Tabs */}
           <Tabs defaultValue="recipe" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-12 mb-6">
+            <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
               <TabsTrigger value="recipe" className="text-sm">
                 <BookOpen className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="hidden sm:inline">
@@ -393,13 +393,6 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   {t("aiMealView.ingredientsSelector") || "Ingredients"}
                 </span>
                 <span className="sm:hidden">Items</span>
-              </TabsTrigger>
-              <TabsTrigger value="video" className="text-sm">
-                <Play className="h-4 w-4 mr-1 md:mr-2" />
-                <span className="hidden sm:inline">
-                  {t("aiMealView.videoTab") || "Video"}
-                </span>
-                <span className="sm:hidden">Video</span>
               </TabsTrigger>
             </TabsList>
 
@@ -575,75 +568,6 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="video">
-              <Card>
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center space-x-2">
-                    <Play className="h-5 w-5 text-red-600" />
-                    <span>{t("aiMealView.videoTitle") || "Video Tutorial"}</span>
-                  </CardTitle>
-                  <CardDescription>
-                    {t("aiMealView.videoDesc") || "Watch step-by-step preparation"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center relative overflow-hidden">
-                    {!isVideoPlaying ? (
-                      <div className="text-center space-y-4 p-6">
-                        <Button
-                          onClick={() => setIsVideoPlaying(true)}
-                          size="lg"
-                          className="bg-red-600 hover:bg-red-700 rounded-full h-14 px-8"
-                        >
-                          <Play className="h-6 w-6 mr-3" />
-                          {t("aiMealView.playVideo") || "Play Video"}
-                        </Button>
-                        <Button
-                          onClick={openFullscreenVideo}
-                          variant="outline"
-                          className="bg-white/10 border-white/20 text-white hover:bg-white/20 h-12"
-                        >
-                          <Maximize className="h-4 w-4 mr-2" />
-                          {t("aiMealView.fullscreen") || "Fullscreen"}
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="w-full h-full">
-                        <iframe
-                          width="100%"
-                          height="100%"
-                          src="https://www.youtube.com/embed/ixpYIgHlU60"
-                          title="Recipe Video Tutorial"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="rounded-lg"
-                        ></iframe>
-                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                          <Button
-                            onClick={() => setIsVideoPlaying(false)}
-                            variant="secondary"
-                            size="sm"
-                            className="bg-background/90"
-                          >
-                            {t("aiMealView.closeVideo") || "Close"}
-                          </Button>
-                          <Button
-                            onClick={openFullscreenVideo}
-                            variant="secondary"
-                            size="sm"
-                            className="bg-background/90"
-                          >
-                            <Maximize className="h-4 w-4 mr-1" />
-                            {t("aiMealView.fullscreen") || "Fullscreen"}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
 
           {/* Mobile-optimized Info Cards */}
