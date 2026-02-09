@@ -312,9 +312,8 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="recipe">Recipe</TabsTrigger>
-                <TabsTrigger value="video">Video Tutorial</TabsTrigger>
               </TabsList>
 
               <TabsContent value="recipe" className="space-y-6">
@@ -433,77 +432,6 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="video">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Play className="h-5 w-5 text-red-600" />
-                      <span>Video Tutorial</span>
-                    </CardTitle>
-                    <CardDescription>
-                      Watch step-by-step preparation
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
-                      {!isVideoPlaying ? (
-                        <div className="text-center space-y-4">
-                          <Button
-                            onClick={() => setIsVideoPlaying(true)}
-                            size="lg"
-                            className="bg-red-600 hover:bg-red-700 rounded-full"
-                          >
-                            <Play className="h-6 w-6 mr-2" />
-                            Play Video
-                          </Button>
-                          <Button
-                            onClick={openFullscreenVideo}
-                            variant="outline"
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <Maximize className="h-4 w-4 mr-2" />
-                            Fullscreen
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="text-white text-center space-y-4">
-                          <iframe
-                            width="100%"
-                            height="315"
-                            src="https://www.youtube.com/embed/ixpYIgHlU60"
-                            title="Recipe Video Tutorial"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="rounded-lg"
-                          ></iframe>
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              onClick={() => setIsVideoPlaying(false)}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              Close Video
-                            </Button>
-                            <Button
-                              onClick={openFullscreenVideo}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              <Maximize className="h-4 w-4 mr-2" />
-                              Fullscreen
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-4 text-center text-sm text-gray-600">
-                      <p>Duration: 8:30 | Difficulty: {meal.difficulty}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </Tabs>
           </div>
 
