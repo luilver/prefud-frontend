@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,11 +16,13 @@ import {
   CheckCircle2,
   Circle,
   Plus,
+  ChefHat,
 } from "lucide-react";
 import { ApiDrink } from "@/services/drinkService";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import DrinkShoppingModal from "./DrinkShoppingModal";
+import CookingMode from "./CookingMode";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
@@ -39,6 +41,7 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const [showCookingMode, setShowCookingMode] = useState(false);
 
   const handleCreateShoppingList = () => {
     try {
@@ -214,68 +217,86 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
 
   const healthyDrink = drink.drinkPlan.healthyDrink;
 
+  const enhancedInstructions = useMemo(() => {
+    const tips = [
+      "🔥 Heat your pan to medium-high heat",
+      "⏱️ Don't rush this step",
+      "👨‍🍳 Pro tip: Taste as you go",
+      "🌟 This is where the magic happens",
+      "💡 Keep stirring to prevent sticking",
+      "🎯 Almost there!",
+    ];
+    return (healthyDrink.steps || []).map((step: string, index: number) => ({
+      text: step,
+      tip: tips[index % tips.length],
+      estimatedTime: 2 + (index % 5),
+    }));
+  }, [healthyDrink.steps]);
+
   return (
     <>
-      <div className="space-y-6">
-        {/* Header - Made responsive */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <Button variant="ghost" onClick={onBack} className="p-2">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-              {drink.drink_name}
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-1">
-              {healthyDrink.name}
-            </p>
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+        {/* Sticky header matching AI Meal style */}
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b">
+          <div className="flex items-center justify-between px-4 py-3">
+            <Button variant="ghost" onClick={onBack} size="sm" className="p-2">
+              ← {t("drinkDetailView.back") || "Back"}
+            </Button>
+            <Button
+              onClick={() => setShowCookingMode(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              size="sm"
+            >
+              <ChefHat className="h-4 w-4 mr-2" />
+              {t("cookingMode.enter") || "Cooking Mode"}
+            </Button>
           </div>
         </div>
 
-        {/* Quick Stats Cards - Made more compact for mobile */}
-        <div className="flex overflow-x-auto gap-2 sm:grid sm:grid-cols-4 sm:gap-4 pb-2 sm:pb-0 snap-x snap-mandatory">
-          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
-            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
-              <Clock className="h-4 w-4 sm:h-6 sm:w-6 text-primary sm:mb-2" />
-              <div className="sm:text-center">
-                <p className="text-sm font-bold leading-tight">{healthyDrink.cookingTime}</p>
-                <p className="text-xs text-muted-foreground">{t("drinkDetailView.min") || "min"}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
-            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
-              <Users className="h-4 w-4 sm:h-6 sm:w-6 text-primary sm:mb-2" />
-              <div className="sm:text-center">
-                <p className="text-sm font-bold leading-tight">{drink.numberPeople}</p>
-                <p className="text-xs text-muted-foreground">{t("drinkDetailView.servings") || "Servings"}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
-            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
-              <Droplets className="h-4 w-4 sm:h-6 sm:w-6 text-accent-foreground sm:mb-2" />
-              <div className="sm:text-center">
-                <p className="text-sm font-bold leading-tight">{healthyDrink.calories}</p>
-                <p className="text-xs text-muted-foreground">{t("drinkDetailView.cal") || "Cal"}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
-            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
-              <Leaf className="h-4 w-4 sm:h-6 sm:w-6 text-primary sm:mb-2" />
-              <div className="sm:text-center">
-                <p className="text-sm font-bold leading-tight">{drink.drinkPlan.totalCarbonFootprint}</p>
-                <p className="text-xs text-muted-foreground">{t("drinkDetailView.co2") || "kg CO₂"}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
+          {/* Hero Card */}
+          <Card className="overflow-hidden border-0 shadow-lg">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10" />
+              <CardHeader className="relative pb-4">
+                <CardTitle className="text-xl md:text-3xl font-bold mb-2 leading-tight">
+                  {drink.drink_name}
+                </CardTitle>
+                <p className="text-base md:text-lg text-muted-foreground mb-4">
+                  {healthyDrink.name}
+                </p>
 
-        {/* Main Content - Responsive Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Content - Left Side */}
-          <div className="lg:col-span-2 space-y-6">
+                {/* Stats Grid matching AI Meal style */}
+                <div className="grid grid-cols-4 gap-3 mt-4">
+                  <div className="flex flex-col items-center p-3 bg-background/60 rounded-lg backdrop-blur-sm">
+                    <Clock className="h-5 w-5 text-primary mb-1" />
+                    <span className="text-xs font-medium text-center">{healthyDrink.cookingTime}</span>
+                    <span className="text-xs text-muted-foreground">{t("drinkDetailView.min") || "min"}</span>
+                  </div>
+                  <div className="flex flex-col items-center p-3 bg-background/60 rounded-lg backdrop-blur-sm">
+                    <Users className="h-5 w-5 text-primary mb-1" />
+                    <span className="text-xs font-medium text-center">{drink.numberPeople}</span>
+                    <span className="text-xs text-muted-foreground">{t("drinkDetailView.servings") || "Servings"}</span>
+                  </div>
+                  <div className="flex flex-col items-center p-3 bg-background/60 rounded-lg backdrop-blur-sm">
+                    <Droplets className="h-5 w-5 text-primary mb-1" />
+                    <span className="text-xs font-medium text-center">{healthyDrink.calories}</span>
+                    <span className="text-xs text-muted-foreground">{t("drinkDetailView.cal") || "Cal"}</span>
+                  </div>
+                  <div className="flex flex-col items-center p-3 bg-background/60 rounded-lg backdrop-blur-sm">
+                    <Leaf className="h-5 w-5 text-primary mb-1" />
+                    <span className="text-xs font-medium text-center">{drink.drinkPlan.totalCarbonFootprint}</span>
+                    <span className="text-xs text-muted-foreground">{t("drinkDetailView.co2") || "kg CO₂"}</span>
+                  </div>
+                </div>
+              </CardHeader>
+            </div>
+          </Card>
+
+          {/* Main Content - Responsive Grid */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Main Content - Left Side */}
+            <div className="lg:col-span-2 space-y-6">
             {/* Description & Benefits Card */}
             <Card>
               <CardHeader>
@@ -614,37 +635,46 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
               </CardContent>
             </Card>
 
+           </div>
           </div>
+
+          {/* Pro Tip */}
+          {healthyDrink.prepTip && (
+            <Card className="border-primary/30 bg-primary/10">
+              <CardContent className="pt-6">
+                <div className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-3">
+                  <div className="p-2 bg-primary rounded-full flex-shrink-0">
+                    <Droplets className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground mb-1">
+                      {t("drinkDetailView.proTip") || "Pro Tip"}
+                    </h4>
+                    <p className="text-sm sm:text-base text-foreground/90">
+                      {healthyDrink.prepTip}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
-
-        {/* Pro Tip */}
-        {healthyDrink.prepTip && (
-          <Card className="border-primary/30 bg-primary/10">
-            <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-3">
-                <div className="p-2 bg-primary rounded-full flex-shrink-0">
-                  <Droplets className="h-4 w-4 text-primary-foreground" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-foreground mb-1">
-                    {t("drinkDetailView.proTip") || "Pro Tip"}
-                  </h4>
-                  <p className="text-sm sm:text-base text-foreground/90">
-                    {healthyDrink.prepTip}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <DrinkShoppingModal
-          drink={drink}
-          isOpen={showShoppingModal}
-          onClose={() => setShowShoppingModal(false)}
-        />
-
       </div>
+
+      <DrinkShoppingModal
+        drink={drink}
+        isOpen={showShoppingModal}
+        onClose={() => setShowShoppingModal(false)}
+      />
+
+      {showCookingMode && (
+        <CookingMode
+          meal={{ name: drink.drink_name }}
+          ingredients={healthyDrink.ingredients.map((ing: any) => `${ing.quantity} ${ing.unit} ${ing.name}`)}
+          instructions={enhancedInstructions}
+          onClose={() => setShowCookingMode(false)}
+        />
+      )}
     </>
   );
 };
