@@ -25,6 +25,7 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import MealShoppingModal from "./MealShoppingModal";
+import CookingMode from "./CookingMode";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
@@ -42,6 +43,7 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
+  const [showCookingMode, setShowCookingMode] = useState(false);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const { deleteAIMeal, addShoppingItem, pantryItems, setPantryItems, user } =
     useUser();
@@ -325,12 +327,12 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
               ← {t("aiMealView.backToAiMeals") || "Back"}
             </Button>
             <Button
-              onClick={openShoppingModal}
+              onClick={() => setShowCookingMode(true)}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
               size="sm"
             >
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              {t("aiMealView.shoppingList") || "Shop"}
+              <ChefHat className="h-4 w-4 mr-2" />
+              {t("cookingMode.enter") || "Cooking Mode"}
             </Button>
           </div>
         </div>
@@ -715,6 +717,15 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
       />
+
+      {showCookingMode && (
+        <CookingMode
+          meal={meal}
+          ingredients={enhancedIngredients}
+          instructions={enhancedInstructions}
+          onClose={() => setShowCookingMode(false)}
+        />
+      )}
     </>
   );
 };
