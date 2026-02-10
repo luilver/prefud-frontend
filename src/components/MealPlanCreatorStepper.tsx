@@ -713,17 +713,9 @@ const MealPlanCreatorStepper = ({
   const stepperConfig = getStepperConfig();
 
   return (
-    <div className="fixed inset-0 z-40 overflow-hidden"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-emerald-900/50" />
+    <>
+    <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px] bg-black/50 backdrop-blur-sm rounded-2xl border border-white/40 shadow-xl my-2 md:bg-black/40 md:my-4">
       <LoaderComponent />
-
-      <div className="relative z-10 flex flex-col h-[100dvh]">
           {/* Header */}
           <div className="flex items-center justify-between px-2 py-3 shrink-0">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-white/80 hover:text-white hover:bg-white/10">
@@ -962,28 +954,28 @@ const MealPlanCreatorStepper = ({
           )}
         </div>
 
-        <MealPlanSuccessModal
-          isOpen={showSuccessModal}
-          onClose={handleSuccessModalClose}
-          onViewPlan={handleViewSuccessPlan}
-          mealPlan={createdPlan ? {
-            name: createdPlan.name || planData.planName,
-            numberOfDays: planData.numberOfDays,
-            numberOfPersons: planData.numberOfPersons,
-            mealsPerDay: planData.mealsPerDay,
-          } : undefined}
-        />
+      <MealPlanSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        onViewPlan={handleViewSuccessPlan}
+        mealPlan={createdPlan ? {
+          name: createdPlan.name || planData.planName,
+          numberOfDays: planData.numberOfDays,
+          numberOfPersons: planData.numberOfPersons,
+          mealsPerDay: planData.mealsPerDay,
+        } : undefined}
+      />
 
-        <MealPlanTimeoutModal
-          isOpen={showTimeoutModal}
-          onClose={handleTimeoutModalClose}
-        />
+      <MealPlanTimeoutModal
+        isOpen={showTimeoutModal}
+        onClose={handleTimeoutModalClose}
+      />
 
-        <SubscriptionUpgradeModal
-          isOpen={showUpgradeModal}
-          onClose={() => setShowUpgradeModal(false)}
-        />
-    </div>
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
+    </>
   );
 };
 
