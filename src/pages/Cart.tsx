@@ -32,7 +32,7 @@ const Cart = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="px-4 py-6">
           {/* Mobile Header */}
           <div className="flex items-center mb-6">
@@ -73,9 +73,9 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {/* Mobile Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
             <Button
@@ -206,7 +206,7 @@ const Cart = () => {
       </div>
 
       {/* Floating Checkout Button */}
-      <div className="fixed bottom-4 left-4 z-50">
+      <div className="fixed z-50" style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))', left: '1rem' }}>
         <Button
           size="lg"
           className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
