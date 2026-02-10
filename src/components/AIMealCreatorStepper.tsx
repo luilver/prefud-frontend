@@ -721,7 +721,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                 onChange={(e) => setTextInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleTextSubmit()}
                 placeholder={t("aiMealCreatorStepper.chat.typePlaceholder") || "Type here or skip..."}
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
+                className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder:text-gray-400"
                 maxLength={40}
               />
             ) : (
@@ -734,7 +734,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                     ? (t("aiMealCreatorStepper.mealNamePlaceholder") || "e.g., My Special Sunday Dinner")
                     : (t("aiMealCreatorStepper.chat.dishPlaceholder") || "e.g., Mac and Cheese")
                 }
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
+                className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder:text-gray-400"
                 maxLength={currentStep === "mealName" ? 20 : 30}
               />
             )}

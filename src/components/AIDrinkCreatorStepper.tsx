@@ -789,7 +789,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                   ? (t("aiDrinkChat.drinkNamePlaceholder") || "e.g., Morning Energy Smoothie")
                   : (t("aiDrinkChat.extrasPlaceholder") || "Type here or skip...")
               }
-              className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
+              className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder:text-gray-400"
               maxLength={currentStep === "drinkName" ? 30 : 60}
             />
             <Button
