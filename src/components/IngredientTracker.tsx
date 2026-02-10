@@ -283,136 +283,95 @@ const IngredientTracker = () => {
         />
 
         {/* Quick Stats */}
-        <div className="grid md:grid-cols-4 gap-6">
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t('ingredientTracker.totalItems') || 'Total Items'}</p>
-                  <p className="text-2xl font-bold text-emerald-700">
-                    {ingredients.length}
-                  </p>
+        <div className="flex md:grid md:grid-cols-4 gap-3 md:gap-6 overflow-x-auto pb-2 md:pb-0 snap-x snap-mandatory">
+          {[
+            { label: t('ingredientTracker.totalItems') || 'Total Items', value: ingredients.length, gradient: 'from-emerald-500 to-teal-500', textColor: 'text-emerald-700', icon: <Package className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+            { label: t('ingredientTracker.expiringSoon') || 'Expiring Soon', value: expiringIngredients.length, gradient: 'from-orange-500 to-red-500', textColor: 'text-orange-700', icon: <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+            { label: t('ingredientTracker.categories') || 'Categories', value: Object.keys(categorizedIngredients).length, gradient: 'from-teal-500 to-cyan-500', textColor: 'text-teal-700', icon: <Calendar className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+            { label: t('ingredientTracker.lowStock') || 'Low Stock', value: ingredients.filter((i) => i.quantity <= 1).length, gradient: 'from-red-500 to-pink-500', textColor: 'text-red-700', icon: <Bell className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+          ].map((stat, i) => (
+            <Card key={i} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl min-w-[120px] md:min-w-0 snap-start flex-shrink-0 overflow-hidden">
+              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`} />
+              <CardContent className="p-3 md:p-6">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs md:text-sm text-gray-600 whitespace-nowrap">{stat.label}</p>
+                    <p className={`text-xl md:text-2xl font-bold ${stat.textColor}`}>{stat.value}</p>
+                  </div>
+                  <div className={`p-2 md:p-3 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
+                    {stat.icon}
+                  </div>
                 </div>
-                <div className="p-3 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
-                  <Package className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</p>
-                  <p className="text-2xl font-bold text-orange-700">
-                    {expiringIngredients.length}
-                  </p>
-                </div>
-                <div className="p-3 rounded-lg bg-gradient-to-br from-orange-500 to-red-500">
-                  <AlertTriangle className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500" />
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t('ingredientTracker.categories') || 'Categories'}</p>
-                  <p className="text-2xl font-bold text-teal-700">
-                    {Object.keys(categorizedIngredients).length}
-                  </p>
-                </div>
-                <div className="p-3 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-pink-500" />
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t('ingredientTracker.lowStock') || 'Low Stock'}</p>
-                  <p className="text-2xl font-bold text-red-700">
-                    {ingredients.filter((i) => i.quantity <= 1).length}
-                  </p>
-                </div>
-                <div className="p-3 rounded-lg bg-gradient-to-br from-red-500 to-pink-500">
-                  <Bell className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Expiring Soon Alert */}
+          {/* Expiring Soon Alert - Accordion */}
           <Card className="bg-gradient-to-br from-orange-50/95 to-red-50/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-orange-700">
-                <AlertTriangle className="h-5 w-5" />
-                <span>{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</span>
-              </CardTitle>
-              <CardDescription className="text-orange-600">
-                {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}            
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {expiringIngredients.slice(0, 5).map((ingredient) => {
-                  const expiryInfo = getExpiryStatus(ingredient.expiryDate);
-                  const daysLeft = getDaysUntilExpiry(ingredient.expiryDate);
-
-                  return (
-                    <div
-                      key={ingredient.id}
-                      className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-800">
-                            {ingredient.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {ingredient.quantity} {ingredient.unit}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p
-                            className={`text-sm font-medium ${expiryInfo.color}`}
-                          >
-                            {daysLeft < 0
-                              ? "Expired"
-                              : daysLeft === 0
-                              ? "Today"
-                              : `${daysLeft} day${daysLeft > 1 ? "s" : ""}`}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {formatExpiryDate(ingredient.expiryDate)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {expiringIngredients.length === 0 && (
-                  <div className="text-center py-6 text-gray-500">
-                    <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">{t('ingredientTracker.allFresh') || 'All ingredients are fresh!'}</p>
+            <Accordion type="single" collapsible>
+              <AccordionItem value="expiring" className="border-0">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center space-x-2">
+                    <AlertTriangle className="h-5 w-5 text-orange-700" />
+                    <span className="font-semibold text-orange-700">{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</span>
+                    <span className="text-xs font-bold bg-orange-500 text-white rounded-full px-2 py-0.5 min-w-[22px]">
+                      {expiringIngredients.length}
+                    </span>
                   </div>
-                )}
-              </div>
-            </CardContent>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <p className="text-sm text-orange-600 mb-3">
+                    {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}
+                  </p>
+                  <div className="space-y-3">
+                    {expiringIngredients.slice(0, 5).map((ingredient) => {
+                      const expiryInfo = getExpiryStatus(ingredient.expiryDate);
+                      const daysLeft = getDaysUntilExpiry(ingredient.expiryDate);
+
+                      return (
+                        <div
+                          key={ingredient.id}
+                          className={`p-3 rounded-lg border ${expiryInfo.bgColor} ${expiryInfo.borderColor}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium text-gray-800">
+                                {ingredient.name}
+                              </h4>
+                              <p className="text-sm text-gray-600">
+                                {ingredient.quantity} {ingredient.unit}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className={`text-sm font-medium ${expiryInfo.color}`}>
+                                {daysLeft < 0
+                                  ? "Expired"
+                                  : daysLeft === 0
+                                  ? "Today"
+                                  : `${daysLeft} day${daysLeft > 1 ? "s" : ""}`}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {formatExpiryDate(ingredient.expiryDate)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {expiringIngredients.length === 0 && (
+                      <div className="text-center py-6 text-gray-500">
+                        <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">{t('ingredientTracker.allFresh') || 'All ingredients are fresh!'}</p>
+                      </div>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </Card>
 
           {/* Ingredients by Category */}
