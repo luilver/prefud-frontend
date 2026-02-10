@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
 import UltraFocusCooking from "@/components/UltraFocusCooking";
+import { speak as ttsSpeak, stopSpeaking as ttsStop } from "@/utils/ttsService";
 
 interface CookingModeProps {
   meal: any;
@@ -67,7 +68,6 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
 
     requestWakeLock();
 
-    // Re-acquire on visibility change
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         requestWakeLock();
@@ -82,7 +82,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
         wakeLockRef.current = null;
         console.log("Wake Lock released");
       }
-      window.speechSynthesis.cancel();
+      ttsStop();
     };
   }, []);
 
@@ -92,35 +92,42 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
     );
   };
 
-  const speak = useCallback((text: string, stepIndex?: number) => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = speechLang;
-    utterance.rate = 0.9;
-    utterance.onend = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
-    utterance.onerror = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
+  const speak = useCallback(async (text: string, stepIndex?: number) => {
+    await ttsStop();
     setIsSpeaking(true);
     setSpeakingStepIndex(stepIndex ?? null);
-    window.speechSynthesis.speak(utterance);
-  }, []);
+    try {
+      await ttsSpeak(text, speechLang, 0.9);
+    } catch {
+      // speech error or cancelled
+    } finally {
+      if (!speakingCancelledRef.current) {
+        setIsSpeaking(false);
+        setSpeakingStepIndex(null);
+      }
+    }
+  }, [speechLang]);
 
   const stopSpeaking = useCallback(() => {
     speakingCancelledRef.current = true;
-    window.speechSynthesis.cancel();
+    ttsStop();
     setIsSpeaking(false);
     setSpeakingStepIndex(null);
     setSpeakingIngredientIndex(null);
   }, []);
 
-  const speakIngredients = useCallback(() => {
+  const speakIngredients = useCallback(async () => {
     speakingCancelledRef.current = false;
+    await ttsStop();
+    setIsSpeaking(true);
+
     let currentIdx = 0;
-    const speakNext = () => {
+    const speakNext = async () => {
       if (speakingCancelledRef.current) return;
       if (currentIdx >= ingredients.length) {
         if (loopIngredientsRef.current && !speakingCancelledRef.current) {
           currentIdx = 0;
-          speakNext();
+          await speakNext();
           return;
         }
         setIsSpeaking(false);
@@ -128,20 +135,22 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
         return;
       }
       const idx = currentIdx;
-      const utterance = new SpeechSynthesisUtterance(ingredients[idx]);
-      utterance.lang = speechLang;
-      utterance.rate = 0.9;
-      utterance.onend = () => { currentIdx++; speakNext(); };
-      utterance.onerror = () => { setIsSpeaking(false); setSpeakingIngredientIndex(null); };
       setSpeakingIngredientIndex(idx);
-      // Auto-scroll to active ingredient on mobile
       ingredientRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-      window.speechSynthesis.speak(utterance);
+      try {
+        await ttsSpeak(ingredients[idx], speechLang, 0.9);
+      } catch {
+        setIsSpeaking(false);
+        setSpeakingIngredientIndex(null);
+        return;
+      }
+      if (speakingCancelledRef.current) return;
+      currentIdx++;
+      await speakNext();
     };
-    window.speechSynthesis.cancel();
-    setIsSpeaking(true);
-    speakNext();
-  }, [ingredients]);
+
+    await speakNext();
+  }, [ingredients, speechLang]);
 
   const speakStep = (index: number) => {
     speakingCancelledRef.current = false;
@@ -149,15 +158,18 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
     stepRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
-  const speakAllSteps = useCallback(() => {
+  const speakAllSteps = useCallback(async () => {
     speakingCancelledRef.current = false;
+    await ttsStop();
+    setIsSpeaking(true);
+
     let currentIdx = 0;
-    const speakNext = () => {
+    const speakNext = async () => {
       if (speakingCancelledRef.current) return;
       if (currentIdx >= instructions.length) {
         if (loopStepsRef.current && !speakingCancelledRef.current) {
           currentIdx = 0;
-          speakNext();
+          await speakNext();
           return;
         }
         setIsSpeaking(false);
@@ -166,19 +178,22 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
       }
       const idx = currentIdx;
       const text = `${t("cookingMode.step") || "Step"} ${idx + 1}. ${instructions[idx].text}`;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = speechLang;
-      utterance.rate = 0.9;
-      utterance.onend = () => { currentIdx++; speakNext(); };
-      utterance.onerror = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
       setSpeakingStepIndex(idx);
       stepRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
-      window.speechSynthesis.speak(utterance);
+      try {
+        await ttsSpeak(text, speechLang, 0.9);
+      } catch {
+        setIsSpeaking(false);
+        setSpeakingStepIndex(null);
+        return;
+      }
+      if (speakingCancelledRef.current) return;
+      currentIdx++;
+      await speakNext();
     };
-    window.speechSynthesis.cancel();
-    setIsSpeaking(true);
-    speakNext();
-  }, [instructions, t]);
+
+    await speakNext();
+  }, [instructions, t, speechLang]);
 
   const progress = instructions.length > 0
     ? Math.round((completedSteps.length / instructions.length) * 100)
