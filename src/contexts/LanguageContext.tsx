@@ -1430,6 +1430,10 @@ const translations = {
     "cookingMode.stepsCompleted": "steps",
     "cookingMode.repeat": "Repeat",
     "cookingMode.viewAll": "View All",
+    "cookingMode.ultraFocus": "Ultra Focus",
+    "cookingMode.autoPlay": "Auto",
+    "cookingMode.markDone": "Mark as done",
+    "cookingMode.undoStep": "Undo",
     "password.security.title": "Password Security",
     "password.security.description":
       "Keep your account secure by updating your password regularly.",
@@ -3260,6 +3264,10 @@ const translations = {
     "cookingMode.stepsCompleted": "pasos",
     "cookingMode.repeat": "Repetir",
     "cookingMode.viewAll": "Ver Todo",
+    "cookingMode.ultraFocus": "Ultra Focus",
+    "cookingMode.autoPlay": "Auto",
+    "cookingMode.markDone": "Marcar como hecho",
+    "cookingMode.undoStep": "Deshacer",
     "password.security.title": "Seguridad de Contraseña",
     "password.security.description":
       "Mantén tu cuenta segura actualizando tu contraseña regularmente.",
@@ -5109,6 +5117,10 @@ const translations = {
     "cookingMode.stepsCompleted": "passos",
     "cookingMode.repeat": "Repetir",
     "cookingMode.viewAll": "Ver Tudo",
+    "cookingMode.ultraFocus": "Ultra Focus",
+    "cookingMode.autoPlay": "Auto",
+    "cookingMode.markDone": "Marcar como feito",
+    "cookingMode.undoStep": "Desfazer",
     "password.security.title": "Segurança da Senha",
     "password.security.description":
       "Mantenha sua conta segura atualizando sua senha regularmente.",
