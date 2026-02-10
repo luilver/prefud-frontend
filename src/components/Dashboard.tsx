@@ -229,8 +229,8 @@ const DashboardContent = () => {
             {/* Subtle content background */}
             <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl overflow-hidden">
               <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-75"
-                style={{ backgroundImage: `url(${dashboardTabsBg})` }}
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-75"
+                style={{ backgroundImage: `url(${dashboardTabsBg})`, backgroundAttachment: isMobile ? 'scroll' : 'fixed', transform: 'translateZ(0)' }}
               />
             </div>
             
