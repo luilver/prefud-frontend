@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import dashboardTabsBg from "@/assets/dashboard-tabs-bg.jpg";
+import dashboardTabsBgMobile from "@/assets/dashboard-tabs-bg-mobile.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -229,8 +230,8 @@ const DashboardContent = () => {
             {/* Subtle content background */}
             <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl overflow-hidden">
               <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-75"
-                style={{ backgroundImage: `url(${dashboardTabsBg})`, backgroundAttachment: isMobile ? 'scroll' : 'fixed', transform: 'translateZ(0)' }}
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-75"
+                style={{ backgroundImage: `url(${isMobile ? dashboardTabsBgMobile : dashboardTabsBg})`, backgroundAttachment: isMobile ? 'scroll' : 'fixed', transform: 'translateZ(0)' }}
               />
             </div>
             
