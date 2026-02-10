@@ -713,18 +713,19 @@ const MealPlanCreatorStepper = ({
   const stepperConfig = getStepperConfig();
 
   return (
-    <div
-      className="h-[100dvh] w-full bg-cover bg-center bg-no-repeat relative overflow-hidden"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-emerald-900/50" />
+    <div className="h-full w-full relative overflow-hidden">
+      <LoaderComponent />
 
-      <div className="relative z-10 h-full flex flex-col items-center justify-center py-4 px-4">
-        <LoaderComponent />
+      <div className="h-full flex flex-col"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-emerald-900/50" />
 
-        <div className="max-w-2xl w-full flex flex-col h-full max-h-[calc(100dvh-2rem)] backdrop-blur-sm rounded-2xl border border-white/40 shadow-xl">
+        <div className="relative z-10 flex flex-col flex-1 min-h-0">
           {/* Header */}
           <div className="flex items-center justify-between px-2 py-3 shrink-0">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-white/80 hover:text-white hover:bg-white/10">
