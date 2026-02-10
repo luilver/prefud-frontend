@@ -713,11 +713,12 @@ const MealPlanCreatorStepper = ({
   const stepperConfig = getStepperConfig();
 
   return (
-    <>
-    <div className="max-w-2xl mx-auto flex flex-col h-[calc(100vh-160px)] min-h-[500px] bg-black/50 backdrop-blur-sm rounded-2xl border border-white/40 shadow-xl my-2 md:bg-black/40 md:my-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="w-full max-w-2xl h-full max-h-[100dvh] flex flex-col">
+      <div className="w-full max-w-2xl h-full max-h-[100dvh] flex flex-col">
       <LoaderComponent />
-          {/* Header */}
-          <div className="flex items-center justify-between px-2 py-3 shrink-0">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 shrink-0">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-white/80 hover:text-white hover:bg-white/10">
               <ArrowLeft className="h-4 w-4 mr-1" />
               {t("common.back") || "Back"}
@@ -975,7 +976,8 @@ const MealPlanCreatorStepper = ({
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
       />
-    </>
+      </div>
+    </div>
   );
 };
 
