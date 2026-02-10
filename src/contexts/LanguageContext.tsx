@@ -1416,6 +1416,7 @@ const translations = {
     "recipeView.addedToPantry": "Added to Pantry",
 
     // Cooking Mode
+    "cookingMode.title": "Cooking Mode",
     "cookingMode.enter": "Cooking Mode",
     "cookingMode.ingredients": "Ingredients",
     "cookingMode.steps": "Steps",
@@ -3243,6 +3244,7 @@ const translations = {
     "recipeView.addedToPantry": "Añadido a la Despensa",
 
     // Cooking Mode
+    "cookingMode.title": "Modo Cocina",
     "cookingMode.enter": "Modo Cocina",
     "cookingMode.ingredients": "Ingredientes",
     "cookingMode.steps": "Pasos",
@@ -5089,6 +5091,7 @@ const translations = {
     "recipeView.addedToPantry": "Adicionado à Despensa",
 
     // Cooking Mode
+    "cookingMode.title": "Modo Cozinha",
     "cookingMode.enter": "Modo Cozinha",
     "cookingMode.ingredients": "Ingredientes",
     "cookingMode.steps": "Passos",
