@@ -104,217 +104,181 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-card/95 backdrop-blur-sm safe-area-top">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <ChefHat className="h-5 w-5 text-primary flex-shrink-0" />
-          <h2 className="font-bold text-foreground truncate text-sm sm:text-base">
-            {meal.name}
-          </h2>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {isSpeaking ? (
+      <div className="px-4 py-3 border-b bg-card/95 backdrop-blur-sm safe-area-top">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <ChefHat className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-bold text-foreground truncate text-sm leading-tight">
+                {meal.name}
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {t("cookingMode.title") || "Cooking Mode"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {isSpeaking && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={stopSpeaking}
+                className="h-8 w-8 p-0 border-destructive/50 text-destructive"
+              >
+                <VolumeX className="h-4 w-4" />
+              </Button>
+            )}
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={stopSpeaking}
-              className="h-8 w-8 p-0 border-destructive text-destructive"
+              onClick={onClose}
+              className="h-8 w-8 p-0 text-muted-foreground"
             >
-              <VolumeX className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </Button>
-          ) : null}
+          </div>
+        </div>
+        {/* Progress bar */}
+        <div className="mt-2.5 flex items-center gap-2.5">
+          <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-primary h-full rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-xs font-semibold text-primary tabular-nums w-9 text-right">
+            {progress}%
+          </span>
+        </div>
+      </div>
+
+      {/* Ingredients - Horizontal scroll */}
+      <div className="border-b bg-card/50">
+        <div className="flex items-center justify-between px-4 pt-3 pb-1.5">
+          <div className="flex items-center gap-1.5">
+            <BookOpen className="h-4 w-4 text-primary" />
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+              {t("cookingMode.ingredients") || "Ingredients"}
+            </h3>
+          </div>
           <Button
             variant="ghost"
             size="sm"
-            onClick={onClose}
-            className="h-8 w-8 p-0"
+            onClick={isSpeaking ? stopSpeaking : speakIngredients}
+            className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-primary"
           >
-            <X className="h-5 w-5" />
+            {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+            {isSpeaking ? (t("cookingMode.stop") || "Stop") : (t("cookingMode.listen") || "Listen")}
           </Button>
+        </div>
+        <div className="flex overflow-x-auto gap-2 px-4 pb-3 scrollbar-hide snap-x snap-mandatory">
+          {ingredients.map((ingredient, index) => (
+            <div
+              key={index}
+              className="flex-shrink-0 snap-start px-3 py-2 rounded-lg bg-primary/5 border border-primary/15 text-xs sm:text-sm text-foreground whitespace-nowrap"
+            >
+              {ingredient}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="w-full bg-muted h-1.5">
-        <div
-          className="bg-primary h-1.5 transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* Section toggle */}
-      <div className="flex border-b bg-card/50">
-        <button
-          onClick={() => setActiveSection("ingredients")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
-            activeSection === "ingredients"
-              ? "text-primary border-b-2 border-primary"
-              : "text-muted-foreground"
-          }`}
-        >
-          <BookOpen className="h-4 w-4" />
-          {t("cookingMode.ingredients") || "Ingredients"}
-        </button>
-        <button
-          onClick={() => setActiveSection("steps")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
-            activeSection === "steps"
-              ? "text-primary border-b-2 border-primary"
-              : "text-muted-foreground"
-          }`}
-        >
-          <Flame className="h-4 w-4" />
-          {t("cookingMode.steps") || "Steps"}
-          <span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">
-            {completedSteps.length}/{instructions.length}
-          </span>
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {activeSection === "ingredients" && (
-          <>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-foreground">
-                {t("cookingMode.ingredientsList") || "Ingredients List"}
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={isSpeaking ? stopSpeaking : speakIngredients}
-                className="gap-1.5"
-              >
-                {isSpeaking ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-                <span className="text-xs">
-                  {isSpeaking
-                    ? (t("cookingMode.stop") || "Stop")
-                    : (t("cookingMode.listen") || "Listen")}
-                </span>
-              </Button>
-            </div>
-            {ingredients.map((ingredient, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 p-3 rounded-xl bg-card border border-border"
-              >
-                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <span className="text-sm sm:text-base text-foreground leading-relaxed flex-1">
-                  {ingredient}
-                </span>
-              </div>
-            ))}
-          </>
-        )}
-
-        {activeSection === "steps" && (
-          <>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-foreground">
-                {t("cookingMode.cookingSteps") || "Cooking Steps"}
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={isSpeaking ? stopSpeaking : speakAllSteps}
-                className="gap-1.5"
-              >
-                {isSpeaking ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-                <span className="text-xs">
-                  {isSpeaking
-                    ? (t("cookingMode.stop") || "Stop")
-                    : (t("cookingMode.listenAll") || "Listen All")}
-                </span>
-              </Button>
-            </div>
-            {instructions.map((instruction, index) => (
+      {/* Steps section */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+          <div className="flex items-center gap-1.5">
+            <Flame className="h-4 w-4 text-primary" />
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+              {t("cookingMode.steps") || "Steps"}
+            </h3>
+            <span className="ml-1 text-xs bg-primary/10 text-primary font-semibold px-1.5 py-0.5 rounded-full tabular-nums">
+              {completedSteps.length}/{instructions.length}
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={isSpeaking ? stopSpeaking : speakAllSteps}
+            className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-primary"
+          >
+            {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+            {isSpeaking ? (t("cookingMode.stop") || "Stop") : (t("cookingMode.listenAll") || "Listen All")}
+          </Button>
+        </div>
+        <div className="px-4 pb-4 space-y-2.5">
+          {instructions.map((instruction, index) => {
+            const isCompleted = completedSteps.includes(index);
+            return (
               <div
                 key={index}
                 onClick={() => toggleStep(index)}
-                className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer active:scale-[0.98] ${
-                  completedSteps.includes(index)
-                    ? "bg-primary/10 border-primary/40"
-                    : "bg-card border-border"
+                className={`relative p-3.5 rounded-xl border transition-all duration-300 cursor-pointer active:scale-[0.98] ${
+                  isCompleted
+                    ? "bg-primary/5 border-primary/30"
+                    : "bg-card border-border hover:border-primary/20 hover:shadow-sm"
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all ${
-                      completedSteps.includes(index)
-                        ? "bg-primary text-primary-foreground"
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all mt-0.5 ${
+                      isCompleted
+                        ? "bg-primary text-primary-foreground shadow-sm"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    {completedSteps.includes(index) ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      index + 1
-                    )}
+                    {isCompleted ? <Check className="h-3.5 w-3.5" /> : index + 1}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-sm sm:text-base leading-relaxed ${
-                        completedSteps.includes(index)
-                          ? "line-through text-muted-foreground"
+                      className={`text-sm leading-relaxed ${
+                        isCompleted
+                          ? "line-through text-muted-foreground/70"
                           : "text-foreground"
                       }`}
                     >
                       {instruction.text}
                     </p>
-                    {!completedSteps.includes(index) && (
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs">
+                    {!isCompleted && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-xs font-medium">
                           <Timer className="h-3 w-3 mr-1" />~{instruction.estimatedTime} min
                         </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-xs gap-1"
+                        <button
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             isSpeaking ? stopSpeaking() : speakStep(index);
                           }}
                         >
-                          {isSpeaking ? (
-                            <VolumeX className="h-3 w-3" />
-                          ) : (
-                            <Volume2 className="h-3 w-3" />
-                          )}
-                          {isSpeaking
-                            ? (t("cookingMode.stop") || "Stop")
-                            : (t("cookingMode.listen") || "Listen")}
-                        </Button>
+                          {isSpeaking ? <VolumeX className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                          {isSpeaking ? (t("cookingMode.stop") || "Stop") : (t("cookingMode.listen") || "Listen")}
+                        </button>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-            ))}
-          </>
-        )}
+            );
+          })}
+        </div>
       </div>
 
       {/* Footer */}
       <div className="px-4 py-3 border-t bg-card/95 backdrop-blur-sm safe-area-bottom">
         {progress === 100 && instructions.length > 0 ? (
-          <div className="text-center p-3 bg-primary/10 rounded-xl">
-            <p className="text-primary font-semibold">
+          <div className="text-center p-3 bg-primary/10 rounded-xl border border-primary/20">
+            <p className="text-primary font-semibold text-sm">
               🎉 {t("cookingMode.completed") || "All steps completed! Enjoy your meal!"}
             </p>
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {completedSteps.length} / {instructions.length} {t("cookingMode.stepsCompleted") || "steps"}
             </span>
-            <span className="text-sm font-medium text-primary">{progress}%</span>
+            <span className="text-xs font-semibold text-primary tabular-nums">{progress}%</span>
           </div>
         )}
       </div>
