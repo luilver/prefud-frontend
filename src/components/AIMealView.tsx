@@ -508,14 +508,22 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Package className="h-5 w-5 text-primary" />
-                      <span>Ingredients Selector</span>
+                      <span>{t("aiMealView.ingredientsSelector") || "Ingredients Selector"}</span>
                     </div>
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                      {selectedIngredients.length} selected
-                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSelectAllIngredients}
+                      className="text-xs"
+                    >
+                      {selectedIngredients.length === getIngredientsForShopping().length
+                        ? (t("aiMealView.deselectAll") || "Deselect All")
+                        : (t("aiMealView.selectAll") || "Select All")
+                      }
+                    </Button>
                   </CardTitle>
                   <CardDescription>
-                    Select ingredients to add to your pantry or order online
+                    {t("aiMealView.selectIngredientsDesc") || "Select ingredients to add to your pantry or cart"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -548,19 +556,20 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
                     <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
                       <Button
                         onClick={handleAddToPantry}
-                        className="flex-1 bg-green-600 hover:bg-green-700 h-12"
+                        variant="outline"
+                        className="flex-1 h-12"
                         size="lg"
                       >
                         <Package className="h-5 w-5 mr-2" />
-                        Add to Pantry ({selectedIngredients.length})
+                        {t("aiMealView.addToPantry") || "Add to Pantry"} ({selectedIngredients.length})
                       </Button>
                       <Button
                         onClick={() => handleAddToCart()}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
+                        className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-12"
                         size="lg"
                       >
                         <ShoppingCart className="h-5 w-5 mr-2" />
-                        Add to Cart ({selectedIngredients.length})
+                        {t("aiMealView.addToCart") || "Add to Cart"} ({selectedIngredients.length})
                       </Button>
                     </div>
                   )}
