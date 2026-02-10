@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { speak as ttsSpeak, stopSpeaking as ttsStop } from "@/utils/ttsService";
 
 interface UltraFocusCookingProps {
   mealName: string;
@@ -50,7 +51,7 @@ const UltraFocusCooking = ({
   }, []);
 
   // Auto-play: speak each step, advance, repeat
-  const startAutoPlay = useCallback(() => {
+  const startAutoPlay = useCallback(async () => {
     speakingCancelledRef.current = false;
     autoPlayRef.current = true;
     setIsAutoPlaying(true);
@@ -58,7 +59,7 @@ const UltraFocusCooking = ({
 
     let idx = currentIndex;
 
-    const speakNext = () => {
+    const speakNext = async () => {
       if (speakingCancelledRef.current || !autoPlayRef.current) {
         setIsAutoPlaying(false);
         setIsSpeaking(false);
@@ -74,28 +75,32 @@ const UltraFocusCooking = ({
       scrollToCard(idx);
 
       const text = `${t("cookingMode.step") || "Step"} ${idx + 1}. ${instructions[idx].text}`;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = speechLang;
-      utterance.rate = 0.9;
-      utterance.onend = () => {
-        idx++;
-        speakNext();
-      };
-      utterance.onerror = () => {
+      try {
+        await ttsSpeak(text, speechLang, 0.9);
+      } catch {
         setIsAutoPlaying(false);
         setIsSpeaking(false);
-      };
-      window.speechSynthesis.speak(utterance);
+        return;
+      }
+
+      if (speakingCancelledRef.current || !autoPlayRef.current) {
+        setIsAutoPlaying(false);
+        setIsSpeaking(false);
+        return;
+      }
+
+      idx++;
+      await speakNext();
     };
 
-    window.speechSynthesis.cancel();
-    speakNext();
+    await ttsStop();
+    await speakNext();
   }, [currentIndex, instructions, speechLang, t, scrollToCard]);
 
   const stopAutoPlay = useCallback(() => {
     autoPlayRef.current = false;
     speakingCancelledRef.current = true;
-    window.speechSynthesis.cancel();
+    ttsStop();
     setIsAutoPlaying(false);
     setIsSpeaking(false);
   }, []);
@@ -146,7 +151,7 @@ const UltraFocusCooking = ({
   // Cleanup speech on unmount
   useEffect(() => {
     return () => {
-      window.speechSynthesis.cancel();
+      ttsStop();
     };
   }, []);
 
