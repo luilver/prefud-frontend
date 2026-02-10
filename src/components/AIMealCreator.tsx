@@ -98,6 +98,7 @@ const AIMealCreator = () => {
 
   const handleViewMeal = (meal: any) => {
     setSelectedMeal(meal);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleMarkAsDone = async (mealId: string, mealName: string, isFromApi: boolean = false) => {
@@ -146,6 +147,7 @@ const AIMealCreator = () => {
     };
     console.log('this is the transformed meal',transformedMeal)
     setSelectedMeal(transformedMeal);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handlePageChange = (page: number) => {
