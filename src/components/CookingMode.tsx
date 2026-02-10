@@ -103,54 +103,58 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      {/* Header */}
-      <div className="px-4 py-3 border-b bg-card/95 backdrop-blur-sm safe-area-top">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-            <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <ChefHat className="h-5 w-5 text-primary" />
-            </div>
-            <div className="min-w-0">
-              <h2 className="font-bold text-foreground truncate text-sm leading-tight">
+      {/* Branded Header */}
+      <div className="bg-primary safe-area-top">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-primary-foreground/70 text-xs font-semibold uppercase tracking-widest">Pantry</span>
+                <span className="text-primary-foreground/40 text-xs">•</span>
+                <div className="flex items-center gap-1">
+                  <ChefHat className="h-3 w-3 text-primary-foreground/70" />
+                  <span className="text-primary-foreground/70 text-xs font-medium">
+                    {t("cookingMode.title") || "Cooking Mode"}
+                  </span>
+                </div>
+              </div>
+              <h2 className="font-bold text-primary-foreground truncate text-base leading-tight mt-0.5">
                 {meal.name}
               </h2>
-              <p className="text-xs text-muted-foreground">
-                {t("cookingMode.title") || "Cooking Mode"}
-              </p>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              {isSpeaking && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={stopSpeaking}
+                  className="h-8 w-8 p-0 border-primary-foreground/30 text-primary-foreground bg-transparent hover:bg-primary-foreground/10"
+                >
+                  <VolumeX className="h-4 w-4" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="h-8 w-8 p-0 text-primary-foreground/80 hover:bg-primary-foreground/10"
+              >
+                <X className="h-5 w-5" />
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            {isSpeaking && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={stopSpeaking}
-                className="h-8 w-8 p-0 border-destructive/50 text-destructive"
-              >
-                <VolumeX className="h-4 w-4" />
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0 text-muted-foreground"
-            >
-              <X className="h-5 w-5" />
-            </Button>
+          {/* Progress bar */}
+          <div className="mt-2.5 flex items-center gap-2.5">
+            <div className="flex-1 bg-primary-foreground/20 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="bg-primary-foreground h-full rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <span className="text-xs font-semibold text-primary-foreground/90 tabular-nums w-9 text-right">
+              {progress}%
+            </span>
           </div>
-        </div>
-        {/* Progress bar */}
-        <div className="mt-2.5 flex items-center gap-2.5">
-          <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-primary h-full rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <span className="text-xs font-semibold text-primary tabular-nums w-9 text-right">
-            {progress}%
-          </span>
         </div>
       </div>
 
