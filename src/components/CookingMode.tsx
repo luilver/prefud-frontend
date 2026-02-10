@@ -12,8 +12,10 @@ import {
   Repeat,
   ChevronDown,
   ChevronUp,
+  Maximize2,
 } from "lucide-react";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
+import UltraFocusCooking from "@/components/UltraFocusCooking";
 
 interface CookingModeProps {
   meal: any;
@@ -31,6 +33,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   const [loopSteps, setLoopSteps] = useState(false);
   const [showAllIngredients, setShowAllIngredients] = useState(false);
   const [activeSection, setActiveSection] = useState<"ingredients" | "steps">("ingredients");
+  const [showUltraFocus, setShowUltraFocus] = useState(false);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const ingredientRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -180,6 +183,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
     : 0;
 
   return (
+    <>
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Branded Header */}
       <div className="bg-primary safe-area-top">
@@ -360,6 +364,15 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
               >
                 <Repeat className="h-3.5 w-3.5" />
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => { stopSpeaking(); setShowUltraFocus(true); }}
+                className="h-7 md:h-8 w-7 md:w-8 p-0 text-muted-foreground hover:text-primary"
+                title={t("cookingMode.ultraFocus") || "Ultra Focus"}
+              >
+                <Maximize2 className="h-3.5 w-3.5" />
+              </Button>
             </div>
           </div>
           <div className="px-4 md:px-8 lg:px-12 pb-4 space-y-2.5 md:space-y-3">
@@ -447,6 +460,18 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
         </div>
       </div>
     </div>
+
+      {/* Ultra Focus Mode */}
+      {showUltraFocus && (
+        <UltraFocusCooking
+          mealName={meal.name}
+          instructions={instructions}
+          completedSteps={completedSteps}
+          onToggleStep={toggleStep}
+          onClose={() => setShowUltraFocus(false)}
+        />
+      )}
+    </>
   );
 };
 
