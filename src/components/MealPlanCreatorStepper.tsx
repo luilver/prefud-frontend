@@ -713,19 +713,17 @@ const MealPlanCreatorStepper = ({
   const stepperConfig = getStepperConfig();
 
   return (
-    <div className="h-full w-full relative overflow-hidden">
+    <div className="fixed inset-0 z-40 overflow-hidden"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-emerald-900/50" />
       <LoaderComponent />
 
-      <div className="h-full flex flex-col"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-emerald-900/50" />
-
-        <div className="relative z-10 flex flex-col flex-1 min-h-0">
+      <div className="relative z-10 flex flex-col h-[100dvh]">
           {/* Header */}
           <div className="flex items-center justify-between px-2 py-3 shrink-0">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-white/80 hover:text-white hover:bg-white/10">
@@ -984,9 +982,7 @@ const MealPlanCreatorStepper = ({
         <SubscriptionUpgradeModal
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
-          featureType="plans"
         />
-      </div>
     </div>
   );
 };
