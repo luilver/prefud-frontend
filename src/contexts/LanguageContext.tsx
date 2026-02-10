@@ -1041,6 +1041,11 @@ const translations = {
     "aiMealView.stepsCompleted": "steps completed",
     "aiMealView.recipeCompleted": "Congratulations! Recipe completed!",
     "aiMealView.ingredientsSelector": "Shopping List",
+    "aiMealView.selectAll": "Select All",
+    "aiMealView.deselectAll": "Deselect All",
+    "aiMealView.selectIngredientsDesc": "Select ingredients to add to your pantry or cart",
+    "aiMealView.addToPantry": "Add to Pantry",
+    "aiMealView.addToCart": "Add to Cart",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Create Your Perfect Healthy Drink",
@@ -2743,6 +2748,11 @@ const translations = {
     "aiMealView.stepsCompleted": "pasos completados",
     "aiMealView.recipeCompleted": "¡Felicidades! ¡Receta completada!",
     "aiMealView.ingredientsSelector": "Lista de compras",
+    "aiMealView.selectAll": "Seleccionar Todo",
+    "aiMealView.deselectAll": "Deseleccionar Todo",
+    "aiMealView.selectIngredientsDesc": "Selecciona ingredientes para añadir a tu despensa o carrito",
+    "aiMealView.addToPantry": "Añadir a la Despensa",
+    "aiMealView.addToCart": "Añadir al Carrito",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crea tu Bebida Saludable Perfecta",
@@ -4660,6 +4670,11 @@ const translations = {
     "aiMealView.stepsCompleted": "passos concluídos",
     "aiMealView.recipeCompleted": "Parabéns! Receita concluída!",
     "aiMealView.ingredientsSelector": "Lista de Ingredientes",
+    "aiMealView.selectAll": "Selecionar Tudo",
+    "aiMealView.deselectAll": "Desmarcar Tudo",
+    "aiMealView.selectIngredientsDesc": "Selecione ingredientes para adicionar à despensa ou carrinho",
+    "aiMealView.addToPantry": "Adicionar à Despensa",
+    "aiMealView.addToCart": "Adicionar ao Carrinho",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crie Sua Bebida Saudável Perfeita",
