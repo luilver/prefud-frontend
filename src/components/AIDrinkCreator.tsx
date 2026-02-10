@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2 } from "lucide-react";
+import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AIDrinkCreatorStepper from "./AIDrinkCreatorStepper";
@@ -104,6 +104,24 @@ const AIDrinkCreator = () => {
 
   const handleViewApiDrink = (drink: ApiDrink) => {
     setSelectedApiDrink(drink);
+  };
+
+  const handleMarkAsDone = async (drinkId: string, drinkName: string, isFromApi: boolean = false) => {
+    try {
+      // TODO: Integrate with backend service when ready
+      // await markDrinkAsConsumed(drinkId, isFromApi);
+      
+      toast({
+        title: "✅ " + (t("aiDrinkCreator.markAsDoneSuccess") || "Drink marked as consumed successfully!"),
+        description: drinkName,
+      });
+    } catch (error) {
+      console.error('Failed to mark drink as done:', error);
+      toast({
+        title: t("aiDrinkCreator.markAsDoneError") || "Failed to mark drink as consumed",
+        variant: "destructive",
+      });
+    }
   };
 
   if (showStepper) {
@@ -239,15 +257,24 @@ const AIDrinkCreator = () => {
                         </span>
                       ))}
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                      onClick={() => handleViewApiDrink(drink)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        onClick={() => handleViewApiDrink(drink)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                        onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -343,15 +370,24 @@ const AIDrinkCreator = () => {
                         </span>
                       ))}
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                      onClick={() => handleViewDrink(drink)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        onClick={() => handleViewDrink(drink)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                        onClick={() => handleMarkAsDone(drink.id || index.toString(), drink.name)}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
