@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2, Eye, Salad, Loader2 } from "lucide-react";
+import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2, Eye, Salad, Loader2, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import AIMealCreatorStepper from "./AIMealCreatorStepper";
 import AIMealView from "./AIMealView";
@@ -98,6 +98,25 @@ const AIMealCreator = () => {
 
   const handleViewMeal = (meal: any) => {
     setSelectedMeal(meal);
+  };
+
+  const handleMarkAsDone = async (mealId: string, mealName: string, isFromApi: boolean = false) => {
+    try {
+      // TODO: Integrate with backend service
+      // Example: await markMealAsConsumed(mealId, user?.id);
+      console.log('Mark as done:', { mealId, isFromApi, userId: user?.id });
+      
+      toast({
+        title: "✅ " + (t("aiMealCreator.markAsDoneSuccess") || "Meal marked as consumed successfully!"),
+        description: mealName,
+      });
+    } catch (error) {
+      console.error('Error marking meal as done:', error);
+      toast({
+        title: t("aiMealCreator.markAsDoneError") || "Failed to mark meal as consumed. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleViewApiMeal = (apiMeal: any) => {
@@ -252,15 +271,24 @@ const AIMealCreator = () => {
                         </span>
                       ))}
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                      onClick={() => handleViewMeal(meal)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        onClick={() => handleViewMeal(meal)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                        onClick={() => handleMarkAsDone(meal.id || index.toString(), meal.name, false)}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -301,15 +329,24 @@ const AIMealCreator = () => {
                     <div className="text-xs text-gray-500 mb-2">
                       {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} {t("aiMealCreator.peopleLabel") || "people"}
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                      onClick={() => handleViewApiMeal(meal)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        onClick={() => handleViewApiMeal(meal)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                        onClick={() => handleMarkAsDone(meal._id, meal.specialMeal.specialMeal.name, true)}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
