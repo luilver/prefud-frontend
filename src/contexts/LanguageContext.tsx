@@ -799,6 +799,8 @@ const translations = {
     "aiMealCreatorStepper.chat.cookTime": "⏱️ What's the maximum cooking time (in minutes)?",
     "aiMealCreatorStepper.chat.skill": "👨‍🍳 What's your cooking skill level?",
     "aiMealCreatorStepper.chat.budget": "💰 What's your budget range for this meal?",
+    "aiMealCreator.markAsDoneSuccess": "Meal marked as completed",
+    "aiMealCreator.markAsUndoneSuccess": "Meal marked as uncompleted",
 
     // AI Drink Creator Chat
     "aiDrinkChat.welcome": "👋 Hi! I'm your AI drink assistant. Let's create a healthy drink just for you! What type of drink would you like?",
@@ -2435,6 +2437,8 @@ const translations = {
     "aiMealCreatorStepper.chat.cookTime": "⏱️ ¿Cuál es el tiempo máximo de cocción (en minutos)?",
     "aiMealCreatorStepper.chat.skill": "👨‍🍳 ¿Cuál es tu nivel de habilidad en la cocina?",
     "aiMealCreatorStepper.chat.budget": "💰 ¿Cuál es tu rango de presupuesto para esta comida?",
+    "aiMealCreator.markAsDoneSuccess": "¡Comida marcada como completada! 🎉",
+    "aiMealCreator.markAsUndoneSuccess": "¡Comida marcada como no completada! 😌",
 
     // AI Drink Creator Chat
     "aiDrinkChat.welcome": "👋 ¡Hola! Soy tu asistente de bebidas IA. ¡Creemos una bebida saludable para ti! ¿Qué tipo de bebida te gustaría?",
@@ -4291,6 +4295,9 @@ const translations = {
     "aiMealCreatorStepper.chat.cookTime": "⏱️ Qual o tempo máximo de cozimento (em minutos)?",
     "aiMealCreatorStepper.chat.skill": "👨‍🍳 Qual é o seu nível de habilidade na cozinha?",
     "aiMealCreatorStepper.chat.budget": "💰 Qual é a sua faixa de orçamento para esta refeição?",
+    "aiMealCreator.markAsDoneSuccess": "Refeição marcada como concluída",
+    "aiMealCreator.markAsUndoneSuccess": "Refeição marcada como não concluída",
+  
 
     // AI Drink Creator Chat
     "aiDrinkChat.welcome": "👋 Olá! Sou seu assistente de bebidas IA. Vamos criar uma bebida saudável para você! Que tipo de bebida você gostaria?",
