@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Users, Droplets, Play, BookOpen, Heart, Share2, Check, Timer, Maximize, X, Trash2, Zap, ShoppingCart, Package } from "lucide-react";
+import { Clock, Users, Droplets, BookOpen, Heart, Share2, Check, Timer, Trash2, Zap, ShoppingCart, Package } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -18,8 +18,6 @@ interface AIDrinkViewProps {
 const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
   const { t } = useLanguage();
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const { deleteAIDrink } = useUser();
   const { addItem } = useCart();
@@ -32,15 +30,6 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
     }
   };
 
-  const openFullscreenVideo = () => {
-    setIsFullscreen(true);
-    setIsVideoPlaying(true);
-  };
-
-  const closeFullscreenVideo = () => {
-    setIsFullscreen(false);
-    setIsVideoPlaying(false);
-  };
 
   const handleDelete = () => {
     deleteAIDrink(drink.id);
@@ -170,7 +159,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
             <div className="lg:col-span-2 space-y-6">
               {/* Mobile-first Tabs */}
               <Tabs defaultValue="recipe" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 h-12 mb-6">
+                <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
                   <TabsTrigger value="recipe" className="text-sm">
                     <BookOpen className="h-4 w-4 mr-1 md:mr-2" />
                     <span className="hidden sm:inline">{t("aiDrinkView.recipeTab") || "Recipe"}</span>
@@ -180,11 +169,6 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                     <Package className="h-4 w-4 mr-1 md:mr-2" />
                     <span className="hidden sm:inline">Ingredients</span>
                     <span className="sm:hidden">Items</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="video" className="text-sm">
-                    <Play className="h-4 w-4 mr-1 md:mr-2" />
-                    <span className="hidden sm:inline">{t("aiDrinkView.videoTab") || "Video"}</span>
-                    <span className="sm:hidden">Video</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -401,73 +385,6 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                   </Card>
                 </TabsContent>
 
-                <TabsContent value="video">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <Play className="h-5 w-5 text-red-600" />
-                        <span>{t("aiDrinkView.videoTutorial") || "Video Tutorial"}</span>
-                      </CardTitle>
-                      <CardDescription>
-                        {t("aiDrinkView.videoDesc") || "Watch step-by-step preparation"}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
-                        {!isVideoPlaying ? (
-                          <div className="text-center space-y-4">
-                            <Button
-                              onClick={() => setIsVideoPlaying(true)}
-                              size="lg"
-                              className="bg-red-600 hover:bg-red-700 rounded-full"
-                            >
-                              <Play className="h-6 w-6 mr-2" />
-                              {t("aiDrinkView.playVideo") || "Play Video"}
-                            </Button>
-                            <Button
-                              onClick={openFullscreenVideo}
-                              variant="outline"
-                              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                            >
-                              <Maximize className="h-4 w-4 mr-2" />
-                              {t("aiDrinkView.fullscreen") || "Fullscreen"}
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="text-white text-center space-y-4">
-                            <iframe
-                              width="100%"
-                              height="315"
-                              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                              title={t("aiDrinkView.videoTitle") || "Drink Video Tutorial"}
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              className="rounded-lg"
-                            ></iframe>
-                            <div className="flex justify-center gap-2">
-                              <Button
-                                onClick={() => setIsVideoPlaying(false)}
-                                variant="ghost"
-                                className="text-white hover:bg-white/20"
-                              >
-                                {t("aiDrinkView.closeVideo") || "Close Video"}
-                              </Button>
-                              <Button
-                                onClick={openFullscreenVideo}
-                                variant="ghost"
-                                className="text-white hover:bg-white/20"
-                              >
-                                <Maximize className="h-4 w-4 mr-2" />
-                                {t("aiDrinkView.fullscreen") || "Fullscreen"}
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
               </Tabs>
             </div>
 
@@ -538,28 +455,6 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
         </div>
       </div>
 
-      {isFullscreen && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="relative w-full h-full">
-            <Button
-              onClick={closeFullscreenVideo}
-              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-2"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-              title={t("aiDrinkView.videoTitleFullscreen") || "Drink Video Tutorial - Fullscreen"}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            ></iframe>
-          </div>
-        </div>
-      )}
     </>
   );
 };
