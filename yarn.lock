@@ -12,6 +12,11 @@
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.28.6.tgz#d267a43cb1836dc4d182cce93ae75ba954ef6d2b"
   integrity sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==
 
+"@capacitor-community/text-to-speech@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor-community/text-to-speech/-/text-to-speech-8.0.0.tgz#aad9cdddf588c4d96bb60369f53e91166eeb697b"
+  integrity sha512-8GCRavhp4uJft+DsJTywxUmMidMxJVTWHtrCKHjai5LPcJwHI93zpf1LsuvNtTSv/AeC0+oB0ULi/kHzqoB5Bg==
+
 "@capacitor-firebase/analytics@^8.0.1":
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/@capacitor-firebase/analytics/-/analytics-8.0.1.tgz#53aa3d6176709313463360b0a705317278f68670"
