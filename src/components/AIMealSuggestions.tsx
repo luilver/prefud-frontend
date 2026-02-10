@@ -57,7 +57,7 @@ const AIMealSuggestions = ({
     removeFavoriteMeal,
     isMealFavorite,
   } = useUser();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
 
   const generateSuggestions = async () => {
@@ -67,8 +67,8 @@ const AIMealSuggestions = ({
     });
     if (!user?.id) {
       toast({
-        title: "Error",
-        description: "User not found. Please sign in again.",
+        title: t("aiSuggestions.error"),
+        description: t("aiSuggestions.userNotFound"),
         variant: "destructive",
       });
       return;
@@ -76,13 +76,12 @@ const AIMealSuggestions = ({
 
     setIsGenerating(true);
     setShowServingsModal(false);
-    showLoader("Creating delicious meal suggestions from your ingredients...");
+    showLoader(t("aiSuggestions.loaderMessage"));
 
     try {
       const today = new Date();
       const startDate = today.toISOString().split("T")[0];
 
-      // Map language context to API language
       const languageMap: Record<string, string> = {
         en: "english",
         es: "spanish",
@@ -104,13 +103,12 @@ const AIMealSuggestions = ({
         apiLanguage
       );
 
-      // Handle error codes
       if (response.code === "03") {
         toast({
-          title: "Subscription Limit Reached",
+          title: t("aiSuggestions.subscriptionLimit"),
           description:
             response.message ||
-            "No generated meals available according to your subscription.",
+            t("aiSuggestions.subscriptionLimit"),
           variant: "destructive",
         });
         return;
@@ -118,16 +116,15 @@ const AIMealSuggestions = ({
 
       if (response.code === "02") {
         toast({
-          title: "No Ingredients Found",
+          title: t("aiSuggestions.noIngredients"),
           description:
             response.message ||
-            "No ingredients found in pantry to generate meals.",
+            t("aiSuggestions.noIngredients"),
           variant: "destructive",
         });
         return;
       }
 
-      // Process successful response
       if (response.generatedMeals && Array.isArray(response.generatedMeals)) {
         const transformedMeals = response.generatedMeals.map((meal: any) => ({
           id: `meal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -148,8 +145,8 @@ const AIMealSuggestions = ({
 
         setSuggestions(transformedMeals);
         toast({
-          title: "AI suggestions ready!",
-          description: `Generated ${transformedMeals.length} meal suggestions. Total carbon footprint: ${response.totalCarbonFootprint}kg CO2.`,
+          title: t("aiSuggestions.ready"),
+          description: `${transformedMeals.length} ${t("aiSuggestions.readyDesc")} ${response.totalCarbonFootprint}kg CO2.`,
         });
       } else {
         throw new Error("Invalid response format");
@@ -157,10 +154,10 @@ const AIMealSuggestions = ({
     } catch (error: any) {
       console.error("Error generating suggestions:", error);
       toast({
-        title: "Error",
+        title: t("aiSuggestions.error"),
         description:
           error.response?.data?.message ||
-          "Failed to generate suggestions. Please try again.",
+          t("aiSuggestions.failedToGenerate"),
         variant: "destructive",
       });
     } finally {
@@ -173,23 +170,22 @@ const AIMealSuggestions = ({
     if (isMealFavorite(meal.id)) {
       removeFavoriteMeal(meal.id);
       toast({
-        title: "Removed from favorites",
-        description: `${meal.name} has been removed from your favorites.`,
+        title: t("aiSuggestions.removedFromFavorites"),
+        description: `${meal.name} ${t("aiSuggestions.removedFromFavoritesDesc")}`,
       });
     } else {
       addFavoriteMeal(meal);
       toast({
-        title: "Added to favorites!",
-        description: `${meal.name} has been added to your favorites.`,
+        title: t("aiSuggestions.addedToFavorites"),
+        description: `${meal.name} ${t("aiSuggestions.addedToFavoritesDesc")}`,
       });
     }
   };
 
   const handleMarkAsConsumed = (meal: any) => {
-    // TODO: Implement endpoint integration
     toast({
-      title: "Marked as consumed!",
-      description: `${meal.name} has been marked as consumed.`,
+      title: t("aiSuggestions.markedAsConsumed"),
+      description: `${meal.name} ${t("aiSuggestions.markedAsConsumedDesc")}`,
     });
     setSelectedMealForDetails(null);
   };
@@ -197,14 +193,14 @@ const AIMealSuggestions = ({
   return (
     <>
       <LoaderComponent />
-      <Card className="bg-white/70 backdrop-blur-sm border-green-200">
+      <Card className="bg-card/70 backdrop-blur-sm border-primary/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-green-700">
+          <CardTitle className="flex items-center space-x-2 text-primary">
             <Sparkles className="h-5 w-5" />
-            <span>AI Meal Suggestions</span>
+            <span>{t("aiSuggestions.title")}</span>
           </CardTitle>
           <CardDescription>
-            Get personalized meal suggestions based on your expiring ingredients
+            {t("aiSuggestions.description")}
           </CardDescription>
           {!suggestions.length && (
             <>
@@ -217,10 +213,10 @@ const AIMealSuggestions = ({
                   });
                 }}
                 disabled={isGenerating}
-                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
-                {isGenerating ? "Generating..." : "Generate AI Suggestions"}
+                {isGenerating ? t("aiSuggestions.generating") : t("aiSuggestions.generate")}
               </Button>
 
               <Dialog
@@ -230,13 +226,13 @@ const AIMealSuggestions = ({
                 <DialogContent className="w-[95vw] max-w-md mx-auto">
                   <DialogHeader>
                     <DialogTitle className="text-base sm:text-lg">
-                      Select Number of Servings
+                      {t("aiSuggestions.selectServings")}
                     </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-6 py-4">
                     <div className="space-y-3">
                       <Label htmlFor="servings-slider" className="text-sm">
-                        Servings:{" "}
+                        {t("aiSuggestions.servings")}:{" "}
                         <span className="font-bold text-primary">
                           {servings}
                         </span>
@@ -261,13 +257,13 @@ const AIMealSuggestions = ({
                       variant="outline"
                       onClick={() => setShowServingsModal(false)}
                     >
-                      Cancel
+                      {t("aiSuggestions.cancel")}
                     </Button>
                     <Button
                       onClick={generateSuggestions}
-                      className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                      className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                     >
-                      Generate Meals
+                      {t("aiSuggestions.generateMeals")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -282,15 +278,15 @@ const AIMealSuggestions = ({
               {suggestions.map((meal) => (
                 <Card
                   key={meal.id}
-                  className="border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50"
+                  className="border-accent/30 bg-gradient-to-r from-accent/10 to-accent/5"
                 >
                   <CardHeader className="pb-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <CardTitle className="text-base sm:text-lg text-orange-700 break-words">
+                        <CardTitle className="text-base sm:text-lg text-accent-foreground break-words">
                           {meal.name}
                         </CardTitle>
-                        <CardDescription className="text-orange-600 text-sm break-words">
+                        <CardDescription className="text-muted-foreground text-sm break-words">
                           {meal.description}
                         </CardDescription>
                       </div>
@@ -299,10 +295,10 @@ const AIMealSuggestions = ({
                           size="sm"
                           variant="outline"
                           onClick={() => setSelectedMealForDetails(meal)}
-                          className="border-orange-300 text-orange-700 hover:bg-orange-50 text-xs sm:text-sm w-full sm:w-auto"
+                          className="border-accent/40 text-accent-foreground hover:bg-accent/10 text-xs sm:text-sm w-full sm:w-auto"
                         >
                           <ChefHat className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                          View Details
+                          {t("aiSuggestions.viewDetails")}
                         </Button>
                         <Button
                           size="sm"
@@ -312,8 +308,8 @@ const AIMealSuggestions = ({
                           onClick={() => handleAddToFavorites(meal)}
                           className={
                             isMealFavorite(meal.id)
-                              ? "bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm w-full sm:w-auto"
-                              : "border-red-300 text-red-700 hover:bg-red-50 text-xs sm:text-sm w-full sm:w-auto"
+                              ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm w-full sm:w-auto"
+                              : "border-destructive/40 text-destructive hover:bg-destructive/10 text-xs sm:text-sm w-full sm:w-auto"
                           }
                         >
                           <Heart
@@ -322,25 +318,25 @@ const AIMealSuggestions = ({
                             }`}
                           />
                           {isMealFavorite(meal.id)
-                            ? "Favorited"
-                            : "Add to Favorites"}
+                            ? t("aiSuggestions.favorited")
+                            : t("aiSuggestions.addToFavorites")}
                         </Button>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                       <div className="flex items-center space-x-1">
                         <Clock className="h-3 w-3" />
-                        <span>{meal.prepTime}min</span>
+                        <span>{meal.prepTime}{t("aiSuggestions.min")}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Users className="h-3 w-3" />
                         <span className="capitalize">{meal.difficulty}</span>
                       </div>
-                      <span>{meal.calories} cal</span>
+                      <span>{meal.calories} {t("aiSuggestions.cal")}</span>
                       {meal.carbonFootprint && (
                         <div className="flex items-center space-x-1">
-                          <Leaf className="h-3 w-3 text-green-600" />
+                          <Leaf className="h-3 w-3 text-primary" />
                           <span>{meal.carbonFootprint}kg CO₂</span>
                         </div>
                       )}
@@ -353,10 +349,10 @@ const AIMealSuggestions = ({
                 onClick={generateSuggestions}
                 variant="outline"
                 disabled={isGenerating}
-                className="w-full border-green-200 text-green-700 hover:bg-green-50 text-sm sm:text-base"
+                className="w-full border-primary/30 text-primary hover:bg-primary/10 text-sm sm:text-base"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
-                {isGenerating ? "Generating..." : "Generate More Suggestions"}
+                {isGenerating ? t("aiSuggestions.generating") : t("aiSuggestions.generateMore")}
               </Button>
             </div>
           </CardContent>
@@ -375,34 +371,32 @@ const AIMealSuggestions = ({
             </DialogHeader>
             <ScrollArea className="flex-1 pr-2 sm:pr-4 -mr-2 sm:-mr-4">
               <div className="space-y-6">
-                {/* Description */}
                 <div>
                   <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                     {selectedMealForDetails?.description}
                   </p>
                 </div>
 
-                {/* Meal Info */}
                 <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-primary" />
                     <span>
-                      Prep Time: {selectedMealForDetails?.prepTime} min
+                      {t("aiSuggestions.prepTime")}: {selectedMealForDetails?.prepTime} {t("aiSuggestions.min")}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <ChefHat className="h-4 w-4 text-primary" />
                     <span>
-                      Difficulty: {selectedMealForDetails?.difficulty}
+                      {t("aiSuggestions.difficulty")}: {selectedMealForDetails?.difficulty}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 text-primary" />
-                    <span>Servings: {servings}</span>
+                    <span>{t("aiSuggestions.servingsLabel")}: {servings}</span>
                   </div>
                   {selectedMealForDetails?.carbonFootprint && (
                     <div className="flex items-center space-x-2">
-                      <Leaf className="h-4 w-4 text-green-600" />
+                      <Leaf className="h-4 w-4 text-primary" />
                       <span>
                         {selectedMealForDetails.carbonFootprint}kg CO₂
                       </span>
@@ -410,11 +404,10 @@ const AIMealSuggestions = ({
                   )}
                 </div>
 
-                {/* Benefits */}
                 {selectedMealForDetails?.benefits && (
                   <div>
                     <h3 className="font-semibold mb-2 text-sm sm:text-base">
-                      Health Benefits
+                      {t("aiSuggestions.healthBenefits")}
                     </h3>
                     <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                       {selectedMealForDetails.benefits}
@@ -422,24 +415,22 @@ const AIMealSuggestions = ({
                   </div>
                 )}
 
-                {/* Prep Tip */}
                 {selectedMealForDetails?.prepTip && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
-                    <h3 className="font-semibold mb-1 text-xs sm:text-sm text-blue-900 dark:text-blue-100">
-                      💡 Pro Tip
+                  <div className="bg-primary/10 p-3 sm:p-4 rounded-lg">
+                    <h3 className="font-semibold mb-1 text-xs sm:text-sm text-primary">
+                      💡 {t("aiSuggestions.proTip")}
                     </h3>
-                    <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed">
                       {selectedMealForDetails.prepTip}
                     </p>
                   </div>
                 )}
 
-                {/* Ingredients */}
                 {selectedMealForDetails?.ingredients &&
                   selectedMealForDetails.ingredients.length > 0 && (
                     <div>
                       <h3 className="font-semibold mb-3 text-sm sm:text-base">
-                        Ingredients
+                        {t("aiSuggestions.ingredients")}
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {selectedMealForDetails.ingredients.map(
@@ -464,36 +455,35 @@ const AIMealSuggestions = ({
                     </div>
                   )}
 
-                {/* Nutritional Info */}
                 {selectedMealForDetails?.nutritionalInfo && (
                   <div>
                     <h3 className="font-semibold mb-3 text-sm sm:text-base">
-                      Nutritional Information
+                      {t("aiSuggestions.nutritionalInfo")}
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                       <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
                         <p className="text-xs text-muted-foreground">
-                          Calories
+                          {t("aiSuggestions.calories")}
                         </p>
                         <p className="text-base sm:text-lg font-bold">
                           {selectedMealForDetails.calories}
                         </p>
                       </div>
                       <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
-                        <p className="text-xs text-muted-foreground">Protein</p>
+                        <p className="text-xs text-muted-foreground">{t("aiSuggestions.protein")}</p>
                         <p className="text-base sm:text-lg font-bold">
                           {selectedMealForDetails.nutritionalInfo.protein}g
                         </p>
                       </div>
                       <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
-                        <p className="text-xs text-muted-foreground">Carbs</p>
+                        <p className="text-xs text-muted-foreground">{t("aiSuggestions.carbs")}</p>
                         <p className="text-base sm:text-lg font-bold">
                           {selectedMealForDetails.nutritionalInfo.carbohydrates}
                           g
                         </p>
                       </div>
                       <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
-                        <p className="text-xs text-muted-foreground">Fat</p>
+                        <p className="text-xs text-muted-foreground">{t("aiSuggestions.fat")}</p>
                         <p className="text-base sm:text-lg font-bold">
                           {selectedMealForDetails.nutritionalInfo.fat}g
                         </p>
@@ -504,7 +494,7 @@ const AIMealSuggestions = ({
                         0 && (
                         <div className="mt-3">
                           <p className="text-xs text-muted-foreground mb-2">
-                            Rich in vitamins:
+                            {t("aiSuggestions.richInVitamins")}:
                           </p>
                           <div className="flex flex-wrap gap-1">
                             {selectedMealForDetails.nutritionalInfo.vitamins.map(
@@ -524,12 +514,11 @@ const AIMealSuggestions = ({
                   </div>
                 )}
 
-                {/* Steps */}
                 {selectedMealForDetails?.steps &&
                   selectedMealForDetails.steps.length > 0 && (
                     <div>
                       <h3 className="font-semibold mb-3 text-sm sm:text-base">
-                        Cooking Instructions
+                        {t("aiSuggestions.cookingInstructions")}
                       </h3>
                       <ol className="space-y-3 sm:space-y-4">
                         {selectedMealForDetails.steps.map(
@@ -555,7 +544,7 @@ const AIMealSuggestions = ({
                 onClick={() => setSelectedMealForDetails(null)}
                 className="w-full sm:w-auto order-3 sm:order-1"
               >
-                Close
+                {t("aiSuggestions.close")}
               </Button>
               <Button
                 variant={
@@ -570,8 +559,8 @@ const AIMealSuggestions = ({
                 }}
                 className={`w-full sm:w-auto order-2 ${
                   isMealFavorite(selectedMealForDetails?.id)
-                    ? "bg-red-500 hover:bg-red-600"
-                    : "border-red-300 text-red-700 hover:bg-red-50"
+                    ? "bg-destructive hover:bg-destructive/90"
+                    : "border-destructive/40 text-destructive hover:bg-destructive/10"
                 }`}
               >
                 <Heart
@@ -582,8 +571,8 @@ const AIMealSuggestions = ({
                   }`}
                 />
                 {isMealFavorite(selectedMealForDetails?.id)
-                  ? "Favorited"
-                  : "Add to Favorites"}
+                  ? t("aiSuggestions.favorited")
+                  : t("aiSuggestions.addToFavorites")}
               </Button>
               <Button
                 onClick={() => {
@@ -591,10 +580,10 @@ const AIMealSuggestions = ({
                     handleMarkAsConsumed(selectedMealForDetails);
                   }
                 }}
-                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto order-1 sm:order-3"
+                className="bg-primary hover:bg-primary/90 w-full sm:w-auto order-1 sm:order-3"
               >
                 <Check className="h-4 w-4 mr-2" />
-                Mark as Consumed
+                {t("aiSuggestions.markAsConsumed")}
               </Button>
             </DialogFooter>
           </DialogContent>
