@@ -9,6 +9,7 @@ import {
   BookOpen,
   Flame,
   Timer,
+  Repeat,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -23,9 +24,13 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingStepIndex, setSpeakingStepIndex] = useState<number | null>(null);
+  const [speakingIngredientIndex, setSpeakingIngredientIndex] = useState<number | null>(null);
+  const [loopIngredients, setLoopIngredients] = useState(false);
+  const [loopSteps, setLoopSteps] = useState(false);
   const [activeSection, setActiveSection] = useState<"ingredients" | "steps">("ingredients");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const speakingCancelledRef = useRef(false);
   const { t } = useLanguage();
 
   // Request wake lock on mount
@@ -80,26 +85,58 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   }, []);
 
   const stopSpeaking = useCallback(() => {
+    speakingCancelledRef.current = true;
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
     setSpeakingStepIndex(null);
+    setSpeakingIngredientIndex(null);
   }, []);
 
-  const speakIngredients = () => {
-    const text = ingredients.join(". ");
-    speak(`${t("cookingMode.ingredientsList") || "Ingredients list"}. ${text}`);
-  };
+  const speakIngredients = useCallback((loop = false) => {
+    speakingCancelledRef.current = false;
+    let currentIdx = 0;
+    const speakNext = () => {
+      if (speakingCancelledRef.current) return;
+      if (currentIdx >= ingredients.length) {
+        if (loop && !speakingCancelledRef.current) {
+          currentIdx = 0;
+          speakNext();
+          return;
+        }
+        setIsSpeaking(false);
+        setSpeakingIngredientIndex(null);
+        return;
+      }
+      const idx = currentIdx;
+      const utterance = new SpeechSynthesisUtterance(ingredients[idx]);
+      utterance.rate = 0.9;
+      utterance.onend = () => { currentIdx++; speakNext(); };
+      utterance.onerror = () => { setIsSpeaking(false); setSpeakingIngredientIndex(null); };
+      setSpeakingIngredientIndex(idx);
+      window.speechSynthesis.speak(utterance);
+    };
+    window.speechSynthesis.cancel();
+    setIsSpeaking(true);
+    speakNext();
+  }, [ingredients]);
 
   const speakStep = (index: number) => {
+    speakingCancelledRef.current = false;
     speak(`${t("cookingMode.step") || "Step"} ${index + 1}. ${instructions[index].text}`, index);
     stepRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
-  const speakAllSteps = () => {
-    // Speak steps one by one with visual tracking
+  const speakAllSteps = useCallback((loop = false) => {
+    speakingCancelledRef.current = false;
     let currentIdx = 0;
     const speakNext = () => {
+      if (speakingCancelledRef.current) return;
       if (currentIdx >= instructions.length) {
+        if (loop && !speakingCancelledRef.current) {
+          currentIdx = 0;
+          speakNext();
+          return;
+        }
         setIsSpeaking(false);
         setSpeakingStepIndex(null);
         return;
@@ -108,10 +145,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
       const text = `${t("cookingMode.step") || "Step"} ${idx + 1}. ${instructions[idx].text}`;
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.9;
-      utterance.onend = () => {
-        currentIdx++;
-        speakNext();
-      };
+      utterance.onend = () => { currentIdx++; speakNext(); };
       utterance.onerror = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
       setSpeakingStepIndex(idx);
       stepRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -120,7 +154,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
     window.speechSynthesis.cancel();
     setIsSpeaking(true);
     speakNext();
-  };
+  }, [instructions, t]);
 
   const progress = instructions.length > 0
     ? Math.round((completedSteps.length / instructions.length) * 100)
@@ -193,22 +227,37 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
                 {t("cookingMode.ingredients") || "Ingredients"}
               </h3>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={isSpeaking ? stopSpeaking : speakIngredients}
-              className="h-7 md:h-8 px-2 md:px-3 text-xs gap-1 text-muted-foreground hover:text-primary"
-            >
-              {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-              {isSpeaking ? (t("cookingMode.stop") || "Stop") : (t("cookingMode.listen") || "Listen")}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={isSpeaking ? stopSpeaking : () => speakIngredients(loopIngredients)}
+                className="h-7 md:h-8 px-2 md:px-3 text-xs gap-1 text-muted-foreground hover:text-primary"
+              >
+                {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                {isSpeaking ? (t("cookingMode.stop") || "Stop") : (t("cookingMode.listen") || "Listen")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLoopIngredients(!loopIngredients)}
+                className={`h-7 md:h-8 w-7 md:w-8 p-0 ${loopIngredients ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-primary"}`}
+                title={t("cookingMode.repeat") || "Repeat"}
+              >
+                <Repeat className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
           {/* Mobile: horizontal scroll / Tablet+: wrapping grid */}
           <div className="flex md:hidden overflow-x-auto gap-2 px-4 pb-3 scrollbar-hide snap-x snap-mandatory">
             {ingredients.map((ingredient, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 snap-start px-3 py-2 rounded-lg bg-primary/5 border border-primary/15 text-xs text-foreground whitespace-nowrap"
+                className={`flex-shrink-0 snap-start px-3 py-2 rounded-lg border text-xs whitespace-nowrap transition-all duration-300 ${
+                  speakingIngredientIndex === index
+                    ? "bg-accent/20 border-accent ring-2 ring-accent/30 text-accent-foreground font-semibold shadow-md"
+                    : "bg-primary/5 border-primary/15 text-foreground"
+                }`}
               >
                 {ingredient}
               </div>
@@ -218,7 +267,11 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
             {ingredients.map((ingredient, index) => (
               <div
                 key={index}
-                className="px-3.5 py-2 rounded-lg bg-primary/5 border border-primary/15 text-sm text-foreground"
+                className={`px-3.5 py-2 rounded-lg border text-sm transition-all duration-300 ${
+                  speakingIngredientIndex === index
+                    ? "bg-accent/20 border-accent ring-2 ring-accent/30 text-accent-foreground font-semibold shadow-md"
+                    : "bg-primary/5 border-primary/15 text-foreground"
+                }`}
               >
                 {ingredient}
               </div>
@@ -240,15 +293,26 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
                 {completedSteps.length}/{instructions.length}
               </span>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={isSpeaking ? stopSpeaking : speakAllSteps}
-              className="h-7 md:h-8 px-2 md:px-3 text-xs gap-1 text-muted-foreground hover:text-primary"
-            >
-              {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-              {isSpeaking ? (t("cookingMode.stop") || "Stop") : (t("cookingMode.listenAll") || "Listen All")}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={isSpeaking ? stopSpeaking : () => speakAllSteps(loopSteps)}
+                className="h-7 md:h-8 px-2 md:px-3 text-xs gap-1 text-muted-foreground hover:text-primary"
+              >
+                {isSpeaking ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                {isSpeaking ? (t("cookingMode.stop") || "Stop") : (t("cookingMode.listenAll") || "Listen All")}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLoopSteps(!loopSteps)}
+                className={`h-7 md:h-8 w-7 md:w-8 p-0 ${loopSteps ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-primary"}`}
+                title={t("cookingMode.repeat") || "Repeat"}
+              >
+                <Repeat className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
           <div className="px-4 md:px-8 lg:px-12 pb-4 space-y-2.5 md:space-y-3">
             {instructions.map((instruction, index) => {
