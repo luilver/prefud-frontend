@@ -588,7 +588,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
       />
 
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] shrink-0">
         <Button variant="ghost" size="sm" onClick={onBack} className="text-white/80 hover:text-white hover:bg-white/10">
           <ArrowLeft className="h-4 w-4 mr-1" />
           {t("aiDrinkChat.back") || "Back"}
@@ -778,7 +778,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
 
       {/* Text Input Area */}
       {isTextStep && (
-        <div className="shrink-0 px-3 pb-3 pt-2">
+        <div className="shrink-0 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
           <div className="flex gap-2 bg-white/95 rounded-full px-4 py-2 shadow-lg items-center">
             <input
               value={textInput}
