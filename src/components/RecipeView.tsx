@@ -502,8 +502,8 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
               <TabsContent value="shopping" className="space-y-4">
                 <Card>
                   <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                    <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center space-x-2 min-w-0">
                         <Package className="h-5 w-5 text-primary" />
                         <span>{t("recipeView.ingredientsSelector") || "Ingredients"}</span>
                       </div>
@@ -528,7 +528,7 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
                       {getIngredientsForShopping().map((ingredient, index) => (
                         <div
                           key={index}
-                          className="flex items-center space-x-3 p-4 border-2 rounded-xl hover:bg-muted/30 transition-colors active:scale-95"
+                          className="flex items-center space-x-3 p-3 sm:p-4 border-2 rounded-xl hover:bg-muted/30 transition-colors active:scale-[0.98]"
                         >
                           <Checkbox
                             id={`recipe-ingredient-${index}`}
@@ -550,23 +550,23 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
                     </div>
 
                     {selectedIngredients.length > 0 && (
-                      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                      <div className="flex flex-col gap-3 pt-4 border-t">
                         <Button
                           onClick={handleAddToPantry}
                           variant="outline"
-                          className="flex-1 h-12"
+                          className="w-full h-11 sm:h-12"
                           size="lg"
                         >
-                          <Package className="h-5 w-5 mr-2" />
-                          {t("recipeView.addToPantry") || "Add to Pantry"} ({selectedIngredients.length})
+                          <Package className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                          <span className="text-sm sm:text-base">{t("recipeView.addToPantry") || "Add to Pantry"} ({selectedIngredients.length})</span>
                         </Button>
                         <Button
                           onClick={() => handleAddToCart()}
-                          className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-12"
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-11 sm:h-12"
                           size="lg"
                         >
-                          <ShoppingCart className="h-5 w-5 mr-2" />
-                          {t("recipeView.addToCart") || "Add to Cart"} ({selectedIngredients.length})
+                          <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                          <span className="text-sm sm:text-base">{t("recipeView.addToCart") || "Add to Cart"} ({selectedIngredients.length})</span>
                         </Button>
                       </div>
                     )}

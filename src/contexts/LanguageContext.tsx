@@ -1406,6 +1406,14 @@ const translations = {
     "recipeView.stepsCompleted": "steps completed",
     "recipeView.completed": "🎉 Congratulations! Recipe completed!",
     "recipeView.videoTitleFullscreen": "Recipe Video Tutorial - Fullscreen",
+    "recipeView.shoppingTab": "Shopping List",
+    "recipeView.ingredientsSelector": "Ingredients",
+    "recipeView.selectAll": "Select All",
+    "recipeView.deselectAll": "Deselect All",
+    "recipeView.selectIngredientsDesc": "Select ingredients to add to your pantry or cart",
+    "recipeView.addToPantry": "Add to Pantry",
+    "recipeView.addToCart": "Add to Cart",
+    "recipeView.addedToPantry": "Added to Pantry",
 
     // Password
     "password.security.title": "Password Security",
@@ -3214,6 +3222,14 @@ const translations = {
     "recipeView.completed": "🎉 ¡Felicidades! ¡Receta completada!",
     "recipeView.videoTitleFullscreen":
       "Video Tutorial de la Receta - Pantalla Completa",
+    "recipeView.shoppingTab": "Lista de Compras",
+    "recipeView.ingredientsSelector": "Ingredientes",
+    "recipeView.selectAll": "Seleccionar Todo",
+    "recipeView.deselectAll": "Deseleccionar Todo",
+    "recipeView.selectIngredientsDesc": "Selecciona ingredientes para añadir a tu despensa o carrito",
+    "recipeView.addToPantry": "Añadir a Despensa",
+    "recipeView.addToCart": "Añadir al Carrito",
+    "recipeView.addedToPantry": "Añadido a la Despensa",
 
     // Password
     "password.security.title": "Seguridad de Contraseña",
@@ -5041,6 +5057,14 @@ const translations = {
     "recipeView.stepsCompleted": "passos concluídos",
     "recipeView.completed": "🎉 Parabéns! Receita concluída!",
     "recipeView.videoTitleFullscreen": "Vídeo Tutorial da Receita - Tela Cheia",
+    "recipeView.shoppingTab": "Lista de Compras",
+    "recipeView.ingredientsSelector": "Ingredientes",
+    "recipeView.selectAll": "Selecionar Tudo",
+    "recipeView.deselectAll": "Desmarcar Tudo",
+    "recipeView.selectIngredientsDesc": "Selecione ingredientes para adicionar à despensa ou carrinho",
+    "recipeView.addToPantry": "Adicionar à Despensa",
+    "recipeView.addToCart": "Adicionar ao Carrinho",
+    "recipeView.addedToPantry": "Adicionado à Despensa",
 
     // Password
     "password.security.title": "Segurança da Senha",
