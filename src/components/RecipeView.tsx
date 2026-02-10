@@ -727,6 +727,8 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
           ingredients={enhancedIngredients}
           instructions={enhancedInstructions}
           onClose={() => setShowCookingMode(false)}
+          onMarkAsCooked={handleMarkAsCooked}
+          isCooked={isCooked}
         />
       )}
     </>
