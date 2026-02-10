@@ -30,6 +30,7 @@ import MealShoppingModal from "./MealShoppingModal";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/contexts/CartContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
+import CookingMode from "./CookingMode";
 
 interface RecipeViewProps {
   meal: any;
@@ -46,6 +47,7 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
   const [showShoppingModal, setShowShoppingModal] = useState(false);
   const [isCooked, setIsCooked] = useState(meal.consumed || false);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [showCookingMode, setShowCookingMode] = useState(false);
   const { addShoppingItem, pantryItems, setPantryItems, user } = useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -326,7 +328,15 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
       <div className="max-w-4xl mx-auto space-y-6 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <Button variant="ghost" onClick={onBack} className="self-start text-white hover:text-white-800">
-            ← Back to Plan
+            ← {t("recipeView.backToPlan") || "Back to Plan"}
+          </Button>
+          <Button
+            onClick={() => setShowCookingMode(true)}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+            size="sm"
+          >
+            <ChefHat className="h-4 w-4" />
+            {t("cookingMode.enter") || "Cooking Mode"}
           </Button>
         </div>
 
@@ -710,6 +720,15 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
       />
+
+      {showCookingMode && (
+        <CookingMode
+          meal={meal}
+          ingredients={enhancedIngredients}
+          instructions={enhancedInstructions}
+          onClose={() => setShowCookingMode(false)}
+        />
+      )}
     </>
   );
 };

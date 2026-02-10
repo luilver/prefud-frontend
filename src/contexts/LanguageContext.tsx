@@ -1415,7 +1415,18 @@ const translations = {
     "recipeView.addToCart": "Add to Cart",
     "recipeView.addedToPantry": "Added to Pantry",
 
-    // Password
+    // Cooking Mode
+    "cookingMode.enter": "Cooking Mode",
+    "cookingMode.ingredients": "Ingredients",
+    "cookingMode.steps": "Steps",
+    "cookingMode.ingredientsList": "Ingredients List",
+    "cookingMode.cookingSteps": "Cooking Steps",
+    "cookingMode.step": "Step",
+    "cookingMode.listen": "Listen",
+    "cookingMode.listenAll": "Listen All",
+    "cookingMode.stop": "Stop",
+    "cookingMode.completed": "All steps completed! Enjoy your meal!",
+    "cookingMode.stepsCompleted": "steps",
     "password.security.title": "Password Security",
     "password.security.description":
       "Keep your account secure by updating your password regularly.",
@@ -3231,7 +3242,18 @@ const translations = {
     "recipeView.addToCart": "Añadir al Carrito",
     "recipeView.addedToPantry": "Añadido a la Despensa",
 
-    // Password
+    // Cooking Mode
+    "cookingMode.enter": "Modo Cocina",
+    "cookingMode.ingredients": "Ingredientes",
+    "cookingMode.steps": "Pasos",
+    "cookingMode.ingredientsList": "Lista de Ingredientes",
+    "cookingMode.cookingSteps": "Pasos de Cocina",
+    "cookingMode.step": "Paso",
+    "cookingMode.listen": "Escuchar",
+    "cookingMode.listenAll": "Escuchar Todo",
+    "cookingMode.stop": "Parar",
+    "cookingMode.completed": "¡Todos los pasos completados! ¡Disfruta tu comida!",
+    "cookingMode.stepsCompleted": "pasos",
     "password.security.title": "Seguridad de Contraseña",
     "password.security.description":
       "Mantén tu cuenta segura actualizando tu contraseña regularmente.",
@@ -5066,7 +5088,18 @@ const translations = {
     "recipeView.addToCart": "Adicionar ao Carrinho",
     "recipeView.addedToPantry": "Adicionado à Despensa",
 
-    // Password
+    // Cooking Mode
+    "cookingMode.enter": "Modo Cozinha",
+    "cookingMode.ingredients": "Ingredientes",
+    "cookingMode.steps": "Passos",
+    "cookingMode.ingredientsList": "Lista de Ingredientes",
+    "cookingMode.cookingSteps": "Passos de Cozinha",
+    "cookingMode.step": "Passo",
+    "cookingMode.listen": "Ouvir",
+    "cookingMode.listenAll": "Ouvir Tudo",
+    "cookingMode.stop": "Parar",
+    "cookingMode.completed": "Todos os passos concluídos! Aproveite sua refeição!",
+    "cookingMode.stepsCompleted": "passos",
     "password.security.title": "Segurança da Senha",
     "password.security.description":
       "Mantenha sua conta segura atualizando sua senha regularmente.",
