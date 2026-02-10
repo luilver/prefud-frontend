@@ -22,9 +22,11 @@ interface CookingModeProps {
   ingredients: string[];
   instructions: { text: string; tip: string; estimatedTime: number }[];
   onClose: () => void;
+  onMarkAsCooked?: () => void;
+  isCooked?: boolean;
 }
 
-const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModeProps) => {
+const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked, isCooked }: CookingModeProps) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingStepIndex, setSpeakingStepIndex] = useState<number | null>(null);
@@ -442,7 +444,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
 
       {/* Footer */}
       <div className="border-t bg-card/95 backdrop-blur-sm safe-area-bottom">
-        <div className="px-4 md:px-8 lg:px-12 py-3 max-w-5xl mx-auto w-full">
+        <div className="px-4 md:px-8 lg:px-12 py-3 max-w-5xl mx-auto w-full space-y-2">
           {progress === 100 && instructions.length > 0 ? (
             <div className="text-center p-3 bg-primary/10 rounded-xl border border-primary/20">
               <p className="text-primary font-semibold text-sm md:text-base">
@@ -456,6 +458,18 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
               </span>
               <span className="text-xs md:text-sm font-semibold text-primary tabular-nums">{progress}%</span>
             </div>
+          )}
+          {onMarkAsCooked && (
+            <Button
+              onClick={onMarkAsCooked}
+              className={`w-full ${isCooked ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
+              size="sm"
+            >
+              <ChefHat className="h-4 w-4 mr-2" />
+              {isCooked 
+                ? (t("recipeView.markedAsCooked") || "✓ Cooked") 
+                : (t("recipeView.markAsCooked") || "Mark as Cooked")}
+            </Button>
           )}
         </div>
       </div>
