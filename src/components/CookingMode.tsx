@@ -11,7 +11,7 @@ import {
   Timer,
   Repeat,
 } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage, type Language } from "@/contexts/LanguageContext";
 
 interface CookingModeProps {
   meal: any;
@@ -35,7 +35,10 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   const speakingCancelledRef = useRef(false);
   const loopIngredientsRef = useRef(false);
   const loopStepsRef = useRef(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Map app language to BCP 47 speech lang
+  const speechLang = language === "es" ? "es-ES" : language === "pt" ? "pt-BR" : "en-US";
 
   // Keep refs in sync with state
   useEffect(() => { loopIngredientsRef.current = loopIngredients; }, [loopIngredients]);
@@ -84,6 +87,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   const speak = useCallback((text: string, stepIndex?: number) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = speechLang;
     utterance.rate = 0.9;
     utterance.onend = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
     utterance.onerror = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
@@ -117,6 +121,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
       }
       const idx = currentIdx;
       const utterance = new SpeechSynthesisUtterance(ingredients[idx]);
+      utterance.lang = speechLang;
       utterance.rate = 0.9;
       utterance.onend = () => { currentIdx++; speakNext(); };
       utterance.onerror = () => { setIsSpeaking(false); setSpeakingIngredientIndex(null); };
@@ -154,6 +159,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
       const idx = currentIdx;
       const text = `${t("cookingMode.step") || "Step"} ${idx + 1}. ${instructions[idx].text}`;
       const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = speechLang;
       utterance.rate = 0.9;
       utterance.onend = () => { currentIdx++; speakNext(); };
       utterance.onerror = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
