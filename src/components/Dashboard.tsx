@@ -58,6 +58,13 @@ const DashboardContent = () => {
     };
   }, []);
 
+  // Scroll to top when active tab changes on mobile
+  useEffect(() => {
+    if (isMobile) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeTab, isMobile]);
+
   // Calculate dynamic margin based on sidebar state
   const getSidebarWidth = () => {
     if (isMobile) return 0;
