@@ -715,7 +715,6 @@ const MealPlanCreatorStepper = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-2xl h-full max-h-[100dvh] flex flex-col">
-      <div className="w-full max-w-2xl h-full max-h-[100dvh] flex flex-col">
       <LoaderComponent />
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] shrink-0">
