@@ -233,56 +233,40 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
         </div>
 
         {/* Quick Stats Cards - Made more compact for mobile */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
-          <Card className="bg-white/70 backdrop-blur-sm">
-            <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
-              <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mb-1 sm:mb-2" />
-              <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">
-                  {healthyDrink.cookingTime}
-                </p>
-                <p className="text-xs text-gray-600">
-                  {t("drinkDetailView.min") || "min"}
-                </p>
+        <div className="flex overflow-x-auto gap-2 sm:grid sm:grid-cols-4 sm:gap-4 pb-2 sm:pb-0 snap-x snap-mandatory">
+          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
+            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
+              <Clock className="h-4 w-4 sm:h-6 sm:w-6 text-primary sm:mb-2" />
+              <div className="sm:text-center">
+                <p className="text-sm font-bold leading-tight">{healthyDrink.cookingTime}</p>
+                <p className="text-xs text-muted-foreground">{t("drinkDetailView.min") || "min"}</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white/70 backdrop-blur-sm">
-            <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
-              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 mb-1 sm:mb-2" />
-              <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">
-                  {drink.numberPeople}
-                </p>
-                <p className="text-xs text-gray-600">
-                  {t("drinkDetailView.servings") || "Servings"}
-                </p>
+          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
+            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
+              <Users className="h-4 w-4 sm:h-6 sm:w-6 text-primary sm:mb-2" />
+              <div className="sm:text-center">
+                <p className="text-sm font-bold leading-tight">{drink.numberPeople}</p>
+                <p className="text-xs text-muted-foreground">{t("drinkDetailView.servings") || "Servings"}</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white/70 backdrop-blur-sm">
-            <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
-              <Droplets className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 mb-1 sm:mb-2" />
-              <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">
-                  {healthyDrink.calories}
-                </p>
-                <p className="text-xs text-gray-600">
-                  {t("drinkDetailView.cal") || "Cal"}
-                </p>
+          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
+            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
+              <Droplets className="h-4 w-4 sm:h-6 sm:w-6 text-accent-foreground sm:mb-2" />
+              <div className="sm:text-center">
+                <p className="text-sm font-bold leading-tight">{healthyDrink.calories}</p>
+                <p className="text-xs text-muted-foreground">{t("drinkDetailView.cal") || "Cal"}</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white/70 backdrop-blur-sm">
-            <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4">
-              <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 mb-1 sm:mb-2" />
-              <div className="text-center">
-                <p className="text-sm sm:text-lg font-bold">
-                  {drink.drinkPlan.totalCarbonFootprint}
-                </p>
-                <p className="text-xs text-gray-600">
-                  {t("drinkDetailView.co2") || "kg CO₂"}
-                </p>
+          <Card className="bg-card/70 backdrop-blur-sm min-w-[5rem] snap-start flex-shrink-0 sm:min-w-0">
+            <CardContent className="flex items-center gap-2 p-2.5 sm:flex-col sm:items-center sm:p-4">
+              <Leaf className="h-4 w-4 sm:h-6 sm:w-6 text-primary sm:mb-2" />
+              <div className="sm:text-center">
+                <p className="text-sm font-bold leading-tight">{drink.drinkPlan.totalCarbonFootprint}</p>
+                <p className="text-xs text-muted-foreground">{t("drinkDetailView.co2") || "kg CO₂"}</p>
               </div>
             </CardContent>
           </Card>
@@ -635,17 +619,17 @@ const DrinkDetailView = ({ drink, onBack }: DrinkDetailViewProps) => {
 
         {/* Pro Tip */}
         {healthyDrink.prepTip && (
-          <Card className="border-primary/20 bg-primary/5">
+          <Card className="border-primary/30 bg-primary/10">
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-3">
                 <div className="p-2 bg-primary rounded-full flex-shrink-0">
                   <Droplets className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-primary mb-1">
+                  <h4 className="font-semibold text-foreground mb-1">
                     {t("drinkDetailView.proTip") || "Pro Tip"}
                   </h4>
-                  <p className="text-sm sm:text-base text-foreground">
+                  <p className="text-sm sm:text-base text-foreground/90">
                     {healthyDrink.prepTip}
                   </p>
                 </div>
