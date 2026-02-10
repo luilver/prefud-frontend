@@ -253,7 +253,7 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
     <>
       <div className="max-w-4xl mx-auto space-y-6 p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <Button variant="ghost" onClick={onBack} className="self-start">
+          <Button variant="ghost" onClick={onBack} className="self-start text-white hover:text-white-800">
             ← Back to Plan
           </Button>
           <div className="flex flex-wrap gap-2">
@@ -302,9 +302,7 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
                 </div>
               </div>
 
-              <div className="w-full sm:w-48 h-32 bg-gradient-to-br from-green-100 to-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <ChefHat className="h-12 w-12 sm:h-16 sm:w-16 text-green-600 opacity-50" />
-              </div>
+             
             </div>
           </CardHeader>
         </Card>

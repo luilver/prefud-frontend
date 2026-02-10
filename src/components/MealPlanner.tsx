@@ -354,29 +354,25 @@ const MealPlanner = () => {
                           </span>
                         </div>
 
-                        {
-                          kidsbelow5Count > 0 && (
-                            <div className="flex items-center gap-2">
-                              <Baby className="h-4 w-4 text-emerald-500" />
-                              <span>
-                                {t("mealPlanner.for") || "For"} {kidsbelow5Count}{" "}
-                                {t("mealPlanner.kidsbelow5") || "kids below 5"}
-                              </span>
-                            </div>
-                          )
-                        }
-                        {
-                          kidsover5Count > 0 && (
-                            <div className="flex items-center gap-2">
-                              <Smile className="h-4 w-4 text-emerald-500" />
-                              <span>
-                                {t("mealPlanner.for") || "For"} {kidsover5Count}{" "}
-                                {t("mealPlanner.kidsover5") || "kids over 5"}
-                              </span>
-                            </div>
-                          )
-                        }
-                        
+                        {kidsbelow5Count > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Baby className="h-4 w-4 text-emerald-500" />
+                            <span>
+                              {t("mealPlanner.for") || "For"} {kidsbelow5Count}{" "}
+                              {t("mealPlanner.kidsbelow5") || "kids below 5"}
+                            </span>
+                          </div>
+                        )}
+                        {kidsover5Count > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Smile className="h-4 w-4 text-emerald-500" />
+                            <span>
+                              {t("mealPlanner.for") || "For"} {kidsover5Count}{" "}
+                              {t("mealPlanner.kidsover5") || "kids over 5"}
+                            </span>
+                          </div>
+                        )}
+
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-emerald-500" />
                           <span>
