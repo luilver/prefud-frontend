@@ -162,6 +162,7 @@ const MealPlanner = () => {
     setShowCreator(false);
     setIsEditing(false);
     isNavigatingBack.current = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handlePageChange = (page: number) => {
