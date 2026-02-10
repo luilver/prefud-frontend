@@ -975,7 +975,6 @@ const MealPlanCreatorStepper = ({
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
       />
-      </div>
     </div>
   );
 };
