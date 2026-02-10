@@ -344,6 +344,11 @@ export const es = {
       "box": "Caja"
     }
   },
+  "aiMealCreator": {
+    "markAsDoneBtn": "Marcar como hecha",
+    "markAsDoneSuccess": "¡Comida marcada como consumida exitosamente!",
+    "markAsDoneError": "Error al marcar la comida como consumida. Inténtalo de nuevo."
+  },
   "mealPlanCreator": {
     "cuisine": {
       "customCountry": "Agregar Cocina de País",

@@ -340,6 +340,11 @@ export const en = {
       "box": "Box"
     }
   },
+  "aiMealCreator": {
+    "markAsDoneBtn": "Mark as Done",
+    "markAsDoneSuccess": "Meal marked as consumed successfully!",
+    "markAsDoneError": "Failed to mark meal as consumed. Please try again."
+  },
   "mealPlanCreator": {
     "cuisine": {
       "customCountry": "Add Country Cuisine",

@@ -343,6 +343,11 @@ export const pt = {
       "box": "Caixa"
     }
   },
+  "aiMealCreator": {
+    "markAsDoneBtn": "Marcar como feita",
+    "markAsDoneSuccess": "Refeição marcada como consumida com sucesso!",
+    "markAsDoneError": "Erro ao marcar a refeição como consumida. Tente novamente."
+  },
   "aiMealCreatorStepper": {
     "backToMeals": "Voltar",
     "createAIMealTitle": "Criador de Refeição IA",
