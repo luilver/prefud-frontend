@@ -20,12 +20,16 @@ import {
   Maximize,
   X,
   ShoppingCart,
+  Package,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { updateMealConsumed } from "@/services/pantryService";
+import { updateMealConsumed, addIngredientsToPantry } from "@/services/pantryService";
 import MealShoppingModal from "./MealShoppingModal";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useCart } from "@/contexts/CartContext";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 interface RecipeViewProps {
   meal: any;
@@ -41,9 +45,108 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
   const [isCooked, setIsCooked] = useState(meal.consumed || false);
-  const { addShoppingItem } = useUser();
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const { addShoppingItem, pantryItems, setPantryItems, user } = useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { addItem } = useCart();
+
+  const getIngredientsForShopping = () => {
+    if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
+      return meal.ingredientsData.map((ingredient: any) => ({
+        name: ingredient.name || ingredient,
+        quantity: ingredient.quantity || 1,
+        unit: ingredient.unit || "unit",
+        classification: ingredient.classification || "ingredient",
+      }));
+    }
+
+    if (meal.ingredients && Array.isArray(meal.ingredients)) {
+      return meal.ingredients.map((ingredient: string) => {
+        const match = ingredient.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
+        if (match) {
+          return {
+            name: match[3],
+            quantity: parseFloat(match[1]),
+            unit: match[2],
+            classification: "ingredient",
+          };
+        }
+        return {
+          name: ingredient,
+          quantity: 1,
+          unit: "unit",
+          classification: "ingredient",
+        };
+      });
+    }
+
+    return [];
+  };
+
+  const { handleAddToCart } = useAddToCart({
+    ingredients: getIngredientsForShopping(),
+    selectedIngredients,
+    onSuccess: () => setSelectedIngredients([]),
+  });
+
+  const handleIngredientToggle = (ingredientName: string) => {
+    setSelectedIngredients((prev) =>
+      prev.includes(ingredientName)
+        ? prev.filter((name) => name !== ingredientName)
+        : [...prev, ingredientName]
+    );
+  };
+
+  const handleSelectAllIngredients = () => {
+    const allIngredients = getIngredientsForShopping();
+    if (selectedIngredients.length === allIngredients.length) {
+      setSelectedIngredients([]);
+    } else {
+      setSelectedIngredients(allIngredients.map((i) => i.name));
+    }
+  };
+
+  const handleAddToPantry = async () => {
+    try {
+      const ingredientsToAdd = getIngredientsForShopping().filter(
+        (ingredient) => selectedIngredients.includes(ingredient.name)
+      );
+      const newPantryItems = ingredientsToAdd.map((ingredient) => ({
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.classification || "ingredient",
+        purchased: true,
+        purchaseDate: new Date().toISOString(),
+        carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste || 0,
+        daysToExpire: ingredient.daysToExpire || 7,
+        expiryDate: new Date(
+          Date.now() + (ingredient.daysToExpire || 7) * 24 * 60 * 60 * 1000
+        ).toISOString(),
+        notes: `From meal: ${meal.name}`,
+      }));
+
+      try {
+        await addIngredientsToPantry(user.id, newPantryItems);
+      } catch (error) {
+        console.log("error updating pantry", error);
+      }
+      toast({
+        title: t("aiMealView.addedToPantry") || "Added to Pantry",
+        description: `Added ${ingredientsToAdd.length} ingredients to pantry!`,
+      });
+      setSelectedIngredients([]);
+    } catch (error) {
+      console.error("Error adding to pantry:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add ingredients to pantry.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -153,38 +256,7 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
     }
   };
 
-  const getIngredientsForShopping = () => {
-    if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
-      return meal.ingredientsData.map((ingredient: any) => ({
-        name: ingredient.name || ingredient,
-        quantity: ingredient.quantity || 1,
-        unit: ingredient.unit || "unit",
-        classification: ingredient.classification || "ingredient",
-      }));
-    }
 
-    if (meal.ingredients && Array.isArray(meal.ingredients)) {
-      return meal.ingredients.map((ingredient: string) => {
-        const match = ingredient.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
-        if (match) {
-          return {
-            name: match[3],
-            quantity: parseFloat(match[1]),
-            unit: match[2],
-            classification: "ingredient",
-          };
-        }
-        return {
-          name: ingredient,
-          quantity: 1,
-          unit: "unit",
-          classification: "ingredient",
-        };
-      });
-    }
-
-    return [];
-  };
 
   const nutrition = useMemo(
     () => ({
@@ -256,16 +328,6 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
           <Button variant="ghost" onClick={onBack} className="self-start text-white hover:text-white-800">
             ← Back to Plan
           </Button>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={openShoppingModal}
-              className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
-              size="sm"
-            >
-              <ShoppingCart className="h-4 w-4 mr-1" />
-              Shopping List
-            </Button>
-          </div>
         </div>
 
         <Card className="bg-white/70 backdrop-blur-sm border-green-200">
@@ -310,8 +372,15 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
-              <TabsList className="grid w-full grid-cols-1">
-                <TabsTrigger value="recipe">Recipe</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
+                <TabsTrigger value="recipe" className="text-sm">
+                  <BookOpen className="h-4 w-4 mr-1 md:mr-2" />
+                  {t("recipeView.recipeTab") || "Recipe"}
+                </TabsTrigger>
+                <TabsTrigger value="shopping" className="text-sm">
+                  <ShoppingCart className="h-4 w-4 mr-1 md:mr-2" />
+                  {t("recipeView.shoppingTab") || "Shopping List"}
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="recipe" className="space-y-6">
@@ -424,6 +493,81 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
                           mark it as completed. Take your time and enjoy the
                           process!
                         </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="shopping" className="space-y-4">
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Package className="h-5 w-5 text-primary" />
+                        <span>{t("recipeView.ingredientsSelector") || "Ingredients"}</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSelectAllIngredients}
+                        className="text-xs"
+                      >
+                        {selectedIngredients.length === getIngredientsForShopping().length
+                          ? (t("recipeView.deselectAll") || "Deselect All")
+                          : (t("recipeView.selectAll") || "Select All")
+                        }
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      {t("recipeView.selectIngredientsDesc") || "Select ingredients to add to your pantry or cart"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3 max-h-80 overflow-y-auto">
+                      {getIngredientsForShopping().map((ingredient, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-3 p-4 border-2 rounded-xl hover:bg-muted/30 transition-colors active:scale-95"
+                        >
+                          <Checkbox
+                            id={`recipe-ingredient-${index}`}
+                            checked={selectedIngredients.includes(ingredient.name)}
+                            onCheckedChange={() => handleIngredientToggle(ingredient.name)}
+                            className="w-5 h-5"
+                          />
+                          <label
+                            htmlFor={`recipe-ingredient-${index}`}
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="font-medium text-sm md:text-base">{ingredient.name}</div>
+                            <div className="text-xs md:text-sm text-muted-foreground">
+                              {ingredient.quantity} {ingredient.unit}
+                            </div>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+
+                    {selectedIngredients.length > 0 && (
+                      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                        <Button
+                          onClick={handleAddToPantry}
+                          variant="outline"
+                          className="flex-1 h-12"
+                          size="lg"
+                        >
+                          <Package className="h-5 w-5 mr-2" />
+                          {t("recipeView.addToPantry") || "Add to Pantry"} ({selectedIngredients.length})
+                        </Button>
+                        <Button
+                          onClick={() => handleAddToCart()}
+                          className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-12"
+                          size="lg"
+                        >
+                          <ShoppingCart className="h-5 w-5 mr-2" />
+                          {t("recipeView.addToCart") || "Add to Cart"} ({selectedIngredients.length})
+                        </Button>
                       </div>
                     )}
                   </CardContent>
