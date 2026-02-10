@@ -100,10 +100,12 @@ const AIDrinkCreator = () => {
 
   const handleViewDrink = (drink: any) => {
     setSelectedDrink(drink);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleViewApiDrink = (drink: ApiDrink) => {
     setSelectedApiDrink(drink);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleMarkAsDone = async (drinkId: string, drinkName: string, isFromApi: boolean = false) => {
