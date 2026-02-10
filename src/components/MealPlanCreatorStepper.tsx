@@ -908,7 +908,7 @@ const MealPlanCreatorStepper = ({
                       ? (t("mealPlanCreator.planDescriptionPlaceholder") || "Describe your plan goals...")
                       : (t("mealPlanCreator.chat.extrasPlaceholder") || "Type here or skip...")
                   }
-                  className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
+                  className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder:text-gray-400"
                   maxLength={currentStep === "planName" ? 50 : 100}
                 />
                 <Button
@@ -940,7 +940,7 @@ const MealPlanCreatorStepper = ({
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleDateSubmit()}
-                  className="flex-1 bg-transparent outline-none text-sm text-gray-800"
+                  className="flex-1 bg-transparent outline-none text-base text-gray-800"
                 />
                 <Button
                   size="sm"
