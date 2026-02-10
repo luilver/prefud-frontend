@@ -1429,6 +1429,7 @@ const translations = {
     "cookingMode.completed": "All steps completed! Enjoy your meal!",
     "cookingMode.stepsCompleted": "steps",
     "cookingMode.repeat": "Repeat",
+    "cookingMode.viewAll": "View All",
     "password.security.title": "Password Security",
     "password.security.description":
       "Keep your account secure by updating your password regularly.",
@@ -3258,6 +3259,7 @@ const translations = {
     "cookingMode.completed": "¡Todos los pasos completados! ¡Disfruta tu comida!",
     "cookingMode.stepsCompleted": "pasos",
     "cookingMode.repeat": "Repetir",
+    "cookingMode.viewAll": "Ver Todo",
     "password.security.title": "Seguridad de Contraseña",
     "password.security.description":
       "Mantén tu cuenta segura actualizando tu contraseña regularmente.",
@@ -5106,6 +5108,7 @@ const translations = {
     "cookingMode.completed": "Todos os passos concluídos! Aproveite sua refeição!",
     "cookingMode.stepsCompleted": "passos",
     "cookingMode.repeat": "Repetir",
+    "cookingMode.viewAll": "Ver Tudo",
     "password.security.title": "Segurança da Senha",
     "password.security.description":
       "Mantenha sua conta segura atualizando sua senha regularmente.",

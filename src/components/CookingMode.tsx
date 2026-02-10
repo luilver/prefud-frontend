@@ -10,6 +10,8 @@ import {
   Flame,
   Timer,
   Repeat,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
 
@@ -27,6 +29,7 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   const [speakingIngredientIndex, setSpeakingIngredientIndex] = useState<number | null>(null);
   const [loopIngredients, setLoopIngredients] = useState(false);
   const [loopSteps, setLoopSteps] = useState(false);
+  const [showAllIngredients, setShowAllIngredients] = useState(false);
   const [activeSection, setActiveSection] = useState<"ingredients" | "steps">("ingredients");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -262,24 +265,52 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
               >
                 <Repeat className="h-3.5 w-3.5" />
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAllIngredients(!showAllIngredients)}
+                className="h-7 md:h-8 w-7 md:w-8 p-0 md:hidden text-muted-foreground hover:text-primary"
+                title={t("cookingMode.viewAll") || "View All"}
+              >
+                {showAllIngredients ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              </Button>
             </div>
           </div>
-          {/* Mobile: horizontal scroll / Tablet+: wrapping grid */}
-          <div className="flex md:hidden overflow-x-auto gap-2 px-4 pb-3 scrollbar-hide snap-x snap-mandatory">
-            {ingredients.map((ingredient, index) => (
-              <div
-                key={index}
-                ref={(el) => { ingredientRefs.current[index] = el; }}
-                className={`flex-shrink-0 snap-start px-3 py-2 rounded-lg border text-xs whitespace-nowrap transition-all duration-300 ${
-                  speakingIngredientIndex === index
-                    ? "bg-accent/20 border-accent ring-2 ring-accent/30 text-accent-foreground font-semibold shadow-md"
-                    : "bg-primary/5 border-primary/15 text-foreground"
-                }`}
-              >
-                {ingredient}
-              </div>
-            ))}
-          </div>
+          {/* Mobile: horizontal scroll or expanded grid */}
+          {showAllIngredients ? (
+            <div className="flex md:hidden flex-wrap gap-2 px-4 pb-3">
+              {ingredients.map((ingredient, index) => (
+                <div
+                  key={index}
+                  ref={(el) => { ingredientRefs.current[index] = el; }}
+                  className={`px-3 py-2 rounded-lg border text-xs transition-all duration-300 ${
+                    speakingIngredientIndex === index
+                      ? "bg-accent/20 border-accent ring-2 ring-accent/30 text-accent-foreground font-semibold shadow-md"
+                      : "bg-primary/5 border-primary/15 text-foreground"
+                  }`}
+                >
+                  {ingredient}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex md:hidden overflow-x-auto gap-2 px-4 pb-3 scrollbar-hide snap-x snap-mandatory">
+              {ingredients.map((ingredient, index) => (
+                <div
+                  key={index}
+                  ref={(el) => { ingredientRefs.current[index] = el; }}
+                  className={`flex-shrink-0 snap-start px-3 py-2 rounded-lg border text-xs whitespace-nowrap transition-all duration-300 ${
+                    speakingIngredientIndex === index
+                      ? "bg-accent/20 border-accent ring-2 ring-accent/30 text-accent-foreground font-semibold shadow-md"
+                      : "bg-primary/5 border-primary/15 text-foreground"
+                  }`}
+                >
+                  {ingredient}
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Tablet+: always wrapping grid */}
           <div className="hidden md:flex flex-wrap gap-2 px-8 lg:px-12 pb-4">
             {ingredients.map((ingredient, index) => (
               <div
