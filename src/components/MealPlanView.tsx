@@ -218,6 +218,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
 
   const handleMealClick = (meal: any) => {
     setSelectedMeal(meal);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleBackFromMeal = () => {
