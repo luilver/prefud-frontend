@@ -22,8 +22,10 @@ interface CookingModeProps {
 const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModeProps) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speakingStepIndex, setSpeakingStepIndex] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState<"ingredients" | "steps">("ingredients");
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { t } = useLanguage();
 
   // Request wake lock on mount
@@ -66,19 +68,21 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
     );
   };
 
-  const speak = useCallback((text: string) => {
+  const speak = useCallback((text: string, stepIndex?: number) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+    utterance.onend = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
+    utterance.onerror = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
     setIsSpeaking(true);
+    setSpeakingStepIndex(stepIndex ?? null);
     window.speechSynthesis.speak(utterance);
   }, []);
 
   const stopSpeaking = useCallback(() => {
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
+    setSpeakingStepIndex(null);
   }, []);
 
   const speakIngredients = () => {
@@ -87,14 +91,35 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
   };
 
   const speakStep = (index: number) => {
-    speak(`${t("cookingMode.step") || "Step"} ${index + 1}. ${instructions[index].text}`);
+    speak(`${t("cookingMode.step") || "Step"} ${index + 1}. ${instructions[index].text}`, index);
+    stepRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   const speakAllSteps = () => {
-    const text = instructions
-      .map((inst, i) => `${t("cookingMode.step") || "Step"} ${i + 1}. ${inst.text}`)
-      .join(". ");
-    speak(text);
+    // Speak steps one by one with visual tracking
+    let currentIdx = 0;
+    const speakNext = () => {
+      if (currentIdx >= instructions.length) {
+        setIsSpeaking(false);
+        setSpeakingStepIndex(null);
+        return;
+      }
+      const idx = currentIdx;
+      const text = `${t("cookingMode.step") || "Step"} ${idx + 1}. ${instructions[idx].text}`;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.onend = () => {
+        currentIdx++;
+        speakNext();
+      };
+      utterance.onerror = () => { setIsSpeaking(false); setSpeakingStepIndex(null); };
+      setSpeakingStepIndex(idx);
+      stepRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.speechSynthesis.speak(utterance);
+    };
+    window.speechSynthesis.cancel();
+    setIsSpeaking(true);
+    speakNext();
   };
 
   const progress = instructions.length > 0
@@ -228,25 +253,31 @@ const CookingMode = ({ meal, ingredients, instructions, onClose }: CookingModePr
           <div className="px-4 md:px-8 lg:px-12 pb-4 space-y-2.5 md:space-y-3">
             {instructions.map((instruction, index) => {
               const isCompleted = completedSteps.includes(index);
+              const isSpeakingThis = speakingStepIndex === index;
               return (
                 <div
                   key={index}
+                  ref={(el) => { stepRefs.current[index] = el; }}
                   onClick={() => toggleStep(index)}
-                  className={`relative p-3.5 md:p-4 lg:p-5 rounded-xl border transition-all duration-300 cursor-pointer active:scale-[0.98] ${
-                    isCompleted
-                      ? "bg-primary/5 border-primary/30"
-                      : "bg-card border-border hover:border-primary/20 hover:shadow-sm"
+                  className={`relative p-3.5 md:p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer active:scale-[0.98] ${
+                    isSpeakingThis
+                      ? "bg-accent/20 border-accent ring-2 ring-accent/30 shadow-md"
+                      : isCompleted
+                        ? "bg-primary/5 border-primary/30"
+                        : "bg-card border-border hover:border-primary/20 hover:shadow-sm"
                   }`}
                 >
                   <div className="flex items-start gap-3 md:gap-4">
                     <div
                       className={`w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center text-xs md:text-sm font-bold flex-shrink-0 transition-all mt-0.5 ${
-                        isCompleted
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "bg-muted text-muted-foreground"
+                        isSpeakingThis
+                          ? "bg-accent text-accent-foreground shadow-md animate-pulse"
+                          : isCompleted
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "bg-muted text-muted-foreground"
                       }`}
                     >
-                      {isCompleted ? <Check className="h-3.5 w-3.5 md:h-4 md:w-4" /> : index + 1}
+                      {isCompleted ? <Check className="h-3.5 w-3.5 md:h-4 md:w-4" /> : isSpeakingThis ? <Volume2 className="h-3.5 w-3.5 md:h-4 md:w-4" /> : index + 1}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
