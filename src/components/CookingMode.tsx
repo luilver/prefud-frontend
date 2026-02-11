@@ -167,41 +167,52 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
   };
 
   const speakAllSteps = useCallback(async () => {
-    speakingCancelledRef.current = false;
-    await ttsStop();
-    setIsSpeaking(true);
+  speakingCancelledRef.current = false;
+  await ttsStop();
+  setIsSpeaking(true);
 
-    let currentIdx = 0;
-    const speakNext = async () => {
-      if (speakingCancelledRef.current) return;
-      if (currentIdx >= instructions.length) {
-        if (loopStepsRef.current && !speakingCancelledRef.current) {
-          currentIdx = 0;
-          await speakNext();
-          return;
-        }
+  // CRITICAL: We use a local variable to track progress to avoid stale state issues
+  let currentIdx = 0;
+
+  const speakNext = async () => {
+    // 1. Check if user pressed "Stop"
+    if (speakingCancelledRef.current) {
+      setSpeakingStepIndex(null);
+      setIsSpeaking(false);
+      return;
+    }
+
+    // 2. Check if we reached the end
+    if (currentIdx >= instructions.length) {
+      if (loopStepsRef.current) {
+        currentIdx = 0;
+        await speakNext();
+      } else {
         setIsSpeaking(false);
         setSpeakingStepIndex(null);
-        return;
       }
-      const idx = currentIdx;
-      const text = `${t("cookingMode.step") || "Step"} ${idx + 1}. ${instructions[idx].text}`;
-      setSpeakingStepIndex(idx);
-      stepRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
-      try {
-        await ttsSpeak(text, speechLang, 0.9);
-      } catch {
-        setIsSpeaking(false);
-        setSpeakingStepIndex(null);
-        return;
-      }
-      if (speakingCancelledRef.current) return;
-      currentIdx++;
-      await speakNext();
-    };
+      return;
+    }
 
+    // 3. Highlight and Scroll
+    const idx = currentIdx;
+    setSpeakingStepIndex(idx);
+    stepRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // 4. Speak (The service now has a 10s safety timeout)
+    const textToSay = `${t("cookingMode.step") || "Step"} ${idx + 1}. ${instructions[idx].text}`;
+    await ttsSpeak(textToSay, speechLang, 0.9);
+
+    // 5. Short delay between steps for natural feeling
+    await new Promise(r => setTimeout(r, 600));
+
+    // 6. Move to next
+    currentIdx++;
     await speakNext();
-  }, [instructions, t, speechLang]);
+  };
+
+  await speakNext();
+}, [instructions, t, speechLang]);
 
   const progress = instructions.length > 0
     ? Math.round((completedSteps.length / instructions.length) * 100)
