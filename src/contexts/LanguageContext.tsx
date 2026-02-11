@@ -278,6 +278,20 @@ const translations = {
     "profile.cancelSubscription": "Cancel Subscription",
     "profile.subscriptionDesc": "Your current plan usage and limits",
 
+    // Delete Account
+    "profile.deleteAccount.section": "Danger Zone",
+    "profile.deleteAccount.sectionDesc": "Permanently delete your account and all data",
+    "profile.deleteAccount.button": "Delete Account",
+    "profile.deleteAccount.title": "Delete Account",
+    "profile.deleteAccount.description": "This action is permanent and cannot be undone.",
+    "profile.deleteAccount.warningTitle": "By deleting your account:",
+    "profile.deleteAccount.cancelSub": "Your active subscription will be cancelled immediately",
+    "profile.deleteAccount.deleteData": "All your personal data, meal plans, and recipes will be permanently deleted",
+    "profile.deleteAccount.noRecovery": "You will not be able to recover your account or data",
+    "profile.deleteAccount.goBack": "Go Back",
+    "profile.deleteAccount.confirm": "Delete My Account",
+    "profile.deleteAccount.deleting": "Deleting...",
+
     // Meal Planner
     "mealPlanner.title": "Meal Planner",
     "mealPlanner.description": "Create and manage your weekly meal plans",
@@ -2081,6 +2095,20 @@ const translations = {
     "profile.active": "Activo",
     "profile.cancelSubscription": "Cancelar suscripción",
     "profile.subscriptionDesc": "Límites y uso de su plan actual",
+
+    // Delete Account
+    "profile.deleteAccount.section": "Zona de Peligro",
+    "profile.deleteAccount.sectionDesc": "Eliminar permanentemente tu cuenta y todos tus datos",
+    "profile.deleteAccount.button": "Eliminar Cuenta",
+    "profile.deleteAccount.title": "Eliminar Cuenta",
+    "profile.deleteAccount.description": "Esta acción es permanente y no se puede deshacer.",
+    "profile.deleteAccount.warningTitle": "Al eliminar tu cuenta:",
+    "profile.deleteAccount.cancelSub": "Tu suscripción activa se cancelará inmediatamente",
+    "profile.deleteAccount.deleteData": "Todos tus datos personales, planes de comida y recetas serán eliminados permanentemente",
+    "profile.deleteAccount.noRecovery": "No podrás recuperar tu cuenta ni tus datos",
+    "profile.deleteAccount.goBack": "Volver",
+    "profile.deleteAccount.confirm": "Eliminar Mi Cuenta",
+    "profile.deleteAccount.deleting": "Eliminando...",
 
     // Meal Planner
     "mealPlanner.title": "Planificador de Comidas",
@@ -3934,6 +3962,20 @@ const translations = {
     "profile.active": "Ativo",
     "profile.cancelSubscription": "Cancelar Assinatura",
     "profile.subscriptionDesc": "Limites e uso do seu plano atual",
+
+    // Delete Account
+    "profile.deleteAccount.section": "Zona de Perigo",
+    "profile.deleteAccount.sectionDesc": "Excluir permanentemente sua conta e todos os dados",
+    "profile.deleteAccount.button": "Excluir Conta",
+    "profile.deleteAccount.title": "Excluir Conta",
+    "profile.deleteAccount.description": "Esta ação é permanente e não pode ser desfeita.",
+    "profile.deleteAccount.warningTitle": "Ao excluir sua conta:",
+    "profile.deleteAccount.cancelSub": "Sua assinatura ativa será cancelada imediatamente",
+    "profile.deleteAccount.deleteData": "Todos os seus dados pessoais, planos de refeição e receitas serão excluídos permanentemente",
+    "profile.deleteAccount.noRecovery": "Você não poderá recuperar sua conta ou dados",
+    "profile.deleteAccount.goBack": "Voltar",
+    "profile.deleteAccount.confirm": "Excluir Minha Conta",
+    "profile.deleteAccount.deleting": "Excluindo...",
 
     // Meal Planner
     "mealPlanner.title": "Planejador de Refeições",
