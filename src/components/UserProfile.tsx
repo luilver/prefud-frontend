@@ -49,6 +49,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PasswordUpdate from "./PasswordUpdate";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
+import DeleteAccountModal from "./DeleteAccountModal";
 import { authService } from "@/services/authService";
 import axios from "axios";
 
@@ -122,6 +123,8 @@ const UserProfile = () => {
   const [currentSubscriptionInfo, setCurrentSubscriptionInfo] = 
     useState<CurrentSubscriptionInfo | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -229,9 +232,22 @@ const UserProfile = () => {
   };
 
   const handleCancelSubscription = () => {
-    // Simulate switching to free plan
     setCurrentSubscriptionName("Free");
     setShowCancelModal(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      // TODO: Call actual delete account API
+      // await authService.deleteAccount(authUser?.userId);
+      logout();
+    } catch (error) {
+      console.error("Error deleting account:", error);
+    } finally {
+      setIsDeletingAccount(false);
+      setShowDeleteAccountModal(false);
+    }
   };
 
   const getLanguageDisplay = (langCode?: string) => {
@@ -820,6 +836,30 @@ const UserProfile = () => {
         {/* Password Update Section */}
         <PasswordUpdate />
 
+        {/* Delete Account Section */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-red-600">
+                  {t("profile.deleteAccount.section") || "Danger Zone"}
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {t("profile.deleteAccount.sectionDesc") || "Permanently delete your account and all data"}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteAccountModal(true)}
+                className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+              >
+                {t("profile.deleteAccount.button") || "Delete Account"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Cancel Subscription Modal */}
         <SubscriptionCancelModal
           isOpen={showCancelModal}
@@ -827,6 +867,14 @@ const UserProfile = () => {
           onConfirm={handleCancelSubscription}
           currentPlan={currentSubscriptionName}
           userId={authUser?.userId || ""}
+        />
+
+        {/* Delete Account Modal */}
+        <DeleteAccountModal
+          isOpen={showDeleteAccountModal}
+          onClose={() => setShowDeleteAccountModal(false)}
+          onConfirm={handleDeleteAccount}
+          isProcessing={isDeletingAccount}
         />
       </div>
     </div>
