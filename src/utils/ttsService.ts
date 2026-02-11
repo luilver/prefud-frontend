@@ -7,13 +7,21 @@ import { Capacitor } from "@capacitor/core";
  */
 
 let nativeTTS: any = null;
+let nativeLoadFailed = false;
 
 const isNative = () => Capacitor.isNativePlatform();
 
 const getNativeTTS = async () => {
+  if (nativeLoadFailed) return null;
   if (!nativeTTS) {
-    const mod = await import("@capacitor-community/text-to-speech");
-    nativeTTS = mod.TextToSpeech;
+    try {
+      const mod = await import("@capacitor-community/text-to-speech");
+      nativeTTS = mod.TextToSpeech;
+    } catch (err) {
+      console.error("[TTS] Failed to load native TTS plugin:", err);
+      nativeLoadFailed = true;
+      return null;
+    }
   }
   return nativeTTS;
 };
@@ -21,7 +29,7 @@ const getNativeTTS = async () => {
 /**
  * Speak text. Returns a promise that resolves when speech finishes.
  * On native: uses Capacitor plugin (reliable onend via Promise).
- * On web: wraps speechSynthesis in a Promise.
+ * On web: wraps speechSynthesis in a Promise with iOS workaround.
  */
 export const speak = async (
   text: string,
@@ -30,18 +38,72 @@ export const speak = async (
 ): Promise<void> => {
   if (isNative()) {
     const TTS = await getNativeTTS();
-    await TTS.speak({ text, lang, rate, pitch: 1.0, volume: 1.0, category: "ambient" });
-  } else {
-    return new Promise<void>((resolve, reject) => {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      utterance.rate = rate;
-      utterance.onend = () => resolve();
-      utterance.onerror = (e) => reject(e);
-      window.speechSynthesis.speak(utterance);
-    });
+    if (TTS) {
+      try {
+        await TTS.speak({ text, lang, rate, pitch: 1.0, volume: 1.0, category: "ambient" });
+        return;
+      } catch (err) {
+        console.error("[TTS] Native speak failed, falling back to web:", err);
+        // Fall through to web fallback
+      }
+    }
   }
+
+  // Web fallback (also used if native fails)
+  return new Promise<void>((resolve, reject) => {
+    if (!window.speechSynthesis) {
+      console.warn("[TTS] speechSynthesis not available");
+      resolve();
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = rate;
+
+    // iOS Safari workaround: onend sometimes doesn't fire.
+    // Use a polling fallback to detect when speech has finished.
+    let resolved = false;
+    const done = () => {
+      if (resolved) return;
+      resolved = true;
+      clearInterval(iosCheckInterval);
+      resolve();
+    };
+
+    utterance.onend = done;
+    utterance.onerror = (e) => {
+      if (resolved) return;
+      resolved = true;
+      clearInterval(iosCheckInterval);
+      // Don't reject for 'interrupted' errors (happens when we cancel)
+      if (e.error === "interrupted" || e.error === "canceled") {
+        resolve();
+      } else {
+        reject(e);
+      }
+    };
+
+    window.speechSynthesis.speak(utterance);
+
+    // iOS Safari fix: poll to detect when speech finishes since onend is unreliable
+    const iosCheckInterval = setInterval(() => {
+      if (!window.speechSynthesis.speaking && !resolved) {
+        done();
+      }
+    }, 250);
+
+    // Safety timeout: resolve after estimated duration to prevent hanging
+    const estimatedDuration = Math.max(5000, text.length * 80);
+    setTimeout(() => {
+      if (!resolved) {
+        console.warn("[TTS] Safety timeout reached, resolving");
+        done();
+      }
+    }, estimatedDuration);
+  });
 };
 
 /**
@@ -51,11 +113,15 @@ export const stopSpeaking = async (): Promise<void> => {
   if (isNative()) {
     try {
       const TTS = await getNativeTTS();
-      await TTS.stop();
+      if (TTS) {
+        await TTS.stop();
+        return;
+      }
     } catch {
-      // ignore if nothing is playing
+      // ignore
     }
-  } else {
+  }
+  if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }
 };
