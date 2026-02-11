@@ -1,13 +1,8 @@
 import { Capacitor } from "@capacitor/core";
 
-/**
- * Cross-platform TTS service.
- * Uses @capacitor-community/text-to-speech on native (iOS/Android),
- * falls back to Web Speech API on web.
- */
-
 let nativeTTS: any = null;
 let nativeLoadFailed = false;
+let activeUtterance: SpeechSynthesisUtterance | null = null;
 
 const isNative = () => Capacitor.isNativePlatform();
 
@@ -17,111 +12,82 @@ const getNativeTTS = async () => {
     try {
       const mod = await import("@capacitor-community/text-to-speech");
       nativeTTS = mod.TextToSpeech;
+      
     } catch (err) {
-      console.error("[TTS] Failed to load native TTS plugin:", err);
       nativeLoadFailed = true;
+      console.log('error loading native ', err);
       return null;
     }
   }
   return nativeTTS;
 };
 
-/**
- * Speak text. Returns a promise that resolves when speech finishes.
- * On native: uses Capacitor plugin (reliable onend via Promise).
- * On web: wraps speechSynthesis in a Promise with iOS workaround.
- */
-export const speak = async (
-  text: string,
-  lang: string = "en-US",
-  rate: number = 0.9
-): Promise<void> => {
+export const speak = async (text: string, lang: string = "en-US", rate: number = 0.9): Promise<void> => {
   if (isNative()) {
     const TTS = await getNativeTTS();
     if (TTS) {
-      try {
-        await TTS.speak({ text, lang, rate, pitch: 1.0, volume: 1.0, category: "ambient" });
-        return;
-      } catch (err) {
-        console.error("[TTS] Native speak failed, falling back to web:", err);
-        // Fall through to web fallback
-      }
+      return new Promise(async (resolve) => {
+        // Safety: If native engine hangs for more than 10s, move on
+        const timer = setTimeout(() => {
+          console.warn("[TTS] Native call timed out");
+          resolve();
+        }, 10000);
+
+        try {
+          await TTS.speak({
+            text,
+            lang,
+            rate,
+            pitch: 1.0,
+            volume: 1.0,
+            category: "playback", // playback allows audio even on silent mode
+          });
+        } catch (err) {
+          console.error("[TTS] Native speak error:", err);
+        } finally {
+          clearTimeout(timer);
+          resolve();
+        }
+      });
     }
   }
 
-  // Web fallback (also used if native fails)
-  return new Promise<void>((resolve, reject) => {
-    if (!window.speechSynthesis) {
-      console.warn("[TTS] speechSynthesis not available");
-      resolve();
-      return;
-    }
-
+  // WEB FALLBACK
+  return new Promise<void>((resolve) => {
+    if (!window.speechSynthesis) return resolve();
     window.speechSynthesis.cancel();
+    activeUtterance = new SpeechSynthesisUtterance(text);
+    activeUtterance.lang = lang;
+    activeUtterance.rate = rate;
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = rate;
-
-    // iOS Safari workaround: onend sometimes doesn't fire.
-    // Use a polling fallback to detect when speech has finished.
     let resolved = false;
     const done = () => {
       if (resolved) return;
       resolved = true;
-      clearInterval(iosCheckInterval);
+      activeUtterance = null;
       resolve();
     };
 
-    utterance.onend = done;
-    utterance.onerror = (e) => {
-      if (resolved) return;
-      resolved = true;
-      clearInterval(iosCheckInterval);
-      // Don't reject for 'interrupted' errors (happens when we cancel)
-      if (e.error === "interrupted" || e.error === "canceled") {
-        resolve();
-      } else {
-        reject(e);
-      }
-    };
-
-    window.speechSynthesis.speak(utterance);
-
-    // iOS Safari fix: poll to detect when speech finishes since onend is unreliable
-    const iosCheckInterval = setInterval(() => {
+    activeUtterance.onend = done;
+    activeUtterance.onerror = done;
+    window.speechSynthesis.speak(activeUtterance);
+    
+    // iOS WebKit fix: poll if speaking stopped
+    const check = setInterval(() => {
       if (!window.speechSynthesis.speaking && !resolved) {
+        clearInterval(check);
         done();
       }
     }, 250);
-
-    // Safety timeout: resolve after estimated duration to prevent hanging
-    const estimatedDuration = Math.max(5000, text.length * 80);
-    setTimeout(() => {
-      if (!resolved) {
-        console.warn("[TTS] Safety timeout reached, resolving");
-        done();
-      }
-    }, estimatedDuration);
+    setTimeout(done, 10000);
   });
 };
 
-/**
- * Stop any ongoing speech.
- */
 export const stopSpeaking = async (): Promise<void> => {
   if (isNative()) {
-    try {
-      const TTS = await getNativeTTS();
-      if (TTS) {
-        await TTS.stop();
-        return;
-      }
-    } catch {
-      // ignore
-    }
+    const TTS = await getNativeTTS();
+    try { await TTS?.stop(); } catch (e) {}
   }
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  activeUtterance = null;
 };

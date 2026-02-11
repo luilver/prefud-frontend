@@ -93,20 +93,28 @@ const CookingMode = ({ meal, ingredients, instructions, onClose, onMarkAsCooked,
   };
 
   const speak = useCallback(async (text: string, stepIndex?: number) => {
-    await ttsStop();
-    setIsSpeaking(true);
-    setSpeakingStepIndex(stepIndex ?? null);
-    try {
-      await ttsSpeak(text, speechLang, 0.9);
-    } catch {
-      // speech error or cancelled
-    } finally {
-      if (!speakingCancelledRef.current) {
-        setIsSpeaking(false);
-        setSpeakingStepIndex(null);
-      }
+  // Ensure the previous session is FULLY stopped before starting
+  await ttsStop(); 
+  
+  speakingCancelledRef.current = false; // Reset the cancel ref
+  setIsSpeaking(true);
+  setSpeakingStepIndex(stepIndex ?? null);
+
+  try {
+    // Small delay helps the native engine context switch
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    await ttsSpeak(text, speechLang, 0.9);
+  } catch (err) {
+    console.error("TTS Error:", err);
+  } finally {
+    // Only update UI if we weren't manually interrupted
+    if (!speakingCancelledRef.current) {
+      setIsSpeaking(false);
+      setSpeakingStepIndex(null);
     }
-  }, [speechLang]);
+  }
+}, [speechLang]);
 
   const stopSpeaking = useCallback(() => {
     speakingCancelledRef.current = true;
