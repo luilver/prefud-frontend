@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { initializeRevenueCat, identifyUser, isNativePlatform } from "@/services/revenueCatService";
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
 import SignIn from "@/pages/SignIn";
@@ -22,7 +23,21 @@ import NotFound from "@/pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { isLoading } = useAuth();
+  const { isLoading, user } = useAuth();
+
+  // Initialize RevenueCat on native platforms
+  useEffect(() => {
+    if (isNativePlatform()) {
+      initializeRevenueCat().catch(console.error);
+    }
+  }, []);
+
+  // Identify user in RevenueCat after login
+  useEffect(() => {
+    if (isNativePlatform() && user?.userId) {
+      identifyUser(user.userId).catch(console.error);
+    }
+  }, [user?.userId]);
 
   if (isLoading) {
     return (

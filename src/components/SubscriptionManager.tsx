@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star, XCircle } from "lucide-react";
+import { Check, Crown, Star, XCircle, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { getAllSubscriptionTypes, ApiSubscriptionType } from "@/services/payments";
+import { getAllSubscriptionTypes, ApiSubscriptionType, subscribeUser } from "@/services/payments";
 import PaymentForm from "./PaymentForm";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import PaymentMethodModal from "./PaymentMethodModal";
 import SubscriptionSuccessModal from "./SubscriptionSuccessModal";
 import { trackEvent } from "@/services/analytics";
+import {
+  isNativePlatform,
+  getOfferings,
+  purchasePackage,
+  restorePurchases,
+  getRevenueCatProductId,
+  getBackendSubscriptionTypeId,
+} from "@/services/revenueCatService";
+import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 
 interface SubscriptionPlan {
   id: string;
@@ -36,8 +45,11 @@ const SubscriptionManager = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isNativePurchasing, setIsNativePurchasing] = useState(false);
+  const [rcPackages, setRcPackages] = useState<PurchasesPackage[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, updateSubscription } = useAuth();
+  const isNative = isNativePlatform();
 
   // Convert API subscription types to UI subscription plans
   const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
@@ -109,6 +121,13 @@ const SubscriptionManager = () => {
         // Also set the current subscription name based on the loaded plans
         const matched = convertedPlans.find(p => p.id === userSubId);
         setCurrentSubscriptionName(matched ? matched.name : "Free");
+
+        // Fetch RevenueCat offerings on native
+        if (isNative) {
+          const packages = await getOfferings();
+          setRcPackages(packages);
+          console.log("[SubscriptionManager] RevenueCat packages:", packages);
+        }
       } catch (error) {
         console.error('Error fetching subscription types:', error);
         toast({
@@ -122,9 +141,9 @@ const SubscriptionManager = () => {
     };
 
     fetchSubscriptionTypes();
-  }, [toast, user?.subscription?.subscriptionTypeId]);
+  }, [toast, user?.subscription?.subscriptionTypeId, isNative]);
 
-  const handleSelectPlan = (plan: SubscriptionPlan) => {
+  const handleSelectPlan = async (plan: SubscriptionPlan) => {
     if (plan.id === currentSubscriptionId) return;
     
     setSelectedPlan(plan);
@@ -133,12 +152,106 @@ const SubscriptionManager = () => {
       if (currentSubscriptionId && currentSubscriptionId !== "") {
         setShowCancelModal(true);
       } else {
-        // Already on free plan or no subscription
         handleSubscriptionSuccess();
       }
+    } else if (isNative) {
+      // Native platform → use RevenueCat IAP
+      await handleNativePurchase(plan);
     } else {
-      // Paid plan - show payment modal
+      // Web → use Stripe payment modal
       setShowPaymentModal(true);
+    }
+  };
+
+  /**
+   * Handle native in-app purchase via RevenueCat
+   */
+  const handleNativePurchase = async (plan: SubscriptionPlan) => {
+    const rcProductId = getRevenueCatProductId(plan.id);
+    if (!rcProductId) {
+      toast({
+        title: "Error",
+        description: "This plan is not available for in-app purchase.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Find matching RC package
+    const matchingPackage = rcPackages.find(
+      (pkg) => pkg.product.identifier === rcProductId
+    );
+
+    if (!matchingPackage) {
+      toast({
+        title: "Product Not Found",
+        description: "This subscription product is not available yet. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsNativePurchasing(true);
+    trackEvent('button_click', {
+      button_name: 'native_iap_purchase',
+      screen: 'subscription_manager',
+      plan_name: plan.name,
+    });
+
+    try {
+      const result = await purchasePackage(matchingPackage);
+      
+      if (result.success) {
+        // Persist subscription in your backend
+        const backendResult = await subscribeUser(
+          user?.userId || "",
+          plan.id,
+          `rc_${matchingPackage.product.identifier}`
+        );
+        
+        updateSubscription(backendResult.return);
+        setCurrentSubscriptionId(plan.id);
+        setCurrentSubscriptionName(plan.name);
+        setShowSuccessModal(true);
+
+        toast({
+          title: "Subscription Successful!",
+          description: `Welcome to ${plan.name}! Your subscription is now active.`,
+        });
+      } else if (result.error === 'cancelled') {
+        // User cancelled — do nothing
+      } else {
+        toast({
+          title: "Purchase Failed",
+          description: result.error || "There was an error processing your purchase.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('[SubscriptionManager] Native purchase error:', error);
+      toast({
+        title: "Purchase Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsNativePurchasing(false);
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    const result = await restorePurchases();
+    if (result.success) {
+      toast({
+        title: "Purchases Restored",
+        description: "Your previous purchases have been restored.",
+      });
+    } else {
+      toast({
+        title: "Restore Failed",
+        description: result.error || "Could not restore purchases.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -314,15 +427,31 @@ const SubscriptionManager = () => {
                       ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600'
                       : 'bg-gray-800 hover:bg-gray-700'
                   }`}
-                  disabled={isCurrentPlan}
+                  disabled={isCurrentPlan || isNativePurchasing}
                 >
-                  {isCurrentPlan ? 'Current Plan' : `Get ${plan.name}`}
+                  {isNativePurchasing && selectedPlan?.id === plan.id
+                    ? 'Processing...'
+                    : isCurrentPlan ? 'Current Plan' : `Get ${plan.name}`}
                 </Button>
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      {/* Restore Purchases button for native platforms */}
+      {isNative && (
+        <div className="text-center pt-4">
+          <Button
+            variant="outline"
+            onClick={handleRestorePurchases}
+            className="mx-auto"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Restore Purchases
+          </Button>
+        </div>
+      )}
 
       <div className="text-center space-y-4 pt-8 border-t">
         <h3 className="text-lg font-semibold text-gray-800">All plans include:</h3>
