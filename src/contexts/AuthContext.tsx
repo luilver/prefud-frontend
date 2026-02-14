@@ -217,7 +217,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     // Optional: Clear any other session-related data if needed in the future
     // This ensures complete cleanup without affecting other app data
-    const keysToRemove = ['authUser', 'authToken'];
+    const keysToRemove = ['authUser', 'authToken', 'userSubscription'];
     keysToRemove.forEach(key => {
       if (localStorage.getItem(key)) {
         localStorage.removeItem(key);
