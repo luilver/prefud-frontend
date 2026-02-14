@@ -21,7 +21,6 @@ import {
   Smile,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { useAuth } from "@/contexts/AuthContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
@@ -60,15 +59,13 @@ const MealPlanner = () => {
   } = useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const { isAuthenticated: authIsAuthenticated } = useAuth();
 
   // Load meal plans when component mounts, page changes, or page size changes
-  // Only fetch if user is actually authenticated (not just restored from localStorage)
   useEffect(() => {
-    if (authIsAuthenticated && user?.id && !showCreator && !selectedMealPlan) {
+    if (user?.id && !showCreator && !selectedMealPlan) {
       loadMealPlans(currentPage, pageSize);
     }
-  }, [authIsAuthenticated, user?.id, currentPage, pageSize, showCreator, selectedMealPlan]);
+  }, [user?.id, currentPage, pageSize, showCreator, selectedMealPlan]);
 
   const loadMealPlans = async (page: number, limit: number) => {
     if (!user?.id) return;
