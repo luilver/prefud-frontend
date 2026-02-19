@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Dashboard from "@/components/Dashboard";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
@@ -23,6 +24,7 @@ import { trackEvent } from "@/services/analytics";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
+  const { isLoading: isAuthLoading } = useAuth();
   const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -33,13 +35,14 @@ const Index = () => {
     }
   }, [isAuthenticated, checkSubscription]);
 
-  // Redirect mobile users to login if not authenticated
+  // Redirect mobile users to login if not authenticated (only after auth loading completes)
   useEffect(() => {
+    if (isAuthLoading) return;
     const isMobile = window.innerWidth <= 768;
     if (isMobile && !isAuthenticated) {
       navigate("/signin");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isAuthLoading, navigate]);
 
   // If user is authenticated, show the full dashboard
   if (isAuthenticated) {
