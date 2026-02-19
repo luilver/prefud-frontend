@@ -147,7 +147,7 @@ const SubscriptionManager = () => {
 
   const handleSelectPlan = async (plan: SubscriptionPlan) => {
     if (plan.id === currentSubscriptionId) return;
-    
+    console.log('selected plan during selection ', plan)
     setSelectedPlan(plan);
     if (plan.price === 0) {
       // Free plan - show confirmation modal if user has an active subscription
@@ -158,6 +158,7 @@ const SubscriptionManager = () => {
       }
     } else if (isNative) {
       // Native platform → use RevenueCat IAP
+      console.log('native behavior!!!')
       await handleNativePurchase(plan);
     } else {
       // Web → use Stripe payment modal
@@ -169,7 +170,9 @@ const SubscriptionManager = () => {
    * Handle native in-app purchase via RevenueCat
    */
   const handleNativePurchase = async (plan: SubscriptionPlan) => {
+    console.log('handle native log plan selected', plan)
     const rcProductId = getRevenueCatProductId(plan.id);
+    console.log('rcPRODUCTID ', rcProductId);
     if (!rcProductId) {
       toast({
         title: "Error",
