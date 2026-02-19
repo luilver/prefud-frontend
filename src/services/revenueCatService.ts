@@ -1,8 +1,10 @@
 import { Capacitor } from '@capacitor/core';
 import { Purchases, LOG_LEVEL, PURCHASES_ERROR_CODE, type PurchasesPackage, type CustomerInfo } from '@revenuecat/purchases-capacitor';
 
-// RevenueCat API keys
-const REVENUECAT_API_KEY = 'test_KFZibtSrGczqQOdxuSEcAsJuwLb';
+// RevenueCat API keys test
+//const REVENUECAT_API_KEY = 'test_KFZibtSrGczqQOdxuSEcAsJuwLb';
+// RevenueCat API keys production (uncomment when ready to switch to production)
+const REVENUECAT_API_KEY = import.meta.env.VITE_REVENUECAT_API_KEY || 'test_KFZibtSrGczqQOdxuSEcAsJuwLb';
 
 // RevenueCat product IDs mapped to your backend subscription type IDs
 export const RC_PRODUCT_MAP: Record<string, string> = {
@@ -83,8 +85,10 @@ export const getOfferings = async (): Promise<PurchasesPackage[]> => {
   if (!isNativePlatform() || !isInitialized) return [];
 
   try {
+    
     const offerings = await Purchases.getOfferings();
     console.log('[RevenueCat] Offerings:', offerings);
+
 
     if (offerings.current && offerings.current.availablePackages.length > 0) {
       return offerings.current.availablePackages;
@@ -108,6 +112,7 @@ export const purchasePackage = async (
   }
 
   try {
+    console.log('REVENUECAT this is the pkg to buy ', pkg)
     const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg });
     console.log('[RevenueCat] Purchase successful:', customerInfo);
     return { success: true, customerInfo };

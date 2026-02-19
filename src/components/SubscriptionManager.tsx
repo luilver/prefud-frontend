@@ -110,6 +110,7 @@ const SubscriptionManager = () => {
       try {
         setIsLoading(true);
         const apiPlans = await getAllSubscriptionTypes();
+        console.log('this are the subscription plans ', apiPlans);
         const convertedPlans = convertApiToPlans(apiPlans);
         setPlans(convertedPlans);
 
@@ -125,6 +126,7 @@ const SubscriptionManager = () => {
         // Fetch RevenueCat offerings on native
         if (isNative) {
           const packages = await getOfferings();
+  
           setRcPackages(packages);
           console.log("[SubscriptionManager] RevenueCat packages:", packages);
         }
