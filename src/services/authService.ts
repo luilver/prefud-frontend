@@ -121,16 +121,26 @@ class AuthService {
         body: JSON.stringify({ email, password })
       });
 
+      const responseData = await response.json();
+
+      // Check for ACCOUNT_INCOMPLETE before any other handling
+      if (responseData.code === 'ACCOUNT_INCOMPLETE') {
+        const error = new Error(responseData.message || 'Account incomplete');
+        (error as any).code = 'ACCOUNT_INCOMPLETE';
+        (error as any).email = email; // Use the email from the form since response may have empty email
+        (error as any).userId = responseData.userId; // May or may not be present
+        throw error;
+      }
+
       if (!response.ok) {
-        const errorData: ApiErrorResponse = await response.json();
         // Handle both array and string error messages
-        const errorMessage = Array.isArray(errorData.message.message) 
-          ? errorData.message.message[0] 
-          : errorData.message.message;
+        const errorMessage = Array.isArray(responseData.message?.message) 
+          ? responseData.message.message[0] 
+          : responseData.message?.message || responseData.message;
         throw new Error(errorMessage);
       }
 
-      const loginData: LoginResponse = await response.json();
+      const loginData: LoginResponse = responseData;
       
       // Fetch user profile after successful login
       const profile = await this.getProfile(loginData.userId);

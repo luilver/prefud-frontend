@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -72,10 +73,15 @@ const BasicURL =
   import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
 
 const SignupSteps = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const location = useLocation();
+  const incompleteState = location.state as { accountIncomplete?: boolean; email?: string; userId?: string } | null;
+  const isAccountIncomplete = incompleteState?.accountIncomplete === true;
+
+  const [currentStep, setCurrentStep] = useState(isAccountIncomplete ? 2 : 1);
   const [signupData, setSignupData] = useState<SignupData>({
-    email: "",
+    email: incompleteState?.email || "",
     password: "",
+    userId: incompleteState?.userId || undefined,
     wantsSubscription: false,
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -107,6 +113,18 @@ const SignupSteps = () => {
     setIsLoading(true);
 
     try {
+      if (isAccountIncomplete) {
+        // For incomplete accounts: account already exists, just store password and proceed to profile
+        console.log("Incomplete account flow: storing password and proceeding to profile");
+        toast({
+          title: "✅ Password Confirmed!",
+          description: "Continue to complete your profile.",
+          duration: 5000,
+        });
+        setCurrentStep(3);
+        return;
+      }
+
       console.log("Sending signup request to API:", signupData.email);
 
       const requestData = {
@@ -126,7 +144,6 @@ const SignupSteps = () => {
       const response = await axios.request(config);
       console.log("Signup API response:", response.data);
 
-      // Check if response indicates success with the correct structure
       if (
         response.data.message &&
         response.data.message.includes("OTP code has been sent") &&
@@ -139,7 +156,6 @@ const SignupSteps = () => {
           duration: 5000,
         });
 
-        // Store userId for OTP verification
         setSignupData((prev) => ({
           ...prev,
           userId: response.data.response.userId,
@@ -152,14 +168,12 @@ const SignupSteps = () => {
     } catch (error: any) {
       console.error("Signup failed:", error);
 
-      // Handle API error responses
       if (error.response?.data?.message) {
         const errorMessage =
           typeof error.response.data.message === "string"
             ? error.response.data.message
             : error.response.data.message.message || "Signup failed";
 
-        console.log("Showing error toast with message:", errorMessage);
         toast({
           title: "❌ Signup Failed",
           description: errorMessage,
@@ -167,7 +181,6 @@ const SignupSteps = () => {
           duration: 5000,
         });
       } else {
-        console.log("Showing generic error toast");
         toast({
           title: "❌ Signup Failed",
           description: "Unable to create account. Please try again.",
@@ -182,7 +195,12 @@ const SignupSteps = () => {
 
   const handleOTPVerified = () => {
     console.log("OTP verified successfully");
-    setCurrentStep(3);
+    if (isAccountIncomplete) {
+      // For incomplete accounts: after OTP, go to step 1 to ask for password
+      setCurrentStep(1);
+    } else {
+      setCurrentStep(3);
+    }
   };
 
   const handleProfileComplete = (profileData: any) => {
@@ -452,7 +470,8 @@ const SignupSteps = () => {
                         }))
                       }
                       required
-                      className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background"
+                      disabled={isAccountIncomplete}
+                      className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background disabled:opacity-70 disabled:cursor-not-allowed"
                       placeholder={t("signup.emailPlaceholder") || "Enter your email address"}
                     />
                   </div>
@@ -532,7 +551,8 @@ const SignupSteps = () => {
           email={signupData.email}
           userId={signupData.userId || ""}
           onVerified={handleOTPVerified}
-          onBack={() => setCurrentStep(1)}
+          onBack={() => isAccountIncomplete ? undefined : setCurrentStep(1)}
+          useEmailVerification={isAccountIncomplete}
         />
       )}
 

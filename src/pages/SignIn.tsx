@@ -61,6 +61,23 @@ const SignIn = () => {
     } catch (error) {
       console.log("Login error caught:", error);
 
+      // Handle ACCOUNT_INCOMPLETE - redirect to signup to complete registration
+      if (error instanceof Error && (error as any).code === 'ACCOUNT_INCOMPLETE') {
+        toast({
+          title: t("signin.accountIncomplete") || "Account Incomplete",
+          description: t("signin.accountIncompleteDesc") || "Your account needs to be completed. Please verify your email to continue.",
+          variant: "destructive",
+        });
+        navigate("/signup", { 
+          state: { 
+            accountIncomplete: true, 
+            email, 
+            userId: (error as any).userId 
+          } 
+        });
+        return;
+      }
+
       const errorMessage =
         error instanceof Error ? error.message : "An unexpected error occurred";
 
