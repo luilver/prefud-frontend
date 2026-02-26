@@ -145,6 +145,8 @@ export const pt = {
     verifyEmail: "Verificar e-mail",
     didntReceiveCode: "Não recebeu o código?",
     resendCode: "Reenviar código",
+    "ageError.title": "❌ Requisito de idade",
+    "ageError.description": "Você deve ter pelo menos 18 anos para criar uma conta.",
   },
   signin: {
     title: "Entrar na sua conta",
