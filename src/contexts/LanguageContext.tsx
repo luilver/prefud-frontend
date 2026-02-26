@@ -257,6 +257,9 @@ const translations = {
     "signin.signing-in": "Signing in...",
     "signin.no-account": "Don't have an account?",
     "signin.create-here": "Create one here",
+    "signin.accountIncomplete": "Account Incomplete",
+    "signin.accountIncompleteDesc":
+      "Your account needs to be completed. Please verify your email to continue.",
 
     // Profile
     "profile.title": "Profile Information",
@@ -280,14 +283,19 @@ const translations = {
 
     // Delete Account
     "profile.deleteAccount.section": "Danger Zone",
-    "profile.deleteAccount.sectionDesc": "Permanently delete your account and all data",
+    "profile.deleteAccount.sectionDesc":
+      "Permanently delete your account and all data",
     "profile.deleteAccount.button": "Delete Account",
     "profile.deleteAccount.title": "Delete Account",
-    "profile.deleteAccount.description": "This action is permanent and cannot be undone.",
+    "profile.deleteAccount.description":
+      "This action is permanent and cannot be undone.",
     "profile.deleteAccount.warningTitle": "By deleting your account:",
-    "profile.deleteAccount.cancelSub": "Your active subscription will be cancelled immediately",
-    "profile.deleteAccount.deleteData": "All your personal data, meal plans, and recipes will be permanently deleted",
-    "profile.deleteAccount.noRecovery": "You will not be able to recover your account or data",
+    "profile.deleteAccount.cancelSub":
+      "Your active subscription will be cancelled immediately",
+    "profile.deleteAccount.deleteData":
+      "All your personal data, meal plans, and recipes will be permanently deleted",
+    "profile.deleteAccount.noRecovery":
+      "You will not be able to recover your account or data",
     "profile.deleteAccount.goBack": "Go Back",
     "profile.deleteAccount.confirm": "Delete My Account",
     "profile.deleteAccount.deleting": "Deleting...",
@@ -432,29 +440,39 @@ const translations = {
     "mealPlanCreator.cuisine.otherPlaceholder": "Type your cuisine...",
     "mealPlanCreator.allergy.other": "Other",
     "mealPlanCreator.allergy.otherPlaceholder": "Type your allergy...",
-    "mealPlanCreator.chat.welcome": "👋 Hi! Let's create your personalized meal plan. What would you like to name it?",
-    "mealPlanCreator.chat.description": "📝 Add a brief description for your plan. (Optional)",
+    "mealPlanCreator.chat.welcome":
+      "👋 Hi! Let's create your personalized meal plan. What would you like to name it?",
+    "mealPlanCreator.chat.description":
+      "📝 Add a brief description for your plan. (Optional)",
     "mealPlanCreator.chat.startDate": "📅 When should your meal plan start?",
-    "mealPlanCreator.chat.numberOfDays": "📆 How many days should the plan cover?",
-    "mealPlanCreator.chat.numberOfPersons": "👥 How many adults will be eating?",
+    "mealPlanCreator.chat.numberOfDays":
+      "📆 How many days should the plan cover?",
+    "mealPlanCreator.chat.numberOfPersons":
+      "👥 How many adults will be eating?",
     "mealPlanCreator.chat.kidsUnder5": "👶 How many kids under 5 years?",
     "mealPlanCreator.chat.kids5to12": "🧒 How many kids between 5 and 12?",
     "mealPlanCreator.chat.mealsPerDay": "🍽️ How many meals per day?",
-    "mealPlanCreator.chat.dietary": "🥗 Any dietary restrictions? Select all that apply.",
-    "mealPlanCreator.chat.cuisine": "🌍 Any cuisine preferences? Select all that apply.",
-    "mealPlanCreator.chat.maxCookTime": "⏱️ What's the maximum cooking time per meal (in minutes)?",
+    "mealPlanCreator.chat.dietary":
+      "🥗 Any dietary restrictions? Select all that apply.",
+    "mealPlanCreator.chat.cuisine":
+      "🌍 Any cuisine preferences? Select all that apply.",
+    "mealPlanCreator.chat.maxCookTime":
+      "⏱️ What's the maximum cooking time per meal (in minutes)?",
     "mealPlanCreator.chat.skillLevel": "👨‍🍳 What's your cooking skill level?",
     "mealPlanCreator.chat.budget": "💰 What's your budget range?",
     "mealPlanCreator.chat.allergies": "⚠️ Any allergies or food intolerances?",
     "mealPlanCreator.chat.healthGoals": "💪 Any health goals for this plan?",
-    "mealPlanCreator.chat.extras": "📝 Any dislikes or special requests? (Optional)",
+    "mealPlanCreator.chat.extras":
+      "📝 Any dislikes or special requests? (Optional)",
     "mealPlanCreator.chat.extrasPlaceholder": "Type here or skip...",
     "mealPlanCreator.chat.none": "None",
     "mealPlanCreator.chat.skipped": "Skipped",
     "mealPlanCreator.chat.summaryTitle": "Here's your meal plan summary:",
-    "mealPlanCreator.chat.confirmPrompt": "Looks good? Hit **Generate** to create your meal plan! 🚀",
+    "mealPlanCreator.chat.confirmPrompt":
+      "Looks good? Hit **Generate** to create your meal plan! 🚀",
     "mealPlanCreator.chat.letsGo": "Let's go! 🚀",
-    "mealPlanCreator.chat.loaderMessage": "Analyzing your preferences and creating your perfect meal plan...",
+    "mealPlanCreator.chat.loaderMessage":
+      "Analyzing your preferences and creating your perfect meal plan...",
     "mealPlanCreator.chat.missingName": "Please enter a plan name.",
     "mealPlanCreator.chat.missingDate": "Please select a start date.",
     "mealPlanCreator.chat.confirm": "Confirm",
@@ -524,7 +542,7 @@ const translations = {
     "mealPlanView.mealCompletedDesc": "Great job on completing your meal!",
     "mealPlanView.mealUncompletedDesc": "Meal has been marked as uncompleted.",
     //new keys
-//Checkout and cart
+    //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
     "cart.checkout.proceedToCheckout": "Proceed to Checkout",
     "cart.inCart": "in cart",
@@ -579,7 +597,7 @@ const translations = {
     "checkout.summary.processPayment": "Process Payment",
     "checkout.payment.form.cvv": "CVV",
     "checkout.summary.deliveryFee": "Delivery Fee",
-    
+
     //falta confirmation
     "checkout.confirmation.title": "Order Confirmed!",
     "checkout.confirmation.subtitle":
@@ -787,15 +805,24 @@ const translations = {
     "aiMealCreatorStepper.review.dish": " Dish",
 
     // AI Meal Creator Chat
-    "aiMealCreatorStepper.chat.welcome": "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
-    "aiMealCreatorStepper.chat.mealName": "Great choice! 🎉 Do you have a name for this meal? (Optional - just type or skip)",
-    "aiMealCreatorStepper.chat.dishName": "🍽️ Do you have a specific dish in mind? e.g. Mac and Cheese (Optional)",
-    "aiMealCreatorStepper.chat.details": "⚡ Let's set up the details — servings, cooking time, skill level, and budget.",
-    "aiMealCreatorStepper.chat.dietary": "🥗 Any dietary restrictions? Select all that apply.",
-    "aiMealCreatorStepper.chat.cuisine": "🌍 Any cuisine preferences? Select all that sound good!",
-    "aiMealCreatorStepper.chat.healthGoals": "💪 Any health goals for this meal?",
-    "aiMealCreatorStepper.chat.allergies": "⚠️ Any allergies or food intolerances I should know about?",
-    "aiMealCreatorStepper.chat.extras": "📝 Anything else? Dislikes, special requests, or custom allergies? (Optional)",
+    "aiMealCreatorStepper.chat.welcome":
+      "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
+    "aiMealCreatorStepper.chat.mealName":
+      "Great choice! 🎉 Do you have a name for this meal? (Optional - just type or skip)",
+    "aiMealCreatorStepper.chat.dishName":
+      "🍽️ Do you have a specific dish in mind? e.g. Mac and Cheese (Optional)",
+    "aiMealCreatorStepper.chat.details":
+      "⚡ Let's set up the details — servings, cooking time, skill level, and budget.",
+    "aiMealCreatorStepper.chat.dietary":
+      "🥗 Any dietary restrictions? Select all that apply.",
+    "aiMealCreatorStepper.chat.cuisine":
+      "🌍 Any cuisine preferences? Select all that sound good!",
+    "aiMealCreatorStepper.chat.healthGoals":
+      "💪 Any health goals for this meal?",
+    "aiMealCreatorStepper.chat.allergies":
+      "⚠️ Any allergies or food intolerances I should know about?",
+    "aiMealCreatorStepper.chat.extras":
+      "📝 Anything else? Dislikes, special requests, or custom allergies? (Optional)",
     "aiMealCreatorStepper.chat.none": "None",
     "aiMealCreatorStepper.chat.skipped": "Skipped",
     "aiMealCreatorStepper.chat.confirm": "Confirm",
@@ -804,32 +831,42 @@ const translations = {
     "aiMealCreatorStepper.chat.generate": "Generate My Meal",
     "aiMealCreatorStepper.chat.letsGo": "Let's go! 🚀",
     "aiMealCreatorStepper.chat.readyTitle": "Here's your meal plan summary:",
-    "aiMealCreatorStepper.chat.confirmPrompt": "Looks good? Hit **Generate** to create your meal! 🚀",
+    "aiMealCreatorStepper.chat.confirmPrompt":
+      "Looks good? Hit **Generate** to create your meal! 🚀",
     "aiMealCreatorStepper.chat.typePlaceholder": "Type here or skip...",
     "aiMealCreatorStepper.chat.dishPlaceholder": "e.g., Mac and Cheese",
     "aiMealCreatorStepper.chat.servingsLabel": "servings",
     "aiMealCreatorStepper.chat.budgetSuffix": "budget",
     "aiMealCreatorStepper.chat.servings": "👥 How many servings do you need?",
-    "aiMealCreatorStepper.chat.cookTime": "⏱️ What's the maximum cooking time (in minutes)?",
+    "aiMealCreatorStepper.chat.cookTime":
+      "⏱️ What's the maximum cooking time (in minutes)?",
     "aiMealCreatorStepper.chat.skill": "👨‍🍳 What's your cooking skill level?",
-    "aiMealCreatorStepper.chat.budget": "💰 What's your budget range for this meal?",
+    "aiMealCreatorStepper.chat.budget":
+      "💰 What's your budget range for this meal?",
     "aiMealCreator.markAsDoneSuccess": "Meal marked as completed",
     "aiMealCreator.markAsUndoneSuccess": "Meal marked as uncompleted",
-    "aiDrinkCreator.markAsDoneSuccess": "Drink marked as consumed successfully!",
+    "aiDrinkCreator.markAsDoneSuccess":
+      "Drink marked as consumed successfully!",
     "aiDrinkCreator.markAsDoneError": "Failed to mark drink as consumed",
 
     // AI Drink Creator Chat
-    "aiDrinkChat.welcome": "👋 Hi! I'm your AI drink assistant. Let's create a healthy drink just for you! What type of drink would you like?",
-    "aiDrinkChat.drinkName": "Great choice! 🎉 What would you like to name your drink? (Optional)",
+    "aiDrinkChat.welcome":
+      "👋 Hi! I'm your AI drink assistant. Let's create a healthy drink just for you! What type of drink would you like?",
+    "aiDrinkChat.drinkName":
+      "Great choice! 🎉 What would you like to name your drink? (Optional)",
     "aiDrinkChat.servings": "👥 How many servings do you need?",
     "aiDrinkChat.cookTime": "⏱️ What's the maximum prep time (in minutes)?",
     "aiDrinkChat.skill": "👨‍🍳 What's your skill level?",
     "aiDrinkChat.budget": "💰 What's your budget range for this drink?",
-    "aiDrinkChat.healthGoals": "💪 What are your health goals? Select all that apply.",
-    "aiDrinkChat.dietary": "🥗 Any dietary restrictions? Select all that apply.",
+    "aiDrinkChat.healthGoals":
+      "💪 What are your health goals? Select all that apply.",
+    "aiDrinkChat.dietary":
+      "🥗 Any dietary restrictions? Select all that apply.",
     "aiDrinkChat.cuisine": "🌍 Any cuisine or flavor preferences?",
-    "aiDrinkChat.allergies": "⚠️ Any allergies or intolerances I should know about?",
-    "aiDrinkChat.extras": "📝 Anything else? Dislikes or special requests? (Optional)",
+    "aiDrinkChat.allergies":
+      "⚠️ Any allergies or intolerances I should know about?",
+    "aiDrinkChat.extras":
+      "📝 Anything else? Dislikes or special requests? (Optional)",
     "aiDrinkChat.none": "None",
     "aiDrinkChat.skipped": "Skipped",
     "aiDrinkChat.confirm": "Confirm",
@@ -838,7 +875,8 @@ const translations = {
     "aiDrinkChat.generate": "Generate My Drink",
     "aiDrinkChat.letsGo": "Let's go! 🚀",
     "aiDrinkChat.readyTitle": "Here's your drink summary:",
-    "aiDrinkChat.confirmPrompt": "Looks good? Hit **Generate** to create your drink! 🚀",
+    "aiDrinkChat.confirmPrompt":
+      "Looks good? Hit **Generate** to create your drink! 🚀",
     "aiDrinkChat.loaderMessage": "Mixing the perfect healthy drink for you...",
     "aiDrinkChat.back": "Back",
     "aiDrinkChat.title": "AI Drink Creator",
@@ -907,7 +945,8 @@ const translations = {
     "aiDrinkChat.allergy.other": "✏️ Other",
     "aiDrinkChat.allergy.otherPlaceholder": "Type your allergy...",
     "aiDrinkChat.drinkCreatedSuccess": "Healthy drink created successfully!",
-    "aiDrinkChat.drinkCreatedError": "Failed to generate drink. Please try again.",
+    "aiDrinkChat.drinkCreatedError":
+      "Failed to generate drink. Please try again.",
 
     "aiMealGenerator.loaderMessage":
       "Creating your personalized meal with AI...",
@@ -1057,7 +1096,8 @@ const translations = {
     "aiMealView.ingredientsSelector": "Shopping List",
     "aiMealView.selectAll": "Select All",
     "aiMealView.deselectAll": "Deselect All",
-    "aiMealView.selectIngredientsDesc": "Select ingredients to add to your pantry or cart",
+    "aiMealView.selectIngredientsDesc":
+      "Select ingredients to add to your pantry or cart",
     "aiMealView.addToPantry": "Add to Pantry",
     "aiMealView.addToCart": "Add to Cart",
 
@@ -1330,8 +1370,10 @@ const translations = {
     "drinkDetailView.addedToCart": "Added to Cart",
     "drinkDetailView.itemsAddedToCart": "items added to your shopping cart",
     "drinkDetailView.noIngredientsSelected": "No ingredients selected",
-    "drinkDetailView.selectIngredientsFirst": "Please select ingredients first.",
-    "drinkDetailView.pantryFailed": "Failed to add ingredients to pantry. Please try again.",
+    "drinkDetailView.selectIngredientsFirst":
+      "Please select ingredients first.",
+    "drinkDetailView.pantryFailed":
+      "Failed to add ingredients to pantry. Please try again.",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No ingredients selected",
@@ -1424,7 +1466,8 @@ const translations = {
     "recipeView.ingredientsSelector": "Ingredients",
     "recipeView.selectAll": "Select All",
     "recipeView.deselectAll": "Deselect All",
-    "recipeView.selectIngredientsDesc": "Select ingredients to add to your pantry or cart",
+    "recipeView.selectIngredientsDesc":
+      "Select ingredients to add to your pantry or cart",
     "recipeView.addToPantry": "Add to Pantry",
     "recipeView.addToCart": "Add to Cart",
     "recipeView.addedToPantry": "Added to Pantry",
@@ -1746,7 +1789,8 @@ const translations = {
 
     // AI Meal Suggestions
     "aiSuggestions.title": "AI Meal Suggestions",
-    "aiSuggestions.description": "Get personalized meal suggestions based on your expiring ingredients",
+    "aiSuggestions.description":
+      "Get personalized meal suggestions based on your expiring ingredients",
     "aiSuggestions.generate": "Generate AI Suggestions",
     "aiSuggestions.generating": "Generating...",
     "aiSuggestions.generateMore": "Generate More Suggestions",
@@ -1758,7 +1802,8 @@ const translations = {
     "aiSuggestions.addToFavorites": "Add to Favorites",
     "aiSuggestions.favorited": "Favorited",
     "aiSuggestions.removedFromFavorites": "Removed from favorites",
-    "aiSuggestions.removedFromFavoritesDesc": "has been removed from your favorites.",
+    "aiSuggestions.removedFromFavoritesDesc":
+      "has been removed from your favorites.",
     "aiSuggestions.addedToFavorites": "Added to favorites!",
     "aiSuggestions.addedToFavoritesDesc": "has been added to your favorites.",
     "aiSuggestions.markAsConsumed": "Mark as Consumed",
@@ -1782,10 +1827,12 @@ const translations = {
     "aiSuggestions.readyDesc": "meal suggestions. Total carbon footprint:",
     "aiSuggestions.error": "Error",
     "aiSuggestions.userNotFound": "User not found. Please sign in again.",
-    "aiSuggestions.failedToGenerate": "Failed to generate suggestions. Please try again.",
+    "aiSuggestions.failedToGenerate":
+      "Failed to generate suggestions. Please try again.",
     "aiSuggestions.subscriptionLimit": "Subscription Limit Reached",
     "aiSuggestions.noIngredients": "No Ingredients Found",
-    "aiSuggestions.loaderMessage": "Creating delicious meal suggestions from your ingredients...",
+    "aiSuggestions.loaderMessage":
+      "Creating delicious meal suggestions from your ingredients...",
     "aiSuggestions.min": "min",
     "aiSuggestions.cal": "cal",
 
@@ -1811,7 +1858,7 @@ const translations = {
     "subscription.monthly": "Monthly",
     "subscription.paymentInfo": "Payment Information",
     "subscription.cardDetails": "Card Details",
-    "subscription.paymentSecure":"Your payment is secured by Rukupay LLC",
+    "subscription.paymentSecure": "Your payment is secured by Rukupay LLC",
     "subscription.processing": "Processing...",
     "mealPlanner.pagination.previous": "Before",
     "mealPlanner.pagination.next": "Next",
@@ -2075,6 +2122,9 @@ const translations = {
     "signin.signing-in": "Iniciando sesión...",
     "signin.no-account": "¿No tienes una cuenta?",
     "signin.create-here": "Crea una aquí",
+    "signin.accountIncomplete": "Cuenta Incompleta",
+    "signin.accountIncompleteDesc":
+      "Tu cuenta necesita ser completada. Por favor verifica tu correo electrónico para continuar.",
 
     // Profile
     "profile.title": "Información del Perfil",
@@ -2098,14 +2148,19 @@ const translations = {
 
     // Delete Account
     "profile.deleteAccount.section": "Zona de Peligro",
-    "profile.deleteAccount.sectionDesc": "Eliminar permanentemente tu cuenta y todos tus datos",
+    "profile.deleteAccount.sectionDesc":
+      "Eliminar permanentemente tu cuenta y todos tus datos",
     "profile.deleteAccount.button": "Eliminar Cuenta",
     "profile.deleteAccount.title": "Eliminar Cuenta",
-    "profile.deleteAccount.description": "Esta acción es permanente y no se puede deshacer.",
+    "profile.deleteAccount.description":
+      "Esta acción es permanente y no se puede deshacer.",
     "profile.deleteAccount.warningTitle": "Al eliminar tu cuenta:",
-    "profile.deleteAccount.cancelSub": "Tu suscripción activa se cancelará inmediatamente",
-    "profile.deleteAccount.deleteData": "Todos tus datos personales, planes de comida y recetas serán eliminados permanentemente",
-    "profile.deleteAccount.noRecovery": "No podrás recuperar tu cuenta ni tus datos",
+    "profile.deleteAccount.cancelSub":
+      "Tu suscripción activa se cancelará inmediatamente",
+    "profile.deleteAccount.deleteData":
+      "Todos tus datos personales, planes de comida y recetas serán eliminados permanentemente",
+    "profile.deleteAccount.noRecovery":
+      "No podrás recuperar tu cuenta ni tus datos",
     "profile.deleteAccount.goBack": "Volver",
     "profile.deleteAccount.confirm": "Eliminar Mi Cuenta",
     "profile.deleteAccount.deleting": "Eliminando...",
@@ -2258,31 +2313,47 @@ const translations = {
     "mealPlanCreator.cuisine.otherPlaceholder": "Escribe tu cocina...",
     "mealPlanCreator.allergy.other": "Otro",
     "mealPlanCreator.allergy.otherPlaceholder": "Escribe tu alergia...",
-    "mealPlanCreator.chat.welcome": "👋 ¡Hola! Vamos a crear tu plan de comidas personalizado. ¿Cómo te gustaría llamarlo?",
-    "mealPlanCreator.chat.description": "📝 Agrega una breve descripción para tu plan. (Opcional)",
-    "mealPlanCreator.chat.startDate": "📅 ¿Cuándo debería comenzar tu plan de comidas?",
-    "mealPlanCreator.chat.numberOfDays": "📆 ¿Cuántos días debe cubrir el plan?",
+    "mealPlanCreator.chat.welcome":
+      "👋 ¡Hola! Vamos a crear tu plan de comidas personalizado. ¿Cómo te gustaría llamarlo?",
+    "mealPlanCreator.chat.description":
+      "📝 Agrega una breve descripción para tu plan. (Opcional)",
+    "mealPlanCreator.chat.startDate":
+      "📅 ¿Cuándo debería comenzar tu plan de comidas?",
+    "mealPlanCreator.chat.numberOfDays":
+      "📆 ¿Cuántos días debe cubrir el plan?",
     "mealPlanCreator.chat.numberOfPersons": "👥 ¿Cuántos adultos comerán?",
     "mealPlanCreator.chat.kidsUnder5": "👶 ¿Cuántos niños menores de 5 años?",
     "mealPlanCreator.chat.kids5to12": "🧒 ¿Cuántos niños entre 5 y 12 años?",
     "mealPlanCreator.chat.mealsPerDay": "🍽️ ¿Cuántas comidas por día?",
-    "mealPlanCreator.chat.dietary": "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
-    "mealPlanCreator.chat.cuisine": "🌍 ¿Preferencias de cocina? Selecciona todas las que apliquen.",
-    "mealPlanCreator.chat.maxCookTime": "⏱️ ¿Cuál es el tiempo máximo de cocción por comida (en minutos)?",
-    "mealPlanCreator.chat.skillLevel": "👨‍🍳 ¿Cuál es tu nivel de habilidad culinaria?",
+    "mealPlanCreator.chat.dietary":
+      "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+    "mealPlanCreator.chat.cuisine":
+      "🌍 ¿Preferencias de cocina? Selecciona todas las que apliquen.",
+    "mealPlanCreator.chat.maxCookTime":
+      "⏱️ ¿Cuál es el tiempo máximo de cocción por comida (en minutos)?",
+    "mealPlanCreator.chat.skillLevel":
+      "👨‍🍳 ¿Cuál es tu nivel de habilidad culinaria?",
     "mealPlanCreator.chat.budget": "💰 ¿Cuál es tu rango de presupuesto?",
-    "mealPlanCreator.chat.allergies": "⚠️ ¿Alguna alergia o intolerancia alimentaria?",
-    "mealPlanCreator.chat.healthGoals": "💪 ¿Algún objetivo de salud para este plan?",
-    "mealPlanCreator.chat.extras": "📝 ¿Algo que no te guste o solicitudes especiales? (Opcional)",
+    "mealPlanCreator.chat.allergies":
+      "⚠️ ¿Alguna alergia o intolerancia alimentaria?",
+    "mealPlanCreator.chat.healthGoals":
+      "💪 ¿Algún objetivo de salud para este plan?",
+    "mealPlanCreator.chat.extras":
+      "📝 ¿Algo que no te guste o solicitudes especiales? (Opcional)",
     "mealPlanCreator.chat.extrasPlaceholder": "Escribe aquí o salta...",
     "mealPlanCreator.chat.none": "Ninguno",
     "mealPlanCreator.chat.skipped": "Saltado",
-    "mealPlanCreator.chat.summaryTitle": "Aquí está el resumen de tu plan de comidas:",
-    "mealPlanCreator.chat.confirmPrompt": "¿Se ve bien? ¡Haz clic en **Generar** para crear tu plan de comidas! 🚀",
+    "mealPlanCreator.chat.summaryTitle":
+      "Aquí está el resumen de tu plan de comidas:",
+    "mealPlanCreator.chat.confirmPrompt":
+      "¿Se ve bien? ¡Haz clic en **Generar** para crear tu plan de comidas! 🚀",
     "mealPlanCreator.chat.letsGo": "¡Vamos! 🚀",
-    "mealPlanCreator.chat.loaderMessage": "Analizando tus preferencias y creando tu plan de comidas perfecto...",
-    "mealPlanCreator.chat.missingName": "Por favor ingresa un nombre para el plan.",
-    "mealPlanCreator.chat.missingDate": "Por favor selecciona una fecha de inicio.",
+    "mealPlanCreator.chat.loaderMessage":
+      "Analizando tus preferencias y creando tu plan de comidas perfecto...",
+    "mealPlanCreator.chat.missingName":
+      "Por favor ingresa un nombre para el plan.",
+    "mealPlanCreator.chat.missingDate":
+      "Por favor selecciona una fecha de inicio.",
     "mealPlanCreator.chat.confirm": "Confirmar",
     "mealPlanCreator.chat.skip": "Saltar →",
     "mealPlanCreator.chat.continue": "Continuar",
@@ -2527,15 +2598,24 @@ const translations = {
     "aiMealCreatorStepper.review.dish": " Plato",
 
     // AI Meal Creator Chat
-    "aiMealCreatorStepper.chat.welcome": "👋 ¡Hola! Soy tu asistente de comidas IA. ¡Creemos algo delicioso juntos! ¿Qué tipo de comida se te antoja?",
-    "aiMealCreatorStepper.chat.mealName": "¡Gran elección! 🎉 ¿Tienes un nombre para esta comida? (Opcional - escribe o salta)",
-    "aiMealCreatorStepper.chat.dishName": "🍽️ ¿Tienes un plato específico en mente? ej. Macarrones con Queso (Opcional)",
-    "aiMealCreatorStepper.chat.details": "⚡ Configuremos los detalles — porciones, tiempo de cocción, nivel de habilidad y presupuesto.",
-    "aiMealCreatorStepper.chat.dietary": "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
-    "aiMealCreatorStepper.chat.cuisine": "🌍 ¿Preferencias de cocina? ¡Selecciona las que te gusten!",
-    "aiMealCreatorStepper.chat.healthGoals": "💪 ¿Algún objetivo de salud para esta comida?",
-    "aiMealCreatorStepper.chat.allergies": "⚠️ ¿Alguna alergia o intolerancia alimentaria que deba saber?",
-    "aiMealCreatorStepper.chat.extras": "📝 ¿Algo más? ¿Disgustos, solicitudes especiales o alergias personalizadas? (Opcional)",
+    "aiMealCreatorStepper.chat.welcome":
+      "👋 ¡Hola! Soy tu asistente de comidas IA. ¡Creemos algo delicioso juntos! ¿Qué tipo de comida se te antoja?",
+    "aiMealCreatorStepper.chat.mealName":
+      "¡Gran elección! 🎉 ¿Tienes un nombre para esta comida? (Opcional - escribe o salta)",
+    "aiMealCreatorStepper.chat.dishName":
+      "🍽️ ¿Tienes un plato específico en mente? ej. Macarrones con Queso (Opcional)",
+    "aiMealCreatorStepper.chat.details":
+      "⚡ Configuremos los detalles — porciones, tiempo de cocción, nivel de habilidad y presupuesto.",
+    "aiMealCreatorStepper.chat.dietary":
+      "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+    "aiMealCreatorStepper.chat.cuisine":
+      "🌍 ¿Preferencias de cocina? ¡Selecciona las que te gusten!",
+    "aiMealCreatorStepper.chat.healthGoals":
+      "💪 ¿Algún objetivo de salud para esta comida?",
+    "aiMealCreatorStepper.chat.allergies":
+      "⚠️ ¿Alguna alergia o intolerancia alimentaria que deba saber?",
+    "aiMealCreatorStepper.chat.extras":
+      "📝 ¿Algo más? ¿Disgustos, solicitudes especiales o alergias personalizadas? (Opcional)",
     "aiMealCreatorStepper.chat.none": "Ninguno",
     "aiMealCreatorStepper.chat.skipped": "Omitido",
     "aiMealCreatorStepper.chat.confirm": "Confirmar",
@@ -2543,33 +2623,49 @@ const translations = {
     "aiMealCreatorStepper.chat.continue": "Continuar",
     "aiMealCreatorStepper.chat.generate": "Generar Mi Comida",
     "aiMealCreatorStepper.chat.letsGo": "¡Vamos! 🚀",
-    "aiMealCreatorStepper.chat.readyTitle": "Aquí está el resumen de tu plan de comidas:",
-    "aiMealCreatorStepper.chat.confirmPrompt": "¿Se ve bien? ¡Presiona **Generar** para crear tu comida! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle":
+      "Aquí está el resumen de tu plan de comidas:",
+    "aiMealCreatorStepper.chat.confirmPrompt":
+      "¿Se ve bien? ¡Presiona **Generar** para crear tu comida! 🚀",
     "aiMealCreatorStepper.chat.typePlaceholder": "Escribe aquí o salta...",
     "aiMealCreatorStepper.chat.dishPlaceholder": "ej., Macarrones con Queso",
     "aiMealCreatorStepper.chat.servingsLabel": "porciones",
     "aiMealCreatorStepper.chat.budgetSuffix": "presupuesto",
     "aiMealCreatorStepper.chat.servings": "👥 ¿Cuántas porciones necesitas?",
-    "aiMealCreatorStepper.chat.cookTime": "⏱️ ¿Cuál es el tiempo máximo de cocción (en minutos)?",
-    "aiMealCreatorStepper.chat.skill": "👨‍🍳 ¿Cuál es tu nivel de habilidad en la cocina?",
-    "aiMealCreatorStepper.chat.budget": "💰 ¿Cuál es tu rango de presupuesto para esta comida?",
+    "aiMealCreatorStepper.chat.cookTime":
+      "⏱️ ¿Cuál es el tiempo máximo de cocción (en minutos)?",
+    "aiMealCreatorStepper.chat.skill":
+      "👨‍🍳 ¿Cuál es tu nivel de habilidad en la cocina?",
+    "aiMealCreatorStepper.chat.budget":
+      "💰 ¿Cuál es tu rango de presupuesto para esta comida?",
     "aiMealCreator.markAsDoneSuccess": "¡Comida marcada como completada! 🎉",
-    "aiMealCreator.markAsUndoneSuccess": "¡Comida marcada como no completada! 😌",
-    "aiDrinkCreator.markAsDoneSuccess": "¡Bebida marcada como consumida exitosamente!",
-    "aiDrinkCreator.markAsDoneError": "Error al marcar la bebida como consumida",
+    "aiMealCreator.markAsUndoneSuccess":
+      "¡Comida marcada como no completada! 😌",
+    "aiDrinkCreator.markAsDoneSuccess":
+      "¡Bebida marcada como consumida exitosamente!",
+    "aiDrinkCreator.markAsDoneError":
+      "Error al marcar la bebida como consumida",
 
     // AI Drink Creator Chat
-    "aiDrinkChat.welcome": "👋 ¡Hola! Soy tu asistente de bebidas IA. ¡Creemos una bebida saludable para ti! ¿Qué tipo de bebida te gustaría?",
-    "aiDrinkChat.drinkName": "¡Gran elección! 🎉 ¿Cómo quieres llamar a tu bebida? (Opcional)",
+    "aiDrinkChat.welcome":
+      "👋 ¡Hola! Soy tu asistente de bebidas IA. ¡Creemos una bebida saludable para ti! ¿Qué tipo de bebida te gustaría?",
+    "aiDrinkChat.drinkName":
+      "¡Gran elección! 🎉 ¿Cómo quieres llamar a tu bebida? (Opcional)",
     "aiDrinkChat.servings": "👥 ¿Cuántas porciones necesitas?",
-    "aiDrinkChat.cookTime": "⏱️ ¿Cuál es el tiempo máximo de preparación (en minutos)?",
+    "aiDrinkChat.cookTime":
+      "⏱️ ¿Cuál es el tiempo máximo de preparación (en minutos)?",
     "aiDrinkChat.skill": "👨‍🍳 ¿Cuál es tu nivel de habilidad?",
-    "aiDrinkChat.budget": "💰 ¿Cuál es tu rango de presupuesto para esta bebida?",
-    "aiDrinkChat.healthGoals": "💪 ¿Cuáles son tus objetivos de salud? Selecciona todos los que apliquen.",
-    "aiDrinkChat.dietary": "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+    "aiDrinkChat.budget":
+      "💰 ¿Cuál es tu rango de presupuesto para esta bebida?",
+    "aiDrinkChat.healthGoals":
+      "💪 ¿Cuáles son tus objetivos de salud? Selecciona todos los que apliquen.",
+    "aiDrinkChat.dietary":
+      "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
     "aiDrinkChat.cuisine": "🌍 ¿Preferencias de cocina o sabores?",
-    "aiDrinkChat.allergies": "⚠️ ¿Alguna alergia o intolerancia que deba saber?",
-    "aiDrinkChat.extras": "📝 ¿Algo más? ¿Disgustos o solicitudes especiales? (Opcional)",
+    "aiDrinkChat.allergies":
+      "⚠️ ¿Alguna alergia o intolerancia que deba saber?",
+    "aiDrinkChat.extras":
+      "📝 ¿Algo más? ¿Disgustos o solicitudes especiales? (Opcional)",
     "aiDrinkChat.none": "Ninguno",
     "aiDrinkChat.skipped": "Omitido",
     "aiDrinkChat.confirm": "Confirmar",
@@ -2578,8 +2674,10 @@ const translations = {
     "aiDrinkChat.generate": "Generar Mi Bebida",
     "aiDrinkChat.letsGo": "¡Vamos! 🚀",
     "aiDrinkChat.readyTitle": "Aquí está el resumen de tu bebida:",
-    "aiDrinkChat.confirmPrompt": "¿Se ve bien? ¡Presiona **Generar** para crear tu bebida! 🚀",
-    "aiDrinkChat.loaderMessage": "Preparando la bebida saludable perfecta para ti...",
+    "aiDrinkChat.confirmPrompt":
+      "¿Se ve bien? ¡Presiona **Generar** para crear tu bebida! 🚀",
+    "aiDrinkChat.loaderMessage":
+      "Preparando la bebida saludable perfecta para ti...",
     "aiDrinkChat.back": "Volver",
     "aiDrinkChat.title": "Creador de Bebidas IA",
     "aiDrinkChat.servingsLabel": "Porciones",
@@ -2647,7 +2745,8 @@ const translations = {
     "aiDrinkChat.allergy.other": "✏️ Otro",
     "aiDrinkChat.allergy.otherPlaceholder": "Escribe tu alergia...",
     "aiDrinkChat.drinkCreatedSuccess": "¡Bebida saludable creada exitosamente!",
-    "aiDrinkChat.drinkCreatedError": "Error al generar la bebida. Inténtalo de nuevo.",
+    "aiDrinkChat.drinkCreatedError":
+      "Error al generar la bebida. Inténtalo de nuevo.",
 
     "aiMealGenerator.loaderMessage":
       "Creando tu comida personalizada con IA...",
@@ -2804,7 +2903,8 @@ const translations = {
     "aiMealView.ingredientsSelector": "Lista de compras",
     "aiMealView.selectAll": "Seleccionar Todo",
     "aiMealView.deselectAll": "Deseleccionar Todo",
-    "aiMealView.selectIngredientsDesc": "Selecciona ingredientes para añadir a tu despensa o carrito",
+    "aiMealView.selectIngredientsDesc":
+      "Selecciona ingredientes para añadir a tu despensa o carrito",
     "aiMealView.addToPantry": "Añadir a la Despensa",
     "aiMealView.addToCart": "Añadir al Carrito",
 
@@ -3170,13 +3270,17 @@ const translations = {
     "drinkDetailView.shoppingList": "Lista de Compras",
     "drinkDetailView.selectAll": "Seleccionar Todo",
     "drinkDetailView.deselectAll": "Deseleccionar Todo",
-    "drinkDetailView.selectIngredients": "Selecciona ingredientes para añadir al carrito",
+    "drinkDetailView.selectIngredients":
+      "Selecciona ingredientes para añadir al carrito",
     "drinkDetailView.addToCart": "Añadir al Carrito",
     "drinkDetailView.addedToCart": "Añadido al Carrito",
-    "drinkDetailView.itemsAddedToCart": "artículos añadidos a tu carrito de compras",
+    "drinkDetailView.itemsAddedToCart":
+      "artículos añadidos a tu carrito de compras",
     "drinkDetailView.noIngredientsSelected": "No se seleccionaron ingredientes",
-    "drinkDetailView.selectIngredientsFirst": "Por favor selecciona ingredientes primero.",
-    "drinkDetailView.pantryFailed": "No se pudieron añadir los ingredientes a la despensa. Inténtalo de nuevo.",
+    "drinkDetailView.selectIngredientsFirst":
+      "Por favor selecciona ingredientes primero.",
+    "drinkDetailView.pantryFailed":
+      "No se pudieron añadir los ingredientes a la despensa. Inténtalo de nuevo.",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No se seleccionaron ingredientes",
@@ -3272,7 +3376,8 @@ const translations = {
     "recipeView.ingredientsSelector": "Ingredientes",
     "recipeView.selectAll": "Seleccionar Todo",
     "recipeView.deselectAll": "Deseleccionar Todo",
-    "recipeView.selectIngredientsDesc": "Selecciona ingredientes para añadir a tu despensa o carrito",
+    "recipeView.selectIngredientsDesc":
+      "Selecciona ingredientes para añadir a tu despensa o carrito",
     "recipeView.addToPantry": "Añadir a Despensa",
     "recipeView.addToCart": "Añadir al Carrito",
     "recipeView.addedToPantry": "Añadido a la Despensa",
@@ -3288,7 +3393,8 @@ const translations = {
     "cookingMode.listen": "Escuchar",
     "cookingMode.listenAll": "Escuchar Todo",
     "cookingMode.stop": "Parar",
-    "cookingMode.completed": "¡Todos los pasos completados! ¡Disfruta tu comida!",
+    "cookingMode.completed":
+      "¡Todos los pasos completados! ¡Disfruta tu comida!",
     "cookingMode.stepsCompleted": "pasos",
     "cookingMode.repeat": "Repetir",
     "cookingMode.viewAll": "Ver Todo",
@@ -3612,7 +3718,8 @@ const translations = {
 
     // AI Meal Suggestions
     "aiSuggestions.title": "Sugerencias de Comidas con IA",
-    "aiSuggestions.description": "Obtén sugerencias personalizadas basadas en tus ingredientes próximos a vencer",
+    "aiSuggestions.description":
+      "Obtén sugerencias personalizadas basadas en tus ingredientes próximos a vencer",
     "aiSuggestions.generate": "Generar Sugerencias IA",
     "aiSuggestions.generating": "Generando...",
     "aiSuggestions.generateMore": "Generar Más Sugerencias",
@@ -3624,7 +3731,8 @@ const translations = {
     "aiSuggestions.addToFavorites": "Agregar a Favoritos",
     "aiSuggestions.favorited": "En Favoritos",
     "aiSuggestions.removedFromFavorites": "Eliminado de favoritos",
-    "aiSuggestions.removedFromFavoritesDesc": "ha sido eliminado de tus favoritos.",
+    "aiSuggestions.removedFromFavoritesDesc":
+      "ha sido eliminado de tus favoritos.",
     "aiSuggestions.addedToFavorites": "¡Agregado a favoritos!",
     "aiSuggestions.addedToFavoritesDesc": "ha sido agregado a tus favoritos.",
     "aiSuggestions.markAsConsumed": "Marcar como Consumido",
@@ -3645,13 +3753,17 @@ const translations = {
     "aiSuggestions.richInVitamins": "Rico en vitaminas",
     "aiSuggestions.cookingInstructions": "Instrucciones de Cocina",
     "aiSuggestions.ready": "¡Sugerencias de IA listas!",
-    "aiSuggestions.readyDesc": "sugerencias de comidas. Huella de carbono total:",
+    "aiSuggestions.readyDesc":
+      "sugerencias de comidas. Huella de carbono total:",
     "aiSuggestions.error": "Error",
-    "aiSuggestions.userNotFound": "Usuario no encontrado. Inicia sesión de nuevo.",
-    "aiSuggestions.failedToGenerate": "Error al generar sugerencias. Inténtalo de nuevo.",
+    "aiSuggestions.userNotFound":
+      "Usuario no encontrado. Inicia sesión de nuevo.",
+    "aiSuggestions.failedToGenerate":
+      "Error al generar sugerencias. Inténtalo de nuevo.",
     "aiSuggestions.subscriptionLimit": "Límite de Suscripción Alcanzado",
     "aiSuggestions.noIngredients": "No Se Encontraron Ingredientes",
-    "aiSuggestions.loaderMessage": "Creando deliciosas sugerencias de comidas con tus ingredientes...",
+    "aiSuggestions.loaderMessage":
+      "Creando deliciosas sugerencias de comidas con tus ingredientes...",
     "aiSuggestions.min": "min",
     "aiSuggestions.cal": "cal",
 
@@ -3678,7 +3790,7 @@ const translations = {
     "subscription.monthly": "Mensual",
     "subscription.paymentInfo": "Información de Pago",
     "subscription.cardDetails": "Detalles de la Tarjeta",
-    "subscription.paymentSecure":"Tu pago esta asegurado por Rukupay LLC",
+    "subscription.paymentSecure": "Tu pago esta asegurado por Rukupay LLC",
     "subscription.processing": "Procesando...",
     "mealPlanner.pagination.previous": "Anterior",
     "mealPlanner.pagination.next": "Siguiente",
@@ -3942,6 +4054,9 @@ const translations = {
     "signin.signing-in": "Entrando...",
     "signin.no-account": "Não tem uma conta?",
     "signin.create-here": "Crie uma aqui",
+    "signin.accountIncomplete": "Conta Incompleta",
+    "signin.accountIncompleteDesc":
+      "Sua conta precisa ser completada. Por favor verifique seu e-mail para continuar.",
 
     // Profile
     "profile.title": "Informações do Perfil",
@@ -3965,14 +4080,19 @@ const translations = {
 
     // Delete Account
     "profile.deleteAccount.section": "Zona de Perigo",
-    "profile.deleteAccount.sectionDesc": "Excluir permanentemente sua conta e todos os dados",
+    "profile.deleteAccount.sectionDesc":
+      "Excluir permanentemente sua conta e todos os dados",
     "profile.deleteAccount.button": "Excluir Conta",
     "profile.deleteAccount.title": "Excluir Conta",
-    "profile.deleteAccount.description": "Esta ação é permanente e não pode ser desfeita.",
+    "profile.deleteAccount.description":
+      "Esta ação é permanente e não pode ser desfeita.",
     "profile.deleteAccount.warningTitle": "Ao excluir sua conta:",
-    "profile.deleteAccount.cancelSub": "Sua assinatura ativa será cancelada imediatamente",
-    "profile.deleteAccount.deleteData": "Todos os seus dados pessoais, planos de refeição e receitas serão excluídos permanentemente",
-    "profile.deleteAccount.noRecovery": "Você não poderá recuperar sua conta ou dados",
+    "profile.deleteAccount.cancelSub":
+      "Sua assinatura ativa será cancelada imediatamente",
+    "profile.deleteAccount.deleteData":
+      "Todos os seus dados pessoais, planos de refeição e receitas serão excluídos permanentemente",
+    "profile.deleteAccount.noRecovery":
+      "Você não poderá recuperar sua conta ou dados",
     "profile.deleteAccount.goBack": "Voltar",
     "profile.deleteAccount.confirm": "Excluir Minha Conta",
     "profile.deleteAccount.deleting": "Excluindo...",
@@ -4125,31 +4245,46 @@ const translations = {
     "mealPlanCreator.cuisine.otherPlaceholder": "Digite sua culinária...",
     "mealPlanCreator.allergy.other": "Outro",
     "mealPlanCreator.allergy.otherPlaceholder": "Digite sua alergia...",
-    "mealPlanCreator.chat.welcome": "👋 Olá! Vamos criar seu plano de refeições personalizado. Como você gostaria de chamá-lo?",
-    "mealPlanCreator.chat.description": "📝 Adicione uma breve descrição para seu plano. (Opcional)",
-    "mealPlanCreator.chat.startDate": "📅 Quando seu plano de refeições deve começar?",
+    "mealPlanCreator.chat.welcome":
+      "👋 Olá! Vamos criar seu plano de refeições personalizado. Como você gostaria de chamá-lo?",
+    "mealPlanCreator.chat.description":
+      "📝 Adicione uma breve descrição para seu plano. (Opcional)",
+    "mealPlanCreator.chat.startDate":
+      "📅 Quando seu plano de refeições deve começar?",
     "mealPlanCreator.chat.numberOfDays": "📆 Quantos dias o plano deve cobrir?",
     "mealPlanCreator.chat.numberOfPersons": "👥 Quantos adultos vão comer?",
     "mealPlanCreator.chat.kidsUnder5": "👶 Quantas crianças menores de 5 anos?",
     "mealPlanCreator.chat.kids5to12": "🧒 Quantas crianças entre 5 e 12 anos?",
     "mealPlanCreator.chat.mealsPerDay": "🍽️ Quantas refeições por dia?",
-    "mealPlanCreator.chat.dietary": "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
-    "mealPlanCreator.chat.cuisine": "🌍 Preferências de culinária? Selecione todas que se aplicam.",
-    "mealPlanCreator.chat.maxCookTime": "⏱️ Qual o tempo máximo de cozimento por refeição (em minutos)?",
-    "mealPlanCreator.chat.skillLevel": "👨‍🍳 Qual seu nível de habilidade culinária?",
+    "mealPlanCreator.chat.dietary":
+      "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
+    "mealPlanCreator.chat.cuisine":
+      "🌍 Preferências de culinária? Selecione todas que se aplicam.",
+    "mealPlanCreator.chat.maxCookTime":
+      "⏱️ Qual o tempo máximo de cozimento por refeição (em minutos)?",
+    "mealPlanCreator.chat.skillLevel":
+      "👨‍🍳 Qual seu nível de habilidade culinária?",
     "mealPlanCreator.chat.budget": "💰 Qual sua faixa de orçamento?",
-    "mealPlanCreator.chat.allergies": "⚠️ Alguma alergia ou intolerância alimentar?",
-    "mealPlanCreator.chat.healthGoals": "💪 Algum objetivo de saúde para este plano?",
-    "mealPlanCreator.chat.extras": "📝 Algo que não goste ou pedidos especiais? (Opcional)",
+    "mealPlanCreator.chat.allergies":
+      "⚠️ Alguma alergia ou intolerância alimentar?",
+    "mealPlanCreator.chat.healthGoals":
+      "💪 Algum objetivo de saúde para este plano?",
+    "mealPlanCreator.chat.extras":
+      "📝 Algo que não goste ou pedidos especiais? (Opcional)",
     "mealPlanCreator.chat.extrasPlaceholder": "Digite aqui ou pule...",
     "mealPlanCreator.chat.none": "Nenhum",
     "mealPlanCreator.chat.skipped": "Pulado",
-    "mealPlanCreator.chat.summaryTitle": "Aqui está o resumo do seu plano de refeições:",
-    "mealPlanCreator.chat.confirmPrompt": "Parece bom? Clique em **Gerar** para criar seu plano de refeições! 🚀",
+    "mealPlanCreator.chat.summaryTitle":
+      "Aqui está o resumo do seu plano de refeições:",
+    "mealPlanCreator.chat.confirmPrompt":
+      "Parece bom? Clique em **Gerar** para criar seu plano de refeições! 🚀",
     "mealPlanCreator.chat.letsGo": "Vamos lá! 🚀",
-    "mealPlanCreator.chat.loaderMessage": "Analisando suas preferências e criando seu plano de refeições perfeito...",
-    "mealPlanCreator.chat.missingName": "Por favor, insira um nome para o plano.",
-    "mealPlanCreator.chat.missingDate": "Por favor, selecione uma data de início.",
+    "mealPlanCreator.chat.loaderMessage":
+      "Analisando suas preferências e criando seu plano de refeições perfeito...",
+    "mealPlanCreator.chat.missingName":
+      "Por favor, insira um nome para o plano.",
+    "mealPlanCreator.chat.missingDate":
+      "Por favor, selecione uma data de início.",
     "mealPlanCreator.chat.confirm": "Confirmar",
     "mealPlanCreator.chat.skip": "Pular →",
     "mealPlanCreator.chat.continue": "Continuar",
@@ -4487,15 +4622,24 @@ const translations = {
     "aiMealCreatorStepper.review.dish": "Prato",
 
     // AI Meal Creator Chat
-    "aiMealCreatorStepper.chat.welcome": "👋 Olá! Sou seu assistente de refeições IA. Vamos criar algo delicioso juntos! Que tipo de refeição você está desejando?",
-    "aiMealCreatorStepper.chat.mealName": "Ótima escolha! 🎉 Você tem um nome para esta refeição? (Opcional - digite ou pule)",
-    "aiMealCreatorStepper.chat.dishName": "🍽️ Você tem um prato específico em mente? ex. Macarrão com Queijo (Opcional)",
-    "aiMealCreatorStepper.chat.details": "⚡ Vamos configurar os detalhes — porções, tempo de preparo, nível de habilidade e orçamento.",
-    "aiMealCreatorStepper.chat.dietary": "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
-    "aiMealCreatorStepper.chat.cuisine": "🌍 Preferências de culinária? Selecione as que te agradam!",
-    "aiMealCreatorStepper.chat.healthGoals": "💪 Algum objetivo de saúde para esta refeição?",
-    "aiMealCreatorStepper.chat.allergies": "⚠️ Alguma alergia ou intolerância alimentar que eu deva saber?",
-    "aiMealCreatorStepper.chat.extras": "📝 Mais alguma coisa? Alimentos que não gosta, pedidos especiais ou alergias personalizadas? (Opcional)",
+    "aiMealCreatorStepper.chat.welcome":
+      "👋 Olá! Sou seu assistente de refeições IA. Vamos criar algo delicioso juntos! Que tipo de refeição você está desejando?",
+    "aiMealCreatorStepper.chat.mealName":
+      "Ótima escolha! 🎉 Você tem um nome para esta refeição? (Opcional - digite ou pule)",
+    "aiMealCreatorStepper.chat.dishName":
+      "🍽️ Você tem um prato específico em mente? ex. Macarrão com Queijo (Opcional)",
+    "aiMealCreatorStepper.chat.details":
+      "⚡ Vamos configurar os detalhes — porções, tempo de preparo, nível de habilidade e orçamento.",
+    "aiMealCreatorStepper.chat.dietary":
+      "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
+    "aiMealCreatorStepper.chat.cuisine":
+      "🌍 Preferências de culinária? Selecione as que te agradam!",
+    "aiMealCreatorStepper.chat.healthGoals":
+      "💪 Algum objetivo de saúde para esta refeição?",
+    "aiMealCreatorStepper.chat.allergies":
+      "⚠️ Alguma alergia ou intolerância alimentar que eu deva saber?",
+    "aiMealCreatorStepper.chat.extras":
+      "📝 Mais alguma coisa? Alimentos que não gosta, pedidos especiais ou alergias personalizadas? (Opcional)",
     "aiMealCreatorStepper.chat.none": "Nenhum",
     "aiMealCreatorStepper.chat.skipped": "Pulado",
     "aiMealCreatorStepper.chat.confirm": "Confirmar",
@@ -4503,34 +4647,46 @@ const translations = {
     "aiMealCreatorStepper.chat.continue": "Continuar",
     "aiMealCreatorStepper.chat.generate": "Gerar Minha Refeição",
     "aiMealCreatorStepper.chat.letsGo": "Vamos lá! 🚀",
-    "aiMealCreatorStepper.chat.readyTitle": "Aqui está o resumo do seu plano de refeição:",
-    "aiMealCreatorStepper.chat.confirmPrompt": "Parece bom? Clique em **Gerar** para criar sua refeição! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle":
+      "Aqui está o resumo do seu plano de refeição:",
+    "aiMealCreatorStepper.chat.confirmPrompt":
+      "Parece bom? Clique em **Gerar** para criar sua refeição! 🚀",
     "aiMealCreatorStepper.chat.typePlaceholder": "Digite aqui ou pule...",
     "aiMealCreatorStepper.chat.dishPlaceholder": "ex., Macarrão com Queijo",
     "aiMealCreatorStepper.chat.servingsLabel": "porções",
     "aiMealCreatorStepper.chat.budgetSuffix": "orçamento",
     "aiMealCreatorStepper.chat.servings": "👥 Quantas porções você precisa?",
-    "aiMealCreatorStepper.chat.cookTime": "⏱️ Qual o tempo máximo de cozimento (em minutos)?",
-    "aiMealCreatorStepper.chat.skill": "👨‍🍳 Qual é o seu nível de habilidade na cozinha?",
-    "aiMealCreatorStepper.chat.budget": "💰 Qual é a sua faixa de orçamento para esta refeição?",
+    "aiMealCreatorStepper.chat.cookTime":
+      "⏱️ Qual o tempo máximo de cozimento (em minutos)?",
+    "aiMealCreatorStepper.chat.skill":
+      "👨‍🍳 Qual é o seu nível de habilidade na cozinha?",
+    "aiMealCreatorStepper.chat.budget":
+      "💰 Qual é a sua faixa de orçamento para esta refeição?",
     "aiMealCreator.markAsDoneSuccess": "Refeição marcada como concluída",
     "aiMealCreator.markAsUndoneSuccess": "Refeição marcada como não concluída",
-    "aiDrinkCreator.markAsDoneSuccess": "Bebida marcada como consumida com sucesso!",
+    "aiDrinkCreator.markAsDoneSuccess":
+      "Bebida marcada como consumida com sucesso!",
     "aiDrinkCreator.markAsDoneError": "Falha ao marcar bebida como consumida",
-  
 
     // AI Drink Creator Chat
-    "aiDrinkChat.welcome": "👋 Olá! Sou seu assistente de bebidas IA. Vamos criar uma bebida saudável para você! Que tipo de bebida você gostaria?",
-    "aiDrinkChat.drinkName": "Ótima escolha! 🎉 Como você quer chamar sua bebida? (Opcional)",
+    "aiDrinkChat.welcome":
+      "👋 Olá! Sou seu assistente de bebidas IA. Vamos criar uma bebida saudável para você! Que tipo de bebida você gostaria?",
+    "aiDrinkChat.drinkName":
+      "Ótima escolha! 🎉 Como você quer chamar sua bebida? (Opcional)",
     "aiDrinkChat.servings": "👥 Quantas porções você precisa?",
     "aiDrinkChat.cookTime": "⏱️ Qual o tempo máximo de preparo (em minutos)?",
     "aiDrinkChat.skill": "👨‍🍳 Qual é o seu nível de habilidade?",
-    "aiDrinkChat.budget": "💰 Qual é a sua faixa de orçamento para esta bebida?",
-    "aiDrinkChat.healthGoals": "💪 Quais são seus objetivos de saúde? Selecione todos que se aplicam.",
-    "aiDrinkChat.dietary": "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
+    "aiDrinkChat.budget":
+      "💰 Qual é a sua faixa de orçamento para esta bebida?",
+    "aiDrinkChat.healthGoals":
+      "💪 Quais são seus objetivos de saúde? Selecione todos que se aplicam.",
+    "aiDrinkChat.dietary":
+      "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
     "aiDrinkChat.cuisine": "🌍 Preferências de culinária ou sabores?",
-    "aiDrinkChat.allergies": "⚠️ Alguma alergia ou intolerância que eu deva saber?",
-    "aiDrinkChat.extras": "📝 Mais alguma coisa? Alimentos que não gosta ou pedidos especiais? (Opcional)",
+    "aiDrinkChat.allergies":
+      "⚠️ Alguma alergia ou intolerância que eu deva saber?",
+    "aiDrinkChat.extras":
+      "📝 Mais alguma coisa? Alimentos que não gosta ou pedidos especiais? (Opcional)",
     "aiDrinkChat.none": "Nenhum",
     "aiDrinkChat.skipped": "Pulado",
     "aiDrinkChat.confirm": "Confirmar",
@@ -4539,8 +4695,10 @@ const translations = {
     "aiDrinkChat.generate": "Gerar Minha Bebida",
     "aiDrinkChat.letsGo": "Vamos lá! 🚀",
     "aiDrinkChat.readyTitle": "Aqui está o resumo da sua bebida:",
-    "aiDrinkChat.confirmPrompt": "Parece bom? Clique em **Gerar** para criar sua bebida! 🚀",
-    "aiDrinkChat.loaderMessage": "Preparando a bebida saudável perfeita para você...",
+    "aiDrinkChat.confirmPrompt":
+      "Parece bom? Clique em **Gerar** para criar sua bebida! 🚀",
+    "aiDrinkChat.loaderMessage":
+      "Preparando a bebida saudável perfeita para você...",
     "aiDrinkChat.back": "Voltar",
     "aiDrinkChat.title": "Criador de Bebidas IA",
     "aiDrinkChat.servingsLabel": "Porções",
@@ -4766,7 +4924,8 @@ const translations = {
     "aiMealView.ingredientsSelector": "Lista de Ingredientes",
     "aiMealView.selectAll": "Selecionar Tudo",
     "aiMealView.deselectAll": "Desmarcar Tudo",
-    "aiMealView.selectIngredientsDesc": "Selecione ingredientes para adicionar à despensa ou carrinho",
+    "aiMealView.selectIngredientsDesc":
+      "Selecione ingredientes para adicionar à despensa ou carrinho",
     "aiMealView.addToPantry": "Adicionar à Despensa",
     "aiMealView.addToCart": "Adicionar ao Carrinho",
 
@@ -5040,13 +5199,17 @@ const translations = {
     "drinkDetailView.shoppingList": "Lista de Compras",
     "drinkDetailView.selectAll": "Selecionar Tudo",
     "drinkDetailView.deselectAll": "Desmarcar Tudo",
-    "drinkDetailView.selectIngredients": "Selecione ingredientes para adicionar ao carrinho",
+    "drinkDetailView.selectIngredients":
+      "Selecione ingredientes para adicionar ao carrinho",
     "drinkDetailView.addToCart": "Adicionar ao Carrinho",
     "drinkDetailView.addedToCart": "Adicionado ao Carrinho",
-    "drinkDetailView.itemsAddedToCart": "itens adicionados ao seu carrinho de compras",
+    "drinkDetailView.itemsAddedToCart":
+      "itens adicionados ao seu carrinho de compras",
     "drinkDetailView.noIngredientsSelected": "Nenhum ingrediente selecionado",
-    "drinkDetailView.selectIngredientsFirst": "Por favor, selecione ingredientes primeiro.",
-    "drinkDetailView.pantryFailed": "Falha ao adicionar ingredientes à despensa. Tente novamente.",
+    "drinkDetailView.selectIngredientsFirst":
+      "Por favor, selecione ingredientes primeiro.",
+    "drinkDetailView.pantryFailed":
+      "Falha ao adicionar ingredientes à despensa. Tente novamente.",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "Nenhum ingrediente selecionado",
@@ -5139,7 +5302,8 @@ const translations = {
     "recipeView.ingredientsSelector": "Ingredientes",
     "recipeView.selectAll": "Selecionar Tudo",
     "recipeView.deselectAll": "Desmarcar Tudo",
-    "recipeView.selectIngredientsDesc": "Selecione ingredientes para adicionar à despensa ou carrinho",
+    "recipeView.selectIngredientsDesc":
+      "Selecione ingredientes para adicionar à despensa ou carrinho",
     "recipeView.addToPantry": "Adicionar à Despensa",
     "recipeView.addToCart": "Adicionar ao Carrinho",
     "recipeView.addedToPantry": "Adicionado à Despensa",
@@ -5155,7 +5319,8 @@ const translations = {
     "cookingMode.listen": "Ouvir",
     "cookingMode.listenAll": "Ouvir Tudo",
     "cookingMode.stop": "Parar",
-    "cookingMode.completed": "Todos os passos concluídos! Aproveite sua refeição!",
+    "cookingMode.completed":
+      "Todos os passos concluídos! Aproveite sua refeição!",
     "cookingMode.stepsCompleted": "passos",
     "cookingMode.repeat": "Repetir",
     "cookingMode.viewAll": "Ver Tudo",
@@ -5479,7 +5644,8 @@ const translations = {
 
     // AI Meal Suggestions
     "aiSuggestions.title": "Sugestões de Refeições com IA",
-    "aiSuggestions.description": "Receba sugestões personalizadas com base nos seus ingredientes próximos do vencimento",
+    "aiSuggestions.description":
+      "Receba sugestões personalizadas com base nos seus ingredientes próximos do vencimento",
     "aiSuggestions.generate": "Gerar Sugestões IA",
     "aiSuggestions.generating": "Gerando...",
     "aiSuggestions.generateMore": "Gerar Mais Sugestões",
@@ -5491,7 +5657,8 @@ const translations = {
     "aiSuggestions.addToFavorites": "Adicionar aos Favoritos",
     "aiSuggestions.favorited": "Favoritado",
     "aiSuggestions.removedFromFavorites": "Removido dos favoritos",
-    "aiSuggestions.removedFromFavoritesDesc": "foi removido dos seus favoritos.",
+    "aiSuggestions.removedFromFavoritesDesc":
+      "foi removido dos seus favoritos.",
     "aiSuggestions.addedToFavorites": "Adicionado aos favoritos!",
     "aiSuggestions.addedToFavoritesDesc": "foi adicionado aos seus favoritos.",
     "aiSuggestions.markAsConsumed": "Marcar como Consumido",
@@ -5512,13 +5679,17 @@ const translations = {
     "aiSuggestions.richInVitamins": "Rico em vitaminas",
     "aiSuggestions.cookingInstructions": "Instruções de Preparo",
     "aiSuggestions.ready": "Sugestões de IA prontas!",
-    "aiSuggestions.readyDesc": "sugestões de refeições. Pegada de carbono total:",
+    "aiSuggestions.readyDesc":
+      "sugestões de refeições. Pegada de carbono total:",
     "aiSuggestions.error": "Erro",
-    "aiSuggestions.userNotFound": "Usuário não encontrado. Faça login novamente.",
-    "aiSuggestions.failedToGenerate": "Falha ao gerar sugestões. Tente novamente.",
+    "aiSuggestions.userNotFound":
+      "Usuário não encontrado. Faça login novamente.",
+    "aiSuggestions.failedToGenerate":
+      "Falha ao gerar sugestões. Tente novamente.",
     "aiSuggestions.subscriptionLimit": "Limite de Assinatura Atingido",
     "aiSuggestions.noIngredients": "Nenhum Ingrediente Encontrado",
-    "aiSuggestions.loaderMessage": "Criando deliciosas sugestões de refeições com seus ingredientes...",
+    "aiSuggestions.loaderMessage":
+      "Criando deliciosas sugestões de refeições com seus ingredientes...",
     "aiSuggestions.min": "min",
     "aiSuggestions.cal": "cal",
 
@@ -5544,8 +5715,8 @@ const translations = {
     "subscription.monthly": "Mensal",
     "subscription.paymentInfo": "Informações de Pagamento",
     "subscription.cardDetails": "Detalhes do Cartão",
-    "subscription.paymentSecure":"Seu pagamento está seguro com Rukupay LLC",
-     "subscription.processing": "Processando...",
+    "subscription.paymentSecure": "Seu pagamento está seguro com Rukupay LLC",
+    "subscription.processing": "Processando...",
     "mealPlanner.pagination.previous": "Antigo",
     "mealPlanner.pagination.next": "Seguindo",
 
@@ -5558,7 +5729,7 @@ const translations = {
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useLanguage = () => {
