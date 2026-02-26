@@ -77,7 +77,7 @@ const SignupSteps = () => {
   const incompleteState = location.state as { accountIncomplete?: boolean; email?: string; userId?: string } | null;
   const isAccountIncomplete = incompleteState?.accountIncomplete === true;
 
-  const [currentStep, setCurrentStep] = useState(isAccountIncomplete ? 2 : 1);
+  const [currentStep, setCurrentStep] = useState(isAccountIncomplete ? 1 : 1);
   const [signupData, setSignupData] = useState<SignupData>({
     email: incompleteState?.email || "",
     password: "",
@@ -114,14 +114,9 @@ const SignupSteps = () => {
 
     try {
       if (isAccountIncomplete) {
-        // For incomplete accounts: account already exists, just store password and proceed to profile
-        console.log("Incomplete account flow: storing password and proceeding to profile");
-        toast({
-          title: "✅ Password Confirmed!",
-          description: "Continue to complete your profile.",
-          duration: 5000,
-        });
-        setCurrentStep(3);
+        // For incomplete accounts: store password and go to OTP verification
+        console.log("Incomplete account flow: moving to OTP verification");
+        setCurrentStep(2);
         return;
       }
 
@@ -193,11 +188,49 @@ const SignupSteps = () => {
     }
   };
 
-  const handleOTPVerified = () => {
+  const handleOTPVerified = async () => {
     console.log("OTP verified successfully");
     if (isAccountIncomplete) {
-      // For incomplete accounts: after OTP, go to step 1 to ask for password
-      setCurrentStep(1);
+      // After OTP verified, call signup service to update password
+      try {
+        setIsLoading(true);
+        console.log("Calling signup service to update password for incomplete account:", signupData.email);
+
+        const config = {
+          method: "post",
+          url: `${BasicURL}/security/signup`,
+          headers: { "Content-Type": "application/json" },
+          data: { email: signupData.email, password: signupData.password },
+        };
+
+        const response = await axios.request(config);
+        console.log("Signup (password update) response:", response.data);
+
+        if (response.data.response?.userId) {
+          setSignupData((prev) => ({ ...prev, userId: response.data.response.userId }));
+          setUserId(response.data.response.userId);
+        }
+
+        toast({
+          title: "✅ Account Updated!",
+          description: "Your password has been set. Continue to complete your profile.",
+          duration: 5000,
+        });
+        setCurrentStep(3);
+      } catch (error: any) {
+        console.error("Signup service failed for incomplete account:", error);
+        const errorMessage = error.response?.data?.message
+          ? (typeof error.response.data.message === "string" ? error.response.data.message : error.response.data.message.message || "Failed to update account")
+          : error.message || "Failed to update account. Please try again.";
+        toast({
+          title: "❌ Account Update Failed",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 5000,
+        });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setCurrentStep(3);
     }
