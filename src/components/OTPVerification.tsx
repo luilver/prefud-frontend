@@ -205,7 +205,7 @@ const OTPVerification = ({ email, userId, onVerified, onBack, useEmailVerificati
 
           <Button 
             onClick={handleVerify}
-            disabled={otp.length !== 6 || isLoading || !userId}
+            disabled={otp.length !== 6 || isLoading || (!useEmailVerification && !userId)}
             className="w-full bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 mb-4"
           >
             {isLoading ? 'Verifying...' : t("signup.verifyEmail") || "Verify Email"}
@@ -218,7 +218,7 @@ const OTPVerification = ({ email, userId, onVerified, onBack, useEmailVerificati
             <Button 
               variant="ghost" 
               onClick={handleResend}
-              disabled={isResending || !userId}
+              disabled={isResending || (!useEmailVerification && !userId)}
               className="text-green-600 hover:text-green-700"
             >
               {isResending ? (

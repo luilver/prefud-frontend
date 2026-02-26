@@ -153,7 +153,24 @@ export const en = {
     "termsAndConditions": "Terms and Conditions",
     "alreadyAccount": "Already have an account?",
     "signIn": "Sign In",
-    "submit": "Submit"
+    "submit": "Submit",
+    "account": "Account",
+    "account.title": "Create Your Account",
+    "account.description": "Enter your email and create a password to get started",
+    "account.email": "Email Address",
+    "account.password": "Password",
+    "verify": "Verify",
+    "verify.title": "Verify Your Email",
+    "profile": "Profile",
+    "plan": "Plan",
+    "payment": "Payment",
+    "emailPlaceholder": "Enter your email address",
+    "passwordPlaceholder": "Create a secure password",
+    "otpSent": "We've sent a 6-digit code to",
+    "enterOTP": "Enter the verification code sent to your email",
+    "verifyEmail": "Verify Email",
+    "didntReceiveCode": "Didn't receive the code?",
+    "resendCode": "Resend Code"
   },
   "signin": {
     "title": "Sign In",
@@ -170,7 +187,9 @@ export const en = {
     "forgot-password": "Forgot Password?",
     "submit": "Submit",
     "button": "Sign In",
-    "signing-in": "Signing in..."
+    "signing-in": "Signing in...",
+    "accountIncomplete": "Account Incomplete",
+    "accountIncompleteDesc": "Your account needs to be completed. Please verify your email and finish registration."
   },
   "pricing": {
     "title": "Pricing Plans",
