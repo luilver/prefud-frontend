@@ -170,7 +170,9 @@ export const en = {
     "enterOTP": "Enter the verification code sent to your email",
     "verifyEmail": "Verify Email",
     "didntReceiveCode": "Didn't receive the code?",
-    "resendCode": "Resend Code"
+    "resendCode": "Resend Code",
+    "ageError.title": "❌ Age Requirement",
+    "ageError.description": "You must be at least 18 years old to create an account."
   },
   "signin": {
     "title": "Sign In",

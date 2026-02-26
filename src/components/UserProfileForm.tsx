@@ -80,6 +80,26 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate age (must be 18+)
+    if (formData.birthday) {
+      const birthDate = new Date(formData.birthday);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      if (age < 18) {
+        toast({
+          title: t("signup.ageError.title") || "❌ Age Requirement",
+          description: t("signup.ageError.description") || "You must be at least 18 years old to create an account.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        return;
+      }
+    }
+
     if (!formData.acceptedTerms) {
       toast({
         title: "❌ Terms Required",
