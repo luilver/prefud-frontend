@@ -212,18 +212,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Clear user state
     setUser(null);
     
-    // Clean all authentication-related data from localStorage for security
-    localStorage.removeItem('authUser');
-    localStorage.removeItem('authToken');
-    
-    // Optional: Clear any other session-related data if needed in the future
-    // This ensures complete cleanup without affecting other app data
-    const keysToRemove = ['authUser', 'authToken', 'userSubscription'];
-    keysToRemove.forEach(key => {
-      if (localStorage.getItem(key)) {
-        localStorage.removeItem(key);
-      }
-    });
+    // Clean all session-related data from localStorage for security
+    const keysToRemove = [
+      'authUser', 'authToken', 'userSubscription',
+      'user', 'pantryItems', 'shoppingItems', 'mealPlans',
+      'completedMeals', 'subscriptionInfo', 'aiMeals',
+      'aiDrinks', 'favoriteMeals', 'pantry-cart'
+    ];
+    keysToRemove.forEach(key => localStorage.removeItem(key));
     
     // Clear subscription context via sync event
     window.dispatchEvent(new CustomEvent('subscription-sync', { detail: { subscription: null } }));
