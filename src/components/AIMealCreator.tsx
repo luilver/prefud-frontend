@@ -84,16 +84,13 @@ const AIMealCreator = () => {
   };
 
   const handleMealCreated = (meal: any) => {
-    const newMeal = {
-      ...meal,
-      id: Date.now().toString()
-    };
-    addAIMeal(newMeal);
     setShowCreator(false);
-    // Reset to first page when new meal is added
+    // Reset to first page and refresh from server
     setCurrentPage(1);
-    // Refresh API meals after creating a new one
     fetchUserMeals(1, pageSize);
+    toast({
+      title: t("aiMealGenerator.save") || "Meal saved successfully!",
+    });
   };
 
   const handleViewMeal = (meal: any) => {

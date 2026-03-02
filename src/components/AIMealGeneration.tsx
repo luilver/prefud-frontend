@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, ShoppingCart, Package, Plus, CheckSquare, CreditCard, MapPin } from "lucide-react";
+import { Clock, Users, ChefHat, BookOpen, Check, Timer, Flame, ShoppingCart, Package, CheckSquare, CreditCard, MapPin } from "lucide-react";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -206,7 +206,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         quantity: ingredient.quantity,
         unit: ingredient.unit,
         category: ingredient.classification || getCategoryForIngredient(ingredient.name),
-        estimatedPrice: Math.floor(Math.random() * 800) + 200, // $2-10
+        
         mealName: meal.name,
         notes: `For ${meal.name} recipe`
       }));
@@ -341,9 +341,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     }
 
     // Simulate order processing
-    const totalCost = selectedItems.reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100;
-    
-    toast.success(`Order placed successfully! ${selectedItems.length} items ordered for $${totalCost.toFixed(2)}`);
+    toast.success(`Order placed successfully! ${selectedItems.length} items ordered.`);
     
     // Reset state
     setCheckedIngredients(new Set());
@@ -373,7 +371,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const handleSaveMeal = () => {
     if (meal) {
       onMealCreated(meal);
-      toast.success(t("aiMealGenerator.save") || "Meal saved successfully!");
     }
   };
 
@@ -425,10 +422,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   // Shopping List View
   if (showShoppingList) {
     const selectedCount = checkedIngredients.size;
-    const totalCost = shoppingList
-      .filter(item => checkedIngredients.has(item.id))
-      .reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100;
-
     return (
       <>
         <div className="max-w-4xl mx-auto space-y-6 p-4">
@@ -487,9 +480,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                       {item.quantity} {item.unit}
                     </p>
                   </div>
-                  <div className="text-sm font-medium text-green-600">
-                    ${(item.estimatedPrice / 100).toFixed(2)}
-                  </div>
                 </div>
               ))}
             </div>
@@ -544,9 +534,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                     .filter(item => checkedIngredients.has(item.id))
                     .map(item => item.name)
                     .join(', ')}
-                </div>
-                <div className="text-lg font-semibold text-green-600 mt-2">
-                  {t('mealShopping.total') || 'Total'}: ${totalCost.toFixed(2)}
                 </div>
               </div>
 
@@ -751,9 +738,8 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="recipe">{t("mealTabs.recipe") || "Recipe"}</TabsTrigger>
-                <TabsTrigger value="video">{t("mealTabs.video") || "Video Tutorial"}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="recipe" className="space-y-6">
@@ -854,73 +840,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="video">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Play className="h-5 w-5 text-red-600" />
-                      <span>{t("mealTabs.video") || "Video Tutorial"}</span>
-                    </CardTitle>
-                    <CardDescription>
-                      {t("mealTabs.videoDesc") || "Watch step-by-step preparation for"} {meal.name}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
-                      {!isVideoPlaying ? (
-                        <div className="text-center space-y-4">
-                          <Button
-                            onClick={() => setIsVideoPlaying(true)}
-                            size="lg"
-                            className="bg-red-600 hover:bg-red-700 rounded-full"
-                          >
-                            <Play className="h-6 w-6 mr-2" />
-                            {t("mealTabs.playVideo") || "Play Video"}
-                          </Button>
-                          <Button
-                            onClick={openFullscreenVideo}
-                            variant="outline"
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <Maximize className="h-4 w-4 mr-2" />
-                            {t("mealTabs.fullscreen") || "Fullscreen"}
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="text-white text-center space-y-4">
-                          <iframe
-                            width="100%"
-                            height="315"
-                            src="https://www.youtube.com/embed/ixpYIgHlU60"
-                            title="Recipe Video Tutorial"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="rounded-lg"
-                          ></iframe>
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              onClick={() => setIsVideoPlaying(false)}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              {t("mealTabs.closeVideo") || "Close Video"}
-                            </Button>
-                            <Button
-                              onClick={openFullscreenVideo}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              <Maximize className="h-4 w-4 mr-2" />
-                              {t("mealTabs.fullscreen") || "Fullscreen"}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </Tabs>
           </div>
 
@@ -1002,30 +921,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
           </div>
         </div>
       </div>
-
-      {/* Fullscreen Video Modal */}
-      {isFullscreen && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="relative w-full h-full">
-            <Button
-              onClick={closeFullscreenVideo}
-              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-2"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/ixpYIgHlU60?autoplay=1"
-              title="Recipe Video Tutorial - Fullscreen"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            ></iframe>
-          </div>
-        </div>
-      )}
 
       <SubscriptionUpgradeModal
         isOpen={showUpgradeModal}
