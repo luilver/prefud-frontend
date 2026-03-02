@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,7 +45,11 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
   const { language, t } = useLanguage();
 
+  const hasGeneratedRef = useRef(false);
+
   useEffect(() => {
+    if (hasGeneratedRef.current) return;
+    hasGeneratedRef.current = true;
     generateMeal();
   }, []);
 
@@ -734,9 +738,28 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
           </CardHeader>
         </Card>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        {/* Nutrition Stats - Mobile-friendly horizontal scroll */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.calories") || "Calories"}</p>
+            <p className="text-lg font-bold text-purple-600">{nutrition?.calories}</p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.protein") || "Protein"}</p>
+            <p className="text-lg font-bold text-blue-600">{nutrition?.protein}g</p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.carbs") || "Carbs"}</p>
+            <p className="text-lg font-bold text-orange-600">{nutrition?.carbohydrates || nutrition?.carbs}g</p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.fat") || "Fat"}</p>
+            <p className="text-lg font-bold text-red-600">{nutrition?.fat}g</p>
+          </div>
+        </div>
+
+        {/* Main Content - Single column on mobile */}
+        <div className="space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
               <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="recipe">{t("mealTabs.recipe") || "Recipe"}</TabsTrigger>
@@ -841,84 +864,40 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
               </TabsContent>
 
             </Tabs>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Nutrition */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("mealSidebar.nutrition") || "Nutrition (per serving)"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="font-medium">{t("mealSidebar.calories") || "Calories"}</span>
-                    <span>{nutrition?.calories}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.protein") || "Protein"}</span>
-                    <span>{nutrition?.protein}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.carbs") || "Carbs"}</span>
-                    <span>{nutrition?.carbohydrates || nutrition?.carbs}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.fat") || "Fat"}</span>
-                    <span>{nutrition?.fat}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.fiber") || "Fiber"}</span>
-                    <span>{nutrition?.fiber}g</span>
-                  </div>
-                  {nutrition?.vitamins && (
-                    <div className="pt-2 border-t">
-                      <p className="text-sm font-medium mb-1">{t("mealSidebar.vitamins") || "Vitamins"}:</p>
-                      <p className="text-xs text-gray-600">{nutrition.vitamins.join(', ')}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Cooking Progress */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("mealSidebar.progress") || "Cooking Progress"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
+          {/* Cooking Progress */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
                   <div className="text-2xl font-bold text-purple-600">
                     {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
                   </div>
                   <p className="text-sm text-gray-600">
                     {completedSteps.length} {t("mealSidebar.of") || "of"} {enhancedInstructions.length} {t("mealSidebar.stepsCompleted") || "steps completed"}
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div
-                      className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
-                    ></div>
-                  </div>
-                  {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
-                    <div className="mt-3 p-2 bg-purple-100 rounded-lg">
-                      <p className="text-sm text-purple-700 font-medium">🎉 {t("mealSidebar.recipeCompleted") || "Recipe completed!"}</p>
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+                {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
+                  <span className="text-sm text-purple-700 font-medium">🎉</span>
+                )}
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
+                ></div>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Action Button */}
-            <Button 
-              onClick={handleSaveMeal}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-              size="lg"
-            >
-              {t("mealSidebar.saveMeal") || "Save This Meal"}
-            </Button>
-          </div>
+          {/* Action Button */}
+          <Button 
+            onClick={handleSaveMeal}
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+            size="lg"
+          >
+            {t("mealSidebar.saveMeal") || "Save This Meal"}
+          </Button>
         </div>
       </div>
 
