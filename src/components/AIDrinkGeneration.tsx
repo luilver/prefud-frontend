@@ -94,7 +94,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated, initialDrink }: AIDrinkGenera
           name: ing.name,
           amount: `${ing.quantity} ${ing.unit}`,
           category: apiResponse.ingredientsList.find(item => item.name === ing.name)?.classification || 'Other',
-          price: `$${(Math.random() * 5 + 1).toFixed(2)}` // Mock price for shopping list
+          
         })),
         instructions: apiResponse.healthyDrink.steps,
         nutritionHighlights: [
@@ -436,23 +436,11 @@ const AIDrinkGeneration = ({ data, onDrinkCreated, initialDrink }: AIDrinkGenera
                     <p className="text-sm text-gray-500">{ingredient.amount} • {ingredient.category}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-green-600 font-medium">{ingredient.price}</span>
-                </div>
               </div>
             ))}
           </div>
           
           <Separator className="my-4" />
-          
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-lg font-semibold text-green-800">
-              {t("aiDrinkGeneration.totalCost") || "Total Estimated Cost:"}
-            </span>
-            <span className="text-lg font-bold text-green-600">
-              ${shoppingList.reduce((total, item) => total + parseFloat(item.price.replace('$', '')), 0).toFixed(2)}
-            </span>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex space-x-3">
