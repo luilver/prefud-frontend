@@ -19,6 +19,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Favorites from "@/pages/Favorites";
 import Cart from "@/pages/Cart";
 import NotFound from "@/pages/NotFound";
+import Landing from "@/pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const AppContent = () => {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/landing" element={<Landing />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
