@@ -3,11 +3,10 @@ import { Button } from "@/components/ui/button";
 import { 
   ChefHat, ShoppingCart, ListChecks, Package, 
   DollarSign, Sparkles, ArrowRight, Check,
-  Utensils, Leaf, Clock, BookOpen, CookingPot
+  Utensils, Leaf, Clock, BookOpen
 } from "lucide-react";
 import { trackEvent } from "@/services/analytics";
 import { useNavigate } from "react-router-dom";
-import LanguageSelector from "@/components/LanguageSelector";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -19,19 +18,6 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-emerald-950/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-5xl mx-auto flex items-center justify-between px-4 h-14">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
-              <CookingPot className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-poppins font-bold text-white text-lg">Pantry AI</span>
-          </div>
-          <LanguageSelector variant="button" />
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center px-4 overflow-hidden">
         {/* Background gradient */}
