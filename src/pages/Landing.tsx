@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { 
   ChefHat, ShoppingCart, ListChecks, Package, 
   DollarSign, Sparkles, ArrowRight, Check,
-  Utensils, Leaf, Clock, BookOpen
+  Utensils, Leaf, Clock, BookOpen, CookingPot
 } from "lucide-react";
 import { trackEvent } from "@/services/analytics";
 import { useNavigate } from "react-router-dom";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Landing = () => {
   const navigate = useNavigate();
