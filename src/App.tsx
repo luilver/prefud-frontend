@@ -19,6 +19,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Favorites from "@/pages/Favorites";
 import Cart from "@/pages/Cart";
 import NotFound from "@/pages/NotFound";
+import Landing from "@/pages/Landing";
 
 const queryClient = new QueryClient();
 
