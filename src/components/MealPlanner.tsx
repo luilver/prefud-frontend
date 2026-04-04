@@ -333,122 +333,174 @@ const MealPlanner = () => {
                   "N/A";
                 const mealsCount = plan.preferences?.mealsPerDay || "3";
 
+                // CO2 visual calculation (scale: 0-50kg as max for a meal plan)
+                const co2Value = plan.totalCarbonFootprint ? parseFloat(plan.totalCarbonFootprint) : 0;
+                const co2Max = 50;
+                const co2Percent = Math.min((co2Value / co2Max) * 100, 100);
+                const co2Level = co2Percent <= 33 ? 'low' : co2Percent <= 66 ? 'medium' : 'high';
+                const co2Color = co2Level === 'low' ? 'text-emerald-600' : co2Level === 'medium' ? 'text-amber-600' : 'text-red-500';
+                const co2BarColor = co2Level === 'low' ? 'bg-emerald-500' : co2Level === 'medium' ? 'bg-amber-500' : 'bg-red-500';
+                const co2Label = co2Level === 'low' ? (t("mealPlanner.co2Low") || 'Low impact') : co2Level === 'medium' ? (t("mealPlanner.co2Medium") || 'Medium impact') : (t("mealPlanner.co2High") || 'High impact');
+
                 return (
-                  <Card
-                    key={plan.id}
-                    className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
-                    onClick={() => handlePlanSelect(plan)}
-                  >
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
-                    <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center gap-2 text-gray-800">
-                        <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
-                          <ChefHat className="h-5 w-5 text-white" />
-                        </div>
-                        <span className="truncate">{plan.name}</span>
-                      </CardTitle>
-                      <CardDescription className="text-gray-500">
-                        {plan.startDate} -{" "}
-                        {new Date(plan.endDate).toLocaleDateString()}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-emerald-500" />
-                          <span>
-                            {daysCount} {t("mealPlanner.day") || "day"}
-                            {daysCount > 1 ? "s" : ""}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-emerald-500" />
-                          <span>
-                            {t("mealPlanner.for") || "For"} {peopleCount}{" "}
-                            {t("mealPlanner.people") || "people"}
-                          </span>
-                        </div>
+                  <TooltipProvider key={plan.id} delayDuration={300}>
+                    <Card
+                      className="bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group relative"
+                      onClick={() => handlePlanSelect(plan)}
+                    >
+                      {/* Top accent bar */}
+                      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary/70" />
 
-                        {kidsbelow5Count > 0 && (
-                          <div className="flex items-center gap-2">
-                            <Baby className="h-4 w-4 text-emerald-500" />
-                            <span>
-                              {t("mealPlanner.for") || "For"} {kidsbelow5Count}{" "}
-                              {t("mealPlanner.kidsbelow5") || "kids below 5"}
-                            </span>
-                          </div>
-                        )}
-                        {kidsover5Count > 0 && (
-                          <div className="flex items-center gap-2">
-                            <Smile className="h-4 w-4 text-emerald-500" />
-                            <span>
-                              {t("mealPlanner.for") || "For"} {kidsover5Count}{" "}
-                              {t("mealPlanner.kidsover5") || "kids over 5"}
-                            </span>
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-emerald-500" />
-                          <span>
-                            {mealsCount}{" "}
-                            {t("mealPlanner.mealsPDay") || "meals per day"}
-                          </span>
-                        </div>
-
-                        {/* Additional plan details from API */}
-                        <div className="pt-2 border-t border-gray-100 space-y-1">
-                          {plan.preferences?.cuisinePreferences &&
-                            plan.preferences.cuisinePreferences.length > 0 && (
-                              <div className="text-xs text-emerald-600 font-medium">
-                                {t("mealPlanner.cuisine") || "Cuisine"}:{" "}
-                                {plan.preferences.cuisinePreferences.join(", ")}
-                              </div>
-                            )}
-
-                          {plan.preferences?.dietaryRestrictions &&
-                            plan.preferences.dietaryRestrictions.length > 0 && (
-                              <div className="text-xs text-teal-600 font-medium">
-                                {t("mealPlanner.diet") || "Diet"}:{" "}
-                                {plan.preferences.dietaryRestrictions.join(
-                                  ", ",
-                                )}
-                              </div>
-                            )}
-
-                          {plan.preferences?.cookingSkillLevel && (
-                            <div className="text-xs text-blue-600 font-medium">
-                              {t("mealPlanner.skillLevel") || "Skill Level"}:{" "}
-                              {plan.preferences.cookingSkillLevel}
+                      <CardHeader className="pb-2 pt-5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md flex-shrink-0">
+                              <ChefHat className="h-5 w-5 text-primary-foreground" />
                             </div>
+                            <div className="min-w-0">
+                              <CardTitle className="text-foreground text-base font-semibold truncate">
+                                {plan.name}
+                              </CardTitle>
+                              <CardDescription className="text-muted-foreground text-xs mt-0.5">
+                                {plan.startDate} — {new Date(plan.endDate).toLocaleDateString()}
+                              </CardDescription>
+                            </div>
+                          </div>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                        </div>
+                      </CardHeader>
+
+                      <CardContent className="pt-2 pb-4">
+                        {/* Metrics row - icon-driven, compact */}
+                        <div className="flex items-center gap-1 flex-wrap mb-3">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+                                <Calendar className="h-3.5 w-3.5 text-primary" />
+                                <span className="text-xs font-medium text-foreground">{daysCount}d</span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>{daysCount} {t("mealPlanner.day") || "days"}</TooltipContent>
+                          </Tooltip>
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+                                <Users className="h-3.5 w-3.5 text-primary" />
+                                <span className="text-xs font-medium text-foreground">{peopleCount}</span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>{peopleCount} {t("mealPlanner.people") || "people"}</TooltipContent>
+                          </Tooltip>
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+                                <UtensilsCrossed className="h-3.5 w-3.5 text-primary" />
+                                <span className="text-xs font-medium text-foreground">{mealsCount}/d</span>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>{mealsCount} {t("mealPlanner.mealsPDay") || "meals per day"}</TooltipContent>
+                          </Tooltip>
+
+                          {parseInt(kidsbelow5Count) > 0 && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+                                  <Baby className="h-3.5 w-3.5 text-primary" />
+                                  <span className="text-xs font-medium text-foreground">{kidsbelow5Count}</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>{kidsbelow5Count} {t("mealPlanner.kidsbelow5") || "kids under 5"}</TooltipContent>
+                            </Tooltip>
+                          )}
+
+                          {parseInt(kidsover5Count) > 0 && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
+                                  <Smile className="h-3.5 w-3.5 text-primary" />
+                                  <span className="text-xs font-medium text-foreground">{kidsover5Count}</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>{kidsover5Count} {t("mealPlanner.kidsover5") || "kids 5-12"}</TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
 
-                        <div className="mt-3 pt-2 border-t border-gray-100">
-                          <div className="text-xs text-gray-500">
-                            {plan.meals?.length || 0}{" "}
-                            {t("mealPlanner.totalMealsPlanned") ||
-                              "total meals planned"}
+                        {/* Tags: cuisine, diet, skill */}
+                        {(plan.preferences?.cuisinePreferences?.length > 0 || plan.preferences?.dietaryRestrictions?.length > 0 || plan.preferences?.cookingSkillLevel) && (
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {plan.preferences?.cuisinePreferences?.map((c: string) => (
+                              <span key={c} className="inline-flex items-center gap-1 text-[10px] font-medium bg-primary/10 text-primary rounded-full px-2 py-0.5">
+                                <Globe className="h-2.5 w-2.5" />{c}
+                              </span>
+                            ))}
+                            {plan.preferences?.dietaryRestrictions?.map((d: string) => (
+                              <span key={d} className="inline-flex items-center gap-1 text-[10px] font-medium bg-accent/20 text-accent-foreground rounded-full px-2 py-0.5">
+                                <Flame className="h-2.5 w-2.5" />{d}
+                              </span>
+                            ))}
+                            {plan.preferences?.cookingSkillLevel && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-secondary text-secondary-foreground rounded-full px-2 py-0.5">
+                                <Award className="h-2.5 w-2.5" />{plan.preferences.cookingSkillLevel}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Bottom stats row */}
+                        <div className="flex items-center justify-between text-xs text-muted-foreground border-t border-border/50 pt-2.5 mt-1">
+                          <div className="flex items-center gap-3">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-1">
+                                  <UtensilsCrossed className="h-3 w-3" />
+                                  <span className="font-medium">{plan.meals?.length || 0}</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>{plan.meals?.length || 0} {t("mealPlanner.totalMealsPlanned") || "total meals"}</TooltipContent>
+                            </Tooltip>
+
+                            {plan.shoppingList?.length > 0 && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="flex items-center gap-1 text-orange-600">
+                                    <ShoppingBasket className="h-3 w-3" />
+                                    <span className="font-medium">{plan.shoppingList.length}</span>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent>{plan.shoppingList.length} {t("mealPlanner.ingreNeeded") || "ingredients needed"}</TooltipContent>
+                              </Tooltip>
+                            )}
                           </div>
 
-                          {plan.shoppingList &&
-                            plan.shoppingList.length > 0 && (
-                              <div className="text-xs text-orange-600 mt-1">
-                                {plan.shoppingList.length}{" "}
-                                {t("mealPlanner.ingreNeeded") ||
-                                  "ingredients needed"}
-                              </div>
-                            )}
-                          {plan.totalCarbonFootprint && (
-                            <div className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
-                              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                              {plan.totalCarbonFootprint} Kg CO2
-                            </div>
+                          {/* Visual CO2 indicator */}
+                          {co2Value > 0 && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-2 min-w-[100px]">
+                                  <Leaf className={`h-3.5 w-3.5 flex-shrink-0 ${co2Color}`} />
+                                  <div className="flex-1">
+                                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                      <div className={`h-full rounded-full transition-all ${co2BarColor}`} style={{ width: `${co2Percent}%` }} />
+                                    </div>
+                                  </div>
+                                  <span className={`text-[10px] font-semibold ${co2Color} whitespace-nowrap`}>{co2Value}kg</span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="text-center">
+                                  <p className="font-medium">{co2Value} kg CO₂</p>
+                                  <p className="text-xs opacity-80">{co2Label}</p>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </TooltipProvider>
                 );
               })}
             </div>
