@@ -106,7 +106,7 @@ const MealPlanCreatorStepper = ({
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [createdPlan, setCreatedPlan] = useState<any>(null);
   const [showPlanView, setShowPlanView] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const [planData, setPlanData] = useState<any>({
     planName: initialData?.name || "",

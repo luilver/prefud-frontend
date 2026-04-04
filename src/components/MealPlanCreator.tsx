@@ -39,7 +39,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const [dislikes, setDislikes] = useState<string[]>([]);
   const [newDislike, setNewDislike] = useState("");
   const [healthGoals, setHealthGoals] = useState<string[]>([]);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [showPlanView, setShowPlanView] = useState(false);
   const [createdPlan, setCreatedPlan] = useState<any>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
