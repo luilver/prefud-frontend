@@ -19,7 +19,21 @@ import {
   Loader2,
   Baby,
   Smile,
+  Leaf,
+  ShoppingBasket,
+  UtensilsCrossed,
+  ArrowRight,
+  Flame,
+  Globe,
+  Award,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useUser } from "@/contexts/UserContext";
 import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
