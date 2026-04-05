@@ -658,7 +658,7 @@ const translations = {
     "mealShopping.withinWeek": "Within a Week",
     "mealShopping.ingredientCount": "ingredients",
     "mealShopping.backToIngredients": "Back to Ingredients",
-    "mealShopping.selectItems": "Items selected",
+    "mealShopping.selectedItems": "Items selected",
 
     // AIMealCreator
     "aiMealCreator.createMealTitle": "Create a Meal",
@@ -2448,7 +2448,7 @@ const translations = {
     "mealShopping.withinWeek": "Dentro de una Semana",
     "mealShopping.ingredientCount": "ingredientes",
     "mealShopping.backToIngredients": "Volver a Ingredientes",
-    "mealShopping.selectItems": "Items seleccionados",
+    "mealShopping.selectedItems": "Items seleccionados",
 
     //AI Meal Creator
     "aiMealCreator.createMealTitle": "Crear una Comida",
@@ -4380,7 +4380,7 @@ const translations = {
     "mealShopping.withinWeek": "Dentro de uma Semana",
     "mealShopping.ingredientCount": "ingredientes",
     "mealShopping.backToIngredients": "Voltar para Ingredientes",
-    "mealShopping.selectItems": "Itens selecionados",
+    "mealShopping.selectedItems": "Itens selecionados",
 
     //Checkout and cart
     "mealPlanView.addToCart": "Adicionar ao carrinho",
