@@ -30,6 +30,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -80,8 +81,22 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const errors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      errors.name = t("signup.firstName") + " is required";
+    }
+    if (!formData.lastName.trim()) {
+      errors.lastName = t("signup.lastName") + " is required";
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = t("signup.phoneNumber") + " is required";
+    }
+
     // Validate age (must be 18+)
-    if (formData.birthday) {
+    if (!formData.birthday) {
+      errors.birthday = t("signup.birthday") + " is required";
+    } else {
       const birthDate = new Date(formData.birthday);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -90,25 +105,20 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
         age--;
       }
       if (age < 18) {
-        toast({
-          title: t("signup.ageError.title") || "❌ Age Requirement",
-          description: t("signup.ageError.description") || "You must be at least 18 years old to create an account.",
-          variant: "destructive",
-          duration: 5000,
-        });
-        return;
+        errors.birthday = t("signup.ageError.description") || "You must be at least 18 years old to create an account.";
       }
     }
 
     if (!formData.acceptedTerms) {
-      toast({
-        title: "❌ Terms Required",
-        description: "Please accept the Terms and Conditions to continue.",
-        variant: "destructive",
-        duration: 3000,
-      });
+      errors.acceptedTerms = "Please accept the Terms and Conditions to continue.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
+
+    setFormErrors({});
 
     if (!userId) {
       toast({
@@ -249,20 +259,22 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => { setFormData(prev => ({ ...prev, name: e.target.value })); setFormErrors(prev => { const { name, ...rest } = prev; return rest; }); }}
                   required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                  className={`border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1 ${formErrors.name ? 'border-red-500 focus:border-red-500' : ''}`}
                 />
+                {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>}
               </div>
               <div>
                 <Label htmlFor="lastName" className="text-sm sm:text-base">{t("signup.lastName") || "Last Name"} </Label>
                 <Input
                   id="lastName"
                   value={formData.lastName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                  onChange={(e) => { setFormData(prev => ({ ...prev, lastName: e.target.value })); setFormErrors(prev => { const { lastName, ...rest } = prev; return rest; }); }}
                   required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                  className={`border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1 ${formErrors.lastName ? 'border-red-500 focus:border-red-500' : ''}`}
                 />
+                {formErrors.lastName && <p className="text-red-500 text-xs mt-1">{formErrors.lastName}</p>}
               </div>
             </div>
 
@@ -291,15 +303,16 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => {
-                  // Solo permitir números y máximo 10 caracteres
                   const value = e.target.value.replace(/\D/g, "").slice(0, 10);
                   setFormData((prev) => ({ ...prev, phone: value }));
+                  setFormErrors(prev => { const { phone, ...rest } = prev; return rest; });
                   }}
                   placeholder={t("signup.phoneNumberPlaceholder") || "Enter phone number"}
                   required
-                  className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1"
+                  className={`border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base flex-1 ${formErrors.phone ? 'border-red-500 focus:border-red-500' : ''}`}
                 />
               </div>
+              {formErrors.phone && <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>}
             </div>
 
             <div>
@@ -308,10 +321,11 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
                 id="birthday"
                 type="date"
                 value={formData.birthday}
-                onChange={(e) => setFormData(prev => ({ ...prev, birthday: e.target.value }))}
+                onChange={(e) => { setFormData(prev => ({ ...prev, birthday: e.target.value })); setFormErrors(prev => { const { birthday, ...rest } = prev; return rest; }); }}
                 required
-                className="border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1"
+                className={`border-green-200 focus:border-green-400 h-10 sm:h-12 text-sm sm:text-base mt-1 ${formErrors.birthday ? 'border-red-500 focus:border-red-500' : ''}`}
               />
+              {formErrors.birthday && <p className="text-red-500 text-xs mt-1">{formErrors.birthday}</p>}
             </div>
           </div>
 
