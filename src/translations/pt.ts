@@ -516,7 +516,17 @@ export const pt = {
     "kidsUnder5": "Crianças < 5",
     "kids5to12": "Crianças 5-12",
     "noMeals": "Sem refeições",
-    "addedToPantry": "Adicionado à Despensa"
+    "addedToPantry": "Adicionado à Despensa",
+    "planDetails": "Detalhes do Plano",
+    "maxCookingTime": "Tempo Máximo de Cozimento",
+    "skillLevel": "Nível de Habilidade",
+    "budget": "Orçamento",
+    "language": "Idioma",
+    "cuisines": "Cozinhas",
+    "healthGoals": "Objetivos de Saúde",
+    "dietaryRestrictions": "Restrições Alimentares",
+    "allergies": "Alergias e Intolerâncias",
+    "dislikes": "Não gosta"
   },
   "landing": {
     "badge": "Seu assistente de cozinha com IA",
