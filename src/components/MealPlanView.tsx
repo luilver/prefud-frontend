@@ -374,28 +374,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     }
   };
 
-  // If calendar view is active, show the calendar
-  if (showCalendarView) {
-    return (
-      <MealPlanCalendarView
-        plan={plan}
-        onBack={() => setShowCalendarView(false)}
-        onMealClick={handleMealClick}
-        mealsByDay={mealsByDay}
-        mealCompletionStatus={mealCompletionStatus}
-        onToggleCompletion={handleToggleCompletion}
-        onDeleteMeal={handleDeleteMeal}
-      />
-    );
-  }
-
-  // If a meal is selected, show the RecipeView
-  if (selectedMeal) {
-    return (
-      <RecipeView meal={selectedMeal} plan={plan} onBack={handleBackFromMeal} />
-    );
-  }
-
   // Calculate plan statistics with better fallbacks
   const totalDays =
     plan.preferences?.numberOfDays ||
@@ -403,6 +381,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const peopleCount =
     plan.preferences?.numberOfPersons || plan.preferences?.people || 1;
   const mealsPerDay = plan.preferences?.mealsPerDay || 3;
+  const kidsBelow5 = plan.preferences?.kidsbelow5 || plan.plan?.numberKidsLessThan5 || 0;
+  const kidsOver5 = plan.preferences?.kidsover5 || plan.plan?.numberKids5To12 || 0;
 
   // Group meals by day - handle the actual data structure from your meal plan
   const mealsByDay = (() => {
@@ -426,13 +406,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     // If meals are directly in the plan (your old structure)
     else if (plan.meals && plan.meals.length > 0) {
       plan.meals.forEach((meal: any) => {
-        // Map the meal day based on the date or day property
         let dayKey = "Day 1";
-
         if (meal.day) {
           dayKey = `Day ${meal.day}`;
         } else if (meal.date) {
-          // Calculate day from date
           const startDate = plan.startDate;
           const mealDate = new Date(meal.date);
           const dayDiff =
@@ -442,11 +419,9 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             ) + 1;
           dayKey = `Day ${dayDiff}`;
         } else if (meal.id && meal.id.includes("-")) {
-          // Extract day from ID pattern like "1-0", "2-1", etc.
           const dayFromId = meal.id.split("-")[0];
           dayKey = `Day ${dayFromId}`;
         }
-
         if (!groupedMeals[dayKey]) {
           groupedMeals[dayKey] = [];
         }
@@ -495,6 +470,28 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       (total: number, item: any) => total + (item.estimatedPrice || 0),
       0,
     ) || 0;
+
+  // If calendar view is active, show the calendar
+  if (showCalendarView) {
+    return (
+      <MealPlanCalendarView
+        plan={plan}
+        onBack={() => setShowCalendarView(false)}
+        onMealClick={handleMealClick}
+        mealsByDay={mealsByDay}
+        mealCompletionStatus={mealCompletionStatus}
+        onToggleCompletion={handleToggleCompletion}
+        onDeleteMeal={handleDeleteMeal}
+      />
+    );
+  }
+
+  // If a meal is selected, show the RecipeView
+  if (selectedMeal) {
+    return (
+      <RecipeView meal={selectedMeal} plan={plan} onBack={handleBackFromMeal} />
+    );
+  }
 
   return (
     <div className="min-h-screen relative">
