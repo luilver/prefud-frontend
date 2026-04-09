@@ -531,7 +531,7 @@ export const en = {
     "subheadline": "Pantry uses AI to plan meals, generate shopping lists, guide you step-by-step while cooking, and help you save money by using the ingredients you already have at home.",
     "ctaPrimary": "Start Free",
     "ctaSecondary": "See How It Works",
-    "noCreditCard": "No credit card required",
+    "noCreditCard": "Credit card required",
     "problemTitle": "Stop wasting food and money",
     "problemSubtitle": "Most people buy groceries without knowing exactly what they already have.",
     "problem1": "Buying duplicate ingredients",
