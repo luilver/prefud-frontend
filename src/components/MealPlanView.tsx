@@ -18,6 +18,7 @@ import {
 import {
   ArrowLeft,
   Calendar,
+  CalendarDays,
   Users,
   ChefHat,
   Clock,
@@ -29,10 +30,13 @@ import {
   Plus,
   ExternalLink,
   Package,
+  Baby,
+  Smile,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
+import MealPlanCalendarView from "./MealPlanCalendarView";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
@@ -59,6 +63,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const [showCalendarView, setShowCalendarView] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
   const [mealCompletionStatus, setMealCompletionStatus] = useState<
@@ -369,13 +374,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     }
   };
 
-  // If a meal is selected, show the RecipeView
-  if (selectedMeal) {
-    return (
-      <RecipeView meal={selectedMeal} plan={plan} onBack={handleBackFromMeal} />
-    );
-  }
-
   // Calculate plan statistics with better fallbacks
   const totalDays =
     plan.preferences?.numberOfDays ||
@@ -383,6 +381,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const peopleCount =
     plan.preferences?.numberOfPersons || plan.preferences?.people || 1;
   const mealsPerDay = plan.preferences?.mealsPerDay || 3;
+  const kidsBelow5 = plan.preferences?.kidsbelow5 || plan.plan?.numberKidsLessThan5 || 0;
+  const kidsOver5 = plan.preferences?.kidsover5 || plan.plan?.numberKids5To12 || 0;
 
   // Group meals by day - handle the actual data structure from your meal plan
   const mealsByDay = (() => {
@@ -406,13 +406,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     // If meals are directly in the plan (your old structure)
     else if (plan.meals && plan.meals.length > 0) {
       plan.meals.forEach((meal: any) => {
-        // Map the meal day based on the date or day property
         let dayKey = "Day 1";
-
         if (meal.day) {
           dayKey = `Day ${meal.day}`;
         } else if (meal.date) {
-          // Calculate day from date
           const startDate = plan.startDate;
           const mealDate = new Date(meal.date);
           const dayDiff =
@@ -422,11 +419,9 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             ) + 1;
           dayKey = `Day ${dayDiff}`;
         } else if (meal.id && meal.id.includes("-")) {
-          // Extract day from ID pattern like "1-0", "2-1", etc.
           const dayFromId = meal.id.split("-")[0];
           dayKey = `Day ${dayFromId}`;
         }
-
         if (!groupedMeals[dayKey]) {
           groupedMeals[dayKey] = [];
         }
@@ -476,6 +471,28 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       0,
     ) || 0;
 
+  // If calendar view is active, show the calendar
+  if (showCalendarView) {
+    return (
+      <MealPlanCalendarView
+        plan={plan}
+        onBack={() => setShowCalendarView(false)}
+        onMealClick={handleMealClick}
+        mealsByDay={mealsByDay}
+        mealCompletionStatus={mealCompletionStatus}
+        onToggleCompletion={handleToggleCompletion}
+        onDeleteMeal={handleDeleteMeal}
+      />
+    );
+  }
+
+  // If a meal is selected, show the RecipeView
+  if (selectedMeal) {
+    return (
+      <RecipeView meal={selectedMeal} plan={plan} onBack={handleBackFromMeal} />
+    );
+  }
+
   return (
     <div className="min-h-screen relative">
       {/* Food-themed Background */}
@@ -508,23 +525,27 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
               </p>
             </div>
           </div>
-          <div className="flex gap-2"></div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowCalendarView(true)}
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white"
+            >
+              <CalendarDays className="h-4 w-4 mr-2" />
+              {t("mealPlanView.calendarView") || "Calendar View"}
+            </Button>
+          </div>
         </div>
 
-        {/* Plan Stats - Made more compact for mobile */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        {/* Plan Stats */}
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
           <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
             <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
               <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 mb-2 sm:mb-0 sm:mr-3">
                 <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                  {totalDays}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {t("mealPlanView.days") || "Days"}
-                </p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{totalDays}</p>
+                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.days") || "Days"}</p>
               </div>
             </CardContent>
           </Card>
@@ -534,12 +555,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                 <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                  {peopleCount}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {t("mealPlanView.persons") || "Persons"}
-                </p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{peopleCount}</p>
+                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.persons") || "Persons"}</p>
               </div>
             </CardContent>
           </Card>
@@ -549,15 +566,37 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                 <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                  {mealsPerDay}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {t("mealPlanView.mealsPerDay") || "Meals/Day"}
-                </p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{mealsPerDay}</p>
+                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.mealsPerDay") || "Meals/Day"}</p>
               </div>
             </CardContent>
           </Card>
+          {kidsBelow5 > 0 && (
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 mb-2 sm:mb-0 sm:mr-3">
+                  <Baby className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <p className="text-lg sm:text-2xl font-bold text-gray-800">{kidsBelow5}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.kidsUnder5") || "Kids < 5"}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {kidsOver5 > 0 && (
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 mb-2 sm:mb-0 sm:mr-3">
+                  <Smile className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <p className="text-lg sm:text-2xl font-bold text-gray-800">{kidsOver5}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.kids5to12") || "Kids 5-12"}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Tabs */}
