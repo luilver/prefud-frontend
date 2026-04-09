@@ -96,6 +96,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     }
     return initialStatus;
   });
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const { t } = useLanguage();
   const { toast } = useToast();
   const { pantryItems, user } = useUser();
