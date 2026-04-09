@@ -525,23 +525,27 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
               </p>
             </div>
           </div>
-          <div className="flex gap-2"></div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowCalendarView(true)}
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white"
+            >
+              <CalendarDays className="h-4 w-4 mr-2" />
+              {t("mealPlanView.calendarView") || "Calendar View"}
+            </Button>
+          </div>
         </div>
 
-        {/* Plan Stats - Made more compact for mobile */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        {/* Plan Stats */}
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
           <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
             <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
               <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 mb-2 sm:mb-0 sm:mr-3">
                 <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                  {totalDays}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {t("mealPlanView.days") || "Days"}
-                </p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{totalDays}</p>
+                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.days") || "Days"}</p>
               </div>
             </CardContent>
           </Card>
@@ -551,12 +555,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                 <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                  {peopleCount}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {t("mealPlanView.persons") || "Persons"}
-                </p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{peopleCount}</p>
+                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.persons") || "Persons"}</p>
               </div>
             </CardContent>
           </Card>
@@ -566,15 +566,37 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                 <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
               <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">
-                  {mealsPerDay}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {t("mealPlanView.mealsPerDay") || "Meals/Day"}
-                </p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-800">{mealsPerDay}</p>
+                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.mealsPerDay") || "Meals/Day"}</p>
               </div>
             </CardContent>
           </Card>
+          {kidsBelow5 > 0 && (
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 mb-2 sm:mb-0 sm:mr-3">
+                  <Baby className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <p className="text-lg sm:text-2xl font-bold text-gray-800">{kidsBelow5}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.kidsUnder5") || "Kids < 5"}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {kidsOver5 > 0 && (
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 mb-2 sm:mb-0 sm:mr-3">
+                  <Smile className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div className="text-center sm:text-left">
+                  <p className="text-lg sm:text-2xl font-bold text-gray-800">{kidsOver5}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.kids5to12") || "Kids 5-12"}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Tabs */}
