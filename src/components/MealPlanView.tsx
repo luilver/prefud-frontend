@@ -560,68 +560,169 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           </div>
         </div>
 
-        {/* Plan Stats */}
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
+        {/* Plan Details - Collapsible */}
+        <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
           <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 mb-2 sm:mb-0 sm:mr-3">
-                <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-              </div>
-              <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">{totalDays}</p>
-                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.days") || "Days"}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 mb-2 sm:mb-0 sm:mr-3">
-                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-              </div>
-              <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">{peopleCount}</p>
-                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.persons") || "Persons"}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 mb-2 sm:mb-0 sm:mr-3">
-                <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-              </div>
-              <div className="text-center sm:text-left">
-                <p className="text-lg sm:text-2xl font-bold text-gray-800">{mealsPerDay}</p>
-                <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.mealsPerDay") || "Meals/Day"}</p>
-              </div>
-            </CardContent>
-          </Card>
-          {kidsBelow5 > 0 && (
-            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 mb-2 sm:mb-0 sm:mr-3">
-                  <Baby className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+            <CollapsibleTrigger className="w-full">
+              <CardContent className="flex items-center justify-between p-4 cursor-pointer hover:bg-black/5 transition-colors rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                    <Info className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-gray-800">{t("mealPlanView.planDetails") || "Plan Details"}</p>
+                    <p className="text-xs text-gray-500">
+                      {totalDays} {t("mealPlanView.days") || "days"} · {peopleCount} {t("mealPlanView.persons") || "persons"} · {mealsPerDay} {t("mealPlanView.mealsPerDay") || "meals/day"}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-center sm:text-left">
-                  <p className="text-lg sm:text-2xl font-bold text-gray-800">{kidsBelow5}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.kidsUnder5") || "Kids < 5"}</p>
-                </div>
+                <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${detailsOpen ? 'rotate-180' : ''}`} />
               </CardContent>
-            </Card>
-          )}
-          {kidsOver5 > 0 && (
-            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg">
-              <CardContent className="flex flex-col sm:flex-row items-center justify-center sm:justify-start p-3 sm:p-6">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 mb-2 sm:mb-0 sm:mr-3">
-                  <Smile className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-4 pb-4 space-y-4">
+                <div className="h-px bg-gray-200" />
+                
+                {/* Main Stats Row */}
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-blue-50">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <span className="text-lg font-bold text-gray-800">{totalDays}</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{t("mealPlanView.days") || "Days"}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-emerald-50">
+                    <Users className="h-5 w-5 text-emerald-600" />
+                    <span className="text-lg font-bold text-gray-800">{peopleCount}</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{t("mealPlanView.persons") || "People"}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-amber-50">
+                    <Utensils className="h-5 w-5 text-amber-600" />
+                    <span className="text-lg font-bold text-gray-800">{mealsPerDay}</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{t("mealPlanView.mealsPerDay") || "Meals/Day"}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-pink-50">
+                    <Baby className="h-5 w-5 text-pink-500" />
+                    <span className="text-lg font-bold text-gray-800">{kidsBelow5}</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{t("mealPlanView.kidsUnder5") || "Kids < 5"}</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-violet-50">
+                    <Smile className="h-5 w-5 text-violet-500" />
+                    <span className="text-lg font-bold text-gray-800">{kidsOver5}</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{t("mealPlanView.kids5to12") || "Kids 5-12"}</span>
+                  </div>
                 </div>
-                <div className="text-center sm:text-left">
-                  <p className="text-lg sm:text-2xl font-bold text-gray-800">{kidsOver5}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">{t("mealPlanView.kids5to12") || "Kids 5-12"}</p>
+
+                {/* Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Cooking Time & Skill */}
+                  {maxCookingTime > 0 && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-orange-50">
+                      <Clock className="h-5 w-5 text-orange-500 shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">{t("mealPlanView.maxCookingTime") || "Max Cooking Time"}</p>
+                        <p className="font-semibold text-gray-800">{maxCookingTime} min</p>
+                      </div>
+                    </div>
+                  )}
+                  {cookingSkillLevel && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-50">
+                      <ChefHat className="h-5 w-5 text-indigo-500 shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">{t("mealPlanView.skillLevel") || "Skill Level"}</p>
+                        <p className="font-semibold text-gray-800">{cookingSkillLevel}</p>
+                      </div>
+                    </div>
+                  )}
+                  {budgetRange && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-green-50">
+                      <DollarSign className="h-5 w-5 text-green-500 shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">{t("mealPlanView.budget") || "Budget"}</p>
+                        <p className="font-semibold text-gray-800">{budgetRange}</p>
+                      </div>
+                    </div>
+                  )}
+                  {planLanguage && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-cyan-50">
+                      <Globe className="h-5 w-5 text-cyan-500 shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">{t("mealPlanView.language") || "Language"}</p>
+                        <p className="font-semibold text-gray-800 capitalize">{planLanguage}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+
+                {/* Tags Sections */}
+                {cuisinePreferences.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Utensils className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-600">{t("mealPlanView.cuisines") || "Cuisines"}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {cuisinePreferences.map((c: string, i: number) => (
+                        <Badge key={i} className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-0">{c}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {healthGoals.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-600">{t("mealPlanView.healthGoals") || "Health Goals"}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {healthGoals.map((g: string, i: number) => (
+                        <Badge key={i} className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0">{g}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {dietaryRestrictions.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Heart className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-600">{t("mealPlanView.dietaryRestrictions") || "Dietary Restrictions"}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {dietaryRestrictions.map((d: string, i: number) => (
+                        <Badge key={i} className="bg-red-100 text-red-700 hover:bg-red-200 border-0">{d}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {allergies.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-600">{t("mealPlanView.allergies") || "Allergies & Intolerances"}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {allergies.map((a: string, i: number) => (
+                        <Badge key={i} className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-0">{a}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {dislikes && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <ThumbsDown className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-600">{t("mealPlanView.dislikes") || "Dislikes"}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg italic">{dislikes}</p>
+                  </div>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
