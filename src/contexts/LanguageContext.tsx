@@ -234,6 +234,8 @@ const translations = {
     "signup.allergy.none": "None",
 
     "signup.caloriesRange": "Recommended range: 1200-3000 calories per day.",
+    "signup.ageError.title": "❌ Age Requirement",
+    "signup.ageError.description": "You must be at least 18 years old to create an account.",
 
     //Plan
     "signup.choosePlan": "Choose your plan",
@@ -2156,6 +2158,8 @@ const translations = {
     "signup.allergy.none": "Ninguna",
 
     "signup.caloriesRange": "Rango recomendado: 1200-3000 calorías por día.",
+    "signup.ageError.title": "❌ Requisito de edad",
+    "signup.ageError.description": "Debes tener al menos 18 años para crear una cuenta.",
 
     //Plan
     "signup.choosePlan": "Elige tu plan",
@@ -4145,6 +4149,8 @@ const translations = {
     "signup.allergy.none": "Nenhuma",
 
     "signup.caloriesRange": "Faixa recomendada: 1200-3000 calorias por dia.",
+    "signup.ageError.title": "❌ Requisito de idade",
+    "signup.ageError.description": "Você deve ter pelo menos 18 anos para criar uma conta.",
 
     //Plan
     "signup.choosePlan": "Escolha seu plano",
