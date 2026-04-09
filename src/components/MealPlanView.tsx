@@ -471,6 +471,13 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
       0,
     ) || 0;
 
+  // If a meal is selected, show the RecipeView (takes priority over calendar)
+  if (selectedMeal) {
+    return (
+      <RecipeView meal={selectedMeal} plan={plan} onBack={handleBackFromMeal} />
+    );
+  }
+
   // If calendar view is active, show the calendar
   if (showCalendarView) {
     return (
@@ -483,13 +490,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         onToggleCompletion={handleToggleCompletion}
         onDeleteMeal={handleDeleteMeal}
       />
-    );
-  }
-
-  // If a meal is selected, show the RecipeView
-  if (selectedMeal) {
-    return (
-      <RecipeView meal={selectedMeal} plan={plan} onBack={handleBackFromMeal} />
     );
   }
 

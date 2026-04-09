@@ -511,7 +511,12 @@ export const pt = {
     "mealUncompleted": "Refeição marcada como não feita",
     "mealUncompletedDesc": "Status da refeição atualizado com sucesso",
     "updateError": "Atualização falhou",
-    "updateErrorDesc": "Falha ao atualizar o status da refeição. Por favor, tente novamente."
+    "updateErrorDesc": "Falha ao atualizar o status da refeição. Por favor, tente novamente.",
+    "calendarView": "Vista Calendário",
+    "kidsUnder5": "Crianças < 5",
+    "kids5to12": "Crianças 5-12",
+    "noMeals": "Sem refeições",
+    "addedToPantry": "Adicionado à Despensa"
   },
   "landing": {
     "badge": "Seu assistente de cozinha com IA",
