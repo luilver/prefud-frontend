@@ -34,7 +34,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "@/hooks/use-toast";
 import UserProfileForm from "./UserProfileForm";
-import OTPVerification from "./OTPVerification";
+
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import PaymentForm from "./PaymentForm";
@@ -114,8 +114,7 @@ const SignupSteps = () => {
 
     try {
       if (isAccountIncomplete) {
-        // For incomplete accounts: store password and go to OTP verification
-        console.log("Incomplete account flow: moving to OTP verification");
+        console.log("Incomplete account flow: moving to profile");
         setCurrentStep(2);
         return;
       }
@@ -140,14 +139,12 @@ const SignupSteps = () => {
       console.log("Signup API response:", response.data);
 
       if (
-        response.data.message &&
-        response.data.message.includes("OTP code has been sent") &&
         response.data.response?.userId
       ) {
         console.log("Showing success toast");
         toast({
           title: "✅ Account Created Successfully!",
-          description: "An OTP code has been sent to your email address.",
+          description: "Your account has been created. Let's complete your profile.",
           duration: 5000,
         });
 
@@ -188,59 +185,11 @@ const SignupSteps = () => {
     }
   };
 
-  const handleOTPVerified = async () => {
-    console.log("OTP verified successfully");
-    if (isAccountIncomplete) {
-      // After OTP verified, call signup service to update password
-      try {
-        setIsLoading(true);
-        console.log("Calling signup service to update password for incomplete account:", signupData.email);
-
-        const config = {
-          method: "post",
-          url: `${BasicURL}/security/signup`,
-          headers: { "Content-Type": "application/json" },
-          data: { email: signupData.email, password: signupData.password },
-        };
-
-        const response = await axios.request(config);
-        console.log("Signup (password update) response:", response.data);
-
-        if (response.data.response?.userId) {
-          setSignupData((prev) => ({ ...prev, userId: response.data.response.userId }));
-          setUserId(response.data.response.userId);
-        }
-
-        toast({
-          title: "✅ Account Updated!",
-          description: "Your password has been set. Continue to complete your profile.",
-          duration: 5000,
-        });
-        setCurrentStep(3);
-      } catch (error: any) {
-        console.error("Signup service failed for incomplete account:", error);
-        const errorMessage = error.response?.data?.message
-          ? (typeof error.response.data.message === "string" ? error.response.data.message : error.response.data.message.message || "Failed to update account")
-          : error.message || "Failed to update account. Please try again.";
-        toast({
-          title: "❌ Account Update Failed",
-          description: errorMessage,
-          variant: "destructive",
-          duration: 5000,
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      setCurrentStep(3);
-    }
-  };
-
   const handleProfileComplete = (profileData: any) => {
     console.log("Profile data saved:", profileData);
 
     setSignupData((prev) => ({ ...prev, profile: profileData }));
-    setCurrentStep(4);
+    setCurrentStep(3);
   };
 
   const handleSubscriptionChoice = async (planId: string) => {
@@ -256,7 +205,7 @@ const SignupSteps = () => {
       // Handle Free subscription - register directly without payment
       await handleFreeSubscription(planId);
     } else {
-      setCurrentStep(5);
+      setCurrentStep(4);
     }
   };
 
@@ -365,16 +314,10 @@ const SignupSteps = () => {
 
   const stepItems = [
     { step: 1, title: t("signup.account") || "Account", icon: User, color: "from-primary to-accent" },
+    { step: 2, title: t("signup.profile") || "Profile", icon: User, color: "from-accent to-primary" },
+    { step: 3, title: t("signup.plan") || "Plan", icon: Crown, color: "from-primary to-accent" },
     {
-      step: 2,
-      title: t("signup.verify") || "Verify",
-      icon: Mail,
-      color: "from-primary to-secondary",
-    },
-    { step: 3, title: t("signup.profile") || "Profile", icon: User, color: "from-accent to-primary" },
-    { step: 4, title: t("signup.plan") || "Plan", icon: Crown, color: "from-primary to-accent" },
-    {
-      step: 5,
+      step: 4,
       title: t("signup.payment") || "Payment",
       icon: CreditCard,
       color: "from-secondary to-primary",
@@ -580,26 +523,16 @@ const SignupSteps = () => {
       )}
 
       {currentStep === 2 && (
-        <OTPVerification
-          email={signupData.email}
-          userId={signupData.userId || ""}
-          onVerified={handleOTPVerified}
-          onBack={() => isAccountIncomplete ? undefined : setCurrentStep(1)}
-          useEmailVerification={isAccountIncomplete}
-        />
-      )}
-
-      {currentStep === 3 && (
         <UserProfileForm
           onComplete={handleProfileComplete}
-          onBack={() => setCurrentStep(2)}
+          onBack={() => setCurrentStep(1)}
           userId={signupData.userId}
           setCustomer={setCustomerId}
           setUserId={setUserId}
         />
       )}
 
-      {currentStep === 4 && (
+      {currentStep === 3 && (
         <div className="space-y-6 sm:space-y-8">
           <div className="text-center space-y-3 px-2 sm:px-0">
             <div className="flex justify-center mb-4">
@@ -738,11 +671,11 @@ const SignupSteps = () => {
         </div>
       )}
 
-      {currentStep === 5 && (
+      {currentStep === 4 && (
         <Elements stripe={stripePromise}>
           <PaymentForm
             onSuccess={handlePaymentSuccess}
-            onBack={() => setCurrentStep(4)}
+            onBack={() => setCurrentStep(3)}
             userInfo={{
               email: signupData.email,
               phone: signupData.profile?.phone || "",
