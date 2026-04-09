@@ -22,7 +22,7 @@ import {
   Check,
   X,
   User,
-  Mail,
+  User,
   CreditCard,
   Eye,
   EyeOff,
