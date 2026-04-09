@@ -33,6 +33,7 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import RecipeView from "./RecipeView";
+import MealPlanCalendarView from "./MealPlanCalendarView";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
