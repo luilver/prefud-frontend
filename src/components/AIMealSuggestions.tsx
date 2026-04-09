@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,6 +24,7 @@ import {
   ChefHat,
   Leaf,
   Check,
+  AlertTriangle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
@@ -39,6 +40,16 @@ interface AIMealSuggestionsProps {
   onAddMeal: (meal: any, selectedDate?: Date) => void;
 }
 
+// Recipe suggestions mapped to ingredient categories
+const RECIPE_SUGGESTIONS: Record<string, { name: string; emoji: string }[]> = {
+  Meat: [{ name: "Garlic Herb Steak", emoji: "🥩" }, { name: "Chicken Stir Fry", emoji: "🍗" }],
+  Dairy: [{ name: "Creamy Pasta Alfredo", emoji: "🧀" }, { name: "Cheese Omelette", emoji: "🥚" }],
+  Vegetables: [{ name: "Garden Veggie Bowl", emoji: "🥗" }, { name: "Roasted Veggie Medley", emoji: "🥕" }],
+  Fruits: [{ name: "Fresh Fruit Smoothie", emoji: "🍹" }, { name: "Fruit Salad", emoji: "🍎" }],
+  Grains: [{ name: "Fried Rice", emoji: "🍚" }, { name: "Grain Bowl", emoji: "🌾" }],
+  Pantry: [{ name: "Pasta al Ajillo", emoji: "🍝" }, { name: "Quick Bean Soup", emoji: "🍲" }],
+};
+
 const AIMealSuggestions = ({
   ingredients,
   onAddMeal,
@@ -47,8 +58,7 @@ const AIMealSuggestions = ({
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showServingsModal, setShowServingsModal] = useState(false);
   const [servings, setServings] = useState(4);
-  const [selectedMealForDetails, setSelectedMealForDetails] =
-    useState<any>(null);
+  const [selectedMealForDetails, setSelectedMealForDetails] = useState<any>(null);
   const { toast } = useToast();
   const {
     updatePantryFromIngredients,
@@ -59,6 +69,30 @@ const AIMealSuggestions = ({
   } = useUser();
   const { language, t } = useLanguage();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+
+  // Find expiring ingredients (<=3 days)
+  const expiringItems = useMemo(() => {
+    return ingredients.filter((ing) => {
+      if (!ing.expiryDate) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const expiry = new Date(ing.expiryDate);
+      expiry.setHours(0, 0, 0, 0);
+      const diff = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      return diff <= 3;
+    });
+  }, [ingredients]);
+
+  // Build a smart suggestion based on expiring items
+  const insightData = useMemo(() => {
+    if (expiringItems.length === 0) return null;
+    const names = expiringItems.slice(0, 2).map((i) => i.name);
+    // Pick a recipe suggestion based on the first expiring item's category
+    const cat = expiringItems[0]?.category || "Pantry";
+    const recipes = RECIPE_SUGGESTIONS[cat] || RECIPE_SUGGESTIONS["Pantry"];
+    const recipe = recipes[Math.floor(Math.random() * recipes.length)];
+    return { names, recipe };
+  }, [expiringItems]);
 
   const generateSuggestions = async () => {
     trackEvent("button_click", {
@@ -193,7 +227,52 @@ const AIMealSuggestions = ({
   return (
     <>
       <LoaderComponent />
-      <Card className="bg-card/70 backdrop-blur-sm border-primary/20">
+      <Card className="bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden">
+        {/* AI Insight Card */}
+        {!suggestions.length && (
+          <div
+            className="cursor-pointer"
+            onClick={() => setShowServingsModal(true)}
+          >
+            {insightData ? (
+              <div className="relative bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-amber-200/50 p-4 sm:p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500" />
+                <div className="flex items-start gap-3 ml-2">
+                  <div className="p-2 rounded-lg bg-amber-500/15 shrink-0">
+                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-amber-800 mb-1 flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      AI Insight
+                    </p>
+                    <p className="text-sm text-amber-700 leading-relaxed">
+                      You have {insightData.names.map((name, i) => (
+                        <span key={i}>{i > 0 && " and "}<span className="font-bold">{name}</span></span>
+                      ))} expiring soon.
+                      How about a <span className="font-semibold">{insightData.recipe.emoji} {insightData.recipe.name}</span>?
+                    </p>
+                    <p className="text-xs text-amber-600/80 mt-1.5">Tap to generate meals →</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-emerald-200/50 p-4 sm:p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500" />
+                <div className="flex items-start gap-3 ml-2">
+                  <div className="p-2 rounded-lg bg-emerald-500/15 shrink-0">
+                    <Sparkles className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-emerald-800 mb-0.5">Your pantry is looking fresh! 🌿</p>
+                    <p className="text-xs text-emerald-600/80">Generate AI meals anytime. Tap to get started →</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-primary">
             <Sparkles className="h-5 w-5" />
