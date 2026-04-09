@@ -63,6 +63,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
+  const [showCalendarView, setShowCalendarView] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
   const [mealCompletionStatus, setMealCompletionStatus] = useState<
