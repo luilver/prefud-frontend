@@ -1,7 +1,5 @@
 
 import { useState, useEffect } from "react";
-import dashboardTabsBg from "@/assets/dashboard-tabs-bg.jpg";
-import dashboardTabsBgMobile from "@/assets/dashboard-tabs-bg-mobile.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
