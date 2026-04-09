@@ -407,7 +407,6 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const budgetRange = plan.plan?.budgetRange || plan.preferences?.budgetRange || "";
   const planLanguage = plan.plan?.language || plan.preferences?.language || "";
   const healthGoals = plan.plan?.healthGoals || plan.preferences?.healthGoals || [];
-  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // Group meals by day - handle the actual data structure from your meal plan
   const mealsByDay = (() => {
