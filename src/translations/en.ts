@@ -522,7 +522,12 @@ export const en = {
     "mealUncompleted": "Meal marked as not done",
     "mealUncompletedDesc": "Meal status updated successfully",
     "updateError": "Update failed",
-    "updateErrorDesc": "Failed to update meal status. Please try again."
+    "updateErrorDesc": "Failed to update meal status. Please try again.",
+    "calendarView": "Calendar View",
+    "kidsUnder5": "Kids < 5",
+    "kids5to12": "Kids 5-12",
+    "noMeals": "No meals",
+    "addedToPantry": "Added to Pantry"
   },
   "landing": {
     "badge": "Your AI kitchen assistant",
