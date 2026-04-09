@@ -527,7 +527,17 @@ export const en = {
     "kidsUnder5": "Kids < 5",
     "kids5to12": "Kids 5-12",
     "noMeals": "No meals",
-    "addedToPantry": "Added to Pantry"
+    "addedToPantry": "Added to Pantry",
+    "planDetails": "Plan Details",
+    "maxCookingTime": "Max Cooking Time",
+    "skillLevel": "Skill Level",
+    "budget": "Budget",
+    "language": "Language",
+    "cuisines": "Cuisines",
+    "healthGoals": "Health Goals",
+    "dietaryRestrictions": "Dietary Restrictions",
+    "allergies": "Allergies & Intolerances",
+    "dislikes": "Dislikes"
   },
   "landing": {
     "badge": "Your AI kitchen assistant",
