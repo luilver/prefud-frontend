@@ -22,7 +22,6 @@ import {
   Check,
   X,
   User,
-  User,
   CreditCard,
   Eye,
   EyeOff,
