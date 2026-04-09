@@ -18,6 +18,7 @@ import {
 import {
   ArrowLeft,
   Calendar,
+  CalendarDays,
   Users,
   ChefHat,
   Clock,
@@ -29,6 +30,8 @@ import {
   Plus,
   ExternalLink,
   Package,
+  Baby,
+  Smile,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
