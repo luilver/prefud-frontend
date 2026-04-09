@@ -30,6 +30,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -80,8 +81,22 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const errors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      errors.name = t("signup.firstName") + " is required";
+    }
+    if (!formData.lastName.trim()) {
+      errors.lastName = t("signup.lastName") + " is required";
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = t("signup.phoneNumber") + " is required";
+    }
+
     // Validate age (must be 18+)
-    if (formData.birthday) {
+    if (!formData.birthday) {
+      errors.birthday = t("signup.birthday") + " is required";
+    } else {
       const birthDate = new Date(formData.birthday);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -90,25 +105,20 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
         age--;
       }
       if (age < 18) {
-        toast({
-          title: t("signup.ageError.title") || "❌ Age Requirement",
-          description: t("signup.ageError.description") || "You must be at least 18 years old to create an account.",
-          variant: "destructive",
-          duration: 5000,
-        });
-        return;
+        errors.birthday = t("signup.ageError.description") || "You must be at least 18 years old to create an account.";
       }
     }
 
     if (!formData.acceptedTerms) {
-      toast({
-        title: "❌ Terms Required",
-        description: "Please accept the Terms and Conditions to continue.",
-        variant: "destructive",
-        duration: 3000,
-      });
+      errors.acceptedTerms = "Please accept the Terms and Conditions to continue.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
+
+    setFormErrors({});
 
     if (!userId) {
       toast({
