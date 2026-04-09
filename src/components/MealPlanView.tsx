@@ -397,6 +397,16 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
   const mealsPerDay = plan.preferences?.mealsPerDay || 3;
   const kidsBelow5 = plan.preferences?.kidsbelow5 || plan.plan?.numberKidsLessThan5 || 0;
   const kidsOver5 = plan.preferences?.kidsover5 || plan.plan?.numberKids5To12 || 0;
+  const dietaryRestrictions = plan.plan?.dietaryRestrictions || plan.preferences?.dietaryRestrictions || [];
+  const cuisinePreferences = plan.plan?.cuisinePreferences || plan.preferences?.cuisinePreferences || [];
+  const allergies = plan.plan?.allergiesIntolerance || plan.preferences?.allergies || [];
+  const dislikes = plan.plan?.dislikes || plan.preferences?.dislikes || "";
+  const maxCookingTime = plan.plan?.maxCookingTime || plan.preferences?.maxCookingTime || 0;
+  const cookingSkillLevel = plan.plan?.cookingSkillLevel || plan.preferences?.cookingSkillLevel || "";
+  const budgetRange = plan.plan?.budgetRange || plan.preferences?.budgetRange || "";
+  const planLanguage = plan.plan?.language || plan.preferences?.language || "";
+  const healthGoals = plan.plan?.healthGoals || plan.preferences?.healthGoals || [];
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // Group meals by day - handle the actual data structure from your meal plan
   const mealsByDay = (() => {
