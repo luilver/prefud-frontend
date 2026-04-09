@@ -54,6 +54,9 @@ interface PantryItem {
   purchaseDate: Date;
   location?: string;
   notes?: string;
+  carbonFootPrintToWaste?: number;
+  daysToExpire?: number;
+  purchased?: boolean;
 }
 
 interface ShoppingItem {
