@@ -247,7 +247,9 @@ const AIMealSuggestions = ({
                       AI Insight
                     </p>
                     <p className="text-sm text-amber-700 leading-relaxed">
-                      You have <span className="font-bold">{insightData.names.join("</span> and <span class=\"font-bold\">")}</span> expiring soon.
+                      You have {insightData.names.map((name, i) => (
+                        <span key={i}>{i > 0 && " and "}<span className="font-bold">{name}</span></span>
+                      ))} expiring soon.
                       How about a <span className="font-semibold">{insightData.recipe.emoji} {insightData.recipe.name}</span>?
                     </p>
                     <p className="text-xs text-amber-600/80 mt-1.5">Tap to generate meals →</p>
