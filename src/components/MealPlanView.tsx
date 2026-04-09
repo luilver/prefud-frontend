@@ -16,6 +16,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   ArrowLeft,
   Calendar,
   CalendarDays,
@@ -32,6 +37,15 @@ import {
   Package,
   Baby,
   Smile,
+  ChevronDown,
+  Utensils,
+  DollarSign,
+  Globe,
+  Target,
+  AlertTriangle,
+  ThumbsDown,
+  Heart,
+  Info,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { Checkbox } from "@/components/ui/checkbox";
