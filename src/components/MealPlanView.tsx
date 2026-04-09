@@ -374,6 +374,21 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
     }
   };
 
+  // If calendar view is active, show the calendar
+  if (showCalendarView) {
+    return (
+      <MealPlanCalendarView
+        plan={plan}
+        onBack={() => setShowCalendarView(false)}
+        onMealClick={handleMealClick}
+        mealsByDay={mealsByDay}
+        mealCompletionStatus={mealCompletionStatus}
+        onToggleCompletion={handleToggleCompletion}
+        onDeleteMeal={handleDeleteMeal}
+      />
+    );
+  }
+
   // If a meal is selected, show the RecipeView
   if (selectedMeal) {
     return (
