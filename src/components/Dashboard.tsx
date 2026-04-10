@@ -94,7 +94,7 @@ const DashboardContent = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundImage: `url(${dashboardBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+    <div className="min-h-screen relative overflow-hidden bg-black">
       {/* Kitchen Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* Subtle kitchen pattern overlay */}
