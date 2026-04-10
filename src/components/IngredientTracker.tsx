@@ -383,7 +383,7 @@ const IngredientTracker = () => {
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
                 <CardContent className="p-4">
                   {Object.keys(categorizedIngredients).length > 0 ? (
-                    <Accordion type="multiple" defaultValue={Object.keys(categorizedIngredients)} className="space-y-3">
+                    <Accordion type="multiple" defaultValue={[]} className="space-y-3">
                       {Object.entries(categorizedIngredients).map(
                         ([category, categoryIngredients]) => (
                           <AccordionItem
@@ -466,11 +466,39 @@ const IngredientTracker = () => {
                     <p className="text-sm text-orange-600 mb-3">
                       {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}
                     </p>
-                    <div className="space-y-3">
-                      {expiringIngredients.map((ingredient) => (
-                        <IngredientCard key={ingredient.id} ingredient={ingredient} />
+                    <Accordion type="multiple" defaultValue={[]} className="space-y-3">
+                      {Object.entries(
+                        expiringIngredients.reduce((acc: Record<string, any[]>, ing) => {
+                          const cat = ing.category || 'Other';
+                          if (!acc[cat]) acc[cat] = [];
+                          acc[cat].push(ing);
+                          return acc;
+                        }, {})
+                      ).map(([category, categoryIngredients]) => (
+                        <AccordionItem
+                          key={category}
+                          value={category}
+                          className="border border-orange-200 rounded-xl overflow-hidden bg-gradient-to-r from-orange-50/50 to-red-50/50"
+                        >
+                          <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-orange-50/50 transition-colors">
+                            <div className="flex items-center space-x-3">
+                              <span className="text-2xl">{getCategoryIcon(category)}</span>
+                              <span className="font-semibold text-orange-800">{category}</span>
+                              <span className="text-sm text-orange-700 bg-orange-100 px-2.5 py-0.5 rounded-full font-medium">
+                                {categoryIngredients.length}
+                              </span>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4">
+                            <div className="space-y-3 pt-2">
+                              {categoryIngredients.map((ingredient: any) => (
+                                <IngredientCard key={ingredient.id} ingredient={ingredient} />
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
                       ))}
-                    </div>
+                    </Accordion>
                   </CardContent>
                 </Card>
               ) : (

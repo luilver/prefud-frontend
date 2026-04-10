@@ -273,83 +273,58 @@ const AIMealSuggestions = ({
           </div>
         )}
 
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-primary">
-            <Sparkles className="h-5 w-5" />
-            <span>{t("aiSuggestions.title")}</span>
-          </CardTitle>
-          <CardDescription>
-            {t("aiSuggestions.description")}
-          </CardDescription>
-          {!suggestions.length && (
-            <>
-              <Button
-                onClick={async () => {
-                  setShowServingsModal(true);
-                  trackEvent("button_click", {
-                    button_name: "pre_generate_meals_expired_submit",
-                    screen: "pantry_page",
-                  });
-                }}
-                disabled={isGenerating}
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                {isGenerating ? t("aiSuggestions.generating") : t("aiSuggestions.generate")}
-              </Button>
-
-              <Dialog
-                open={showServingsModal}
-                onOpenChange={setShowServingsModal}
-              >
-                <DialogContent className="w-[95vw] max-w-md mx-auto">
-                  <DialogHeader>
-                    <DialogTitle className="text-base sm:text-lg">
-                      {t("aiSuggestions.selectServings")}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-6 py-4">
-                    <div className="space-y-3">
-                      <Label htmlFor="servings-slider" className="text-sm">
-                        {t("aiSuggestions.servings")}:{" "}
-                        <span className="font-bold text-primary">
-                          {servings}
-                        </span>
-                      </Label>
-                      <Slider
-                        id="servings-slider"
-                        min={1}
-                        max={20}
-                        step={1}
-                        value={[servings]}
-                        onValueChange={(value) => setServings(value[0])}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>1</span>
-                        <span>20</span>
-                      </div>
-                    </div>
+        {/* Servings modal - triggered from insight card */}
+        {!suggestions.length && (
+          <Dialog
+            open={showServingsModal}
+            onOpenChange={setShowServingsModal}
+          >
+            <DialogContent className="w-[95vw] max-w-md mx-auto">
+              <DialogHeader>
+                <DialogTitle className="text-base sm:text-lg">
+                  {t("aiSuggestions.selectServings")}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6 py-4">
+                <div className="space-y-3">
+                  <Label htmlFor="servings-slider" className="text-sm">
+                    {t("aiSuggestions.servings")}:{" "}
+                    <span className="font-bold text-primary">
+                      {servings}
+                    </span>
+                  </Label>
+                  <Slider
+                    id="servings-slider"
+                    min={1}
+                    max={20}
+                    step={1}
+                    value={[servings]}
+                    onValueChange={(value) => setServings(value[0])}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>1</span>
+                    <span>20</span>
                   </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowServingsModal(false)}
-                    >
-                      {t("aiSuggestions.cancel")}
-                    </Button>
-                    <Button
-                      onClick={generateSuggestions}
-                      className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
-                    >
-                      {t("aiSuggestions.generateMeals")}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          )}
-        </CardHeader>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowServingsModal(false)}
+                >
+                  {t("aiSuggestions.cancel")}
+                </Button>
+                <Button
+                  onClick={generateSuggestions}
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                >
+                  {t("aiSuggestions.generateMeals")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
 
         {suggestions.length > 0 && (
           <CardContent>
