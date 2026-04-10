@@ -51,6 +51,7 @@ const IngredientTracker = () => {
     useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   const mapApiCategoryToUI = (category: string): string => {
     const categoryMap: Record<string, string> = {
