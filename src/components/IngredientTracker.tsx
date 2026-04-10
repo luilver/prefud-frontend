@@ -32,12 +32,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import AddIngredientForm from "./AddIngredientForm";
 import AIMealSuggestions from "./AIMealSuggestions";
 import { useUser } from "@/contexts/UserContext";
 import { getPantry } from "@/services/pantryService";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ActiveFilter = 'all' | 'expiring' | 'lowStock' | 'categories';
 
