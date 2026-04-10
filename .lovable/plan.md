@@ -1,28 +1,32 @@
 
 
-# Reorganize Pantry Page with Tab Navigation (Mobile)
+# Fix Pantry Mobile Tab Issues
 
-## Overview
-Add a tab bar below the "My Pantry" header section with two tabs: **Pantry** (ingredients list + Add Ingredient button) and **Expiring Soon** (expiring items, AI insight card, generate meals button). On desktop, keep both visible side-by-side as today.
+## Changes to `src/components/IngredientTracker.tsx`
 
-## Changes — `src/components/IngredientTracker.tsx`
+### 1. Accordions closed by default in Pantry tab
+Line 386: Change `defaultValue={Object.keys(categorizedIngredients)}` to `defaultValue={[]}` so all category dropdowns start collapsed.
 
-1. **Import** `Tabs, TabsList, TabsTrigger, TabsContent` from `@/components/ui/tabs` and `useIsMobile` from `@/hooks/use-mobile`
-2. **Remove** the "Add Ingredient" button from the header section (lines 301-314)
-3. **Remove** the stat filter cards row (lines 323-353) and the filter indicator (lines 355-370) — the tab navigation replaces this filtering
-4. **Restructure the main content area** (lines 372-484):
-   - Wrap in a mobile-conditional layout: if `isMobile`, render `<Tabs>` with two tabs; otherwise render the existing side-by-side grid
-   - **"Pantry" tab**: Contains the search bar, "Add Ingredient" button (moved here), and the categorized ingredient accordion list
-   - **"Expiring Soon" tab**: Contains the `<AIMealSuggestions>` component (moved from line 318-321), the expiring ingredients card with CO2 badge, and the expiring ingredient cards
+### 2. Remove duplicate generate button in Expiring Soon tab
+The `AIMealSuggestions` component (line 433-436) already contains both an AI Insight card (clickable, opens servings modal) AND a separate "Generate Meals" button. Remove the standalone button inside `AIMealSuggestions` and keep only the AI Insight card with a helper text explaining the feature.
 
-5. **Desktop layout** remains unchanged — both sections visible in the existing grid
+In `src/components/AIMealSuggestions.tsx`, lines 276-351: Remove the `CardHeader` section that contains the duplicate title, description, and generate button. Keep only the AI Insight card (the clickable gradient banner) as the single entry point. Update the insight card text to better explain it generates meals from expiring ingredients.
 
-## Tab Design
-- Tab bar uses the existing `Tabs` component with emerald styling: `bg-black/30 backdrop-blur-sm` list, active tab `bg-emerald-500 text-white`
-- Pantry tab icon: `Package` + count badge
-- Expiring tab icon: `AlertTriangle` + count badge (orange if items expiring)
+### 3. Categorize expiring ingredients with accordion dropdowns
+Lines 469-473: Instead of a flat list of `expiringIngredients`, group them by category (same logic as pantry tab) and render inside an `Accordion` with category headers, icons, and count badges. All categories closed by default.
 
-## Translation Keys to Add (`en.ts`, `es.ts`, `pt.ts`)
-- `ingredientTracker.pantryTab` — "Pantry" / "Despensa" / "Despensa"
-- `ingredientTracker.expiringTab` — "Expiring Soon" / "Por Vencer" / "A Vencer"
+Add a `categorizedExpiringIngredients` memo:
+```tsx
+const categorizedExpiringIngredients = expiringIngredients.reduce((acc, ing) => {
+  if (!acc[ing.category]) acc[ing.category] = [];
+  acc[ing.category].push(ing);
+  return acc;
+}, {} as Record<string, any[]>);
+```
+
+Replace the flat list with an Accordion identical in style to the pantry tab but with orange/red theming.
+
+## Files modified
+- `src/components/IngredientTracker.tsx` — accordion default closed, categorized expiring items
+- `src/components/AIMealSuggestions.tsx` — remove duplicate button, keep only the insight card with helper text
 
