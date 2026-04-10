@@ -1802,6 +1802,10 @@ const translations = {
       "Your pantry is empty. Try refreshing or add some ingredients.",
     "ingredientTracker.startAdding":
       "Start by adding some ingredients to your pantry",
+    "ingredientTracker.pantryTab": "Pantry",
+    "ingredientTracker.expiringTab": "Expiring Soon",
+    "ingredientTracker.categoriesTab": "Categories",
+    "ingredientTracker.lowStockTab": "Low Stock",
 
     // AI Meal Suggestions
     "aiSuggestions.title": "AI Meal Suggestions",
@@ -3811,6 +3815,10 @@ const translations = {
       "Tu despensa está vacía. Intenta actualizar o agrega algunos ingredientes",
     "ingredientTracker.startAdding":
       "Comienza agregando algunos ingredientes a tu despensa",
+    "ingredientTracker.pantryTab": "Mi Despensa",
+    "ingredientTracker.expiringTab": "Por caducar",
+    "ingredientTracker.categoriesTab": "Categorías",
+    "ingredientTracker.lowStockTab": "Stock Bajo",
     "ingredientTracker.expired": "Caducado",
     "ingredientTracker.today": "Hoy",
 
@@ -5823,6 +5831,10 @@ const translations = {
       "Sua despensa está vazia. Tente atualizar ou adicionar ingredientes.",
     "ingredientTracker.startAdding":
       "Comece adicionando alguns ingredientes à sua despensa",
+    "ingredientTracker.pantryTab": "Despensa",
+    "ingredientTracker.expiringTab": "Vencendo em Breve",
+    "ingredientTracker.categoriesTab": "Categorías",
+    "ingredientTracker.lowStockTab": "Estoque Baixo",
 
     // AI Meal Suggestions
     "aiSuggestions.title": "Sugestões de Refeições com IA",
