@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Utensils, ChefHat, Sparkles, Plus, ShoppingCart } from "lucide-react";
-import dashboardBg from "@/assets/dashboard-bg.jpg";
+
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
@@ -94,7 +94,7 @@ const DashboardContent = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundImage: `url(${dashboardBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+    <div className="min-h-screen relative overflow-hidden bg-black">
       {/* Kitchen Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* Subtle kitchen pattern overlay */}
