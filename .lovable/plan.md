@@ -1,20 +1,28 @@
 
 
-# Replace Dashboard Background Image with Soft Geometric Pattern
+# Reorganize Pantry Page with Tab Navigation (Mobile)
 
-## What changes
-Remove the two background JPG images (`dashboard-tabs-bg.jpg` and `dashboard-tabs-bg-mobile.jpg`) and replace them with a lightweight CSS-only geometric mesh pattern that matches the emerald/teal aesthetic.
+## Overview
+Add a tab bar below the "My Pantry" header section with two tabs: **Pantry** (ingredients list + Add Ingredient button) and **Expiring Soon** (expiring items, AI insight card, generate meals button). On desktop, keep both visible side-by-side as today.
 
-## File: `src/components/Dashboard.tsx`
+## Changes — `src/components/IngredientTracker.tsx`
 
-1. **Remove** the two image imports (`dashboardTabsBg`, `dashboardTabsBgMobile`)
-2. **Replace** the `<div>` that renders the background image (the one using `backgroundImage: url(...)`) with a CSS-only pattern using an inline SVG data URI — a subtle dot-mesh or hexagonal pattern in emerald tones at low opacity (~5-8%)
-3. Keep the existing `bg-white/40 backdrop-blur-sm` glassmorphism wrapper untouched
+1. **Import** `Tabs, TabsList, TabsTrigger, TabsContent` from `@/components/ui/tabs` and `useIsMobile` from `@/hooks/use-mobile`
+2. **Remove** the "Add Ingredient" button from the header section (lines 301-314)
+3. **Remove** the stat filter cards row (lines 323-353) and the filter indicator (lines 355-370) — the tab navigation replaces this filtering
+4. **Restructure the main content area** (lines 372-484):
+   - Wrap in a mobile-conditional layout: if `isMobile`, render `<Tabs>` with two tabs; otherwise render the existing side-by-side grid
+   - **"Pantry" tab**: Contains the search bar, "Add Ingredient" button (moved here), and the categorized ingredient accordion list
+   - **"Expiring Soon" tab**: Contains the `<AIMealSuggestions>` component (moved from line 318-321), the expiring ingredients card with CO2 badge, and the expiring ingredient cards
 
-The pattern will be a repeating SVG grid of soft circles or intersecting lines in `emerald-200` at very low opacity, giving texture without visual weight. No extra dependencies needed — pure CSS.
+5. **Desktop layout** remains unchanged — both sections visible in the existing grid
 
-## Result
-- Faster load (no image fetch)
-- Consistent across all screen sizes (no mobile/desktop variants needed)
-- Maintains the glassmorphism + emerald design language
+## Tab Design
+- Tab bar uses the existing `Tabs` component with emerald styling: `bg-black/30 backdrop-blur-sm` list, active tab `bg-emerald-500 text-white`
+- Pantry tab icon: `Package` + count badge
+- Expiring tab icon: `AlertTriangle` + count badge (orange if items expiring)
+
+## Translation Keys to Add (`en.ts`, `es.ts`, `pt.ts`)
+- `ingredientTracker.pantryTab` — "Pantry" / "Despensa" / "Despensa"
+- `ingredientTracker.expiringTab` — "Expiring Soon" / "Por Vencer" / "A Vencer"
 
