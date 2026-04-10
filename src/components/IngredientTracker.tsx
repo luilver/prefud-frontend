@@ -32,12 +32,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import AddIngredientForm from "./AddIngredientForm";
 import AIMealSuggestions from "./AIMealSuggestions";
 import { useUser } from "@/contexts/UserContext";
 import { getPantry } from "@/services/pantryService";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ActiveFilter = 'all' | 'expiring' | 'lowStock' | 'categories';
 
@@ -49,6 +51,7 @@ const IngredientTracker = () => {
     useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   const mapApiCategoryToUI = (category: string): string => {
     const categoryMap: Record<string, string> = {
@@ -290,6 +293,7 @@ const IngredientTracker = () => {
       </div>
 
       <div className="relative z-10 space-y-6">
+        {/* Header - Add Ingredient button removed on mobile */}
         <div className="flex items-center justify-between bg-black/30 backdrop-blur-sm rounded-xl p-4 sm:p-6">
           <div>
             <h2 className="text-2xl font-bold text-white drop-shadow-lg">{t('ingredientTracker.title') || 'Pantry Tracker'}</h2>
@@ -297,85 +301,144 @@ const IngredientTracker = () => {
               {t('ingredientTracker.description') || 'Keep track of your ingredients and their expiration dates'}
             </p>
           </div>
-          <div className="flex items-center space-x-2">
-            <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/30">
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('ingredientTracker.addIngredient') || 'Add Ingredient'}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <AddIngredientForm
-                  onClose={() => setShowAddForm(false)}
-                  onAdd={handleAddIngredient}
+          {!isMobile && (
+            <div className="flex items-center space-x-2">
+              <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+                <DialogTrigger asChild>
+                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/30">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('ingredientTracker.addIngredient') || 'Add Ingredient'}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <AddIngredientForm
+                    onClose={() => setShowAddForm(false)}
+                    onAdd={handleAddIngredient}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
+        </div>
+
+        {isMobile ? (
+          /* ===== MOBILE: Tab Navigation ===== */
+          <Tabs defaultValue="pantry" className="w-full">
+            <TabsList className="w-full bg-black/30 backdrop-blur-sm border-0 p-1 rounded-xl">
+              <TabsTrigger
+                value="pantry"
+                className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/70 rounded-lg py-2.5 gap-2"
+              >
+                <Package className="h-4 w-4" />
+                {t('ingredientTracker.pantryTab') || 'Pantry'}
+                <span className="text-xs font-bold bg-white/20 data-[state=active]:bg-white/30 rounded-full px-2 py-0.5 min-w-[22px]">
+                  {ingredients.length}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="expiring"
+                className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/70 rounded-lg py-2.5 gap-2"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                {t('ingredientTracker.expiringTab') || 'Expiring Soon'}
+                {expiringIngredients.length > 0 && (
+                  <span className="text-xs font-bold bg-orange-500/30 data-[state=active]:bg-white/30 rounded-full px-2 py-0.5 min-w-[22px]">
+                    {expiringIngredients.length}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Pantry Tab */}
+            <TabsContent value="pantry" className="mt-4 space-y-4">
+              {/* Add Ingredient Button */}
+              <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+                <DialogTrigger asChild>
+                  <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/30 py-3">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('ingredientTracker.addIngredient') || 'Add Ingredient'}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <AddIngredientForm
+                    onClose={() => setShowAddForm(false)}
+                    onAdd={handleAddIngredient}
+                  />
+                </DialogContent>
+              </Dialog>
+
+              {/* Search */}
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 border-emerald-200 focus:border-emerald-400 bg-white/95"
                 />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
+              </div>
 
-        <AIMealSuggestions
-          ingredients={ingredients}
-          onAddMeal={handleAddMealFromAI}
-        />
+              {/* Ingredient List */}
+              <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                <CardContent className="p-4">
+                  {Object.keys(categorizedIngredients).length > 0 ? (
+                    <Accordion type="multiple" defaultValue={Object.keys(categorizedIngredients)} className="space-y-3">
+                      {Object.entries(categorizedIngredients).map(
+                        ([category, categoryIngredients]) => (
+                          <AccordionItem
+                            key={category}
+                            value={category}
+                            className="border border-emerald-200 rounded-xl overflow-hidden bg-gradient-to-r from-emerald-50/50 to-teal-50/50"
+                          >
+                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
+                              <div className="flex items-center space-x-3">
+                                <span className="text-2xl">{getCategoryIcon(category)}</span>
+                                <span className="font-semibold text-gray-800">{category}</span>
+                                <span className="text-sm text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-medium">
+                                  {categoryIngredients.length}
+                                </span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 pb-4">
+                              <div className="space-y-3 pt-2">
+                                {categoryIngredients.map((ingredient: any) => (
+                                  <IngredientCard key={ingredient.id} ingredient={ingredient} />
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        )
+                      )}
+                    </Accordion>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg">{t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
+                      <p className="text-sm">
+                        {searchTerm
+                          ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
+                          : ingredients.length === 0
+                          ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
+                          : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-        <div className="flex md:grid md:grid-cols-4 gap-3 md:gap-6 overflow-x-auto pb-2 md:pb-0 snap-x snap-mandatory">
-          {[
-            { key: 'all' as ActiveFilter, label: t('ingredientTracker.totalItems') || 'Total Items', value: ingredients.length, gradient: 'from-emerald-500 to-teal-500', textColor: 'text-emerald-700', icon: <Package className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
-            { key: 'expiring' as ActiveFilter, label: t('ingredientTracker.expiringSoon') || 'Expiring Soon', value: expiringIngredients.length, gradient: 'from-orange-500 to-red-500', textColor: 'text-orange-700', icon: <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
-            { key: 'categories' as ActiveFilter, label: t('ingredientTracker.categories') || 'Categories', value: Object.keys(categorizedIngredients).length, gradient: 'from-teal-500 to-cyan-500', textColor: 'text-teal-700', icon: <Calendar className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
-            { key: 'lowStock' as ActiveFilter, label: t('ingredientTracker.lowStock') || 'Low Stock', value: ingredients.filter((i) => i.quantity <= 1).length, gradient: 'from-red-500 to-pink-500', textColor: 'text-red-700', icon: <Bell className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
-          ].map((stat) => (
-            <Card
-              key={stat.key}
-              onClick={() => handleStatClick(stat.key)}
-              className={`bg-white/95 backdrop-blur-sm border-0 shadow-xl min-w-[120px] md:min-w-0 snap-start flex-shrink-0 overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
-                activeFilter === stat.key && stat.key !== 'all' && stat.key !== 'categories'
-                  ? 'ring-2 ring-emerald-500 shadow-emerald-500/20'
-                  : ''
-              }`}
-            >
-              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`} />
-              <CardContent className="p-3 md:p-6">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-xs md:text-sm text-gray-600 whitespace-nowrap">{stat.label}</p>
-                    <p className={`text-xl md:text-2xl font-bold ${stat.textColor}`}>{stat.value}</p>
-                  </div>
-                  <div className={`p-2 md:p-3 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
-                    {stat.icon}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+            {/* Expiring Soon Tab */}
+            <TabsContent value="expiring" className="mt-4 space-y-4">
+              <AIMealSuggestions
+                ingredients={ingredients}
+                onAddMeal={handleAddMealFromAI}
+              />
 
-        {activeFilter !== 'all' && activeFilter !== 'categories' && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-white/80">
-              Filtering: <span className="font-semibold text-white">{activeFilter === 'expiring' ? 'Expiring Soon' : 'Low Stock'}</span>
-            </span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setActiveFilter('all')}
-              className="h-6 px-2 text-white/70 hover:text-white hover:bg-white/10"
-            >
-              <X className="h-3 w-3 mr-1" />
-              Clear
-            </Button>
-          </div>
-        )}
-
-        <div className={`grid ${gridCols} gap-6`}>
-          {expiringIngredients.length > 0 && (
-            <Card className="bg-gradient-to-br from-orange-50/95 to-red-50/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
-              <Accordion type="single" collapsible>
-                <AccordionItem value="expiring" className="border-0">
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              {expiringIngredients.length > 0 ? (
+                <Card className="bg-gradient-to-br from-orange-50/95 to-red-50/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
+                  <CardHeader className="pb-2">
                     <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                       <AlertTriangle className="h-5 w-5 text-orange-700" />
                       <span className="font-semibold text-orange-700">{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</span>
@@ -398,90 +461,201 @@ const IngredientTracker = () => {
                         </TooltipProvider>
                       )}
                     </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-4">
+                  </CardHeader>
+                  <CardContent>
                     <p className="text-sm text-orange-600 mb-3">
                       {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}
                     </p>
                     <div className="space-y-3">
-                      {expiringIngredients.slice(0, 5).map((ingredient) => (
+                      {expiringIngredients.map((ingredient) => (
                         <IngredientCard key={ingredient.id} ingredient={ingredient} />
                       ))}
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </Card>
-          )}
-
-          <Card className={`${pantryColSpan} bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden`}>
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
-                  <Package className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-gray-800">{t('ingredientTracker.yourPantry') || 'Your Pantry'}</span>
-              </CardTitle>
-              <CardDescription className="text-gray-600">
-                {t('ingredientTracker.organizedByCategory') || 'All your ingredients organized by category'}
-              </CardDescription>
-              <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-emerald-200 focus:border-emerald-400"
-                />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {Object.keys(categorizedIngredients).length > 0 ? (
-                <Accordion type="multiple" defaultValue={Object.keys(categorizedIngredients)} className="space-y-3">
-                  {Object.entries(categorizedIngredients).map(
-                    ([category, categoryIngredients]) => (
-                      <AccordionItem
-                        key={category}
-                        value={category}
-                        className="border border-emerald-200 rounded-xl overflow-hidden bg-gradient-to-r from-emerald-50/50 to-teal-50/50"
-                      >
-                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
-                          <div className="flex items-center space-x-3">
-                            <span className="text-2xl">{getCategoryIcon(category)}</span>
-                            <span className="font-semibold text-gray-800">{category}</span>
-                            <span className="text-sm text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-medium">
-                              {categoryIngredients.length} {categoryIngredients.length === 1 ? 'item' : 'items'}
-                            </span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4">
-                          <div className="grid md:grid-cols-2 gap-3 pt-2">
-                            {categoryIngredients.map((ingredient: any) => (
-                              <IngredientCard key={ingredient.id} ingredient={ingredient} />
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    )
-                  )}
-                </Accordion>
+                  </CardContent>
+                </Card>
               ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">{t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
-                  <p className="text-sm">
-                    {searchTerm
-                      ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
-                      : ingredients.length === 0
-                      ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
-                      : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
-                  </p>
-                </div>
+                <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+                  <CardContent className="text-center py-12 text-gray-500">
+                    <Leaf className="h-16 w-16 mx-auto mb-4 text-emerald-400 opacity-50" />
+                    <p className="text-lg font-medium text-emerald-700">All fresh!</p>
+                    <p className="text-sm">No items expiring soon</p>
+                  </CardContent>
+                </Card>
               )}
-            </CardContent>
-          </Card>
-        </div>
+            </TabsContent>
+          </Tabs>
+        ) : (
+          /* ===== DESKTOP: Original Layout ===== */
+          <>
+            <AIMealSuggestions
+              ingredients={ingredients}
+              onAddMeal={handleAddMealFromAI}
+            />
+
+            <div className="flex md:grid md:grid-cols-4 gap-3 md:gap-6 overflow-x-auto pb-2 md:pb-0 snap-x snap-mandatory">
+              {[
+                { key: 'all' as ActiveFilter, label: t('ingredientTracker.totalItems') || 'Total Items', value: ingredients.length, gradient: 'from-emerald-500 to-teal-500', textColor: 'text-emerald-700', icon: <Package className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+                { key: 'expiring' as ActiveFilter, label: t('ingredientTracker.expiringSoon') || 'Expiring Soon', value: expiringIngredients.length, gradient: 'from-orange-500 to-red-500', textColor: 'text-orange-700', icon: <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+                { key: 'categories' as ActiveFilter, label: t('ingredientTracker.categories') || 'Categories', value: Object.keys(categorizedIngredients).length, gradient: 'from-teal-500 to-cyan-500', textColor: 'text-teal-700', icon: <Calendar className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+                { key: 'lowStock' as ActiveFilter, label: t('ingredientTracker.lowStock') || 'Low Stock', value: ingredients.filter((i) => i.quantity <= 1).length, gradient: 'from-red-500 to-pink-500', textColor: 'text-red-700', icon: <Bell className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+              ].map((stat) => (
+                <Card
+                  key={stat.key}
+                  onClick={() => handleStatClick(stat.key)}
+                  className={`bg-white/95 backdrop-blur-sm border-0 shadow-xl min-w-[120px] md:min-w-0 snap-start flex-shrink-0 overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                    activeFilter === stat.key && stat.key !== 'all' && stat.key !== 'categories'
+                      ? 'ring-2 ring-emerald-500 shadow-emerald-500/20'
+                      : ''
+                  }`}
+                >
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`} />
+                  <CardContent className="p-3 md:p-6">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-xs md:text-sm text-gray-600 whitespace-nowrap">{stat.label}</p>
+                        <p className={`text-xl md:text-2xl font-bold ${stat.textColor}`}>{stat.value}</p>
+                      </div>
+                      <div className={`p-2 md:p-3 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
+                        {stat.icon}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {activeFilter !== 'all' && activeFilter !== 'categories' && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-white/80">
+                  Filtering: <span className="font-semibold text-white">{activeFilter === 'expiring' ? 'Expiring Soon' : 'Low Stock'}</span>
+                </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setActiveFilter('all')}
+                  className="h-6 px-2 text-white/70 hover:text-white hover:bg-white/10"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Clear
+                </Button>
+              </div>
+            )}
+
+            <div className={`grid ${gridCols} gap-6`}>
+              {expiringIngredients.length > 0 && (
+                <Card className="bg-gradient-to-br from-orange-50/95 to-red-50/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-red-500" />
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="expiring" className="border-0">
+                      <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                          <AlertTriangle className="h-5 w-5 text-orange-700" />
+                          <span className="font-semibold text-orange-700">{t('ingredientTracker.expiringSoon') || 'Expiring Soon'}</span>
+                          <span className="text-xs font-bold bg-orange-500 text-white rounded-full px-2 py-0.5 min-w-[22px]">
+                            {expiringIngredients.length}
+                          </span>
+                          {co2Savings > 0 && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="inline-flex items-center gap-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full px-2.5 py-0.5">
+                                    <Leaf className="h-3 w-3" />
+                                    Save {co2Savings.toFixed(1)} kg CO₂
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Consume these items to prevent this carbon waste</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-6 pb-4">
+                        <p className="text-sm text-orange-600 mb-3">
+                          {t('ingredientTracker.useFirst') || 'Use these ingredients first to avoid waste'}
+                        </p>
+                        <div className="space-y-3">
+                          {expiringIngredients.slice(0, 5).map((ingredient) => (
+                            <IngredientCard key={ingredient.id} ingredient={ingredient} />
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </Card>
+              )}
+
+              <Card className={`${pantryColSpan} bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden`}>
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                      <Package className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-gray-800">{t('ingredientTracker.yourPantry') || 'Your Pantry'}</span>
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    {t('ingredientTracker.organizedByCategory') || 'All your ingredients organized by category'}
+                  </CardDescription>
+                  <div className="relative">
+                    <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input
+                      placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 border-emerald-200 focus:border-emerald-400"
+                    />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {Object.keys(categorizedIngredients).length > 0 ? (
+                    <Accordion type="multiple" defaultValue={Object.keys(categorizedIngredients)} className="space-y-3">
+                      {Object.entries(categorizedIngredients).map(
+                        ([category, categoryIngredients]) => (
+                          <AccordionItem
+                            key={category}
+                            value={category}
+                            className="border border-emerald-200 rounded-xl overflow-hidden bg-gradient-to-r from-emerald-50/50 to-teal-50/50"
+                          >
+                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
+                              <div className="flex items-center space-x-3">
+                                <span className="text-2xl">{getCategoryIcon(category)}</span>
+                                <span className="font-semibold text-gray-800">{category}</span>
+                                <span className="text-sm text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-medium">
+                                  {categoryIngredients.length} {categoryIngredients.length === 1 ? 'item' : 'items'}
+                                </span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 pb-4">
+                              <div className="grid md:grid-cols-2 gap-3 pt-2">
+                                {categoryIngredients.map((ingredient: any) => (
+                                  <IngredientCard key={ingredient.id} ingredient={ingredient} />
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        )
+                      )}
+                    </Accordion>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg">{t('ingredientTracker.noIngredientsFound') || 'No ingredients found'}</p>
+                      <p className="text-sm">
+                        {searchTerm
+                          ? t('ingredientTracker.tryDifferentSearch') || 'Try a different search term'
+                          : ingredients.length === 0
+                          ? t('ingredientTracker.pantryEmpty') || 'Your pantry is empty. Try refreshing or add some ingredients.'
+                          : t('ingredientTracker.startAdding') || 'Start by adding some ingredients to your pantry'}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
