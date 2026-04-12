@@ -1,32 +1,23 @@
 
 
-# Fix Pantry Mobile Tab Issues
+# Remove Gray Translucent Overlay on Mobile
 
-## Changes to `src/components/IngredientTracker.tsx`
+## Problem
+Line 237 in `Dashboard.tsx` renders a decorative content wrapper with `bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl` that creates the visible gray translucent overlay on mobile. On desktop it provides a nice frosted-glass effect over the background image, but on mobile (solid black background) it looks like an unnecessary extra layer.
 
-### 1. Accordions closed by default in Pantry tab
-Line 386: Change `defaultValue={Object.keys(categorizedIngredients)}` to `defaultValue={[]}` so all category dropdowns start collapsed.
+## Solution
+Make this overlay transparent on mobile only. Two elements need updating:
 
-### 2. Remove duplicate generate button in Expiring Soon tab
-The `AIMealSuggestions` component (line 433-436) already contains both an AI Insight card (clickable, opens servings modal) AND a separate "Generate Meals" button. Remove the standalone button inside `AIMealSuggestions` and keep only the AI Insight card with a helper text explaining the feature.
+### `src/components/Dashboard.tsx`
 
-In `src/components/AIMealSuggestions.tsx`, lines 276-351: Remove the `CardHeader` section that contains the duplicate title, description, and generate button. Keep only the AI Insight card (the clickable gradient banner) as the single entry point. Update the insight card text to better explain it generates meals from expiring ingredients.
+1. **Line 237** — The translucent background div: conditionally apply `bg-white/40 backdrop-blur-sm border border-white/50 shadow-xl` only on desktop. On mobile, make it fully transparent with no border/shadow:
+   - Mobile: `bg-transparent`
+   - Desktop: keep current `bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl`
 
-### 3. Categorize expiring ingredients with accordion dropdowns
-Lines 469-473: Instead of a flat list of `expiringIngredients`, group them by category (same logic as pantry tab) and render inside an `Accordion` with category headers, icons, and count badges. All categories closed by default.
+2. **Lines 238-245** — The SVG pattern overlay inside it: hide on mobile (`hidden md:block` or similar) since it serves no purpose on a transparent background.
 
-Add a `categorizedExpiringIngredients` memo:
-```tsx
-const categorizedExpiringIngredients = expiringIngredients.reduce((acc, ing) => {
-  if (!acc[ing.category]) acc[ing.category] = [];
-  acc[ing.category].push(ing);
-  return acc;
-}, {} as Record<string, any[]>);
-```
-
-Replace the flat list with an Accordion identical in style to the pantry tab but with orange/red theming.
+3. **Line 235** — The parent `<div className="relative">` stays as-is.
 
 ## Files modified
-- `src/components/IngredientTracker.tsx` — accordion default closed, categorized expiring items
-- `src/components/AIMealSuggestions.tsx` — remove duplicate button, keep only the insight card with helper text
+- `src/components/Dashboard.tsx` — conditional styling for the content wrapper based on `isMobile`
 
