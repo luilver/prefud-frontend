@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, ChefHat, ArrowLeft, ArrowRight, Wand2, Eye, Salad, Loader2, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import AIMealCreatorStepper from "./AIMealCreatorStepper";
 import AIMealView from "./AIMealView";
 import PageSizeSelector from "./PageSizeSelector";
@@ -17,28 +18,71 @@ import {
 } from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
 import { getSpecialMealsByUser } from "@/services/userMealPlansService";
-import { useLanguage } from "@/contexts/LanguageContext"; // <-- Add this line
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const AIMealCreator = () => {
   const [showCreator, setShowCreator] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<any>(null);
   const [apiMeals, setApiMeals] = useState<any[]>([]);
+  const [allApiMeals, setAllApiMeals] = useState<any[]>([]);
   const [isLoadingMeals, setIsLoadingMeals] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const { aiMeals, addAIMeal, user } = useUser();
   const { toast } = useToast();
-  const { t } = useLanguage(); // <-- Add this line
+  const { t } = useLanguage();
+  const isMobile = useIsMobile();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Fetch meals from API when component mounts or when pagination changes
   useEffect(() => {
     if (user?.id) {
-      fetchUserMeals(currentPage, pageSize);
+      if (isMobile) {
+        if (currentPage === 1) {
+          fetchUserMeals(1, 5, true);
+        }
+      } else {
+        fetchUserMeals(currentPage, pageSize, false);
+      }
     }
-  }, [user?.id, currentPage, pageSize]);
+  }, [user?.id, currentPage, pageSize, isMobile]);
 
-  const fetchUserMeals = async (page: number = 1, limit: number = 5) => {
+  // Infinite scroll observer for mobile
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMeals && !isLoadingMore && currentPage < totalPages) {
+          loadMoreMeals();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isMobile, isLoadingMeals, isLoadingMore, currentPage, totalPages]);
+
+  const loadMoreMeals = async () => {
+    if (!user?.id || isLoadingMore) return;
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const response = await getSpecialMealsByUser(user.id, nextPage, 5);
+      if (response.data && Array.isArray(response.data)) {
+        setAllApiMeals(prev => [...prev, ...response.data]);
+        setCurrentPage(nextPage);
+        setTotalPages(response.totalPages || 1);
+      }
+    } catch (error) {
+      console.error('Error loading more meals:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const fetchUserMeals = async (page: number = 1, limit: number = 5, isInfiniteScroll: boolean = false) => {
     if (!user?.id) return;
 
     setIsLoadingMeals(true);
@@ -48,6 +92,9 @@ const AIMealCreator = () => {
       const response = await getSpecialMealsByUser(user.id, page, limit);
       
       if (response.data && Array.isArray(response.data)) {
+        if (isInfiniteScroll) {
+          setAllApiMeals(response.data);
+        }
         setApiMeals(response.data);
         setTotalPages(response.totalPages || 1);
       }
