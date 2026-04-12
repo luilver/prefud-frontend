@@ -241,18 +241,20 @@ const AIMealCreator = () => {
 
       <div className="relative z-10 space-y-6">
         {/* Header */}
-        <div className="text-center space-y-4 bg-black/30 backdrop-blur-sm rounded-xl p-6">
-          <div className="flex items-center justify-center space-x-3">
-            <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-lg shadow-emerald-500/30">
-              <Salad className="h-8 w-8 text-white" />
+        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+              <Salad className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-              {t("aiMealCreator.createMealTitle") || "Create a Meal"}
-            </h1>
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold text-white">
+                {t("aiMealCreator.createMealTitle") || "Create a Meal"}
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                {t("aiMealCreator.createMealDesc") || "Create unique, personalized meals with AI based on your preferences, dietary needs, and available ingredients."}
+              </p>
+            </div>
           </div>
-          <p className="text-lg text-white/90 max-w-2xl mx-auto drop-shadow-md">
-            {t("aiMealCreator.createMealDesc") || "Create unique, personalized meals with AI based on your preferences, dietary needs, and available ingredients."}
-          </p>
         </div>
 
         <div className="flex justify-center">

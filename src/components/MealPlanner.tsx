@@ -309,29 +309,35 @@ const MealPlanner = () => {
         )}
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-black/30 backdrop-blur-sm rounded-xl p-4 sm:p-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
-              {t("mealPlanner.title") || "Meal Planner"}
-            </h1>
-            <p className="text-white/90 mt-1 drop-shadow-md">
-              {t("mealPlanner.description") ||
-                "Create and manage your weekly meal plans"}
-            </p>
+        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg sm:text-2xl font-bold text-white">
+                  {t("mealPlanner.title") || "Meal Planner"}
+                </h1>
+                <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                  {t("mealPlanner.description") || "Create and manage your weekly meal plans"}
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={() => {
+                console.log("Creating new meal plan");
+                setShowCreator(true);
+                setSelectedMealPlan(null);
+                setIsEditing(false);
+                isNavigatingBack.current = false;
+              }}
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white w-full sm:w-auto shadow-lg"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t("mealPlanner.aiMeal") || "Create AI Meal Plan"}
+            </Button>
           </div>
-          <Button
-            onClick={() => {
-              console.log("Creating new meal plan");
-              setShowCreator(true);
-              setSelectedMealPlan(null);
-              setIsEditing(false);
-              isNavigatingBack.current = false;
-            }}
-            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white w-full sm:w-auto shadow-lg"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t("mealPlanner.aiMeal") || "Create AI Meal Plan"}
-          </Button>
         </div>
 
         {/* Page Size Selector and Results Info - desktop only */}
