@@ -340,7 +340,7 @@ const AIMealCreator = () => {
               ))}
 
               {/* API Meals */}
-              {apiMeals.map((meal, index) => (
+              {(isMobile ? allApiMeals : apiMeals).map((meal, index) => (
                 <Card key={`api-${meal._id || index}`} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
                   <CardHeader>
@@ -398,7 +398,26 @@ const AIMealCreator = () => {
               ))}
             </div>
 
-            {maxTotalPages > 1 && (
+            {/* Infinite scroll sentinel for mobile */}
+            {isMobile && (
+              <>
+                <div ref={loadMoreRef} className="h-4" />
+                {isLoadingMore && (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                  </div>
+                )}
+                {currentPage >= totalPages && allApiMeals.length > 0 && (
+                  <p className="text-center text-white/60 text-sm py-4">
+                    {t("aiMealCreator.noMoreMeals") || "You've seen all your meals"}
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* Pagination - desktop only */}
+            {!isMobile && maxTotalPages > 1 && (
               <div className="flex justify-center mt-8">
                 <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
                   <Pagination>
@@ -451,8 +470,6 @@ const AIMealCreator = () => {
                 </div>
               </div>
             )}
-          </div>
-        )}
 
         {!isLoadingMeals && totalMealsCount === 0 && (
           <Card className="text-center py-12 bg-white/95 backdrop-blur-sm border-0 shadow-xl">
