@@ -30,7 +30,8 @@ const Landing = () => {
     { step: 1, icon: Package, title: t("landing.step1Title"), desc: t("landing.step1Desc") },
     { step: 2, icon: Sparkles, title: t("landing.step2Title"), desc: t("landing.step2Desc") },
     { step: 3, icon: ShoppingCart, title: t("landing.step3Title"), desc: t("landing.step3Desc") },
-    { step: 4, icon: BookOpen, title: t("landing.step4Title"), desc: t("landing.step4Desc") },
+    { step: 4, icon: ListChecks, title: t("landing.step4Title"), desc: t("landing.step4Desc") },
+    { step: 5, icon: BookOpen, title: t("landing.step5Title"), desc: t("landing.step5Desc") },
   ];
 
   const features = [
@@ -151,6 +152,30 @@ const Landing = () => {
               {t("landing.howTitle")}
             </h2>
             <p className="text-muted-foreground text-lg">{t("landing.howSubtitle")}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {steps.slice(0, 3).map((item) => (
+              <div key={item.step} className="relative p-6 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg mb-4">
+                  {item.step}
+                </div>
+                <h3 className="text-lg font-poppins font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto mt-6">
+            {steps.slice(3).map((item) => (
+              <div key={item.step} className="relative p-6 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg mb-4">
+                  {item.step}
+                </div>
+                <h3 className="text-lg font-poppins font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
