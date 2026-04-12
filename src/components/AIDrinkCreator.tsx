@@ -1,10 +1,11 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import AIDrinkCreatorStepper from "./AIDrinkCreatorStepper";
 import AIDrinkView from "./AIDrinkView";
 import DrinkDetailView from "./DrinkDetailView";
@@ -26,21 +27,62 @@ const AIDrinkCreator = () => {
   const [selectedDrink, setSelectedDrink] = useState<any>(null);
   const [selectedApiDrink, setSelectedApiDrink] = useState<ApiDrink | null>(null);
   const [apiDrinks, setApiDrinks] = useState<ApiDrink[]>([]);
+  const [allApiDrinks, setAllApiDrinks] = useState<ApiDrink[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const { user, aiDrinks, addAIDrink } = useUser();
   const { t } = useLanguage();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user?.id) {
-      fetchUserDrinks(currentPage, pageSize);
+      if (isMobile) {
+        if (currentPage === 1) {
+          fetchUserDrinks(1, 5, true);
+        }
+      } else {
+        fetchUserDrinks(currentPage, pageSize, false);
+      }
     }
-  }, [user?.id, currentPage, pageSize]);
+  }, [user?.id, currentPage, pageSize, isMobile]);
 
-  const fetchUserDrinks = async (page: number = 1, limit: number = 5) => {
+  // Infinite scroll observer for mobile
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && !isLoadingMore && currentPage < totalPages) {
+          loadMoreDrinks();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isMobile, loading, isLoadingMore, currentPage, totalPages]);
+
+  const loadMoreDrinks = async () => {
+    if (!user?.id || isLoadingMore) return;
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const response = await getDrinksByUser(user.id, nextPage, 5);
+      setAllApiDrinks(prev => [...prev, ...(response.data || [])]);
+      setCurrentPage(nextPage);
+      setTotalPages(response.totalPages || 1);
+    } catch (error) {
+      console.error('Error loading more drinks:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const fetchUserDrinks = async (page: number = 1, limit: number = 5, isInfiniteScroll: boolean = false) => {
     if (!user?.id) return;
     
     setLoading(true);
@@ -48,6 +90,9 @@ const AIDrinkCreator = () => {
       console.log('Fetching drinks for user:', user.id, 'page:', page, 'limit:', limit);
       
       const response = await getDrinksByUser(user.id, page, limit);
+      if (isInfiniteScroll) {
+        setAllApiDrinks(response.data || []);
+      }
       setApiDrinks(response.data || []);
       setTotalPages(response.totalPages || 1);
       console.log('Fetched user drinks:', response.data);
@@ -93,9 +138,9 @@ const AIDrinkCreator = () => {
     };
     addAIDrink(newDrink);
     setShowStepper(false);
-    // Refresh API drinks list and reset to first page
     setCurrentPage(1);
-    fetchUserDrinks(1, pageSize);
+    setAllApiDrinks([]);
+    fetchUserDrinks(1, isMobile ? 5 : pageSize, isMobile);
   };
 
   const handleViewDrink = (drink: any) => {
@@ -153,8 +198,8 @@ const AIDrinkCreator = () => {
     );
   }
 
-  const totalDrinks = aiDrinks.length + apiDrinks.length;
-  const hasApiDrinks = apiDrinks.length > 0;
+  const totalDrinks = aiDrinks.length + (isMobile ? allApiDrinks.length : apiDrinks.length);
+  const hasApiDrinks = isMobile ? allApiDrinks.length > 0 : apiDrinks.length > 0;
 
   return (
     <div className="min-h-screen relative">
@@ -208,18 +253,20 @@ const AIDrinkCreator = () => {
               {t("aiDrinkCreator.yourCreatedDrinks") || "Your Created Drinks"}
             </h2>
             
-            {/* Pagination Controls */}
-            <PageSizeSelector
-              pageSize={pageSize}
-              onPageSizeChange={handlePageSizeChange}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              itemCount={apiDrinks.length}
-              itemLabel={t("aiDrinkCreator.drinks") || "drinks"}
-            />
+            {/* Pagination Controls - desktop only */}
+            {!isMobile && (
+              <PageSizeSelector
+                pageSize={pageSize}
+                onPageSizeChange={handlePageSizeChange}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemCount={apiDrinks.length}
+                itemLabel={t("aiDrinkCreator.drinks") || "drinks"}
+              />
+            )}
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {apiDrinks.map((drink) => (
+              {(isMobile ? allApiDrinks : apiDrinks).map((drink) => (
                 <Card key={drink._id} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
                   <CardHeader>
@@ -282,8 +329,26 @@ const AIDrinkCreator = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
+            {/* Infinite scroll sentinel for mobile */}
+            {isMobile && (
+              <>
+                <div ref={loadMoreRef} className="h-4" />
+                {isLoadingMore && (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                  </div>
+                )}
+                {currentPage >= totalPages && allApiDrinks.length > 0 && (
+                  <p className="text-center text-white/60 text-sm py-4">
+                    {t("aiDrinkCreator.noMoreDrinks") || "You've seen all your drinks"}
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* Pagination - desktop only */}
+            {!isMobile && totalPages > 1 && (
               <div className="flex justify-center mt-8">
                 <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
                   <Pagination>
@@ -338,6 +403,8 @@ const AIDrinkCreator = () => {
             )}
           </div>
         ) : null}
+
+
 
         {/* Local AI Drinks List (from context) */}
         {aiDrinks.length > 0 && (

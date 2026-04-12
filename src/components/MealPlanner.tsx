@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Card,
   CardContent,
@@ -59,11 +60,15 @@ const MealPlanner = () => {
   const [pageSize, setPageSize] = useState(5); // Default to 5 items per page
   const [totalPages, setTotalPages] = useState(1);
   const [currentPagePlans, setCurrentPagePlans] = useState<any[]>([]);
+  const [allPlans, setAllPlans] = useState<any[]>([]); // For infinite scroll
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasLoadedInitialPlans, setHasLoadedInitialPlans] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successPlan, setSuccessPlan] = useState<any>(null);
   const isNavigatingBack = useRef(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const {
     user,
     mealPlans,
@@ -77,11 +82,49 @@ const MealPlanner = () => {
   // Load meal plans when component mounts, page changes, or page size changes
   useEffect(() => {
     if (user?.id && !showCreator && !selectedMealPlan) {
-      loadMealPlans(currentPage, pageSize);
+      if (isMobile) {
+        // For mobile infinite scroll, only load on mount or reset
+        if (currentPage === 1) {
+          loadMealPlans(1, 5, true);
+        }
+      } else {
+        loadMealPlans(currentPage, pageSize, false);
+      }
     }
-  }, [user?.id, currentPage, pageSize, showCreator, selectedMealPlan]);
+  }, [user?.id, currentPage, pageSize, showCreator, selectedMealPlan, isMobile]);
 
-  const loadMealPlans = async (page: number, limit: number) => {
+  // Infinite scroll observer for mobile
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingPlans && !isLoadingMore && currentPage < totalPages) {
+          loadMorePlans();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isMobile, isLoadingPlans, isLoadingMore, currentPage, totalPages]);
+
+  const loadMorePlans = async () => {
+    if (!user?.id || isLoadingMore) return;
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const response = await fetchMealPlansFromAPI(user.id, nextPage, 5);
+      setAllPlans(prev => [...prev, ...(response.data || [])]);
+      setCurrentPage(nextPage);
+      setTotalPages(response.totalPages || 1);
+    } catch (error) {
+      console.error("Error loading more meal plans:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const loadMealPlans = async (page: number, limit: number, isInfiniteScroll: boolean = false) => {
     if (!user?.id) return;
 
     setIsLoadingPlans(true);
@@ -89,7 +132,10 @@ const MealPlanner = () => {
       console.log(`Loading meal plans for page: ${page}, limit: ${limit}`);
       const response = await fetchMealPlansFromAPI(user.id, page, limit);
       console.log("this si the data of meal plans ", response.data);
-      // Set the current page plans from the API response
+      
+      if (isInfiniteScroll) {
+        setAllPlans(response.data || []);
+      }
       setCurrentPagePlans(response.data || []);
       setTotalPages(response.totalPages || 1);
       setHasLoadedInitialPlans(true);
@@ -149,7 +195,8 @@ const MealPlanner = () => {
 
     // Refresh the first page to show the new plan
     setCurrentPage(1);
-    loadMealPlans(1, pageSize);
+    setAllPlans([]);
+    loadMealPlans(1, isMobile ? 5 : pageSize, isMobile);
   };
 
   const handleEditPlan = () => {
@@ -287,8 +334,8 @@ const MealPlanner = () => {
           </Button>
         </div>
 
-        {/* Page Size Selector and Results Info */}
-        {!isLoadingPlans && hasLoadedInitialPlans && (
+        {/* Page Size Selector and Results Info - desktop only */}
+        {!isMobile && !isLoadingPlans && hasLoadedInitialPlans && (
           <PageSizeSelector
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
@@ -312,10 +359,10 @@ const MealPlanner = () => {
         )}
 
         {/* Meal Plans Grid */}
-        {!isLoadingPlans && currentPagePlans.length > 0 ? (
+        {(isMobile ? !isLoadingPlans && allPlans.length > 0 : !isLoadingPlans && currentPagePlans.length > 0) ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentPagePlans.map((plan) => {
+              {(isMobile ? allPlans : currentPagePlans).map((plan) => {
                 // Calculate days from duration string or use preferences
                 const daysCount = plan.duration
                   ? parseInt(plan.duration.replace(" days", ""))
@@ -505,8 +552,26 @@ const MealPlanner = () => {
               })}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
+            {/* Infinite scroll sentinel for mobile */}
+            {isMobile && (
+              <>
+                <div ref={loadMoreRef} className="h-4" />
+                {isLoadingMore && (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                  </div>
+                )}
+                {currentPage >= totalPages && allPlans.length > 0 && (
+                  <p className="text-center text-white/60 text-sm py-4">
+                    {t("mealPlanner.noMorePlans") || "You've seen all your meal plans"}
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* Pagination - desktop only */}
+            {!isMobile && totalPages > 1 && (
               <div className="flex justify-center mt-8">
                 <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
                   <Pagination>
