@@ -266,7 +266,7 @@ const AIMealCreator = () => {
           </Button>
         </div>
 
-        {!isLoadingMeals && totalMealsCount > 0 && (
+        {!isMobile && !isLoadingMeals && totalMealsCount > 0 && (
           <PageSizeSelector
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
