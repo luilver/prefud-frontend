@@ -198,8 +198,8 @@ const AIDrinkCreator = () => {
     );
   }
 
-  const totalDrinks = aiDrinks.length + apiDrinks.length;
-  const hasApiDrinks = apiDrinks.length > 0;
+  const totalDrinks = aiDrinks.length + (isMobile ? allApiDrinks.length : apiDrinks.length);
+  const hasApiDrinks = isMobile ? allApiDrinks.length > 0 : apiDrinks.length > 0;
 
   return (
     <div className="min-h-screen relative">
