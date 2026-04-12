@@ -401,7 +401,10 @@ const AIDrinkCreator = () => {
                 </div>
               </div>
             )}
+          </div>
         ) : null}
+
+
 
         {/* Local AI Drinks List (from context) */}
         {aiDrinks.length > 0 && (
