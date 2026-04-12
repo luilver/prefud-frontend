@@ -313,7 +313,7 @@ const MealPlanner = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
               <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
-                <CalendarDays className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold text-white">
