@@ -215,27 +215,29 @@ const AIDrinkCreator = () => {
 
       <div className="relative z-10 space-y-6">
         {/* Header Card */}
-        <Card className="bg-black/30 backdrop-blur-sm border-0 shadow-xl">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/30">
-              <Wine className="h-8 w-8 text-white" />
+        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+              <Wine className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <CardTitle className="text-2xl text-white drop-shadow-lg">
-              {t("aiDrinkCreator.title") || "Create Your Perfect Healthy Drink"}
-            </CardTitle>
-            <CardDescription className="text-emerald-100/90">
-              {t("aiDrinkCreator.desc") || "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold text-white">
+                {t("aiDrinkCreator.title") || "Create Your Perfect Healthy Drink"}
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                {t("aiDrinkCreator.desc") || "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences"}
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 sm:mt-4">
             <Button 
               onClick={handleStartCreation}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-8 py-3 text-lg shadow-lg shadow-emerald-500/30"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-2 shadow-lg shadow-emerald-500/30 w-full sm:w-auto"
             >
               {t("aiDrinkCreator.start") || "Start Creating"}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* API Created Drinks List */}
         {loading ? (

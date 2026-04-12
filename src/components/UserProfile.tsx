@@ -289,18 +289,20 @@ const UserProfile = () => {
 
       <div className="relative z-10 space-y-4 sm:space-y-6 max-w-4xl mx-auto p-4">
         {/* Header */}
-        <div className="text-center space-y-4 bg-black/30 backdrop-blur-sm rounded-xl p-6">
-          <div className="flex items-center justify-center space-x-3">
-            <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-lg shadow-emerald-500/30">
-              <User className="h-8 w-8 text-white" />
+        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+              <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-              {t("profile.title") || "My Profile"}
-            </h1>
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold text-white">
+                {t("profile.title") || "My Profile"}
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                {t("profile.description") || "Manage your personal information and preferences"}
+              </p>
+            </div>
           </div>
-          <p className="text-lg text-white/90 max-w-2xl mx-auto drop-shadow-md">
-            {t("profile.description") || "Manage your personal information and preferences"}
-          </p>
         </div>
 
         {/* Profile Information Accordion */}

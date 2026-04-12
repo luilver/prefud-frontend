@@ -294,12 +294,17 @@ const IngredientTracker = () => {
 
       <div className="relative z-10 space-y-6">
         {/* Header - Add Ingredient button removed on mobile */}
-        <div className="flex items-center justify-between bg-black/30 backdrop-blur-sm rounded-xl p-4 sm:p-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white drop-shadow-lg">{t('ingredientTracker.title') || 'Pantry Tracker'}</h2>
-            <p className="text-emerald-100/90">
-              {t('ingredientTracker.description') || 'Keep track of your ingredients and their expiration dates'}
-            </p>
+        <div className="flex items-center justify-between bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold text-white">{t('ingredientTracker.title') || 'Pantry Tracker'}</h1>
+              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                {t('ingredientTracker.description') || 'Keep track of your ingredients and their expiration dates'}
+              </p>
+            </div>
           </div>
           {!isMobile && (
             <div className="flex items-center space-x-2">
