@@ -634,7 +634,8 @@ const MealPlanner = () => {
                   </Pagination>
                 </div>
               </div>
-            )}
+          </>
+        ) : (
           !isLoadingPlans &&
           hasLoadedInitialPlans && (
             <Card className="text-center py-12 bg-card backdrop-blur-sm border border-border shadow-xl">
