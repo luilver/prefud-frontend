@@ -336,6 +336,8 @@ const SubscriptionManager = () => {
     );
   }
 
+  if (isNative) return null;
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="text-center space-y-4">
