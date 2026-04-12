@@ -289,52 +289,44 @@ const AIMealCreator = () => {
         )}
 
         {!isLoadingMeals && totalMealsCount > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center text-black drop-shadow-lg">{t("aiMealCreator.yourAIMealsTitle") || "Your AI Created Meals"}</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-3">
+            <h2 className="text-lg sm:text-2xl font-semibold text-center text-foreground">{t("aiMealCreator.yourAIMealsTitle") || "Your AI Created Meals"}</h2>
+            <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
               {/* Local AI Meals */}
               {currentPageLocalMeals.map((meal, index) => (
-                <Card key={`local-${index}`} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
-                        <ChefHat className="h-5 w-5 text-white" />
+                <Card key={`local-${index}`} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+                  <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                  <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shrink-0">
+                          <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                        </div>
+                        <CardTitle className="text-sm sm:text-lg text-foreground truncate">{meal.name}</CardTitle>
                       </div>
-                      <CardTitle className="text-lg text-gray-800">{meal.name}</CardTitle>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                     </div>
-                    <CardDescription className="text-gray-500">
-                      {meal.cuisine} • {meal.cookingTime} mins • {meal.difficulty}
-                    </CardDescription>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3 text-emerald-500" />{meal.cookingTime}m
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.cuisine}</span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.difficulty}</span>
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 mb-3">{meal.description}</p>
-                    <div className="flex flex-wrap gap-1 mb-3">
+                  <CardContent className="pt-2 pb-3 sm:pb-4 px-3 sm:px-6">
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-2">{meal.description}</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
                       {meal.tags?.slice(0, 3).map((tag: string, tagIndex: number) => (
-                        <span 
-                          key={tagIndex}
-                          className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"
-                        >
-                          {tag}
-                        </span>
+                        <span key={tagIndex} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full">{tag}</span>
                       ))}
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                        onClick={() => handleViewMeal(meal)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
+                    <div className="flex gap-2 pt-2 border-t border-border/50">
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleViewMeal(meal)}>
+                        <Eye className="h-3.5 w-3.5 mr-1" />{t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                       </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
-                        onClick={() => handleMarkAsDone(meal.id || index.toString(), meal.name, false)}
-                      >
-                        <CheckCircle2 className="h-4 w-4" />
+                      <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white" onClick={() => handleMarkAsDone(meal.id || index.toString(), meal.name, false)}>
+                        <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </CardContent>
@@ -343,56 +335,46 @@ const AIMealCreator = () => {
 
               {/* API Meals */}
               {(isMobile ? allApiMeals : apiMeals).map((meal, index) => (
-                <Card key={`api-${meal._id || index}`} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500">
-                        <ChefHat className="h-5 w-5 text-white" />
+                <Card key={`api-${meal._id || index}`} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+                  <div className="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-500" />
+                  <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 shrink-0">
+                          <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                        </div>
+                        <CardTitle className="text-sm sm:text-lg text-foreground truncate">{meal.specialMeal.specialMeal.name}</CardTitle>
                       </div>
-                      <CardTitle className="text-lg text-gray-800">{meal.specialMeal.specialMeal.name}</CardTitle>
-                      <span className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full">
-                        {t("aiMealCreator.savedLabel") || "Saved"}
-                      </span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="px-2 py-0.5 bg-teal-500/10 text-teal-400 text-[10px] rounded-full">{t("aiMealCreator.savedLabel") || "Saved"}</span>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
                     </div>
-                    <CardDescription className="text-gray-500">
-                      {meal.cuisinePreferences?.[0] || 'Various'} • {meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime} {t("aiMealCreator.mins") || "mins"} • {meal.cookingSkillLevel}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 mb-3">{meal.specialMeal.specialMeal.description}</p>
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
-                        {meal.mealType}
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3 text-emerald-500" />{meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime}m
                       </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.cuisinePreferences?.[0] || 'Various'}</span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.cookingSkillLevel}</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-2 pb-3 sm:pb-4 px-3 sm:px-6">
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-2">{meal.specialMeal.specialMeal.description}</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full">{meal.mealType}</span>
                       {meal.dietaryRestrictions?.slice(0, 2).map((restriction: string, tagIndex: number) => (
-                        <span 
-                          key={tagIndex}
-                          className="px-2 py-1 bg-teal-100 text-teal-700 text-xs rounded-full"
-                        >
-                          {restriction}
-                        </span>
+                        <span key={tagIndex} className="px-2 py-0.5 bg-teal-500/10 text-teal-400 text-[10px] rounded-full">{restriction}</span>
                       ))}
                     </div>
-                    <div className="text-xs text-gray-500 mb-2">
+                    <div className="text-[10px] sm:text-xs text-muted-foreground mb-2">
                       {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} {t("aiMealCreator.peopleLabel") || "people"}
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                        onClick={() => handleViewApiMeal(meal)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        {t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
+                    <div className="flex gap-2 pt-2 border-t border-border/50">
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleViewApiMeal(meal)}>
+                        <Eye className="h-3.5 w-3.5 mr-1" />{t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                       </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
-                        onClick={() => handleMarkAsDone(meal._id, meal.specialMeal.specialMeal.name, true)}
-                      >
-                        <CheckCircle2 className="h-4 w-4" />
+                      <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white" onClick={() => handleMarkAsDone(meal._id, meal.specialMeal.specialMeal.name, true)}>
+                        <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </CardContent>
