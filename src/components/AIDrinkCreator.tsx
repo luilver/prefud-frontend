@@ -329,8 +329,26 @@ const AIDrinkCreator = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
+            {/* Infinite scroll sentinel for mobile */}
+            {isMobile && (
+              <>
+                <div ref={loadMoreRef} className="h-4" />
+                {isLoadingMore && (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                  </div>
+                )}
+                {currentPage >= totalPages && allApiDrinks.length > 0 && (
+                  <p className="text-center text-white/60 text-sm py-4">
+                    {t("aiDrinkCreator.noMoreDrinks") || "You've seen all your drinks"}
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* Pagination - desktop only */}
+            {!isMobile && totalPages > 1 && (
               <div className="flex justify-center mt-8">
                 <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
                   <Pagination>
@@ -383,7 +401,6 @@ const AIDrinkCreator = () => {
                 </div>
               </div>
             )}
-          </div>
         ) : null}
 
         {/* Local AI Drinks List (from context) */}
