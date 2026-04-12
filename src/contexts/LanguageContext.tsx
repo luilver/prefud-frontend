@@ -328,6 +328,7 @@ const translations = {
     "mealPlanner.getCustomizedRecipes":
       "Get customized recipes based on your preferences, dietary needs, and cooking skills",
     "mealPlanner.createYourFirstAIMeal": "Create Your First AI Meal Plan",
+    "mealPlanner.noMorePlans":"No more meal plans to show",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Create AI Meal Plan",
@@ -692,6 +693,7 @@ const translations = {
     "aiMealCreator.noMealsTitle": "No Meals created yet",
     "aiMealCreator.noMealsDesc":
       "Start creating your first AI-powered meal based on your preferences and ingredients.",
+      "aiMealCreator.noMoreMeals":"No more meals to show",
 
     // AIMealCreator Stepper
     "aiMealCreatorStepper.step1Title": "Meal Details",
@@ -1154,6 +1156,7 @@ const translations = {
     "aiDrinkCreatorStepper.stepGeneration": "AI Generation",
     "aiDrinkCreatorStepper.previous": "Previous",
     "aiDrinkCreatorStepper.next": "Next",
+    "aiDrinkCreator.noMoreDrinks":"No more drinks to show",
 
     // AI Drink Type
     "aiDrinkType.chooseTitle": "Choose Your Drink Type",
@@ -2282,6 +2285,7 @@ const translations = {
       "Obtén recetas personalizadas basadas en tus preferencias, necesidades dietéticas y habilidades culinarias",
     "mealPlanner.createYourFirstAIMeal":
       "Crea Tu Primer Plan de Comidas con IA",
+      "mealPlanner.noMorePlans":"No tienes más planes de comidas.",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Crear Plan de Comidas con IA",
@@ -2567,6 +2571,7 @@ const translations = {
     "aiMealCreator.noMealsTitle": "Aún no se han creado comidas",
     "aiMealCreator.noMealsDesc":
       "Comienza a crear tu primera comida con IA según tus preferencias e ingredientes.",
+      "aiMealCreator.noMoreMeals":"No hay más planes de comida",
 
     // AI Meal Creator Stepper
     "aiMealCreatorStepper.step1Title": "Detalles de la Comida",
@@ -3047,6 +3052,7 @@ const translations = {
     "aiDrinkCreatorStepper.stepGeneration": "Generación IA",
     "aiDrinkCreatorStepper.previous": "Anterior",
     "aiDrinkCreatorStepper.next": "Siguiente",
+    "aiDrinkCreator.noMoreDrinks":"No se encontraron más bebidas.",
 
     // AI Drink Type
     "aiDrinkType.chooseTitle": "Elige tu Tipo de Bebida",
@@ -4301,6 +4307,7 @@ const translations = {
       "Obtenha receitas personalizadas com base em suas preferências, necessidades dietéticas e habilidades culinárias",
     "mealPlanner.createYourFirstAIMeal":
       "Crie Seu Primeiro Plano de Refeições com IA",
+      "mealPlanner.noMorePlans":"Não há mais planos de refeições para mostrar",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Criar Plano de Refeições com IA",
@@ -4680,6 +4687,7 @@ const translations = {
     "aiMealCreator.noMealsTitle": "Nenhuma refeição criada ainda",
     "aiMealCreator.noMealsDesc":
       "Comece a criar sua primeira refeição com IA com base em suas preferências e ingredientes.",
+      "aiMealCreator.noMoreMeals":"Não há mais refeições para mostrar",
 
     //AI Meal Creator Stepper
     "aiMealCreatorStepper.step1Title": "Detalhes da Refeição",
@@ -5156,6 +5164,7 @@ const translations = {
     "aiDrinkCreatorStepper.stepGeneration": "Geração IA",
     "aiDrinkCreatorStepper.previous": "Anterior",
     "aiDrinkCreatorStepper.next": "Próximo",
+    "aiDrinkCreator.noMoreDrinks":"Não há mais bebidas para mostrar",
 
     // AI Dtink Type
     "aiDrinkType.chooseTitle": "Escolha o Tipo de Bebida",
