@@ -234,15 +234,17 @@ const DashboardContent = () => {
           {/* Kitchen-inspired content wrapper */}
           <div className="relative">
             {/* Subtle content background */}
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl overflow-hidden">
-              <div 
-                className="absolute inset-0 opacity-[0.06] pointer-events-none"
-                style={{ 
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2310b981' stroke-width='0.5'%3E%3Cpath d='M0 20h40M20 0v40M0 0l40 40M40 0L0 40'/%3E%3C/g%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%230d9488' fill-opacity='0.4'/%3E%3Ccircle cx='0' cy='0' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='40' cy='0' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='0' cy='40' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='40' cy='40' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'repeat',
-                  backgroundSize: '40px 40px'
-                }}
-              />
+            <div className={`absolute inset-0 overflow-hidden ${isMobile ? 'bg-transparent' : 'bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl'}`}>
+              {!isMobile && (
+                <div 
+                  className="absolute inset-0 opacity-[0.06] pointer-events-none"
+                  style={{ 
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2310b981' stroke-width='0.5'%3E%3Cpath d='M0 20h40M20 0v40M0 0l40 40M40 0L0 40'/%3E%3C/g%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%230d9488' fill-opacity='0.4'/%3E%3Ccircle cx='0' cy='0' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='40' cy='0' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='0' cy='40' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='40' cy='40' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: '40px 40px'
+                  }}
+                />
+              )}
             </div>
             
             {/* Tab Content */}
