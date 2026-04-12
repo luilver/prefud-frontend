@@ -253,15 +253,17 @@ const AIDrinkCreator = () => {
               {t("aiDrinkCreator.yourCreatedDrinks") || "Your Created Drinks"}
             </h2>
             
-            {/* Pagination Controls */}
-            <PageSizeSelector
-              pageSize={pageSize}
-              onPageSizeChange={handlePageSizeChange}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              itemCount={apiDrinks.length}
-              itemLabel={t("aiDrinkCreator.drinks") || "drinks"}
-            />
+            {/* Pagination Controls - desktop only */}
+            {!isMobile && (
+              <PageSizeSelector
+                pageSize={pageSize}
+                onPageSizeChange={handlePageSizeChange}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemCount={apiDrinks.length}
+                itemLabel={t("aiDrinkCreator.drinks") || "drinks"}
+              />
+            )}
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {apiDrinks.map((drink) => (
