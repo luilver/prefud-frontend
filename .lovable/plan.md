@@ -1,37 +1,58 @@
 
 
-# Unify Section Headers Across All Dashboard Tabs
+# Unify Meal & Drink Cards to Match Meal Plan Card Design
 
 ## Problem
-Each section has a different header design:
-- **Meal Planner**: left-aligned h1 + description, no icon, `bg-black/30 backdrop-blur-sm` wrapper
-- **AI Meal Creator**: centered icon (circle gradient) + h1 + description, `bg-black/30 backdrop-blur-sm` wrapper
-- **AI Drink Creator**: uses `Card`/`CardHeader`/`CardTitle` with a large circle icon, `bg-black/30` card
-- **User Profile**: centered icon (circle gradient) + h1 + description, same as AI Meals
-- **Ingredient Tracker**: left-aligned h2 + description, `bg-black/30 backdrop-blur-sm` wrapper
+The AI Created Meals and Healthy Drinks cards use a different, bulkier design compared to the Meal Plan cards:
+- **White background** (`bg-white/95`) instead of semantic tokens (`bg-card/95`)
+- **Large CardHeader padding** creates excessive top spacing between the section title and cards
+- Cards are too tall on mobile due to full description text, verbose metadata, and spacious padding
+- No accent bar thickness match, no arrow hover cue, no compact metrics row
 
-On mobile with black background, some have contrast issues and inconsistent spacing.
+## Solution
+Redesign both meal and drink cards to mirror the Meal Plan card pattern: compact, icon-driven, semantic-token-based, with the same visual structure.
 
-## Unified Header Design
-All sections will use the same compact header pattern:
+### Card Design Pattern (matching MealPlanner cards)
+- Container: `bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg` (replaces `bg-white/95 border-0 shadow-xl`)
+- Top accent bar: `h-1.5` (currently `h-1`)
+- CardHeader: `pb-2 pt-5` (compact, removes excess spacing)
+- Title row: icon badge + truncated title + arrow hover cue
+- Compact metrics row using pill badges (`bg-muted/60 rounded-full px-2.5 py-1`) with icons
+- Tags as tiny pills (`text-[10px]`)
+- Description: truncated to 1-2 lines on mobile (`line-clamp-2`)
+- CardContent: `pt-2 pb-4`
+- Bottom row with border-t separator for action buttons
 
-- **Layout**: Left-aligned icon + title row, description below
-- **Icon**: Small gradient circle (`p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg`)
-- **Title**: `text-xl sm:text-2xl font-bold text-white`
-- **Description**: `text-sm text-emerald-200/80`
-- **Container**: `bg-emerald-900/40 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-emerald-500/20`
-- **Mobile optimization**: tighter padding (`p-3`), smaller text (`text-lg`), single-line where possible
+### Files to Modify
 
-## Files to Modify
+**1. `src/components/AIMealCreator.tsx`** (lines 293-341 for local meals, 345-399 for API meals)
+- Replace `bg-white/95 border-0 shadow-xl` with `bg-card/95 border border-border/50 shadow-lg`
+- Change accent bar from `h-1` to `h-1.5`
+- Reduce CardHeader padding: `className="pb-2 pt-5"`
+- Add `ArrowRight` hover cue
+- Truncate title: `truncate` class
+- Convert cuisine/time/difficulty into compact pill badges with icons (Clock, Globe, Award)
+- Truncate description with `line-clamp-2`
+- Move tags to tiny `text-[10px]` pills
+- Reduce CardContent padding: `className="pt-2 pb-4"`
+- Remove the "Your AI Created Meals" h2 extra top spacing (`text-black drop-shadow-lg` to `text-foreground`)
+- Reduce grid gap on mobile
 
-1. **`src/components/MealPlanner.tsx`** (lines 312-330) — Add icon, adjust container styling to unified pattern, keep the "Create Plan" button inline
-2. **`src/components/AIMealCreator.tsx`** (lines 244-256) — Switch from centered to left-aligned, reduce icon size, use unified container
-3. **`src/components/AIDrinkCreator.tsx`** (lines 218-238) — Replace `Card`/`CardHeader` with plain div, left-align, use unified container
-4. **`src/components/UserProfile.tsx`** (lines 292-304) — Switch from centered to left-aligned, use unified container
-5. **`src/components/IngredientTracker.tsx`** (lines 297-303) — Upgrade from h2 to match pattern, add icon, use unified container border
+**2. `src/components/AIDrinkCreator.tsx`** (lines 270-331)
+- Same card container change to semantic tokens
+- Same accent bar, header padding, and arrow cue
+- Merge the duplicate metadata (cooking time appears in both CardDescription and the grid) into a single compact metrics row with pills
+- Truncate description with `line-clamp-2`
+- Vitamin tags to `text-[10px]` pills
+- Fix "Your Created Drinks" h2 styling (`text-black drop-shadow-lg` to `text-foreground`)
 
-## Mobile-Specific
-- On mobile: `p-3`, title `text-lg`, no description text (or single short line), icon `p-1.5` with smaller Lucide icon
-- Container uses `bg-emerald-900/40 border border-emerald-500/20` for good contrast on solid black background
-- Remove `drop-shadow-lg` (unnecessary on dark bg)
+**3. Both files — reduce spacing between title section and cards**
+- Reduce `space-y-4` on the cards container to `space-y-3`
+- Remove `mb-3` from description paragraphs, use `mb-2`
+
+## Mobile-Specific Optimizations
+- Grid gap: `gap-3` on mobile (currently `gap-4`)
+- Description hidden or `line-clamp-1` on mobile via responsive classes
+- Smaller icon badges: `p-2` to `p-1.5` on mobile
+- Title text: `text-sm` on mobile instead of `text-lg`
 
