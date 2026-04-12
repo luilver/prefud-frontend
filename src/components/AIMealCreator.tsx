@@ -470,6 +470,8 @@ const AIMealCreator = () => {
                 </div>
               </div>
             )}
+          </div>
+        )}
 
         {!isLoadingMeals && totalMealsCount === 0 && (
           <Card className="text-center py-12 bg-white/95 backdrop-blur-sm border-0 shadow-xl">
