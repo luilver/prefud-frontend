@@ -1,10 +1,11 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import AIDrinkCreatorStepper from "./AIDrinkCreatorStepper";
 import AIDrinkView from "./AIDrinkView";
 import DrinkDetailView from "./DrinkDetailView";
@@ -26,21 +27,62 @@ const AIDrinkCreator = () => {
   const [selectedDrink, setSelectedDrink] = useState<any>(null);
   const [selectedApiDrink, setSelectedApiDrink] = useState<ApiDrink | null>(null);
   const [apiDrinks, setApiDrinks] = useState<ApiDrink[]>([]);
+  const [allApiDrinks, setAllApiDrinks] = useState<ApiDrink[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const { user, aiDrinks, addAIDrink } = useUser();
   const { t } = useLanguage();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user?.id) {
-      fetchUserDrinks(currentPage, pageSize);
+      if (isMobile) {
+        if (currentPage === 1) {
+          fetchUserDrinks(1, 5, true);
+        }
+      } else {
+        fetchUserDrinks(currentPage, pageSize, false);
+      }
     }
-  }, [user?.id, currentPage, pageSize]);
+  }, [user?.id, currentPage, pageSize, isMobile]);
 
-  const fetchUserDrinks = async (page: number = 1, limit: number = 5) => {
+  // Infinite scroll observer for mobile
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && !isLoadingMore && currentPage < totalPages) {
+          loadMoreDrinks();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isMobile, loading, isLoadingMore, currentPage, totalPages]);
+
+  const loadMoreDrinks = async () => {
+    if (!user?.id || isLoadingMore) return;
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const response = await getDrinksByUser(user.id, nextPage, 5);
+      setAllApiDrinks(prev => [...prev, ...(response.data || [])]);
+      setCurrentPage(nextPage);
+      setTotalPages(response.totalPages || 1);
+    } catch (error) {
+      console.error('Error loading more drinks:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const fetchUserDrinks = async (page: number = 1, limit: number = 5, isInfiniteScroll: boolean = false) => {
     if (!user?.id) return;
     
     setLoading(true);
@@ -48,6 +90,9 @@ const AIDrinkCreator = () => {
       console.log('Fetching drinks for user:', user.id, 'page:', page, 'limit:', limit);
       
       const response = await getDrinksByUser(user.id, page, limit);
+      if (isInfiniteScroll) {
+        setAllApiDrinks(response.data || []);
+      }
       setApiDrinks(response.data || []);
       setTotalPages(response.totalPages || 1);
       console.log('Fetched user drinks:', response.data);
