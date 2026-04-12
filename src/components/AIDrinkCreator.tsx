@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -250,8 +250,8 @@ const AIDrinkCreator = () => {
             </CardContent>
           </Card>
         ) : hasApiDrinks ? (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center text-black drop-shadow-lg">
+          <div className="space-y-3">
+            <h2 className="text-lg sm:text-2xl font-semibold text-center text-foreground">
               {t("aiDrinkCreator.yourCreatedDrinks") || "Your Created Drinks"}
             </h2>
             
@@ -267,63 +267,53 @@ const AIDrinkCreator = () => {
               />
             )}
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
               {(isMobile ? allApiDrinks : apiDrinks).map((drink) => (
-                <Card key={drink._id} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
-                        <Droplets className="h-5 w-5 text-white" />
+                <Card key={drink._id} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+                  <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                  <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shrink-0">
+                          <Droplets className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                        </div>
+                        <CardTitle className="text-sm sm:text-lg text-foreground truncate">{drink.drink_name}</CardTitle>
                       </div>
-                      <CardTitle className="text-lg text-gray-800">{drink.drink_name}</CardTitle>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                     </div>
-                    <CardDescription className="text-gray-500">
-                      {drink.drinkPlan.healthyDrink.drinkType} • {drink.drinkPlan.healthyDrink.cookingTime} {t("aiDrinkCreator.min") || "min"} • {drink.drinkPlan.healthyDrink.calories} {t("aiDrinkCreator.cal") || "cal"}
-                    </CardDescription>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3 text-emerald-500" />{drink.drinkPlan.healthyDrink.cookingTime}m
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        {drink.drinkPlan.healthyDrink.drinkType}
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        {drink.drinkPlan.healthyDrink.calories} cal
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Users className="w-3 h-3 text-emerald-500" />{drink.numberPeople}
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Leaf className="w-3 h-3 text-emerald-500" />{drink.drinkPlan.totalCarbonFootprint}kg
+                      </span>
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 mb-3">{drink.drinkPlan.healthyDrink.description}</p>
-                    <div className="grid grid-cols-3 gap-2 mb-3 text-xs">
-                      <div className="flex items-center space-x-1 text-gray-600">
-                        <Clock className="h-3 w-3 text-emerald-500" />
-                        <span>{drink.drinkPlan.healthyDrink.cookingTime}m</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-gray-600">
-                        <Users className="h-3 w-3 text-emerald-500" />
-                        <span>{drink.numberPeople}</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-gray-600">
-                        <Leaf className="h-3 w-3 text-emerald-500" />
-                        <span>{drink.drinkPlan.totalCarbonFootprint}kg</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-1 mb-3">
+                  <CardContent className="pt-2 pb-3 sm:pb-4 px-3 sm:px-6">
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-2">{drink.drinkPlan.healthyDrink.description}</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
                       {drink.drinkPlan.healthyDrink.nutritionalInfo.vitamins?.slice(0, 3).map((vitamin, index) => (
-                        <span 
-                          key={index}
-                          className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"
-                        >
+                        <span key={index} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full">
                           {t("aiDrinkCreator.vitamin") || "Vit"} {vitamin}
                         </span>
                       ))}
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                        onClick={() => handleViewApiDrink(drink)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
+                    <div className="flex gap-2 pt-2 border-t border-border/50">
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleViewApiDrink(drink)}>
+                        <Eye className="h-3.5 w-3.5 mr-1" />{t("aiDrinkCreator.viewRecipe") || "View Recipe"}
                       </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
-                        onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}
-                      >
-                        <CheckCircle2 className="h-4 w-4" />
+                      <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white" onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}>
+                        <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </CardContent>
