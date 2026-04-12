@@ -108,7 +108,7 @@ const Pricing = () => {
       ],
       limits: {
         plansPerMonth: 12,
-        mealCreations: 15, // unlimited
+        mealCreations: 15,
         deliveryCommissions: 10,
         homeDeliveries: 3
       },
@@ -157,12 +157,12 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-6 py-16 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-16 max-w-6xl">
         <PricingHeader />
         <ImpactStats />
         
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-24 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-16 sm:mb-24 max-w-5xl mx-auto items-start">
           {plans.map((plan) => (
             <PricingCard 
               key={plan.id}

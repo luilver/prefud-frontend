@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -36,72 +35,75 @@ const PricingCard = ({ plan, onSelectPlan }: PricingCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Card 
-      className={`relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 group ${
+    <div 
+      className={`relative flex flex-col rounded-2xl transition-all duration-300 hover:shadow-xl ${
         plan.popular 
-          ? 'border-primary/20 bg-gradient-to-b from-primary/5 via-background to-background ring-1 ring-primary/10' 
-          : 'border-border/50 hover:border-primary/20 bg-background/50 backdrop-blur-sm'
+          ? 'bg-gradient-to-b from-emerald-900 to-emerald-950 text-white ring-2 ring-emerald-500/50 shadow-lg shadow-emerald-500/10 scale-[1.02] sm:scale-105' 
+          : 'bg-card border border-border/60 hover:border-primary/30'
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {plan.popular && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary"></div>
-      )}
-
-      {plan.popular && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium flex items-center space-x-1.5 shadow-lg border border-primary/20">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>{t('pricing.most-popular')}</span>
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+          <div className="bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-md">
+            <Sparkles className="h-3 w-3" />
+            {t('pricing.most-popular')}
           </div>
         </div>
       )}
-      
-      <CardHeader className="text-center pb-8 pt-8">
-        <CardTitle className="text-2xl font-bold text-foreground mb-2">{t(plan.nameKey)}</CardTitle>
-        <p className="text-muted-foreground text-sm mb-8">
+
+      <div className="p-5 sm:p-6 pb-0 text-center">
+        <h3 className={`text-lg font-semibold mb-1 ${plan.popular ? 'text-white' : 'text-foreground'}`}>
+          {t(plan.nameKey)}
+        </h3>
+        <p className={`text-xs mb-4 ${plan.popular ? 'text-emerald-200/70' : 'text-muted-foreground'}`}>
           {t(plan.descriptionKey)}
         </p>
-        
-        <div className="mb-6">
-          <div className="flex items-baseline justify-center">
-            {plan.price === 0 ? (
-              <span className="text-4xl font-bold text-primary">{t('pricing.plans.free.name')}</span>
-            ) : (
-              <>
-                <span className="text-sm font-medium text-muted-foreground">$</span>
-                <span className="text-5xl font-bold text-foreground tracking-tight">{plan.price}</span>
-                <span className="text-muted-foreground ml-1">/{plan.interval}</span>
-              </>
-            )}
-          </div>
-        </div>
-      </CardHeader>
 
-      <CardContent className="px-8 pb-8">
-        <div className="space-y-4 mb-8">
-          {plan.features.map((feature, index) => (
-            <div key={index} className="flex items-start space-x-3 group/feature">
-              <div className="flex-shrink-0 mt-0.5">
-                <Check className="h-4 w-4 text-primary" />
-              </div>
-              <span className="text-sm text-muted-foreground leading-relaxed group-hover/feature:text-foreground transition-colors">
-                {feature}
+        <div className="mb-4">
+          {plan.price === 0 ? (
+            <span className={`text-3xl sm:text-4xl font-bold ${plan.popular ? 'text-emerald-300' : 'text-primary'}`}>
+              {t('pricing.plans.free.name')}
+            </span>
+          ) : (
+            <div className="flex items-baseline justify-center gap-0.5">
+              <span className={`text-sm ${plan.popular ? 'text-emerald-300/70' : 'text-muted-foreground'}`}>$</span>
+              <span className={`text-3xl sm:text-4xl font-bold tracking-tight ${plan.popular ? 'text-white' : 'text-foreground'}`}>
+                {plan.price}
+              </span>
+              <span className={`text-sm ml-1 ${plan.popular ? 'text-emerald-300/70' : 'text-muted-foreground'}`}>
+                /{plan.interval}
               </span>
             </div>
-          ))}
+          )}
         </div>
+      </div>
 
+      <div className={`mx-5 sm:mx-6 border-t ${plan.popular ? 'border-emerald-700/50' : 'border-border/50'}`} />
+
+      <div className="flex-1 p-5 sm:p-6 pt-4">
+        <ul className="space-y-2.5 mb-6">
+          {plan.features.map((feature, index) => (
+            <li key={index} className="flex items-start gap-2.5">
+              <Check className={`h-4 w-4 mt-0.5 shrink-0 ${plan.popular ? 'text-emerald-400' : 'text-primary'}`} />
+              <span className={`text-sm leading-snug ${plan.popular ? 'text-emerald-100/90' : 'text-muted-foreground'}`}>
+                {feature}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="p-5 sm:p-6 pt-0">
         <Button
           onClick={() => onSelectPlan(plan)}
-          size="lg"
-          className={`w-full h-12 text-sm font-medium transition-all duration-300 group ${
+          className={`w-full h-11 text-sm font-medium rounded-xl transition-all duration-300 ${
             plan.popular
-              ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/25'
+              ? 'bg-white text-emerald-900 hover:bg-emerald-50 shadow-md'
               : plan.price === 0 
               ? 'bg-muted hover:bg-muted/80 text-muted-foreground'
-              : 'bg-foreground hover:bg-foreground/90 text-background'
+              : 'bg-primary hover:bg-primary/90 text-primary-foreground'
           }`}
         >
           <span>
@@ -114,8 +116,8 @@ const PricingCard = ({ plan, onSelectPlan }: PricingCardProps) => {
             isHovered ? 'translate-x-1' : ''
           }`} />
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
