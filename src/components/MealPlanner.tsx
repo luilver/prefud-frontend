@@ -195,7 +195,8 @@ const MealPlanner = () => {
 
     // Refresh the first page to show the new plan
     setCurrentPage(1);
-    loadMealPlans(1, pageSize);
+    setAllPlans([]);
+    loadMealPlans(1, isMobile ? 5 : pageSize, isMobile);
   };
 
   const handleEditPlan = () => {
