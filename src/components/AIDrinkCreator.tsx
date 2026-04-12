@@ -138,9 +138,9 @@ const AIDrinkCreator = () => {
     };
     addAIDrink(newDrink);
     setShowStepper(false);
-    // Refresh API drinks list and reset to first page
     setCurrentPage(1);
-    fetchUserDrinks(1, pageSize);
+    setAllApiDrinks([]);
+    fetchUserDrinks(1, isMobile ? 5 : pageSize, isMobile);
   };
 
   const handleViewDrink = (drink: any) => {
