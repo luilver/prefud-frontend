@@ -334,8 +334,8 @@ const MealPlanner = () => {
           </Button>
         </div>
 
-        {/* Page Size Selector and Results Info */}
-        {!isLoadingPlans && hasLoadedInitialPlans && (
+        {/* Page Size Selector and Results Info - desktop only */}
+        {!isMobile && !isLoadingPlans && hasLoadedInitialPlans && (
           <PageSizeSelector
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
