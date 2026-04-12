@@ -20,8 +20,6 @@ import {
 } from "@/services/revenueCatService";
 import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 
-// Hide entire component on native platforms (iOS/Android)
-const isNative = isNativePlatform();
 
 interface SubscriptionPlan {
   id: string;
@@ -53,6 +51,9 @@ const SubscriptionManager = () => {
   const { toast } = useToast();
   const { user, updateSubscription } = useAuth();
   const isNative = isNativePlatform();
+
+  // Hide entire component on native platforms
+  if (isNative) return null;
 
   // Convert API subscription types to UI subscription plans
   const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
