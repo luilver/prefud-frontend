@@ -60,11 +60,15 @@ const MealPlanner = () => {
   const [pageSize, setPageSize] = useState(5); // Default to 5 items per page
   const [totalPages, setTotalPages] = useState(1);
   const [currentPagePlans, setCurrentPagePlans] = useState<any[]>([]);
+  const [allPlans, setAllPlans] = useState<any[]>([]); // For infinite scroll
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasLoadedInitialPlans, setHasLoadedInitialPlans] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successPlan, setSuccessPlan] = useState<any>(null);
   const isNavigatingBack = useRef(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const {
     user,
     mealPlans,
@@ -78,11 +82,49 @@ const MealPlanner = () => {
   // Load meal plans when component mounts, page changes, or page size changes
   useEffect(() => {
     if (user?.id && !showCreator && !selectedMealPlan) {
-      loadMealPlans(currentPage, pageSize);
+      if (isMobile) {
+        // For mobile infinite scroll, only load on mount or reset
+        if (currentPage === 1) {
+          loadMealPlans(1, 5, true);
+        }
+      } else {
+        loadMealPlans(currentPage, pageSize, false);
+      }
     }
-  }, [user?.id, currentPage, pageSize, showCreator, selectedMealPlan]);
+  }, [user?.id, currentPage, pageSize, showCreator, selectedMealPlan, isMobile]);
 
-  const loadMealPlans = async (page: number, limit: number) => {
+  // Infinite scroll observer for mobile
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingPlans && !isLoadingMore && currentPage < totalPages) {
+          loadMorePlans();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isMobile, isLoadingPlans, isLoadingMore, currentPage, totalPages]);
+
+  const loadMorePlans = async () => {
+    if (!user?.id || isLoadingMore) return;
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const response = await fetchMealPlansFromAPI(user.id, nextPage, 5);
+      setAllPlans(prev => [...prev, ...(response.data || [])]);
+      setCurrentPage(nextPage);
+      setTotalPages(response.totalPages || 1);
+    } catch (error) {
+      console.error("Error loading more meal plans:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const loadMealPlans = async (page: number, limit: number, isInfiniteScroll: boolean = false) => {
     if (!user?.id) return;
 
     setIsLoadingPlans(true);
@@ -90,7 +132,10 @@ const MealPlanner = () => {
       console.log(`Loading meal plans for page: ${page}, limit: ${limit}`);
       const response = await fetchMealPlansFromAPI(user.id, page, limit);
       console.log("this si the data of meal plans ", response.data);
-      // Set the current page plans from the API response
+      
+      if (isInfiniteScroll) {
+        setAllPlans(response.data || []);
+      }
       setCurrentPagePlans(response.data || []);
       setTotalPages(response.totalPages || 1);
       setHasLoadedInitialPlans(true);
