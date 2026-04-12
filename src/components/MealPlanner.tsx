@@ -359,10 +359,10 @@ const MealPlanner = () => {
         )}
 
         {/* Meal Plans Grid */}
-        {!isLoadingPlans && currentPagePlans.length > 0 ? (
+        {(isMobile ? !isLoadingPlans && allPlans.length > 0 : !isLoadingPlans && currentPagePlans.length > 0) ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentPagePlans.map((plan) => {
+              {(isMobile ? allPlans : currentPagePlans).map((plan) => {
                 // Calculate days from duration string or use preferences
                 const daysCount = plan.duration
                   ? parseInt(plan.duration.replace(" days", ""))
