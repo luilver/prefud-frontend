@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { isNativePlatform } from "@/services/revenueCatService";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ const DeleteAccountModal = ({
                 "By deleting your account:"}
             </h4>
             <ul className="text-sm text-red-700 space-y-1.5">
+              {!isNativePlatform() && (
               <li className="flex items-start space-x-2">
                 <span className="mt-0.5">•</span>
                 <span>
@@ -57,6 +59,7 @@ const DeleteAccountModal = ({
                     "Your active subscription will be cancelled immediately"}
                 </span>
               </li>
+              )}
               <li className="flex items-start space-x-2">
                 <span className="mt-0.5">•</span>
                 <span>

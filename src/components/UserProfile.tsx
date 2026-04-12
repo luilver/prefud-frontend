@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { isNativePlatform } from "@/services/revenueCatService";
 import {
   User,
   Mail,
@@ -522,7 +523,8 @@ const UserProfile = () => {
         </CardContent>
       </Card>
 
-        {/* Subscription Information Accordion */}
+        {/* Subscription Information Accordion - hidden on native platforms */}
+        {!isNativePlatform() && (
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="p-0">
             <Accordion type="single" collapsible>
@@ -645,6 +647,7 @@ const UserProfile = () => {
           </Accordion>
         </CardContent>
       </Card>
+        )}
 
         {/* Calorie Tracking Accordion */}
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
