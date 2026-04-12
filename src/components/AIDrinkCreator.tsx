@@ -266,7 +266,7 @@ const AIDrinkCreator = () => {
             )}
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {apiDrinks.map((drink) => (
+              {(isMobile ? allApiDrinks : apiDrinks).map((drink) => (
                 <Card key={drink._id} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
                   <CardHeader>
