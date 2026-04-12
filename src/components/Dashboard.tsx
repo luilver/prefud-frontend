@@ -35,6 +35,7 @@ const DashboardContent = () => {
   const isMobile = useIsMobile();
   const { isCollapsed } = useSidebar();
   const navigate = useNavigate();
+  const isNative = isNativePlatform();
 
   // Handle hash navigation to switch tabs
   useEffect(() => {
