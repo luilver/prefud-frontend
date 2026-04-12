@@ -19,6 +19,7 @@ import IngredientTracker from "./IngredientTracker";
 import ShoppingList from "./ShoppingList";
 import UserProfile from "./UserProfile";
 import SubscriptionManager from "./SubscriptionManager";
+import { isNativePlatform } from "@/services/revenueCatService";
 import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
