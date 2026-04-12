@@ -634,6 +634,7 @@ const MealPlanner = () => {
                   </Pagination>
                 </div>
               </div>
+            )}
           </>
         ) : (
           !isLoadingPlans &&
