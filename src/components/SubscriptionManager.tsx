@@ -20,6 +20,9 @@ import {
 } from "@/services/revenueCatService";
 import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 
+// Hide entire component on native platforms (iOS/Android)
+const isNative = isNativePlatform();
+
 interface SubscriptionPlan {
   id: string;
   name: string;
