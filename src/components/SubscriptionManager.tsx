@@ -52,9 +52,6 @@ const SubscriptionManager = () => {
   const { user, updateSubscription } = useAuth();
   const isNative = isNativePlatform();
 
-  // Hide entire component on native platforms
-  if (isNative) return null;
-
   // Convert API subscription types to UI subscription plans
   const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
     return apiPlans.map((apiPlan) => {
