@@ -20,6 +20,7 @@ import {
 } from "@/services/revenueCatService";
 import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 
+
 interface SubscriptionPlan {
   id: string;
   name: string;
@@ -334,6 +335,8 @@ const SubscriptionManager = () => {
       </div>
     );
   }
+
+  if (isNative) return null;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">

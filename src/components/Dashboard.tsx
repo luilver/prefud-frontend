@@ -19,6 +19,7 @@ import IngredientTracker from "./IngredientTracker";
 import ShoppingList from "./ShoppingList";
 import UserProfile from "./UserProfile";
 import SubscriptionManager from "./SubscriptionManager";
+import { isNativePlatform } from "@/services/revenueCatService";
 import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
@@ -34,6 +35,7 @@ const DashboardContent = () => {
   const isMobile = useIsMobile();
   const { isCollapsed } = useSidebar();
   const navigate = useNavigate();
+  const isNative = isNativePlatform();
 
   // Handle hash navigation to switch tabs
   useEffect(() => {
@@ -307,7 +309,7 @@ const DashboardContent = () => {
                 <TabsContent value="profile" className="mt-0">
                   <div className="grid gap-6">
                     <UserProfile />
-                    <SubscriptionManager />
+                    {!isNative && <SubscriptionManager />}
                   </div>
                 </TabsContent>
               </Tabs>

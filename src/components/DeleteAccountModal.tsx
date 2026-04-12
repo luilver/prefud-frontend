@@ -25,6 +25,7 @@ const DeleteAccountModal = ({
   isProcessing = false,
 }: DeleteAccountModalProps) => {
   const { t } = useLanguage();
+  const isNative = isNativePlatform();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -51,7 +52,7 @@ const DeleteAccountModal = ({
                 "By deleting your account:"}
             </h4>
             <ul className="text-sm text-red-700 space-y-1.5">
-              {!isNativePlatform() && (
+              {!isNative && (
               <li className="flex items-start space-x-2">
                 <span className="mt-0.5">•</span>
                 <span>
