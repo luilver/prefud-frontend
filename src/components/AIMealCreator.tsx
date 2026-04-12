@@ -132,9 +132,9 @@ const AIMealCreator = () => {
 
   const handleMealCreated = (meal: any) => {
     setShowCreator(false);
-    // Reset to first page and refresh from server
     setCurrentPage(1);
-    fetchUserMeals(1, pageSize);
+    setAllApiMeals([]);
+    fetchUserMeals(1, isMobile ? 5 : pageSize, isMobile);
     toast({
       title: t("aiMealGenerator.save") || "Meal saved successfully!",
     });
