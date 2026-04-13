@@ -115,14 +115,6 @@ const SubscriptionManager = () => {
         const matched = convertedPlans.find(p => p.id === userSubId);
         setCurrentSubscriptionName(matched ? matched.name : "Free");
 
-        // Fetch RevenueCat offerings on native
-        if (isNative) {
-          const packages = await getOfferings();
-  
-          setRcPackages(packages);
-          console.log("[SubscriptionManager] RevenueCat packages:", packages);
-        }
-      } catch (error) {
         console.error('Error fetching subscription types:', error);
         toast({
           title: "Error Loading Plans",
@@ -148,107 +140,9 @@ const SubscriptionManager = () => {
       } else {
         handleSubscriptionSuccess();
       }
-    } else if (isNative) {
-      // Native platform → use RevenueCat IAP
-      console.log('native behavior!!!')
-      await handleNativePurchase(plan);
     } else {
       // Web → use Stripe payment modal
       setShowPaymentModal(true);
-    }
-  };
-
-  /**
-   * Handle native in-app purchase via RevenueCat
-   */
-  const handleNativePurchase = async (plan: SubscriptionPlan) => {
-    console.log('handle native log plan selected', plan)
-    const rcProductId = getRevenueCatProductId(plan.id);
-    console.log('rcPRODUCTID ', rcProductId);
-    if (!rcProductId) {
-      toast({
-        title: "Error",
-        description: "This plan is not available for in-app purchase.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Find matching RC package
-    const matchingPackage = rcPackages.find(
-      (pkg) => pkg.product.identifier === rcProductId
-    );
-
-    if (!matchingPackage) {
-      toast({
-        title: "Product Not Found",
-        description: "This subscription product is not available yet. Please try again later.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsNativePurchasing(true);
-    trackEvent('button_click', {
-      button_name: 'native_iap_purchase',
-      screen: 'subscription_manager',
-      plan_name: plan.name,
-    });
-
-    try {
-      const result = await purchasePackage(matchingPackage);
-      
-      if (result.success) {
-        // Persist subscription in your backend
-        const backendResult = await subscribeUser(
-          user?.userId || "",
-          plan.id,
-          `rc_${matchingPackage.product.identifier}`
-        );
-        
-        updateSubscription(backendResult.return);
-        setCurrentSubscriptionId(plan.id);
-        setCurrentSubscriptionName(plan.name);
-        setShowSuccessModal(true);
-
-        toast({
-          title: "Subscription Successful!",
-          description: `Welcome to ${plan.name}! Your subscription is now active.`,
-        });
-      } else if (result.error === 'cancelled') {
-        // User cancelled — do nothing
-      } else {
-        toast({
-          title: "Purchase Failed",
-          description: result.error || "There was an error processing your purchase.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('[SubscriptionManager] Native purchase error:', error);
-      toast({
-        title: "Purchase Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsNativePurchasing(false);
-    }
-  };
-
-  const handleRestorePurchases = async () => {
-    const result = await restorePurchases();
-    if (result.success) {
-      toast({
-        title: "Purchases Restored",
-        description: "Your previous purchases have been restored.",
-      });
-    } else {
-      toast({
-        title: "Restore Failed",
-        description: result.error || "Could not restore purchases.",
-        variant: "destructive",
-      });
     }
   };
 
