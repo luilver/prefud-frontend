@@ -38,7 +38,7 @@ const SubscriptionManager = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [isNativePurchasing, setIsNativePurchasing] = useState(false);
+  
   const { toast } = useToast();
   const { user, updateSubscription } = useAuth();
   const isNative = isNativePlatform();
