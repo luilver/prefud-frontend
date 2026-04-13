@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CartProvider } from "@/contexts/CartContext";
-import { initializeRevenueCat, identifyUser, isNativePlatform } from "@/services/revenueCatService";
+
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
 import SignIn from "@/pages/SignIn";
@@ -26,19 +26,6 @@ const queryClient = new QueryClient();
 const AppContent = () => {
   const { isLoading, user } = useAuth();
 
-  // Initialize RevenueCat on native platforms
-  useEffect(() => {
-    if (isNativePlatform()) {
-      initializeRevenueCat().catch(console.error);
-    }
-  }, []);
-
-  // Identify user in RevenueCat after login
-  useEffect(() => {
-    if (isNativePlatform() && user?.userId) {
-      identifyUser(user.userId).catch(console.error);
-    }
-  }, [user?.userId]);
 
   if (isLoading) {
     return (
