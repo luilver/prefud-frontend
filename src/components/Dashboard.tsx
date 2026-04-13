@@ -138,19 +138,21 @@ const DashboardContent = () => {
               <div className="flex items-center space-x-4">
                 <LanguageSelector variant="button" />
                 
-                {/* Cart Icon with Badge */}
-                <Button
-                  variant="ghost"
-                  onClick={handleCartClick}
-                  className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white"
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  {getTotalItems() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
-                      {getTotalItems()}
-                    </span>
-                  )}
-                </Button>
+                {/* Cart Icon with Badge - Hidden on native */}
+                {!isNative && (
+                  <Button
+                    variant="ghost"
+                    onClick={handleCartClick}
+                    className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white"
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    {getTotalItems() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                        {getTotalItems()}
+                      </span>
+                    )}
+                  </Button>
+                )}
                 
                 <Button 
                   variant="ghost" 
@@ -190,19 +192,21 @@ const DashboardContent = () => {
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <LanguageSelector variant="button" className="mr-1 sm:mr-2" />
                 
-                {/* Cart Icon with Badge for Mobile */}
-                <Button
-                  variant="ghost"
-                  onClick={handleCartClick}
-                  className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white w-8 h-8 p-0"
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                  {getTotalItems() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
-                      {getTotalItems() > 9 ? '9+' : getTotalItems()}
-                    </span>
-                  )}
-                </Button>
+                {/* Cart Icon with Badge for Mobile - Hidden on native */}
+                {!isNative && (
+                  <Button
+                    variant="ghost"
+                    onClick={handleCartClick}
+                    className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white w-8 h-8 p-0"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    {getTotalItems() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
+                        {getTotalItems() > 9 ? '9+' : getTotalItems()}
+                      </span>
+                    )}
+                  </Button>
+                )}
                 
                 {/* Mobile Welcome - Now clickable to navigate to profile */}
                 <button
