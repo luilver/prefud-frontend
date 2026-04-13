@@ -20,6 +20,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/services/analytics";
+import { isNativePlatform } from "@/services/revenueCatService";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -275,24 +276,37 @@ const SignIn = () => {
                   </Button>
                 </form>
 
-                <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
-                  <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
-                    {t("signin.no-account")}{" "}
-                    <Button
-                      variant="link"
-                      onClick={async () => {
-                        trackEvent("button_click", {
-                          button_name: "signup_submit",
-                          screen: "login_page",
-                        });
-                        navigate("/signup");
-                      }}
-                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-0 h-auto font-semibold text-sm"
-                    >
-                      {t("signin.create-here")}
-                    </Button>
-                  </p>
-                </div>
+                {isNativePlatform() ? (
+                  <div className="mt-6 pt-6 border-t border-emerald-500/20">
+                    <div className="text-center space-y-2">
+                      <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                        Log in with your existing account
+                      </p>
+                      <p className="text-xs text-neutral-400 dark:text-neutral-500">
+                        Use this app with an existing account
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                    <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
+                      {t("signin.no-account")}{" "}
+                      <Button
+                        variant="link"
+                        onClick={async () => {
+                          trackEvent("button_click", {
+                            button_name: "signup_submit",
+                            screen: "login_page",
+                          });
+                          navigate("/signup");
+                        }}
+                        className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-0 h-auto font-semibold text-sm"
+                      >
+                        {t("signin.create-here")}
+                      </Button>
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
