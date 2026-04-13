@@ -24,7 +24,7 @@ import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
 import AIDrinkCreator from "./AIDrinkCreator";
-import Reels from "./Reels";
+
 import LanguageSelector from "./LanguageSelector";
 
 const DashboardContent = () => {
@@ -252,11 +252,6 @@ const DashboardContent = () => {
             {/* Tab Content */}
             <div className="relative p-4 sm:p-6 lg:p-8">
               <Tabs value={activeTab} className="w-full">
-                <TabsContent value="reels" className="mt-0">
-                  <div className="space-y-6">
-                    <Reels />
-                  </div>
-                </TabsContent>
 
                 <TabsContent value="planner" className="mt-0">
                   <div id="meal-planner-section" className="space-y-6">
