@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star, XCircle, RotateCcw } from "lucide-react";
+import { Check, Crown, Star, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAllSubscriptionTypes, ApiSubscriptionType, subscribeUser } from "@/services/payments";
