@@ -114,7 +114,7 @@ const SubscriptionManager = () => {
         // Also set the current subscription name based on the loaded plans
         const matched = convertedPlans.find(p => p.id === userSubId);
         setCurrentSubscriptionName(matched ? matched.name : "Free");
-
+      } catch (error) {
         console.error('Error fetching subscription types:', error);
         toast({
           title: "Error Loading Plans",
@@ -332,19 +332,6 @@ const SubscriptionManager = () => {
         })}
       </div>
 
-      {/* Restore Purchases button for native platforms */}
-      {isNative && (
-        <div className="text-center pt-4">
-          <Button
-            variant="outline"
-            onClick={handleRestorePurchases}
-            className="mx-auto"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Restore Purchases
-          </Button>
-        </div>
-      )}
 
       <div className="text-center space-y-4 pt-8 border-t">
         <h3 className="text-lg font-semibold text-gray-800">All plans include:</h3>
