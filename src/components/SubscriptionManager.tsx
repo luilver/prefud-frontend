@@ -10,15 +10,7 @@ import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import PaymentMethodModal from "./PaymentMethodModal";
 import SubscriptionSuccessModal from "./SubscriptionSuccessModal";
 import { trackEvent } from "@/services/analytics";
-import {
-  isNativePlatform,
-  getOfferings,
-  purchasePackage,
-  restorePurchases,
-  getRevenueCatProductId,
-  getBackendSubscriptionTypeId,
-} from "@/services/revenueCatService";
-import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
+import { isNativePlatform } from "@/services/revenueCatService";
 
 
 interface SubscriptionPlan {
