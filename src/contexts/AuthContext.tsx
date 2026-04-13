@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
-import { logoutRevenueCat, isNativePlatform } from '@/services/revenueCatService';
+import { isNativePlatform } from '@/services/revenueCatService';
 
 interface AuthUser {
   email: string;
@@ -224,10 +224,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Clear subscription context via sync event
     window.dispatchEvent(new CustomEvent('subscription-sync', { detail: { subscription: null } }));
     
-    // Logout from RevenueCat on native platforms
-    if (isNativePlatform()) {
-      logoutRevenueCat().catch(console.error);
-    }
     
     console.log('Session cleanup completed');
   };
