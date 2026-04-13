@@ -1,63 +1,40 @@
 
-# Hide All Subscription UI on Native iOS/Android
 
-## What I found
-The profile already hides one subscription card in `UserProfile.tsx`, and the delete-account warning is already hidden on native in `DeleteAccountModal.tsx`.
+# Remove RevenueCat & Hide Reels Feature
 
-The real reason you still see subscription content in iOS is:
-- `Dashboard.tsx` always renders `<SubscriptionManager />` inside the Profile tab
-- `SubscriptionManager.tsx` contains all the sections you mentioned:
-  - `Actual Plan`
-  - `Update your plan`
-  - `Restore Purchases`
-  - `All plans include`
+## Summary
+Remove the RevenueCat in-app purchase integration entirely (since native apps don't need subscriptions) and hide the Reels tab from navigation. Keep the Reels component code intact for future use.
 
-So this is not mainly a RevenueCat SDK issue; it is a UI rendering issue on native.
+## Changes
 
-## Implementation plan
+### 1. Replace `src/services/revenueCatService.ts` with a minimal stub
+Keep only `isNativePlatform()` (still used for conditional UI hiding) and remove all RevenueCat SDK imports/functions. This avoids breaking the existing `isNativePlatform()` calls in Dashboard, UserProfile, DeleteAccountModal, and SubscriptionManager.
 
-### 1. Stop showing `SubscriptionManager` on native
-In `src/components/Dashboard.tsx`:
-- import `isNativePlatform` from `@/services/revenueCatService`
-- create `const isNative = isNativePlatform();`
-- render `<SubscriptionManager />` only when `!isNative`
+### 2. Clean up `src/components/SubscriptionManager.tsx`
+- Remove all RevenueCat imports (`getOfferings`, `purchasePackage`, `restorePurchases`, `getRevenueCatProductId`, `getBackendSubscriptionTypeId`, `PurchasesPackage`)
+- Remove `rcPackages` state, `handleNativePurchase` function, native purchase branch in `handleSelectPlan`, and the "Restore Purchases" button
+- Remove the native guard (`if (isNative) return null`) since subscriptions are web-only now
+- Keep the `isNative` check only if needed, otherwise simplify to always show web flow
 
-This is the cleanest fix because it removes the whole subscription block from the Profile tab for iOS/Android.
+### 3. Clean up `src/App.tsx`
+- Remove `initializeRevenueCat` and `identifyUser` imports
+- Remove the two `useEffect` blocks that initialize and identify RevenueCat users
 
-### 2. Keep `UserProfile.tsx` native exclusion consistent
-In `src/components/UserProfile.tsx`:
-- replace inline `!isNativePlatform()` usage with a single `const isNative = isNativePlatform();`
-- keep the subscription accordion hidden with `!isNative`
+### 4. Remove `@revenuecat/purchases-capacitor` from `package.json`
 
-This avoids repeated platform checks and keeps behavior consistent.
+### 5. Hide Reels in `src/components/Navigation.tsx`
+- Remove the `{ id: "reels", label: "Reels", icon: Play }` entry from `navItems` array
+- Remove the `Play` icon import if unused elsewhere
 
-### 3. Keep delete-account modal warning hidden on native
-In `src/components/DeleteAccountModal.tsx`:
-- keep the current native exclusion
-- optionally normalize it to use a local `const isNative = isNativePlatform();` for consistency
+### 6. Hide Reels tab content in `src/components/Dashboard.tsx`
+- Remove the `<TabsContent value="reels">` block and the `Reels` import
+- (Optional) remove the `Reels` import to reduce bundle size
 
-### 4. Optional hardening inside `SubscriptionManager.tsx`
-Even if it is hidden from `Dashboard`, I recommend also adding a native guard in `src/components/SubscriptionManager.tsx`:
-- either return `null` immediately on native
-- or wrap the whole page UI in `!isNative`
+## Files modified
+- `src/services/revenueCatService.ts` — replace with stub keeping only `isNativePlatform()`
+- `src/components/SubscriptionManager.tsx` — remove all RevenueCat logic
+- `src/App.tsx` — remove RevenueCat initialization
+- `src/components/Navigation.tsx` — remove Reels nav item
+- `src/components/Dashboard.tsx` — remove Reels tab content and import
+- `package.json` — remove `@revenuecat/purchases-capacitor`
 
-This prevents the component from showing accidentally elsewhere later.
-
-## Files to update
-- `src/components/Dashboard.tsx` — hide `SubscriptionManager` on native
-- `src/components/UserProfile.tsx` — keep native exclusion but normalize the check
-- `src/components/DeleteAccountModal.tsx` — keep native exclusion but normalize the check
-- `src/components/SubscriptionManager.tsx` — optional safeguard to prevent future native rendering
-
-## Result on iOS/Android
-In the Profile area, native users will no longer see:
-- Actual Plan
-- Update your plan
-- Restore Purchases
-- All plans include
-- subscription plan cards / subscription type area
-- subscription counters section
-- delete-account text saying the active subscription will be cancelled immediately
-
-## Technical note
-I would not remove RevenueCat integration itself unless you truly want to stop using native in-app purchases. Your request sounds like: keep native purchases available in the app architecture, but hide all web-style subscription management UI from the native profile experience. This plan does that safely.
