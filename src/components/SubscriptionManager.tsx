@@ -320,11 +320,9 @@ const SubscriptionManager = () => {
                       ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600'
                       : 'bg-gray-800 hover:bg-gray-700'
                   }`}
-                  disabled={isCurrentPlan || isNativePurchasing}
+                  disabled={isCurrentPlan}
                 >
-                  {isNativePurchasing && selectedPlan?.id === plan.id
-                    ? 'Processing...'
-                    : isCurrentPlan ? 'Current Plan' : `Get ${plan.name}`}
+                  {isCurrentPlan ? 'Current Plan' : `Get ${plan.name}`}
                 </Button>
               </CardContent>
             </Card>
