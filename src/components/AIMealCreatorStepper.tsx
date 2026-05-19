@@ -819,6 +819,14 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
         </div>
       )}
       </div>
+      <SubscriptionUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => {
+          setShowUpgradeModal(false);
+          window.location.hash = "profile";
+        }}
+        featureType="meals"
+      />
     </div>
   );
 };
