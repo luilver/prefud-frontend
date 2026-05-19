@@ -578,6 +578,15 @@ const translations = {
     "aiMealStarted.title": "Meal Generation Started",
     "aiMealStarted.description":
       "We'll notify you when your meal is ready.",
+    "pantryMealsReady.title": "Your Pantry Meals are Ready! 🍽️",
+    "pantryMealsReady.description":
+      "Fresh AI meal ideas based on your pantry are ready to explore.",
+    "pantryMealsReady.viewMeals": "View Meals",
+    "pantryMealsReady.later": "View Later",
+    "pantryMealsReady.mealsGenerated": "meals generated",
+    "pantryMealsStarted.title": "Meal Generation Started",
+    "pantryMealsStarted.description":
+      "We'll notify you when your pantry meal ideas are ready.",
     //new keys
     //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
@@ -2569,6 +2578,15 @@ const translations = {
     "aiMealStarted.title": "Generación de Comida Iniciada",
     "aiMealStarted.description":
       "Te avisaremos cuando tu comida esté lista.",
+    "pantryMealsReady.title": "¡Tus Comidas de Despensa están Listas! 🍽️",
+    "pantryMealsReady.description":
+      "Nuevas ideas de comidas con IA basadas en tu despensa están listas para explorar.",
+    "pantryMealsReady.viewMeals": "Ver Comidas",
+    "pantryMealsReady.later": "Ver Más Tarde",
+    "pantryMealsReady.mealsGenerated": "comidas generadas",
+    "pantryMealsStarted.title": "Generación de Comidas Iniciada",
+    "pantryMealsStarted.description":
+      "Te avisaremos cuando tus ideas de comidas estén listas.",
     "days.sunday": "Domingo",
     "days.monday": "Lunes",
     "days.tuesday": "Martes",
@@ -4611,6 +4629,15 @@ const translations = {
     "aiMealStarted.title": "Geração de Refeição Iniciada",
     "aiMealStarted.description":
       "Avisaremos quando sua refeição estiver pronta.",
+    "pantryMealsReady.title": "Suas Refeições da Despensa estão Prontas! 🍽️",
+    "pantryMealsReady.description":
+      "Novas ideias de refeições com IA baseadas em sua despensa estão prontas para explorar.",
+    "pantryMealsReady.viewMeals": "Ver Refeições",
+    "pantryMealsReady.later": "Ver Mais Tarde",
+    "pantryMealsReady.mealsGenerated": "refeições geradas",
+    "pantryMealsStarted.title": "Geração de Refeições Iniciada",
+    "pantryMealsStarted.description":
+      "Avisaremos quando suas ideias de refeições estiverem prontas.",
 
     "days.sunday": "Domingo",
     "days.monday": "Segunda-feira",
