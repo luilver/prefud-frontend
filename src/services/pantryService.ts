@@ -137,3 +137,68 @@ export const generateMealsFromPantry = async (
     throw error;
   }
 };
+
+export class PantryMealsNoIngredientsError extends Error {
+  apiMessage?: string;
+  constructor(message?: string) {
+    super(message || "No ingredients available");
+    this.name = "PantryMealsNoIngredientsError";
+    this.apiMessage = message;
+  }
+}
+
+export class PantryMealsSubscriptionLimitError extends Error {
+  apiMessage?: string;
+  constructor(message?: string) {
+    super(message || "Subscription limit reached");
+    this.name = "PantryMealsSubscriptionLimitError";
+    this.apiMessage = message;
+  }
+}
+
+export const generateMealsFromPantryJob = async (
+  userId: string,
+  startDate: string,
+  servings: number,
+  language: string
+): Promise<{ jobId: string }> => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/meal-plan/generateMeals`,
+      {
+        user_id: userId,
+        start_date: startDate,
+        servings,
+        language,
+      },
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    const data = response.data || {};
+
+    if (data.code === "02") {
+      throw new PantryMealsNoIngredientsError(data.message);
+    }
+    if (data.code === "03") {
+      throw new PantryMealsSubscriptionLimitError(data.message);
+    }
+
+    if (!data.jobId) {
+      throw new Error("Invalid response: missing jobId");
+    }
+
+    return { jobId: data.jobId };
+  } catch (error: any) {
+    if (
+      error instanceof PantryMealsNoIngredientsError ||
+      error instanceof PantryMealsSubscriptionLimitError
+    ) {
+      throw error;
+    }
+    console.error(
+      "Error creating pantry meals job:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
