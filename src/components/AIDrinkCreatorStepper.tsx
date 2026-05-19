@@ -6,7 +6,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import AIDrinkGeneration from "./AIDrinkGeneration";
 import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
-import { createHealthyDrink } from "@/services/drinkService";
+import { createHealthyDrinkJob } from "@/services/drinkService";
+import { useDrinkJob } from "@/contexts/DrinkJobContext";
 import { trackEvent } from "@/services/analytics";
 import { useToast } from "@/hooks/use-toast";
 
@@ -47,6 +48,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
   const { language, t } = useLanguage();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
   const { toast } = useToast();
+  const { startJob } = useDrinkJob();
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
