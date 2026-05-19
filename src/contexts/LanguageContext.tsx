@@ -562,6 +562,14 @@ const translations = {
       "Your personalized AI meal plan has been created and is ready to use. You can view the details of your meal plan, add ingredients to your pantry, or order online for delivery.",
     "mealPlanReady.viewPlan": "View Meal Plan",
     "mealPlanReady.later": "View Later",
+    "drinkReady.title": "Your Healthy Drink is Ready! 🥤",
+    "drinkReady.description":
+      "Your personalized healthy drink has been mixed and is ready to enjoy.",
+    "drinkReady.viewDrink": "View Drink",
+    "drinkReady.later": "View Later",
+    "drinkStarted.title": "Drink Generation Started",
+    "drinkStarted.description":
+      "We'll notify you when your healthy drink is ready.",
     //new keys
     //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
