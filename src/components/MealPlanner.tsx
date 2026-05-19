@@ -261,6 +261,23 @@ const MealPlanner = () => {
     }
   }, [mealPlans, selectedMealPlan?.id, getMealPlanById, showCreator]);
 
+  // Listen for global "open-meal-plan" events (e.g. from MealPlanReadyModal)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      const plan = detail?.plan;
+      if (!plan) return;
+      const updated = getMealPlanById(plan.id) || plan;
+      setShowCreator(false);
+      setIsEditing(false);
+      isNavigatingBack.current = false;
+      setSelectedMealPlan(updated);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    window.addEventListener("open-meal-plan", handler as EventListener);
+    return () => window.removeEventListener("open-meal-plan", handler as EventListener);
+  }, [getMealPlanById]);
+
   // Show meal plan view when a plan is selected and not in creator mode
   if (selectedMealPlan && !showCreator) {
     return (

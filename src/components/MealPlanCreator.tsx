@@ -228,7 +228,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       toast({
         title: "🍳 Meal Plan Generation Started",
         description: "We'll notify you as soon as it's ready. You can keep using the app.",
-        duration: 6000,
+        duration: 5000,
       });
 
       onBack();

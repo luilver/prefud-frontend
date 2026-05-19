@@ -10,6 +10,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { MealPlanJobProvider } from "@/contexts/MealPlanJobContext";
 import MealPlanJobIndicator from "@/components/MealPlanJobIndicator";
+import MealPlanReadyModal from "@/components/MealPlanReadyModal";
 
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
@@ -67,6 +68,7 @@ const App = () => (
                 <TooltipProvider>
                   <AppContent />
                   <MealPlanJobIndicator />
+                  <MealPlanReadyModal />
                   <Toaster />
                 </TooltipProvider>
               </CartProvider>

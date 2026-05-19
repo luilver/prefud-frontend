@@ -1,62 +1,61 @@
-## Background
+# Refine async meal plan flow: toast → top loader → ready modal → navigate
 
-The `POST /meal-plan` endpoint now returns `{ jobId: "..." }` instead of the full plan. Generation happens asynchronously and results are pushed over Socket.IO. The UI must:
-
-1. Send the create request, receive `jobId`, and persist the in-flight job.
-2. Open a Socket.IO connection, join the job room, and listen for `generationCompleted` / `generationFailed`.
-3. Show a non-blocking "Meal plan in progress" loader that lets the user keep navigating.
-4. When `generationCompleted` arrives, show the resulting plan exactly like today (success modal + insert into context + refresh list).
+## Goal
+Replace the persistent "generation started" toast with a short-lived toast, show a top-center in-progress loader while the job runs, and on `generationCompleted` show a "Meal Plan Ready" modal with a button that navigates the user into the generated plan (Recipe + Shopping List view).
 
 ## Changes
 
-### 1. Dependency
-- Add `socket.io-client`.
+### 1. Toast duration on job start
+**Files:** `src/components/MealPlanCreatorStepper.tsx`, `src/components/MealPlanCreator.tsx`
 
-### 2. Env var
-- Add `VITE_SOCKET_URL` (defaults to `ws://localhost:3001`, prod will be set later) read by the new service.
+- Set the "Meal Plan Generation Started" toast `duration: 5000` (5s) instead of 6s/sticky.
+- Keep `startJob(jobId, requestData)` and immediate return to dashboard.
 
-### 3. New service `src/services/mealPlanJobService.ts`
-- `createMealPlanJob(planData) -> Promise<{ jobId }>`: POSTs to `${VITE_PANTRY_URL}/meal-plan`, returns `{ jobId }`.
-- `connectJobSocket(jobId, handlers)`: creates a `socket.io-client` connection to `VITE_SOCKET_URL`, on `connect` emits `joinJobRoom` with `{ jobId }`, wires `generationCompleted` and `generationFailed`, returns a `disconnect()` cleanup.
-- Helper `transformJobResultToApiMealPlan(jobResult, requestData, jobId)` to map the socket `result` payload (which contains `mealPlan`, `ingredientsList`, `totalCarbonFootprint`) into the shape `transformApiMealPlanToLocal` already expects (synthesize `_id` from `jobId`, copy `plan_name`, `start_date`, `duration`, `numberPeople`, etc. from the original request, and put the socket `result` into `plan`).
+### 2. Move loader from bottom-right to top-center
+**File:** `src/components/MealPlanJobIndicator.tsx`
 
-### 4. New context `src/contexts/MealPlanJobContext.tsx`
-Global, mounted in `App.tsx` inside `UserProvider`. Responsibilities:
-- State: `activeJob: { jobId, planName, requestData, startedAt } | null`, `status: 'idle' | 'processing' | 'completed' | 'failed'`.
-- Persist `activeJob` in `localStorage` so a page refresh resumes the socket.
-- On `activeJob` change, open the socket via `connectJobSocket`, emit `joinJobRoom`.
-- On `generationCompleted`: transform result, call `userContext.addMealPlan` (or equivalent existing setter) + `refreshMealPlans()`, fire a success toast, set status `completed`, clear `activeJob`.
-- On `generationFailed`: toast error, clear `activeJob`.
-- Exposes: `startJob(jobId, requestData)`, `activeJob`, `isProcessing`.
+- Reposition to `fixed top-4 left-1/2 -translate-x-1/2 z-50` with safe-area padding.
+- Keep emerald gradient card, ChefHat + Loader2 spinner, "Cooking your meal plan…" + plan name.
+- Stays visible the entire time `isProcessing` is true (from `useMealPlanJob`).
 
-### 5. Floating progress indicator `src/components/MealPlanJobIndicator.tsx`
-- Rendered globally (e.g. in `AppContent` after `<Routes>`).
-- When `isProcessing`, shows a small fixed-bottom-right card with a spinner + "Creating your meal plan…" + plan name. Uses brand emerald tokens. Allows the user to keep navigating (no overlay).
-- Hidden when idle.
+### 3. Ready modal triggered by socket completion
+**New file:** `src/components/MealPlanReadyModal.tsx`
 
-### 6. Update `MealPlanCreatorStepper.tsx` and `MealPlanCreator.tsx`
-Replace the current `await createMealPlan(requestData)` + immediate transform / success-modal flow with:
-- Call `createMealPlanJob(requestData)` → get `jobId`.
-- Call `mealPlanJobContext.startJob(jobId, requestData)`.
-- `hideLoader()`, toast "Meal plan generation started — we'll notify you when it's ready", then `onBack()` so the user returns to the dashboard.
-- Remove the inline `showSuccessModal` triggering here (the global context handles completion). Keep error handling for the synchronous POST (subscription code "03", network errors).
+- Reusable Dialog: CheckCircle + Sparkles icon, title "Your Meal Plan is Ready!", plan name, two buttons:
+  - **View Meal Plan** → calls `onView(plan)`
+  - **Later** → closes modal.
+- Multilingual strings via `useLanguage` (EN/ES/PT keys: `mealPlanReady.title`, `mealPlanReady.description`, `mealPlanReady.viewPlan`, `mealPlanReady.later`).
 
-### 7. Keep existing display path
-- `transformApiMealPlanToLocal` and `UserContext.refreshMealPlans` remain unchanged — completion handler uses them, so meal plans render exactly as today.
+### 4. Wire completion → modal → navigation
+**File:** `src/contexts/MealPlanJobContext.tsx`
+
+- Add `readyPlan` state (the transformed local plan) and `dismissReadyPlan()` to context value.
+- In `onCompleted`: after `addMealPlan(localPlan)` + `refreshMealPlans()`, set `readyPlan = localPlan`, drop the existing success toast (replaced by modal), then `clearJob()` so the top loader disappears.
+- Keep failure toast as-is.
+
+**File:** `src/App.tsx`
+
+- Render `<MealPlanReadyModal />` alongside `<MealPlanJobIndicator />` inside the provider.
+- Modal reads `readyPlan` from `useMealPlanJob`. On "View Meal Plan":
+  - Set the selected meal plan in `UserContext` (use existing `setSelectedMealPlan` / equivalent already used after creating a plan).
+  - Navigate to the meal plan detail route (the same destination `MealPlanView` uses today — the dashboard "Meal Plans" tab opening the plan, mirroring current post-creation behavior).
+  - Call `dismissReadyPlan()`.
+
+### 5. Translations
+**Files:** `src/translations/en.ts`, `es.ts`, `pt.ts`
+
+- Add keys for `mealPlanReady.*` (title, description, viewPlan, later) and update the "started" toast copy if needed.
 
 ## Technical notes
+- No backend changes; purely frontend orchestration around existing socket events.
+- Loader and modal both driven by `MealPlanJobContext` so they work even if user navigates away from the creator while the job runs.
+- Reuse the existing navigation pattern used when a plan is created synchronously today (look up in `MealPlanCreatorStepper.onPlanCreated` callsite to mirror the same `setActiveTab` / route change).
 
-- Socket auth: none specified by the user; connect with default options. If the server later requires the bearer token, pass it through `auth: { token }` in `io(url, { auth })`.
-- Reconnection: rely on socket.io-client defaults; on `connect` always re-emit `joinJobRoom` (covers reconnect mid-generation).
-- Only one active job at a time is supported (single slot in context). If a second job starts, it replaces the first.
-- Cleanup: disconnect socket on completion/failure and on `activeJob` cleared.
-
-## Files
-
-- add: `src/services/mealPlanJobService.ts`
-- add: `src/contexts/MealPlanJobContext.tsx`
-- add: `src/components/MealPlanJobIndicator.tsx`
-- edit: `src/App.tsx` (wrap with provider, mount indicator)
-- edit: `src/components/MealPlanCreatorStepper.tsx` (job flow)
-- edit: `src/components/MealPlanCreator.tsx` (job flow)
-- edit: `package.json` (`socket.io-client`)
+## Files touched
+- edit `src/components/MealPlanJobIndicator.tsx`
+- edit `src/contexts/MealPlanJobContext.tsx`
+- edit `src/components/MealPlanCreatorStepper.tsx`
+- edit `src/components/MealPlanCreator.tsx`
+- edit `src/App.tsx`
+- edit `src/translations/{en,es,pt}.ts`
+- new  `src/components/MealPlanReadyModal.tsx`
