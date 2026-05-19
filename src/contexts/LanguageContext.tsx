@@ -4579,6 +4579,14 @@ const translations = {
       "Seu plano de comidas personalizado com IA foi criado com sucesso e está pronto para ajudá-lo a cozinhar refeições deliciosas e saudáveis esta semana.",
     "mealPlanReady.viewPlan": "Ver Meu Plano de Refeições",
     "mealPlanReady.later": "Ver Mais Tarde",
+    "drinkReady.title": "Sua Bebida Saudável está Pronta! 🥤",
+    "drinkReady.description":
+      "Sua bebida saudável personalizada foi preparada e está pronta para desfrutar.",
+    "drinkReady.viewDrink": "Ver Bebida",
+    "drinkReady.later": "Ver Mais Tarde",
+    "drinkStarted.title": "Geração de Bebida Iniciada",
+    "drinkStarted.description":
+      "Avisaremos quando sua bebida saudável estiver pronta.",
 
     "days.sunday": "Domingo",
     "days.monday": "Segunda-feira",
