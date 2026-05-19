@@ -51,3 +51,41 @@ export const createAIMeal = async (mealData: AIMealRequest): Promise<AIMealRespo
     throw error;
   }
 };
+
+export interface CreateAIMealJobResponse {
+  jobId: string;
+}
+
+export const createAIMealJob = async (
+  mealData: AIMealRequest
+): Promise<CreateAIMealJobResponse> => {
+  console.log('createAIMealJob payload:', mealData);
+
+  const response = await fetch(`${API_MEALS}/meal-plan/special`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(mealData),
+  });
+
+  const data = await response.json();
+  console.log('createAIMealJob response:', data);
+
+  if (
+    data?.code === '03' ||
+    data?.message?.includes('No special meals available according to your subscription')
+  ) {
+    throw new SubscriptionLimitError(
+      data.message || 'No special meals available according to your subscription'
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.message || `Failed to create AI meal: ${response.status}`);
+  }
+
+  if (!data?.jobId) {
+    throw new Error('Server did not return a jobId');
+  }
+
+  return { jobId: data.jobId };
+};

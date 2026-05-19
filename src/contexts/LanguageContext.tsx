@@ -570,6 +570,14 @@ const translations = {
     "drinkStarted.title": "Drink Generation Started",
     "drinkStarted.description":
       "We'll notify you when your healthy drink is ready.",
+    "aiMealReady.title": "Your AI Meal is Ready! 🍽️",
+    "aiMealReady.description":
+      "Your personalized AI meal has been created and is ready to explore.",
+    "aiMealReady.viewMeal": "View Meal",
+    "aiMealReady.later": "View Later",
+    "aiMealStarted.title": "Meal Generation Started",
+    "aiMealStarted.description":
+      "We'll notify you when your meal is ready.",
     //new keys
     //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
@@ -2553,6 +2561,14 @@ const translations = {
     "drinkStarted.title": "Generación de Bebida Iniciada",
     "drinkStarted.description":
       "Te avisaremos cuando tu bebida saludable esté lista.",
+    "aiMealReady.title": "¡Tu Comida con IA está Lista! 🍽️",
+    "aiMealReady.description":
+      "Tu comida personalizada con IA ha sido creada y está lista para explorar.",
+    "aiMealReady.viewMeal": "Ver Comida",
+    "aiMealReady.later": "Ver Más Tarde",
+    "aiMealStarted.title": "Generación de Comida Iniciada",
+    "aiMealStarted.description":
+      "Te avisaremos cuando tu comida esté lista.",
     "days.sunday": "Domingo",
     "days.monday": "Lunes",
     "days.tuesday": "Martes",
@@ -4587,6 +4603,14 @@ const translations = {
     "drinkStarted.title": "Geração de Bebida Iniciada",
     "drinkStarted.description":
       "Avisaremos quando sua bebida saudável estiver pronta.",
+    "aiMealReady.title": "Sua Refeição com IA está Pronta! 🍽️",
+    "aiMealReady.description":
+      "Sua refeição personalizada com IA foi criada e está pronta para explorar.",
+    "aiMealReady.viewMeal": "Ver Refeição",
+    "aiMealReady.later": "Ver Mais Tarde",
+    "aiMealStarted.title": "Geração de Refeição Iniciada",
+    "aiMealStarted.description":
+      "Avisaremos quando sua refeição estiver pronta.",
 
     "days.sunday": "Domingo",
     "days.monday": "Segunda-feira",

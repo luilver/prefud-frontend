@@ -64,6 +64,27 @@ const AIMealCreator = () => {
     return () => observer.disconnect();
   }, [isMobile, isLoadingMeals, isLoadingMore, currentPage, totalPages]);
 
+  // Listen for open-ai-meal event to navigate to the generated meal detail
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent;
+      const meal = ce.detail?.meal;
+      if (meal) {
+        setShowCreator(false);
+        setSelectedMeal(meal);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      if (user?.id) {
+        setCurrentPage(1);
+        setAllApiMeals([]);
+        fetchUserMeals(1, isMobile ? 5 : pageSize, isMobile);
+      }
+    };
+    window.addEventListener("open-ai-meal", handler);
+    return () => window.removeEventListener("open-ai-meal", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isMobile, pageSize]);
+
   const loadMoreMeals = async () => {
     if (!user?.id || isLoadingMore) return;
     const nextPage = currentPage + 1;

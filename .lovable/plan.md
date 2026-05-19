@@ -1,70 +1,68 @@
-# Async Healthy Drink Generation (jobId + websocket)
+## Async AI Meal Generation (jobId + websocket)
 
-Mirror the meal plan async flow for healthy drinks. The drink endpoint now returns `{ jobId }`; results arrive via socket `generationCompleted`/`generationFailed` on the job room.
+Mirror the meal plan / healthy drink async flow for AI Special Meals. `POST /meal-plan/special` now returns `{ jobId }`; results arrive via the shared socket `generationCompleted` / `generationFailed` events filtered by `jobId`.
 
-## Changes
-
-### 1. `src/services/drinkService.ts`
-- Add `createHealthyDrinkJob(data)` → POST `/meal-plan/healthy-drink`, returns `{ jobId }`. Keep the same `code === "03"` subscription-limit handling.
-- Keep existing `createHealthyDrink` for backwards compat.
+### 1. `src/services/aiMealService.ts`
+- Add `createAIMealJob(payload) → { jobId }` against `POST /meal-plan/special`. Keep `code === "03"` → throw `SubscriptionLimitError`. Keep existing `createAIMeal` for backwards compat.
 
 ### 2. Reuse `connectJobSocket` from `mealPlanJobService`
-- The backend uses the same socket gateway with shared `generationCompleted` / `generationFailed` events filtered by `jobId`, so no new socket service file is needed.
+- Same socket gateway, no new service file.
 
-### 3. `src/contexts/DrinkJobContext.tsx` (new)
-- Same shape as `MealPlanJobContext`:
-  - `activeJob`, `isProcessing`, `startJob(jobId, requestData)`, `clearJob`, `readyDrink`, `dismissReadyDrink`.
-  - Persists active job in `localStorage` (`pantry.activeDrinkJob`).
-  - On `generationCompleted`: build the transformed drink object (same shape produced today in `AIDrinkCreatorStepper.handleGenerate`), set `readyDrink`, then `clearJob()`.
+### 3. `src/contexts/AIMealJobContext.tsx` (new)
+- Same shape as `DrinkJobContext`:
+  - `activeJob`, `isProcessing`, `startJob(jobId, requestData)`, `clearJob`, `readyMeal`, `dismissReadyMeal`.
+  - Persists `pantry.activeAIMealJob` in `localStorage`.
+  - On `generationCompleted`: transform `payload.result` into the local meal shape currently built inside `AIMealGeneration.generateMeal` (`name`, `description`, `cookingTime`, `servings`, `difficulty`, `cuisine`, `calories`, `ingredients`, `instructions`, `nutritionalInfo`, `tags`, `benefits`, `prepTip`, `carbonFootprint`, `ingredientsList`). Set `readyMeal`, then `clearJob()`.
   - On `generationFailed`: error toast, clear.
 
-### 4. `src/components/DrinkJobIndicator.tsx` (new)
-- Top-center fixed loader (same styling as `MealPlanJobIndicator`) with a `GlassWater` / `CupSoda` icon + spinner and "Mixing your healthy drink…" + drink name.
+### 4. `src/components/AIMealJobIndicator.tsx` (new)
+- Top-center fixed loader (same styling as `DrinkJobIndicator` / `MealPlanJobIndicator`), `ChefHat` icon + spinner, "Cooking up your meal…" + meal name.
 
-### 5. `src/components/DrinkReadyModal.tsx` (new)
-- Same structure as `MealPlanReadyModal`: CheckCircle + Sparkles icon, drink name, "View Drink" / "Later" buttons.
-- "View Drink" dispatches `CustomEvent("open-drink", { detail: { drink } })` and calls `dismissReadyDrink()`.
-- Uses translation keys: `drinkReady.title`, `drinkReady.description`, `drinkReady.viewDrink`, `drinkReady.later`.
+### 5. `src/components/AIMealReadyModal.tsx` (new)
+- Same structure as `DrinkReadyModal` / `MealPlanReadyModal`: CheckCircle + Sparkles, meal name, buttons "View Meal" / "Later".
+- "View Meal" dispatches `CustomEvent("open-ai-meal", { detail: { meal } })` and `dismissReadyMeal()`.
+- Translation keys: `aiMealReady.title`, `aiMealReady.description`, `aiMealReady.viewMeal`, `aiMealReady.later`.
 
 ### 6. `src/App.tsx`
-- Wrap tree with `<DrinkJobProvider>` (inside `MealPlanJobProvider`).
-- Render `<DrinkJobIndicator />` and `<DrinkReadyModal />` alongside the meal plan equivalents.
+- Wrap tree with `<AIMealJobProvider>` (alongside `MealPlanJobProvider` and `DrinkJobProvider`).
+- Render `<AIMealJobIndicator />` and `<AIMealReadyModal />`.
 
-### 7. `src/components/AIDrinkCreatorStepper.tsx`
-- Replace direct `createHealthyDrink` + transform-and-show flow with:
-  - Call `createHealthyDrinkJob(requestData)` → `{ jobId }`.
-  - `useDrinkJob().startJob(jobId, requestData)`.
-  - Show 5s toast: "🥤 Drink Generation Started — We'll notify you when your healthy drink is ready."
-  - Call `onBack()` to return user to the drinks list.
-- Remove inline `setGeneratedDrink` / `setIsGenerating(true)` success path. Keep `code 03` upgrade modal on POST.
+### 7. `src/components/AIMealCreatorStepper.tsx`
+- In `handleGenerate`: call `createAIMealJob(apiPayload)` (building the same payload currently built in `AIMealGeneration.generateMeal`, so the stepper owns the request transformation).
+- On success → `useAIMealJob().startJob(jobId, requestData)`, show 5s toast "🍽️ Meal Generation Started — We'll notify you when your meal is ready", then `onBack()` to return to the list.
+- On `SubscriptionLimitError` → show existing upgrade modal flow (lift `SubscriptionUpgradeModal` usage from `AIMealGeneration` into the stepper, or keep a small inline copy).
+- Remove `setIsGenerating(true)` success branch and the `AIMealGeneration` render path from this file (no longer needed for happy-path generation).
 
-### 8. `src/components/AIDrinkGeneration.tsx`
-- Same refactor: POST returns `jobId`, call `startJob`, show 5s toast, exit back to list.
-- Keep existing `code === "03"` upgrade modal handling on POST.
+### 8. `src/components/AIMealGeneration.tsx`
+- No longer used for in-flight generation. Either:
+  - Repurpose as a pure "meal detail" view fed by an already-generated meal (drop the `generateMeal` effect and the `SubscriptionLimitError` handling), OR
+  - Delete it if `AIMealView` already covers the post-generation detail view.
+- Decision: keep file, strip the `useEffect`/`generateMeal` so it just renders `mealData` (no API call, no upgrade modal). This preserves any other call sites that pass a fully-formed meal.
 
-### 9. `src/components/AIDrinkCreator.tsx`
-- Add `useEffect` listening for `window.addEventListener("open-drink", ...)` → `setSelectedDrink(detail.drink)` so the user lands directly on the drink detail when they click "View Drink" in the modal.
+### 9. `src/components/AIMealCreator.tsx`
+- Add `useEffect` listening for `window.addEventListener("open-ai-meal", e => setSelectedMeal(e.detail.meal))` so the user lands directly on the meal detail when clicking "View Meal".
+- In `handleMealCreated` (called after the job starts) just close the creator and refresh the list as today.
 
 ### 10. `src/components/Dashboard.tsx`
-- Add `useEffect` listening for `open-drink` → set `activeTab` to the drinks tab (mirrors the existing `open-meal-plan` handler).
+- Add `useEffect` listening for `open-ai-meal` → switch `activeTab` to the AI meals tab (mirrors `open-meal-plan` / `open-drink` handlers).
 
 ### 11. Translations — `src/contexts/LanguageContext.tsx`
-- All EN/ES/PT strings live in this file using flat dot-notation keys (per project memory).
-- Add: `drinkReady.title`, `drinkReady.description`, `drinkReady.viewDrink`, `drinkReady.later`, and the new "drink generation started" toast title/description for the three languages.
+- Add EN/ES/PT flat dot-notation keys: `aiMealReady.title`, `aiMealReady.description`, `aiMealReady.viewMeal`, `aiMealReady.later`, `aiMealStarted.title`, `aiMealStarted.description`, plus indicator label `aiMealJob.processing`.
 
-## Technical notes
-- All orchestration is frontend. No new backend calls beyond the existing `/meal-plan/healthy-drink` POST and the shared socket gateway.
-- Persisting `activeJob` in `localStorage` lets the loader resume if the user reloads while generation is running.
-- The transformed drink object built inside `DrinkJobContext.onCompleted` matches the shape `AIDrinkView` already consumes, so no view changes are needed.
+### Technical notes
+- All orchestration is frontend; only existing `/meal-plan/special` POST + shared socket gateway are used.
+- `localStorage` persistence lets the loader resume on reload.
+- The transformed meal object built in `AIMealJobContext.onCompleted` matches the shape `AIMealView` already consumes via `setSelectedMeal`, so no view changes are needed.
+- Subscription-limit (`code === "03"`) handling stays synchronous on the POST response, before the job is registered.
 
-## Files touched
-- new  `src/contexts/DrinkJobContext.tsx`
-- new  `src/components/DrinkJobIndicator.tsx`
-- new  `src/components/DrinkReadyModal.tsx`
-- edit `src/services/drinkService.ts`
-- edit `src/components/AIDrinkCreatorStepper.tsx`
-- edit `src/components/AIDrinkGeneration.tsx`
-- edit `src/components/AIDrinkCreator.tsx`
+### Files touched
+- new  `src/contexts/AIMealJobContext.tsx`
+- new  `src/components/AIMealJobIndicator.tsx`
+- new  `src/components/AIMealReadyModal.tsx`
+- edit `src/services/aiMealService.ts`
+- edit `src/components/AIMealCreatorStepper.tsx`
+- edit `src/components/AIMealGeneration.tsx`
+- edit `src/components/AIMealCreator.tsx`
 - edit `src/components/Dashboard.tsx`
 - edit `src/App.tsx`
 - edit `src/contexts/LanguageContext.tsx`
