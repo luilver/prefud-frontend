@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { MealPlanJobProvider } from "@/contexts/MealPlanJobContext";
+import MealPlanJobIndicator from "@/components/MealPlanJobIndicator";
 
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
@@ -60,12 +62,15 @@ const App = () => (
       <AuthProvider>
         <SubscriptionProvider>
           <UserProvider>
-            <CartProvider>
-              <TooltipProvider>
-                <AppContent />
-                <Toaster />
-              </TooltipProvider>
-            </CartProvider>
+            <MealPlanJobProvider>
+              <CartProvider>
+                <TooltipProvider>
+                  <AppContent />
+                  <MealPlanJobIndicator />
+                  <Toaster />
+                </TooltipProvider>
+              </CartProvider>
+            </MealPlanJobProvider>
           </UserProvider>
         </SubscriptionProvider>
       </AuthProvider>
