@@ -19,6 +19,8 @@ interface MealPlanJobContextValue {
   isProcessing: boolean;
   startJob: (jobId: string, requestData: CreateMealPlanRequest) => void;
   clearJob: () => void;
+  readyPlan: any | null;
+  dismissReadyPlan: () => void;
 }
 
 const STORAGE_KEY = "pantry.activeMealPlanJob";
@@ -34,6 +36,7 @@ export const MealPlanJobProvider: React.FC<{ children: React.ReactNode }> = ({ c
       return null;
     }
   });
+  const [readyPlan, setReadyPlan] = useState<any | null>(null);
   const { addMealPlan, refreshMealPlans } = useUser();
   const { toast } = useToast();
   const cleanupRef = useRef<(() => void) | null>(null);
@@ -74,11 +77,7 @@ export const MealPlanJobProvider: React.FC<{ children: React.ReactNode }> = ({ c
           const localPlan = transformApiMealPlanToLocal(apiPlan);
           addMealPlan(localPlan as any);
           refreshMealPlans();
-          toast({
-            title: "🎉 Meal Plan Ready!",
-            description: `${activeJob.requestData.plan_name || "Your meal plan"} is ready to explore.`,
-            duration: 8000,
-          });
+          setReadyPlan(localPlan);
         } catch (err) {
           console.error("Error handling generationCompleted:", err);
           toast({
@@ -113,7 +112,14 @@ export const MealPlanJobProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   return (
     <MealPlanJobContext.Provider
-      value={{ activeJob, isProcessing: !!activeJob, startJob, clearJob }}
+      value={{
+        activeJob,
+        isProcessing: !!activeJob,
+        startJob,
+        clearJob,
+        readyPlan,
+        dismissReadyPlan: () => setReadyPlan(null),
+      }}
     >
       {children}
     </MealPlanJobContext.Provider>
