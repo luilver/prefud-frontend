@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,7 +29,12 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { generateMealsFromPantry } from "@/services/pantryService";
+import {
+  generateMealsFromPantryJob,
+  PantryMealsNoIngredientsError,
+  PantryMealsSubscriptionLimitError,
+} from "@/services/pantryService";
+import { usePantryMealsJob } from "@/contexts/PantryMealsJobContext";
 import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
@@ -69,6 +74,19 @@ const AIMealSuggestions = ({
   } = useUser();
   const { language, t } = useLanguage();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { startJob } = usePantryMealsJob();
+
+  // Render suggestions inline when the global ready modal dispatches the event
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.meals && Array.isArray(detail.meals)) {
+        setSuggestions(detail.meals);
+      }
+    };
+    window.addEventListener("open-pantry-meals", handler);
+    return () => window.removeEventListener("open-pantry-meals", handler);
+  }, []);
 
   // Find expiring ingredients (<=3 days)
   const expiringItems = useMemo(() => {
@@ -123,69 +141,44 @@ const AIMealSuggestions = ({
       };
       const apiLanguage = languageMap[language] || "english";
 
-      console.log("Generating AI suggestions with params:", {
-        userId: user.id,
-        startDate,
-        servings,
-        language: apiLanguage,
-      });
-
-      const response = await generateMealsFromPantry(
+      const { jobId } = await generateMealsFromPantryJob(
         user.id,
         startDate,
         servings,
         apiLanguage
       );
 
-      if (response.code === "03") {
+      startJob(jobId, {
+        userId: user.id,
+        startDate,
+        servings,
+        language: apiLanguage,
+      });
+
+      toast({
+        title: t("pantryMealsStarted.title") || "Meal Generation Started",
+        description:
+          t("pantryMealsStarted.description") ||
+          "We'll notify you when your pantry meal ideas are ready.",
+        duration: 5000,
+      });
+    } catch (error: any) {
+      if (error instanceof PantryMealsSubscriptionLimitError) {
         toast({
           title: t("aiSuggestions.subscriptionLimit"),
-          description:
-            response.message ||
-            t("aiSuggestions.subscriptionLimit"),
+          description: error.apiMessage || t("aiSuggestions.subscriptionLimit"),
           variant: "destructive",
         });
         return;
       }
-
-      if (response.code === "02") {
+      if (error instanceof PantryMealsNoIngredientsError) {
         toast({
           title: t("aiSuggestions.noIngredients"),
-          description:
-            response.message ||
-            t("aiSuggestions.noIngredients"),
+          description: error.apiMessage || t("aiSuggestions.noIngredients"),
           variant: "destructive",
         });
         return;
       }
-
-      if (response.generatedMeals && Array.isArray(response.generatedMeals)) {
-        const transformedMeals = response.generatedMeals.map((meal: any) => ({
-          id: `meal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          name: meal.name,
-          description: meal.description,
-          prepTime: meal.cookingTime,
-          difficulty: "medium",
-          calories: meal.calories,
-          type: meal.mealType,
-          benefits: meal.benefits,
-          prepTip: meal.prepTip,
-          carbonFootprint: meal.carbonFootprint,
-          ingredients: meal.ingredientsList || [],
-          steps: meal.steps || [],
-          nutritionalInfo: meal.nutritionalInfo,
-          instructions: meal.instructions,
-        }));
-
-        setSuggestions(transformedMeals);
-        toast({
-          title: t("aiSuggestions.ready"),
-          description: `${transformedMeals.length} ${t("aiSuggestions.readyDesc")} ${response.totalCarbonFootprint}kg CO2.`,
-        });
-      } else {
-        throw new Error("Invalid response format");
-      }
-    } catch (error: any) {
       console.error("Error generating suggestions:", error);
       toast({
         title: t("aiSuggestions.error"),
