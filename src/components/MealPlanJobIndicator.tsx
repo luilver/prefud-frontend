@@ -7,7 +7,10 @@ const MealPlanJobIndicator = () => {
   if (!isProcessing || !activeJob) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-xs animate-in slide-in-from-bottom-4">
+    <div
+      className="fixed left-1/2 -translate-x-1/2 z-50 max-w-sm w-[calc(100%-2rem)] animate-in slide-in-from-top-4"
+      style={{ top: "calc(env(safe-area-inset-top, 0px) + 1rem)" }}
+    >
       <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600 to-emerald-700 px-4 py-3 shadow-2xl">
         <div className="relative">
           <ChefHat className="h-6 w-6 text-white" />
