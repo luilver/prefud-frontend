@@ -6,6 +6,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import AIMealGeneration from "./AIMealGeneration";
 import { trackEvent } from "@/services/analytics";
+import { createAIMealJob, SubscriptionLimitError } from "@/services/aiMealService";
+import { useAIMealJob } from "@/contexts/AIMealJobContext";
+import { useToast } from "@/hooks/use-toast";
+import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
 
 interface AIMealCreatorStepperProps {
   onBack: () => void;
@@ -44,6 +48,9 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
   const { user } = useUser();
   const { language, t } = useLanguage();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { toast } = useToast();
+  const { startJob } = useAIMealJob();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -411,9 +418,66 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
       button_name: "generate_special_meal_submit",
       screen: "generate_special_meal_page",
     });
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    hideLoader();
-    setIsGenerating(true);
+
+    try {
+      const apiPayload = {
+        dislikes: mealData.dislikes || "",
+        cookingSkillLevel: mealData.cookingSkillLevel || "intermediate",
+        budgetRange: mealData.budgetRange || "medium",
+        healthGoals: mealData.healthGoals || [],
+        language: language,
+        user_id: user?.id || "",
+        plan_name: mealData.mealName || "AI Generated Meal",
+        mealType: mealData.mealType?.toLowerCase() || "dinner",
+        numberPeople: mealData.servings || 2,
+        maxCookingTime: mealData.cookingTime || 30,
+        specialRequest: mealData.specialRequests || "",
+        dietaryRestrictions:
+          mealData.dietaryRestrictions?.map((r: string) =>
+            r.toLowerCase().replace("-", " ")
+          ) || [],
+        userId: user?.id || "",
+        cuisinePreferences:
+          mealData.cuisinePreferences?.map((c: string) => c.toLowerCase()) || [],
+        allergiesIntolerance:
+          mealData.allergiesIntolerances?.map((a: string) => a.toLowerCase()) || [],
+        customIntolerance: mealData.customAllergies || "",
+        nameOfMeal: mealData.nameOfMeal || "",
+      } as any;
+
+      const { jobId } = await createAIMealJob(apiPayload);
+      startJob(jobId, apiPayload);
+
+      hideLoader();
+      toast({
+        title: "🍽️ " + (t("aiMealStarted.title") || "Meal Generation Started"),
+        description:
+          t("aiMealStarted.description") ||
+          "We'll notify you when your meal is ready.",
+        duration: 5000,
+      });
+      onBack();
+    } catch (error: any) {
+      hideLoader();
+      console.error("Error generating AI meal:", error);
+
+      if (
+        error instanceof SubscriptionLimitError ||
+        error?.code === "03" ||
+        (typeof error?.message === "string" &&
+          error.message.includes("No special meals available according to your subscription"))
+      ) {
+        setShowUpgradeModal(true);
+        return;
+      }
+
+      toast({
+        title: "Error",
+        description:
+          t("aiMealGenerator.error") || "Failed to generate meal. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRestart = () => {
