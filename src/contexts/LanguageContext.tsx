@@ -557,6 +557,11 @@ const translations = {
     "mealPlanView.cuisines": "Cuisines",
     "mealPlanView.healthGoals": "Health Goals",
     "mealPlanView.dislikes": "Disliked Cuisines",
+    "mealPlanReady.title": "Your Meal Plan is Ready! 🎉",
+    "mealPlanReady.description":
+      "Your personalized AI meal plan has been created and is ready to use. You can view the details of your meal plan, add ingredients to your pantry, or order online for delivery.",
+    "mealPlanReady.viewPlan": "View Meal Plan",
+    "mealPlanReady.later": "View Later",
     //new keys
     //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
@@ -2527,6 +2532,11 @@ const translations = {
     "mealPlanView.cuisines": "Cocinas",
     "mealPlanView.healthGoals": "Objetivos de Salud",
     "mealPlanView.dislikes": "Cocinas que no te gustan",
+    "mealPlanReady.title": "¡Tu Plan de Comidas está Listo! 🎉",
+    "mealPlanReady.description":
+      "Tu plan de comidas personalizado con IA ha sido creado exitosamente y está listo para ayudarte a cocinar comidas deliciosas y saludables esta semana.",
+    "mealPlanReady.viewPlan": "Ver Plan de Comidas",
+    "mealPlanReady.later": "Ver Más Tarde",
     "days.sunday": "Domingo",
     "days.monday": "Lunes",
     "days.tuesday": "Martes",
@@ -4548,6 +4558,11 @@ const translations = {
     "mealPlanView.cuisines": "Culinárias",
     "mealPlanView.healthGoals": "Objetivos de Saúde",
     "mealPlanView.dislikes": "Culinárias que você não gosta",
+    "mealPlanReady.title": "¡Tu Plan de Comidas está Listo! 🎉",
+    "mealPlanReady.description":
+      "Seu plano de comidas personalizado com IA foi criado com sucesso e está pronto para ajudá-lo a cozinhar refeições deliciosas e saudáveis esta semana.",
+    "mealPlanReady.viewPlan": "Ver Meu Plano de Refeições",
+    "mealPlanReady.later": "Ver Mais Tarde",
 
     "days.sunday": "Domingo",
     "days.monday": "Segunda-feira",
