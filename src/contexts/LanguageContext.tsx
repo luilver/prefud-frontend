@@ -562,6 +562,14 @@ const translations = {
       "Your personalized AI meal plan has been created and is ready to use. You can view the details of your meal plan, add ingredients to your pantry, or order online for delivery.",
     "mealPlanReady.viewPlan": "View Meal Plan",
     "mealPlanReady.later": "View Later",
+    "drinkReady.title": "Your Healthy Drink is Ready! 🥤",
+    "drinkReady.description":
+      "Your personalized healthy drink has been mixed and is ready to enjoy.",
+    "drinkReady.viewDrink": "View Drink",
+    "drinkReady.later": "View Later",
+    "drinkStarted.title": "Drink Generation Started",
+    "drinkStarted.description":
+      "We'll notify you when your healthy drink is ready.",
     //new keys
     //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
@@ -2537,6 +2545,14 @@ const translations = {
       "Tu plan de comidas personalizado con IA ha sido creado exitosamente y está listo para ayudarte a cocinar comidas deliciosas y saludables esta semana.",
     "mealPlanReady.viewPlan": "Ver Plan de Comidas",
     "mealPlanReady.later": "Ver Más Tarde",
+    "drinkReady.title": "¡Tu Bebida Saludable está Lista! 🥤",
+    "drinkReady.description":
+      "Tu bebida saludable personalizada ha sido preparada y está lista para disfrutar.",
+    "drinkReady.viewDrink": "Ver Bebida",
+    "drinkReady.later": "Ver Más Tarde",
+    "drinkStarted.title": "Generación de Bebida Iniciada",
+    "drinkStarted.description":
+      "Te avisaremos cuando tu bebida saludable esté lista.",
     "days.sunday": "Domingo",
     "days.monday": "Lunes",
     "days.tuesday": "Martes",
@@ -4563,6 +4579,14 @@ const translations = {
       "Seu plano de comidas personalizado com IA foi criado com sucesso e está pronto para ajudá-lo a cozinhar refeições deliciosas e saudáveis esta semana.",
     "mealPlanReady.viewPlan": "Ver Meu Plano de Refeições",
     "mealPlanReady.later": "Ver Mais Tarde",
+    "drinkReady.title": "Sua Bebida Saudável está Pronta! 🥤",
+    "drinkReady.description":
+      "Sua bebida saudável personalizada foi preparada e está pronta para desfrutar.",
+    "drinkReady.viewDrink": "Ver Bebida",
+    "drinkReady.later": "Ver Mais Tarde",
+    "drinkStarted.title": "Geração de Bebida Iniciada",
+    "drinkStarted.description":
+      "Avisaremos quando sua bebida saudável estiver pronta.",
 
     "days.sunday": "Domingo",
     "days.monday": "Segunda-feira",

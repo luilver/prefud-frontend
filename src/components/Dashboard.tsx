@@ -73,6 +73,13 @@ const DashboardContent = () => {
     return () => window.removeEventListener("open-meal-plan", handler);
   }, []);
 
+  // Switch to the AI drinks tab when a global open-drink event fires
+  useEffect(() => {
+    const handler = () => setActiveTab("ai-drinks");
+    window.addEventListener("open-drink", handler);
+    return () => window.removeEventListener("open-drink", handler);
+  }, []);
+
   // Calculate dynamic margin based on sidebar state
   const getSidebarWidth = () => {
     if (isMobile) return 0;

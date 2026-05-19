@@ -51,6 +51,29 @@ const AIDrinkCreator = () => {
     }
   }, [user?.id, currentPage, pageSize, isMobile]);
 
+  // Listen for open-drink event to navigate to the generated drink detail
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent;
+      const drink = ce.detail?.drink;
+      if (drink) {
+        setShowStepper(false);
+        setSelectedApiDrink(null);
+        setSelectedDrink(drink);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      // Refresh the user's drinks list so newly created ones show up
+      if (user?.id) {
+        setCurrentPage(1);
+        setAllApiDrinks([]);
+        fetchUserDrinks(1, isMobile ? 5 : pageSize, isMobile);
+      }
+    };
+    window.addEventListener("open-drink", handler);
+    return () => window.removeEventListener("open-drink", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isMobile, pageSize]);
+
   // Infinite scroll observer for mobile
   useEffect(() => {
     if (!isMobile || !loadMoreRef.current) return;

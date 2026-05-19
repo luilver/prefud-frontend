@@ -11,6 +11,9 @@ import { CartProvider } from "@/contexts/CartContext";
 import { MealPlanJobProvider } from "@/contexts/MealPlanJobContext";
 import MealPlanJobIndicator from "@/components/MealPlanJobIndicator";
 import MealPlanReadyModal from "@/components/MealPlanReadyModal";
+import { DrinkJobProvider } from "@/contexts/DrinkJobContext";
+import DrinkJobIndicator from "@/components/DrinkJobIndicator";
+import DrinkReadyModal from "@/components/DrinkReadyModal";
 
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
@@ -64,14 +67,18 @@ const App = () => (
         <SubscriptionProvider>
           <UserProvider>
             <MealPlanJobProvider>
-              <CartProvider>
-                <TooltipProvider>
-                  <AppContent />
-                  <MealPlanJobIndicator />
-                  <MealPlanReadyModal />
-                  <Toaster />
-                </TooltipProvider>
-              </CartProvider>
+              <DrinkJobProvider>
+                <CartProvider>
+                  <TooltipProvider>
+                    <AppContent />
+                    <MealPlanJobIndicator />
+                    <MealPlanReadyModal />
+                    <DrinkJobIndicator />
+                    <DrinkReadyModal />
+                    <Toaster />
+                  </TooltipProvider>
+                </CartProvider>
+              </DrinkJobProvider>
             </MealPlanJobProvider>
           </UserProvider>
         </SubscriptionProvider>
