@@ -87,6 +87,13 @@ const DashboardContent = () => {
     return () => window.removeEventListener("open-ai-meal", handler);
   }, []);
 
+  // Switch to the pantry tab when a global open-pantry-meals event fires
+  useEffect(() => {
+    const handler = () => setActiveTab("ingredients");
+    window.addEventListener("open-pantry-meals", handler);
+    return () => window.removeEventListener("open-pantry-meals", handler);
+  }, []);
+
   // Calculate dynamic margin based on sidebar state
   const getSidebarWidth = () => {
     if (isMobile) return 0;
