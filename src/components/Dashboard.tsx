@@ -66,6 +66,13 @@ const DashboardContent = () => {
     }
   }, [activeTab, isMobile]);
 
+  // Switch to the planner tab when a global open-meal-plan event fires
+  useEffect(() => {
+    const handler = () => setActiveTab("planner");
+    window.addEventListener("open-meal-plan", handler);
+    return () => window.removeEventListener("open-meal-plan", handler);
+  }, []);
+
   // Calculate dynamic margin based on sidebar state
   const getSidebarWidth = () => {
     if (isMobile) return 0;
