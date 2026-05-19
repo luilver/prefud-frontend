@@ -17,6 +17,9 @@ import DrinkReadyModal from "@/components/DrinkReadyModal";
 import { AIMealJobProvider } from "@/contexts/AIMealJobContext";
 import AIMealJobIndicator from "@/components/AIMealJobIndicator";
 import AIMealReadyModal from "@/components/AIMealReadyModal";
+import { PantryMealsJobProvider } from "@/contexts/PantryMealsJobContext";
+import PantryMealsJobIndicator from "@/components/PantryMealsJobIndicator";
+import PantryMealsReadyModal from "@/components/PantryMealsReadyModal";
 
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
@@ -72,18 +75,22 @@ const App = () => (
             <MealPlanJobProvider>
               <DrinkJobProvider>
                 <AIMealJobProvider>
-                  <CartProvider>
-                    <TooltipProvider>
-                      <AppContent />
-                      <MealPlanJobIndicator />
-                      <MealPlanReadyModal />
-                      <DrinkJobIndicator />
-                      <DrinkReadyModal />
-                      <AIMealJobIndicator />
-                      <AIMealReadyModal />
-                      <Toaster />
-                    </TooltipProvider>
-                  </CartProvider>
+                  <PantryMealsJobProvider>
+                    <CartProvider>
+                      <TooltipProvider>
+                        <AppContent />
+                        <MealPlanJobIndicator />
+                        <MealPlanReadyModal />
+                        <DrinkJobIndicator />
+                        <DrinkReadyModal />
+                        <AIMealJobIndicator />
+                        <AIMealReadyModal />
+                        <PantryMealsJobIndicator />
+                        <PantryMealsReadyModal />
+                        <Toaster />
+                      </TooltipProvider>
+                    </CartProvider>
+                  </PantryMealsJobProvider>
                 </AIMealJobProvider>
               </DrinkJobProvider>
             </MealPlanJobProvider>
