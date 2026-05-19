@@ -9,7 +9,8 @@ import { Calendar, Sparkles, X, Plus, ChefHat, Clock, DollarSign, Globe, ArrowLe
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { createMealPlan, transformApiMealPlanToLocal } from "@/services/mealPlanService";
+import { createMealPlanJob } from "@/services/mealPlanJobService";
+import { useMealPlanJob } from "@/contexts/MealPlanJobContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanView from "./MealPlanView";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
@@ -50,6 +51,7 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
   const { toast } = useToast();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
   const { t } = useLanguage();
+  const { startJob } = useMealPlanJob();
 
   const availableDiets = [
     "vegetarian", "vegan", "keto", "paleo", "mediterranean", 
@@ -211,49 +213,25 @@ const MealPlanCreator = ({ onPlanCreated, onBack }: MealPlanCreatorProps) => {
       console.log('Creating meal plan with data:', requestData);
       console.log('Language being sent:', requestData.language);
 
-      const apiResponse = await createMealPlan(requestData);
-      console.log('API Response received:', apiResponse);
+      const { jobId } = await createMealPlanJob(requestData);
+      console.log('Meal plan job created:', jobId);
 
-      // Clear the timeout since we got a response
       if (timeout) {
         clearTimeout(timeout);
         setTimeoutId(null);
       }
 
-      // Hide the loader
       hideLoader();
 
-      // Check if the response indicates success - API returns the meal plan object directly
-      const isSuccess = apiResponse && apiResponse._id && apiResponse.plan;
+      startJob(jobId, requestData);
 
-      if (!isSuccess) {
-        throw new Error('Failed to create meal plan - invalid response format');
-      }
-
-      // Transform the API response to match our local format
-      const transformedPlan = transformApiMealPlanToLocal(apiResponse);
-      console.log('Transformed plan:', transformedPlan);
-
-      // Store the created plan
-      setCreatedPlan(transformedPlan);
-      
-      // Show success toast immediately
       toast({
-        title: "🎉 Meal Plan Created Successfully!",
-        description: `Your meal plan is ready to explore.`,
-        duration: 8000,
+        title: "🍳 Meal Plan Generation Started",
+        description: "We'll notify you as soon as it's ready. You can keep using the app.",
+        duration: 6000,
       });
 
-      console.log('Showing success modal with plan:', transformedPlan);
-      
-      // Show the success modal
-      setShowSuccessModal(true);
-
-      // Add to context
-      onPlanCreated(transformedPlan);
-
-      // Refresh meal plans from server
-      await refreshMealPlans();
+      onBack();
 
     } catch (error: any) {
       console.error('Error generating meal plan:', error);

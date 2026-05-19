@@ -17,10 +17,8 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import {
-  createMealPlan,
-  transformApiMealPlanToLocal,
-} from "@/services/mealPlanService";
+import { createMealPlanJob } from "@/services/mealPlanJobService";
+import { useMealPlanJob } from "@/contexts/MealPlanJobContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
@@ -77,6 +75,7 @@ const MealPlanCreatorStepper = ({
   const { language, t } = useLanguage();
   const { toast } = useToast();
   const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { startJob } = useMealPlanJob();
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -561,9 +560,9 @@ const MealPlanCreatorStepper = ({
         plan_description: planData.planDescription,
       };
 
-      console.log("Creating meal plan with data:", requestData);
+      console.log("Creating meal plan job with data:", requestData);
 
-      const apiResponse = await createMealPlan(requestData);
+      const { jobId } = await createMealPlanJob(requestData);
 
       if (timeout) {
         clearTimeout(timeout);
@@ -572,18 +571,15 @@ const MealPlanCreatorStepper = ({
 
       hideLoader();
 
-      const transformedPlan = transformApiMealPlanToLocal(apiResponse);
-      setCreatedPlan(transformedPlan);
+      startJob(jobId, requestData);
 
       toast({
-        title: "🎉 Meal Plan Created Successfully!",
-        description: "Your meal plan is ready to explore.",
-        duration: 8000,
+        title: "🍳 Meal Plan Generation Started",
+        description: "We'll notify you as soon as it's ready. You can keep using the app.",
+        duration: 6000,
       });
 
-      setShowSuccessModal(true);
-      onPlanCreated(transformedPlan);
-      await refreshMealPlans();
+      onBack();
     } catch (error: any) {
       console.error("Error generating meal plan:", error);
 
