@@ -1,0 +1,29 @@
+import { ChefHat, Loader2 } from "lucide-react";
+import { useMealPlanJob } from "@/contexts/MealPlanJobContext";
+
+const MealPlanJobIndicator = () => {
+  const { activeJob, isProcessing } = useMealPlanJob();
+
+  if (!isProcessing || !activeJob) return null;
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 max-w-xs animate-in slide-in-from-bottom-4">
+      <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600 to-emerald-700 px-4 py-3 shadow-2xl">
+        <div className="relative">
+          <ChefHat className="h-6 w-6 text-white" />
+          <Loader2 className="absolute -bottom-1 -right-1 h-3 w-3 animate-spin text-emerald-200" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white truncate">
+            Cooking your meal plan…
+          </p>
+          <p className="text-xs text-emerald-100 truncate">
+            {activeJob.requestData.plan_name || "We'll notify you when it's ready"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MealPlanJobIndicator;
