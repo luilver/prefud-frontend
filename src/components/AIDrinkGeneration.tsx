@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import CocktailAnimation from "./CocktailAnimation";
 import OrderOnlineModal from "./OrderOnlineModal";
 import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
-import { createHealthyDrink, ApiDrinkPlan } from "@/services/drinkService";
+import { createHealthyDrink, createHealthyDrinkJob, ApiDrinkPlan } from "@/services/drinkService";
+import { useDrinkJob } from "@/contexts/DrinkJobContext";
 import { addIngredientsToPantry } from "@/services/pantryService";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -32,6 +33,7 @@ const AIDrinkGeneration = ({ data, onDrinkCreated, initialDrink }: AIDrinkGenera
   const { user, addPantryItem } = useUser();
   const { language } = useLanguage();
   const { t } = useLanguage();
+  const { startJob } = useDrinkJob();
 
   useEffect(() => {
     // Don't auto-generate on mount, wait for user to trigger
@@ -79,46 +81,18 @@ const AIDrinkGeneration = ({ data, onDrinkCreated, initialDrink }: AIDrinkGenera
       };
 
       console.log('Generating drink with request data:', requestData);
-      
-      const apiResponse = await createHealthyDrink(requestData);
-      
-      // Transform API response to match our local format
-      const transformedDrink = {
-        name: apiResponse.healthyDrink.name,
-        type: apiResponse.healthyDrink.drinkType,
-        description: apiResponse.healthyDrink.description,
-        prepTime: `${apiResponse.healthyDrink.cookingTime} minutes`,
-        servings: data.numberPeople || 1,
-        calories: apiResponse.healthyDrink.calories,
-        ingredients: apiResponse.healthyDrink.ingredients.map(ing => ({
-          name: ing.name,
-          amount: `${ing.quantity} ${ing.unit}`,
-          category: apiResponse.ingredientsList.find(item => item.name === ing.name)?.classification || 'Other',
-          
-        })),
-        instructions: apiResponse.healthyDrink.steps,
-        nutritionHighlights: [
-          apiResponse.healthyDrink.benefits,
-          `Rich in vitamins: ${apiResponse.healthyDrink.nutritionalInfo.vitamins.join(', ')}`,
-          `${apiResponse.healthyDrink.nutritionalInfo.protein}g protein, ${apiResponse.healthyDrink.nutritionalInfo.fiber}g fiber`
-        ],
-        tips: [
-          apiResponse.healthyDrink.prepTip,
-          apiResponse.healthyDrink.instructions,
-          "Store in refrigerator and consume within 24 hours",
-          "Add ice for a refreshing cold drink"
-        ],
-        healthGoals: data.healthGoals || [],
-        dietaryRestrictions: data.dietaryRestrictions || [],
-        servingSize: data.numberPeople || 1,
-        apiData: apiResponse // Store original API data
-      };
 
-      setGeneratedDrink(transformedDrink);
-      setShoppingList(transformedDrink.ingredients);
+      const { jobId } = await createHealthyDrinkJob(requestData);
+      startJob(jobId, requestData);
       setIsGenerating(false);
-      
-      toast.success("Healthy drink was created successfully!");
+
+      toast.success(
+        (t("drinkStarted.title") || "Drink Generation Started") +
+          " — " +
+          (t("drinkStarted.description") ||
+            "We'll notify you when your healthy drink is ready."),
+        { duration: 5000 }
+      );
       
     } catch (error: any) {
       console.error('Error generating drink:', error);
