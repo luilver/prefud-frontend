@@ -17,10 +17,8 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import {
-  createMealPlan,
-  transformApiMealPlanToLocal,
-} from "@/services/mealPlanService";
+import { createMealPlanJob } from "@/services/mealPlanJobService";
+import { useMealPlanJob } from "@/contexts/MealPlanJobContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
