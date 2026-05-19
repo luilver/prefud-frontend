@@ -419,41 +419,18 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
         healthGoals: drinkData.healthGoals || [],
       };
 
-      const apiResponse = await createHealthyDrink(requestData);
-
-      const transformedDrink = {
-        name: apiResponse.healthyDrink.name,
-        type: apiResponse.healthyDrink.drinkType,
-        description: apiResponse.healthyDrink.description,
-        prepTime: `${apiResponse.healthyDrink.cookingTime} minutes`,
-        servings: drinkData.numberPeople || 1,
-        calories: apiResponse.healthyDrink.calories,
-        ingredients: apiResponse.healthyDrink.ingredients.map((ing: any) => ({
-          name: ing.name,
-          amount: `${ing.quantity} ${ing.unit}`,
-          category: apiResponse.ingredientsList.find((item: any) => item.name === ing.name)?.classification || 'Other',
-          price: `$${(Math.random() * 5 + 1).toFixed(2)}`
-        })),
-        instructions: apiResponse.healthyDrink.steps,
-        nutritionHighlights: [
-          apiResponse.healthyDrink.benefits,
-          `Rich in vitamins: ${apiResponse.healthyDrink.nutritionalInfo.vitamins.join(', ')}`,
-          `${apiResponse.healthyDrink.nutritionalInfo.protein}g protein, ${apiResponse.healthyDrink.nutritionalInfo.fiber}g fiber`
-        ],
-        tips: [
-          apiResponse.healthyDrink.prepTip,
-          apiResponse.healthyDrink.instructions,
-        ],
-        healthGoals: drinkData.healthGoals || [],
-        dietaryRestrictions: drinkData.dietaryRestrictions || [],
-        servingSize: drinkData.numberPeople || 1,
-        apiData: apiResponse,
-      };
+      const { jobId } = await createHealthyDrinkJob(requestData);
+      startJob(jobId, requestData);
 
       hideLoader();
-      setGeneratedDrink(transformedDrink);
-      setIsGenerating(true);
-      toast({ title: "✅", description: t("aiDrinkChat.drinkCreatedSuccess") || "Healthy drink created successfully!" });
+      toast({
+        title: "🥤 " + (t("drinkStarted.title") || "Drink Generation Started"),
+        description:
+          t("drinkStarted.description") ||
+          "We'll notify you when your healthy drink is ready.",
+        duration: 5000,
+      });
+      onBack();
 
     } catch (error: any) {
       hideLoader();
