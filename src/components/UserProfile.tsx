@@ -111,6 +111,7 @@ interface TrackingData {
   carbonTrak: CarbonTrack | null;
   healthGoals: HealthGoals | null;
 }
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -143,7 +144,7 @@ const UserProfile = () => {
       try {
         // Fetch subscription types
         const typesResponse = await axios.get(
-          "https://pantry-ms-brain.onrender.com/subscriptionType/all"
+          `${API_BASE_URL}/subscriptionType/all`
         );
         setSubscriptionTypes(typesResponse.data);
 
@@ -161,7 +162,7 @@ const UserProfile = () => {
       try {
         if (authUser?.userId) {
           const response = await axios.get(
-            `https://pantry-ms-brain.onrender.com/meal-plan/trakking/${authUser.userId}?type=all`
+            `${API_BASE_URL}/meal-plan/trakking/${authUser.userId}?type=all`
           );
           setTrackingData(response.data);
         }

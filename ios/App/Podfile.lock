@@ -1,6 +1,9 @@
 PODS:
   - Capacitor (8.0.1):
     - CapacitorCordova
+  - CapacitorCamera (8.2.0):
+    - Capacitor
+    - IONCameraLib (~> 1.0.4)
   - CapacitorCommunityTextToSpeech (8.0.0):
     - Capacitor
   - CapacitorCordova (8.0.1)
@@ -82,6 +85,7 @@ PODS:
   - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
+  - IONCameraLib (1.0.4)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -91,6 +95,7 @@ PODS:
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCamera (from `../../node_modules/@capacitor/camera`)"
   - "CapacitorCommunityTextToSpeech (from `../../node_modules/@capacitor-community/text-to-speech`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorFirebaseAnalytics (from `../../node_modules/@capacitor-firebase/analytics`)"
@@ -104,12 +109,15 @@ SPEC REPOS:
     - FirebaseInstallations
     - GoogleAppMeasurement
     - GoogleUtilities
+    - IONCameraLib
     - nanopb
     - PromisesObjC
 
 EXTERNAL SOURCES:
   Capacitor:
     :path: "../../node_modules/@capacitor/ios"
+  CapacitorCamera:
+    :path: "../../node_modules/@capacitor/camera"
   CapacitorCommunityTextToSpeech:
     :path: "../../node_modules/@capacitor-community/text-to-speech"
   CapacitorCordova:
@@ -119,6 +127,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Capacitor: 2d8b1a05870ddb600b0e1e32b83fcf0890c244e1
+  CapacitorCamera: a9b5f1a5d09e61b7a979e3510b87cdda99265d2f
   CapacitorCommunityTextToSpeech: 6b670df24de86c5de1c718b4411c77b548ea974a
   CapacitorCordova: 0d65b9bb74e995dcecb9463f34f1af2aba6f955c
   CapacitorFirebaseAnalytics: 5ea57fbddfc1af7f6078c850ef59f7c7eccbec00
@@ -128,9 +137,10 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 6d05424a046b68ca146b4de4376f05b4e9262fc3
   GoogleAppMeasurement: 8f59e08efecfa1bcd57f0a56fab07d079366268c
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
+  IONCameraLib: f2349804460bd9e3f892e42109b8d996ab3fa19d
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
 
-PODFILE CHECKSUM: a1ac88d6708be43f42bc754ef388b8fa106a0eab
+PODFILE CHECKSUM: 762fcf1d15eec8ef6a437b466ba74b2283083de4
 
 COCOAPODS: 1.16.2
