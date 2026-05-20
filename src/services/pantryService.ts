@@ -27,6 +27,46 @@ export interface PantryIngredient {
 
 const BASE_URL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
 
+export interface AnalyzeImageJobResponse {
+  jobId: string;
+}
+
+/**
+ * Submit an image (base64) to the analyze-image endpoint.
+ * Returns a jobId that is then resolved asynchronously via socket
+ * (generationCompleted / generationFailed).
+ */
+export const analyzeImageJob = async (
+  userId: string,
+  base64Image: string
+): Promise<AnalyzeImageJobResponse> => {
+  // Strip any data URL prefix (e.g. "data:image/png;base64,").
+  const cleanBase64 = base64Image.includes(",")
+    ? base64Image.split(",")[1]
+    : base64Image;
+
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  try {
+    const token = localStorage.getItem("authToken");
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+  } catch {}
+
+  const response = await axios.post(
+    `${BASE_URL}/meal-plan/analyze-image`,
+    { user_id: userId, image: cleanBase64 },
+    { headers }
+  );
+
+  const data = response.data;
+  console.log("analyzeImageJob response:", data);
+
+  if (!data?.jobId) {
+    throw new Error("Server did not return a jobId");
+  }
+
+  return { jobId: data.jobId };
+};
+
 export const updatePantry = async (
   userId: string,
   ingredients: Ingredient[]
