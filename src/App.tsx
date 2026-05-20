@@ -20,6 +20,9 @@ import AIMealReadyModal from "@/components/AIMealReadyModal";
 import { PantryMealsJobProvider } from "@/contexts/PantryMealsJobContext";
 import PantryMealsJobIndicator from "@/components/PantryMealsJobIndicator";
 import PantryMealsReadyModal from "@/components/PantryMealsReadyModal";
+import { AnalyzeImageJobProvider } from "@/contexts/AnalyzeImageJobContext";
+import AnalyzeImageJobIndicator from "@/components/AnalyzeImageJobIndicator";
+import AnalyzeImageReadyModal from "@/components/AnalyzeImageReadyModal";
 
 import Index from "@/pages/Index";
 import SignUp from "@/pages/SignUp";
@@ -76,20 +79,24 @@ const App = () => (
               <DrinkJobProvider>
                 <AIMealJobProvider>
                   <PantryMealsJobProvider>
-                    <CartProvider>
-                      <TooltipProvider>
-                        <AppContent />
-                        <MealPlanJobIndicator />
-                        <MealPlanReadyModal />
-                        <DrinkJobIndicator />
-                        <DrinkReadyModal />
-                        <AIMealJobIndicator />
-                        <AIMealReadyModal />
-                        <PantryMealsJobIndicator />
-                        <PantryMealsReadyModal />
-                        <Toaster />
-                      </TooltipProvider>
-                    </CartProvider>
+                    <AnalyzeImageJobProvider>
+                      <CartProvider>
+                        <TooltipProvider>
+                          <AppContent />
+                          <MealPlanJobIndicator />
+                          <MealPlanReadyModal />
+                          <DrinkJobIndicator />
+                          <DrinkReadyModal />
+                          <AIMealJobIndicator />
+                          <AIMealReadyModal />
+                          <PantryMealsJobIndicator />
+                          <PantryMealsReadyModal />
+                          <AnalyzeImageJobIndicator />
+                          <AnalyzeImageReadyModal />
+                          <Toaster />
+                        </TooltipProvider>
+                      </CartProvider>
+                    </AnalyzeImageJobProvider>
                   </PantryMealsJobProvider>
                 </AIMealJobProvider>
               </DrinkJobProvider>

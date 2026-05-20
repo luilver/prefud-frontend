@@ -587,6 +587,26 @@ const translations = {
     "pantryMealsStarted.title": "Meal Generation Started",
     "pantryMealsStarted.description":
       "We'll notify you when your pantry meal ideas are ready.",
+    "analyzeImageStarted.title": "Analyzing your image…",
+    "analyzeImageStarted.description":
+      "We'll notify you when ingredients are detected.",
+    "analyzeImageReady.title": "Ingredients Detected",
+    "analyzeImageReady.description":
+      "ingredients detected. Select which to add to your pantry.",
+    "analyzeImageReady.addSelected": "Add Selected to Pantry",
+    "analyzeImageReady.cancel": "Cancel",
+    "analyzeImageReady.selectedCount": "selected",
+    "analyzeImageReady.adding": "Adding…",
+    "analyzeImageReady.noneDetected": "No ingredients detected in the image.",
+    "addIngredient.scanWithCamera": "Scan ingredients with camera",
+    "addIngredient.scanWithCameraDesc":
+      "Take a photo or upload an image of your ingredients and we'll detect them automatically.",
+    "addIngredient.takePhoto": "Take Photo",
+    "addIngredient.uploadPhoto": "Upload Photo",
+    "addIngredient.analyzePhoto": "Analyze Photo",
+    "addIngredient.analyzing": "Analyzing…",
+    "addIngredient.retake": "Choose another",
+    "addIngredient.back": "Back",
     //new keys
     //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
@@ -2587,6 +2607,26 @@ const translations = {
     "pantryMealsStarted.title": "Generación de Comidas Iniciada",
     "pantryMealsStarted.description":
       "Te avisaremos cuando tus ideas de comidas estén listas.",
+    "analyzeImageStarted.title": "Analizando tu imagen…",
+    "analyzeImageStarted.description":
+      "Te avisaremos cuando detectemos los ingredientes.",
+    "analyzeImageReady.title": "Ingredientes Detectados",
+    "analyzeImageReady.description":
+      "ingredientes detectados. Selecciona cuáles añadir a tu despensa.",
+    "analyzeImageReady.addSelected": "Añadir Seleccionados",
+    "analyzeImageReady.cancel": "Cancelar",
+    "analyzeImageReady.selectedCount": "seleccionados",
+    "analyzeImageReady.adding": "Añadiendo…",
+    "analyzeImageReady.noneDetected": "No se detectaron ingredientes en la imagen.",
+    "addIngredient.scanWithCamera": "Escanear ingredientes con la cámara",
+    "addIngredient.scanWithCameraDesc":
+      "Toma una foto o sube una imagen de tus ingredientes y los detectaremos automáticamente.",
+    "addIngredient.takePhoto": "Tomar Foto",
+    "addIngredient.uploadPhoto": "Subir Foto",
+    "addIngredient.analyzePhoto": "Analizar Foto",
+    "addIngredient.analyzing": "Analizando…",
+    "addIngredient.retake": "Elegir otra",
+    "addIngredient.back": "Atrás",
     "days.sunday": "Domingo",
     "days.monday": "Lunes",
     "days.tuesday": "Martes",
@@ -4638,6 +4678,26 @@ const translations = {
     "pantryMealsStarted.title": "Geração de Refeições Iniciada",
     "pantryMealsStarted.description":
       "Avisaremos quando suas ideias de refeições estiverem prontas.",
+    "analyzeImageStarted.title": "Analisando sua imagem…",
+    "analyzeImageStarted.description":
+      "Avisaremos quando os ingredientes forem detectados.",
+    "analyzeImageReady.title": "Ingredientes Detectados",
+    "analyzeImageReady.description":
+      "ingredientes detectados. Selecione quais adicionar à sua despensa.",
+    "analyzeImageReady.addSelected": "Adicionar Selecionados",
+    "analyzeImageReady.cancel": "Cancelar",
+    "analyzeImageReady.selectedCount": "selecionados",
+    "analyzeImageReady.adding": "Adicionando…",
+    "analyzeImageReady.noneDetected": "Nenhum ingrediente detectado na imagem.",
+    "addIngredient.scanWithCamera": "Escanear ingredientes com a câmera",
+    "addIngredient.scanWithCameraDesc":
+      "Tire uma foto ou envie uma imagem dos seus ingredientes e os detectaremos automaticamente.",
+    "addIngredient.takePhoto": "Tirar Foto",
+    "addIngredient.uploadPhoto": "Enviar Foto",
+    "addIngredient.analyzePhoto": "Analisar Foto",
+    "addIngredient.analyzing": "Analisando…",
+    "addIngredient.retake": "Escolher outra",
+    "addIngredient.back": "Voltar",
 
     "days.sunday": "Domingo",
     "days.monday": "Segunda-feira",
