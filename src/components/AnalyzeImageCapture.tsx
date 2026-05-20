@@ -7,6 +7,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeImageJob } from "@/services/pantryService";
 import { useAnalyzeImageJob } from "@/contexts/AnalyzeImageJobContext";
+import { Camera as CapCamera, CameraResultType, CameraSource } from "@capacitor/camera";
 
 interface AnalyzeImageCaptureProps {
   onBack: () => void;
@@ -26,6 +27,53 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
 
   const ACCEPTED_MIME = ["image/png", "image/jpeg", "image/gif", "image/webp"];
   const ACCEPT_ATTR = ACCEPTED_MIME.join(",");
+
+  const dataUrlToFile = async (dataUrl: string, filename: string): Promise<File> => {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type || "image/jpeg" });
+  };
+
+  const handleTakePhoto = async () => {
+    try {
+      // Request permission explicitly (native). On web this resolves immediately.
+      try {
+        const perm = await CapCamera.checkPermissions();
+        if (perm.camera !== "granted") {
+          const req = await CapCamera.requestPermissions({ permissions: ["camera"] });
+          if (req.camera !== "granted" && req.camera !== "limited") {
+            toast({
+              title: t("addIngredient.error") || "Camera permission denied",
+              description: "Please allow camera access to take a photo.",
+              variant: "destructive",
+            });
+            return;
+          }
+        }
+      } catch {
+        // checkPermissions may throw on unsupported web browsers; ignore and try getPhoto
+      }
+
+      const photo = await CapCamera.getPhoto({
+        quality: 85,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        saveToGallery: false,
+      });
+
+      if (!photo?.dataUrl) return;
+      const ext = (photo.format || "jpeg").toLowerCase();
+      const file = await dataUrlToFile(photo.dataUrl, `photo-${Date.now()}.${ext}`);
+      handleFile(file);
+    } catch (err: any) {
+      // User cancellation throws — silently ignore those
+      const msg = String(err?.message || err || "");
+      if (/cancel|denied|dismissed/i.test(msg)) return;
+      // Fallback to native file input (mobile browsers will open camera)
+      cameraInputRef.current?.click();
+    }
+  };
 
   const handleFile = (file: File | null) => {
     if (!file) return;
@@ -148,7 +196,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
-              onClick={() => cameraInputRef.current?.click()}
+              onClick={handleTakePhoto}
               className="h-24 flex-col gap-2 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
             >
               <Camera className="h-7 w-7" />

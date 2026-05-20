@@ -11,6 +11,14 @@ import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantry
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
+const toDateInputValue = (iso: string) => {
+  try {
+    return format(new Date(iso), "yyyy-MM-dd");
+  } catch {
+    return "";
+  }
+};
+
 const AnalyzeImageReadyModal = () => {
   const { t } = useLanguage();
   const { readyIngredients, dismissReadyIngredients } = useAnalyzeImageJob();
@@ -160,9 +168,31 @@ const AnalyzeImageReadyModal = () => {
                       </span>
                     </div>
                     {ing.expiryDate && (
-                      <p className="text-xs text-muted-foreground">
-                        Expires {format(new Date(ing.expiryDate), "MMM d, yyyy")}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-muted-foreground shrink-0">
+                          Expires
+                        </label>
+                        <Input
+                          type="date"
+                          value={toDateInputValue(ing.expiryDate)}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (!v) return;
+                            const d = new Date(v);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const daysToExpire = Math.round(
+                              (d.getTime() - today.getTime()) / 86400000
+                            );
+                            updateItem(ing.id, {
+                              expiryDate: d.toISOString(),
+                              daysToExpire,
+                            });
+                          }}
+                          className="h-9 text-sm"
+                          disabled={!checked}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
