@@ -92,6 +92,7 @@ interface SubscriptionInfo {
   specialMeals: number;
   healthyDrinks: number;
   generateMeals: number;
+  processImages: number;
   _id: string;
   createdAt: string;
   updatedAt: string;
