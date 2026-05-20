@@ -24,8 +24,19 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
   const { t } = useLanguage();
   const { startJob } = useAnalyzeImageJob();
 
+  const ACCEPTED_MIME = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+  const ACCEPT_ATTR = ACCEPTED_MIME.join(",");
+
   const handleFile = (file: File | null) => {
     if (!file) return;
+    if (!ACCEPTED_MIME.includes(file.type)) {
+      toast({
+        title: t("addIngredient.error") || "Unsupported format",
+        description: "Only PNG, JPEG, GIF or WEBP images are allowed.",
+        variant: "destructive",
+      });
+      return;
+    }
     setFile(file);
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
@@ -86,7 +97,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
         <input
           ref={cameraInputRef}
           type="file"
-          accept="image/*"
+          accept={ACCEPT_ATTR}
           capture="environment"
           className="hidden"
           onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
@@ -94,7 +105,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
         <input
           ref={uploadInputRef}
           type="file"
-          accept="image/*"
+          accept={ACCEPT_ATTR}
           className="hidden"
           onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
         />
