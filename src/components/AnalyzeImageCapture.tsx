@@ -16,6 +16,7 @@ interface AnalyzeImageCaptureProps {
 const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps) => {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -25,13 +26,14 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
 
   const handleFile = (file: File | null) => {
     if (!file) return;
+    setFile(file);
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
   };
 
   const handleAnalyze = async () => {
-    if (!preview) return;
+    if (!file) return;
     if (!user?.id) {
       toast({
         title: t("addIngredient.error") || "Error",
@@ -42,7 +44,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
     }
     setIsSubmitting(true);
     try {
-      const { jobId } = await analyzeImageJob(user.id, preview);
+      const { jobId } = await analyzeImageJob(user.id, file, file.name);
       startJob(jobId);
       toast({
         title: t("analyzeImageStarted.title") || "Image Analysis Started",
@@ -108,7 +110,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => setPreview(null)}
+                onClick={() => { setPreview(null); setFile(null); }}
                 disabled={isSubmitting}
               >
                 {t("addIngredient.retake") || "Choose another"}
