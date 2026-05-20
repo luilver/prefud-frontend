@@ -76,7 +76,7 @@ interface CurrentSubscriptionInfo {
   specialMeals: number;
   healthyDrinks: number;
   generateMeals: number;
-  processImages: number;
+  processImages?: number;
   _id: string;
 }
 
