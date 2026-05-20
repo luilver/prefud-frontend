@@ -1,72 +1,37 @@
-## Analyze Image → Detected Ingredients (async jobId + socket)
+## Switch analyze-image to multipart/form-data upload
 
-Add a "Scan with camera" entry point at the top of the Add Ingredient modal that lets the user take a photo or upload one, sends it as base64 to `POST /meal-plan/analyze-image`, and processes the returned `jobId` through the same socket gateway as the other async flows.
+The endpoint now expects `multipart/form-data` with `userId` and a binary `image` file instead of JSON `{ user_id, image: base64 }`. The response shape (`{ jobId }`) and the socket flow are unchanged, so only the upload path needs to be adapted.
 
 ### 1. `src/services/pantryService.ts`
-- Add `analyzeImageJob(userId, base64Image) → { jobId }`:
-  - POST `${BASE_URL}/meal-plan/analyze-image` with `{ user_id, image }`.
-  - Strip any `data:image/...;base64,` prefix before sending.
-  - Send `Authorization: Bearer <token>` header when `localStorage.getItem("authToken")` exists.
-  - Throw on missing `jobId`.
+- Change `analyzeImageJob` signature to accept a `File | Blob` instead of a base64 string:
+  - `analyzeImageJob(userId: string, image: File | Blob, filename?: string) → { jobId }`
+- Build a `FormData`:
+  - `form.append("userId", userId)`
+  - `form.append("image", image, filename ?? (image as File).name ?? "photo.jpg")`
+- POST to `${BASE_URL}/meal-plan/analyze-image` with the FormData body.
+- Do NOT set `Content-Type` manually — let axios/browser set the correct `multipart/form-data; boundary=…`.
+- Keep the `Authorization: Bearer <token>` header when `localStorage.authToken` exists.
+- Keep the `jobId` validation and error throw.
+- Remove the base64 stripping logic (no longer needed).
 
-### 2. `src/contexts/AnalyzeImageJobContext.tsx` (new)
-- Same shape as `PantryMealsJobContext`: `activeJob` persisted in `localStorage` (`pantry.activeAnalyzeImageJob`), `isProcessing`, `startJob(jobId)`, `clearJob`, `readyIngredients: PantryIngredient[] | null`, `dismissReadyIngredients`.
-- Subscribes via `connectJobSocket(jobId)` (existing shared gateway, same three events).
-- `onCompleted`: `payload.result` is already an array of `PantryIngredient`-shaped objects (`name, quantity, unit, category, purchased, purchaseDate, carbonFootPrintToWaste, daysToExpire, expiryDate, notes`). Stash array → `readyIngredients`, then `clearJob()`. If empty array, toast "No ingredients detected" and clear.
-- `onFailed`: destructive toast, clear.
+### 2. `src/components/AnalyzeImageCapture.tsx`
+- Keep the two entry points (Take Photo / Upload Photo) and the preview UX as-is.
+- Track the picked `File` in state alongside the data-URL preview:
+  - `const [file, setFile] = useState<File | null>(null);`
+  - `const [preview, setPreview] = useState<string | null>(null);`
+  - In `handleFile`: store the `File` and generate a data-URL only for the `<img>` preview.
+- In `handleAnalyze`: call `analyzeImageJob(user.id, file, file.name)` instead of passing the base64 string.
+- On "Choose another": reset both `file` and `preview`.
 
-### 3. `src/components/AnalyzeImageJobIndicator.tsx` (new)
-- Top-center fixed loader (same style as the others), `Camera` + spinner, "Analyzing your image…".
-
-### 4. `src/components/AnalyzeImageReadyModal.tsx` (new)
-- Dialog showing the detected list with checkboxes (all selected by default), name, quantity + unit, category, expiry date.
-- Buttons:
-  - "Add Selected to Pantry" → assigns ids and calls `addIngredientsToPantry(user.id, selected)`, then dispatches `CustomEvent("pantry:ingredients-added", { detail: { ingredients: selected } })` and `dismissReadyIngredients()`.
-  - "Cancel" → `dismissReadyIngredients()`.
-- Translation keys: `analyzeImageReady.*`.
-
-### 5. `src/components/AnalyzeImageCapture.tsx` (new)
-- Inline panel rendered above the form rows when the user taps "Scan with camera".
-- Two buttons:
-  - "Take Photo" → hidden `<input type="file" accept="image/*" capture="environment">`.
-  - "Upload Photo" → hidden `<input type="file" accept="image/*">`.
-- On file picked: read as data URL, show small preview, "Analyze" button to confirm. On confirm: convert to pure base64, call `analyzeImageJob(user.id, base64)` → `startJob(jobId)`, show 5s toast "Image Analysis Started — We'll notify you when ingredients are detected", then call `onClose()` to close the parent Add Ingredient modal.
-- Loading state with spinner while POST is in flight.
-
-### 6. `src/components/AddIngredientForm.tsx`
-- Add a primary "Scan ingredients with camera" button at the top (above the first ingredient row, full-width, emerald gradient with `Camera` icon).
-- Add state `showAnalyzeImage`. When true, render `AnalyzeImageCapture` in place of the form (mirrors existing `showCamera` / `CameraProductScanner` pattern).
-- `AnalyzeImageCapture` receives `onClose={() => setShowAnalyzeImage(false)}` and `onJobStarted={onClose}` so the whole Add Ingredient dialog closes once the job is queued.
-- Translation keys: `addIngredient.scanWithCamera`, `addIngredient.scanWithCameraDesc`.
-
-### 7. `src/components/IngredientTracker.tsx`
-- Add `useEffect` listener for `pantry:ingredients-added` → refresh local pantry list (re-run the same fetch the component already uses on mount, e.g. by bumping a `refreshKey` or calling the existing loader).
-
-### 8. `src/App.tsx`
-- Wrap tree with `<AnalyzeImageJobProvider>` alongside the other job providers.
-- Render `<AnalyzeImageJobIndicator />` and `<AnalyzeImageReadyModal />`.
-
-### 9. Translations — `src/contexts/LanguageContext.tsx`
-- EN / ES / PT flat dot-notation keys:
-  - `addIngredient.scanWithCamera`, `addIngredient.scanWithCameraDesc`, `addIngredient.takePhoto`, `addIngredient.uploadPhoto`, `addIngredient.analyzePhoto`
-  - `analyzeImageStarted.title`, `analyzeImageStarted.description`
-  - `analyzeImageReady.title`, `analyzeImageReady.description`, `analyzeImageReady.addSelected`, `analyzeImageReady.cancel`, `analyzeImageReady.noneDetected`, `analyzeImageReady.selectedCount`
+### 3. No changes required
+- `src/contexts/AnalyzeImageJobContext.tsx` — socket events, `normalizeIngredients`, and `readyIngredients` flow are unchanged because the response shape is the same.
+- `src/components/AnalyzeImageReadyModal.tsx`, `AnalyzeImageJobIndicator.tsx`, `AddIngredientForm.tsx`, `IngredientTracker.tsx`, `App.tsx`, `LanguageContext.tsx` — untouched.
 
 ### Technical notes
-- The endpoint expects raw base64 (no `data:` prefix); the service strips it.
-- `Authorization: Bearer …` is sent only when `authToken` exists in `localStorage`; falls back to no header to stay consistent with the rest of `pantryService` calls.
-- Reuses the existing `connectJobSocket`; no new socket file.
-- `payload.result` is already in `PantryIngredient` shape — pass straight to `addIngredientsToPantry`.
-- Job persisted in `localStorage` so the indicator resumes on reload.
-- Capture via `<input type="file" capture="environment">` works on iOS/Android Capacitor and web without requiring `getUserMedia` plumbing; matches the project's mobile-first constraint.
+- Using native `FormData` + `File` keeps the request browser-native; `<input type="file" accept="image/*" capture="environment">` already returns a `File`, which axios sends as binary inside the multipart part — matching the `curl --form 'image=@…'` shape.
+- Letting axios infer the `Content-Type` ensures the multipart boundary is correct; manually setting `multipart/form-data` would break the request.
+- Auth header behavior, `jobId` handling, and socket subscription stay identical, so the indicator + ready-modal flow continues to work unchanged.
 
 ### Files touched
-- new  `src/services/pantryService.ts` (added export)
-- new  `src/contexts/AnalyzeImageJobContext.tsx`
-- new  `src/components/AnalyzeImageJobIndicator.tsx`
-- new  `src/components/AnalyzeImageReadyModal.tsx`
-- new  `src/components/AnalyzeImageCapture.tsx`
-- edit `src/components/AddIngredientForm.tsx`
-- edit `src/components/IngredientTracker.tsx`
-- edit `src/App.tsx`
-- edit `src/contexts/LanguageContext.tsx`
+- edit `src/services/pantryService.ts`
+- edit `src/components/AnalyzeImageCapture.tsx`

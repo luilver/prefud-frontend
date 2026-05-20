@@ -38,14 +38,16 @@ export interface AnalyzeImageJobResponse {
  */
 export const analyzeImageJob = async (
   userId: string,
-  base64Image: string
+  image: File | Blob,
+  filename?: string
 ): Promise<AnalyzeImageJobResponse> => {
-  // Strip any data URL prefix (e.g. "data:image/png;base64,").
-  const cleanBase64 = base64Image.includes(",")
-    ? base64Image.split(",")[1]
-    : base64Image;
+  const form = new FormData();
+  form.append("userId", userId);
+  const finalName =
+    filename || (image as File).name || "photo.jpg";
+  form.append("image", image, finalName);
 
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {};
   try {
     const token = localStorage.getItem("authToken");
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -53,7 +55,7 @@ export const analyzeImageJob = async (
 
   const response = await axios.post(
     `${BASE_URL}/meal-plan/analyze-image`,
-    { user_id: userId, image: cleanBase64 },
+    form,
     { headers }
   );
 
