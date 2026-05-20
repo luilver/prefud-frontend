@@ -283,6 +283,8 @@ const translations = {
     "profile.active": "Active",
     "profile.cancelSubscription": "Cancel Subscription",
     "profile.subscriptionDesc": "Your current plan usage and limits",
+    "profile.processImages": "Process Images",
+    "profile.processImagesDesc": "Image ingredient scans",
 
     // Delete Account
     "profile.deleteAccount.section": "Danger Zone",
@@ -2287,6 +2289,8 @@ const translations = {
     "profile.active": "Activo",
     "profile.cancelSubscription": "Cancelar suscripción",
     "profile.subscriptionDesc": "Límites y uso de su plan actual",
+    "profile.processImages": "Procesar Imágenes",
+    "profile.processImagesDesc": "Escaneos de ingredientes por imagen",
 
     // Delete Account
     "profile.deleteAccount.section": "Zona de Peligro",
@@ -4359,6 +4363,8 @@ const translations = {
     "profile.active": "Ativo",
     "profile.cancelSubscription": "Cancelar Assinatura",
     "profile.subscriptionDesc": "Limites e uso do seu plano atual",
+    "profile.processImages": "Processar Imagens",
+    "profile.processImagesDesc": "Escaneamentos de ingredientes por imagem",
 
     // Delete Account
     "profile.deleteAccount.section": "Zona de Perigo",
