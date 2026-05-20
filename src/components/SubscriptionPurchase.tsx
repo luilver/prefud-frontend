@@ -73,6 +73,7 @@ const SubscriptionPurchase = ({ onBack }: SubscriptionPurchaseProps) => {
           `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
           `${apiPlan.healthyDrinks} Healthy Drinks per month`,
           `${apiPlan.specialMeals} Special Meals per month`,
+          `${apiPlan.processImages ?? 0} Process Images per month`,
         ];
 
         if (apiPlan.name.toLowerCase() === "family") {
