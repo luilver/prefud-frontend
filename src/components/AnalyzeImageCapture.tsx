@@ -7,7 +7,6 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeImageJob } from "@/services/pantryService";
 import { useAnalyzeImageJob } from "@/contexts/AnalyzeImageJobContext";
-import { Camera as CapCamera, CameraResultType, CameraSource } from "@capacitor/camera";
 
 interface AnalyzeImageCaptureProps {
   onBack: () => void;
@@ -36,6 +35,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
 
   const handleTakePhoto = async () => {
     try {
+      const { Camera: CapCamera, CameraResultType, CameraSource } = await import("@capacitor/camera");
       // Request permission explicitly (native). On web this resolves immediately.
       try {
         const perm = await CapCamera.checkPermissions();
