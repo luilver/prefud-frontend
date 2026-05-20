@@ -196,7 +196,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
-              onClick={() => cameraInputRef.current?.click()}
+              onClick={handleTakePhoto}
               className="h-24 flex-col gap-2 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
             >
               <Camera className="h-7 w-7" />
