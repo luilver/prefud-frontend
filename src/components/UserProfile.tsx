@@ -63,7 +63,7 @@ interface SubscriptionType {
   healthyDrinks: number;
   specialMeals: number;
   generatedMeals: number;
-  processImages: number;
+  processImages?: number;
 }
 
 interface CurrentSubscriptionInfo {
