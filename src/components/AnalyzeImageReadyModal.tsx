@@ -7,7 +7,7 @@ import { CheckCircle, Sparkles, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAnalyzeImageJob } from "@/contexts/AnalyzeImageJobContext";
 import { useUser } from "@/contexts/UserContext";
-import { addIngredientsToPantry } from "@/services/pantryService";
+import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
