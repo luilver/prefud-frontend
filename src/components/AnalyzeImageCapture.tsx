@@ -7,7 +7,6 @@ import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { analyzeImageJob } from "@/services/pantryService";
 import { useAnalyzeImageJob } from "@/contexts/AnalyzeImageJobContext";
-import { Camera as CapCamera, CameraResultType, CameraSource } from "@capacitor/camera";
 
 interface AnalyzeImageCaptureProps {
   onBack: () => void;
