@@ -547,83 +547,88 @@ const UserProfile = () => {
                 <p className="text-sm text-muted-foreground mb-4">
                   {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
                 </p>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Meal Plans */}
-              <div className="bg-white rounded-lg p-4 border border-emerald-100">
-                <div className="flex items-center justify-between mb-2">
-                  <Calendar className="h-5 w-5 text-emerald-600" />
-                  <div className="text-right">
-                    <span className="text-xl font-bold text-emerald-600">
-                      {currentSubscriptionInfo?.mealPlans || 0}
-                    </span>
-                    {currentSubscriptionType && (
-                      <span className="text-lg text-gray-400">
-                        /{currentSubscriptionType.mealPlans}
-                      </span>
-                    )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {[
+                {
+                  icon: Calendar,
+                  label: "Meal Plans",
+                  desc: "Available this month",
+                  remaining: currentSubscriptionInfo?.mealPlans,
+                  limit: currentSubscriptionType?.mealPlans,
+                  color: "emerald",
+                },
+                {
+                  icon: Star,
+                  label: "Special Meals",
+                  desc: "Premium recipes",
+                  remaining: currentSubscriptionInfo?.specialMeals,
+                  limit: currentSubscriptionType?.specialMeals,
+                  color: "teal",
+                },
+                {
+                  icon: Coffee,
+                  label: "Healthy Drinks",
+                  desc: "Custom beverages",
+                  remaining: currentSubscriptionInfo?.healthyDrinks,
+                  limit: currentSubscriptionType?.healthyDrinks,
+                  color: "cyan",
+                },
+                {
+                  icon: ChefHat,
+                  label: "Generated Meals",
+                  desc: "AI-powered recipes",
+                  remaining: currentSubscriptionInfo?.generateMeals,
+                  limit: currentSubscriptionType?.generatedMeals,
+                  color: "orange",
+                },
+                {
+                  icon: Camera,
+                  label: t("profile.processImages") || "Process Images",
+                  desc: t("profile.processImagesDesc") || "Image ingredient scans",
+                  remaining: currentSubscriptionInfo?.processImages,
+                  limit: currentSubscriptionType?.processImages,
+                  color: "violet",
+                },
+              ].map((card, idx) => {
+                const Icon = card.icon;
+                const remaining = card.remaining ?? 0;
+                const limit = card.limit ?? 0;
+                const pct = limit > 0 ? Math.min(100, Math.round((remaining / limit) * 100)) : 0;
+                const palette: Record<string, { ring: string; bg: string; badgeBg: string; text: string; bar: string; from: string }> = {
+                  emerald: { ring: "border-emerald-100", bg: "from-emerald-50", badgeBg: "bg-emerald-100", text: "text-emerald-600", bar: "bg-emerald-500", from: "" },
+                  teal:    { ring: "border-teal-100",    bg: "from-teal-50",    badgeBg: "bg-teal-100",    text: "text-teal-600",    bar: "bg-teal-500",    from: "" },
+                  cyan:    { ring: "border-cyan-100",    bg: "from-cyan-50",    badgeBg: "bg-cyan-100",    text: "text-cyan-600",    bar: "bg-cyan-500",    from: "" },
+                  orange:  { ring: "border-orange-100",  bg: "from-orange-50",  badgeBg: "bg-orange-100",  text: "text-orange-600",  bar: "bg-orange-500",  from: "" },
+                  violet:  { ring: "border-violet-100",  bg: "from-violet-50",  badgeBg: "bg-violet-100",  text: "text-violet-600",  bar: "bg-violet-500",  from: "" },
+                };
+                const c = palette[card.color];
+                return (
+                  <div
+                    key={idx}
+                    className={`group bg-gradient-to-br ${c.bg} to-white rounded-xl p-4 border ${c.ring} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between ${idx === 4 ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""}`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`h-9 w-9 rounded-full ${c.badgeBg} flex items-center justify-center`}>
+                        <Icon className={`h-4 w-4 ${c.text}`} />
+                      </div>
+                      <div className="text-right leading-none">
+                        <span className={`text-2xl font-bold ${c.text}`}>{remaining}</span>
+                        {currentSubscriptionType && (
+                          <span className="text-sm text-muted-foreground">/{limit}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800 leading-tight">{card.label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{card.desc}</p>
+                      <div className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                        <div className={`h-full ${c.bar} transition-all duration-500`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <p className="text-sm font-medium text-gray-700">Meal Plans</p>
-                <p className="text-xs text-gray-500">Available this month</p>
-              </div>
-
-              {/* Special Meals */}
-              <div className="bg-white rounded-lg p-4 border border-teal-100">
-                <div className="flex items-center justify-between mb-2">
-                  <Star className="h-5 w-5 text-teal-600" />
-                  <div className="text-right">
-                    <span className="text-xl font-bold text-teal-600">
-                      {currentSubscriptionInfo?.specialMeals || 0}
-                    </span>
-                    {currentSubscriptionType && (
-                      <span className="text-lg text-gray-400">
-                        /{currentSubscriptionType.specialMeals}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-gray-700">Special Meals</p>
-                <p className="text-xs text-gray-500">Premium recipes</p>
-              </div>
-
-              {/* Healthy Drinks */}
-              <div className="bg-white rounded-lg p-4 border border-cyan-100">
-                <div className="flex items-center justify-between mb-2">
-                  <Coffee className="h-5 w-5 text-cyan-600" />
-                  <div className="text-right">
-                    <span className="text-xl font-bold text-cyan-600">
-                      {currentSubscriptionInfo?.healthyDrinks || 0}
-                    </span>
-                    {currentSubscriptionType && (
-                      <span className="text-lg text-gray-400">
-                        /{currentSubscriptionType.healthyDrinks}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-gray-700">Healthy Drinks</p>
-                <p className="text-xs text-gray-500">Custom beverages</p>
-              </div>
-
-            {/* Generated Meals */}
-            <div className="bg-white rounded-lg p-4 border border-orange-100">
-              <div className="flex items-center justify-between mb-2">
-                <ChefHat className="h-5 w-5 text-orange-600" />
-                 <div className="text-right">
-                   <span className="text-xl font-bold text-orange-600">
-                     {currentSubscriptionInfo?.generateMeals || 0}
-                   </span>
-                   {currentSubscriptionType && (
-                     <span className="text-lg text-gray-400">
-                       /{currentSubscriptionType.generatedMeals}
-                     </span>
-                   )}
-                 </div>
-              </div>
-              <p className="text-sm font-medium text-gray-700">Generated Meals</p>
-              <p className="text-xs text-gray-500">AI-powered recipes</p>
+                );
+              })}
             </div>
-          </div>
 
             {/* Subscription Status */}
             <div className="mt-6 p-4 bg-white rounded-lg border">
