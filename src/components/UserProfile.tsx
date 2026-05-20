@@ -42,6 +42,7 @@ import {
   TrendingDown,
   Activity,
   Heart,
+  Camera,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -62,6 +63,7 @@ interface SubscriptionType {
   healthyDrinks: number;
   specialMeals: number;
   generatedMeals: number;
+  processImages: number;
 }
 
 interface CurrentSubscriptionInfo {
@@ -74,6 +76,7 @@ interface CurrentSubscriptionInfo {
   specialMeals: number;
   healthyDrinks: number;
   generateMeals: number;
+  processImages: number;
   _id: string;
 }
 
