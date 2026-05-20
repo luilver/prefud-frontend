@@ -11,6 +11,7 @@ interface SubscriptionInfo {
   specialMeals: number;
   healthyDrinks: number;
   generateMeals: number;
+  processImages: number;
   _id: string;
   createdAt: string;
   updatedAt: string;
@@ -26,6 +27,7 @@ interface SubscriptionContextType {
   canCreateSpecialMeal: boolean;
   canCreateHealthyDrink: boolean;
   canGenerateMeal: boolean;
+  canProcessImage: boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -88,6 +90,7 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
   const canCreateSpecialMeal = subscription ? subscription.specialMeals > 0 : false;
   const canCreateHealthyDrink = subscription ? subscription.healthyDrinks > 0 : false;
   const canGenerateMeal = subscription ? subscription.generateMeals > 0 : false;
+  const canProcessImage = subscription ? (subscription.processImages ?? 0) > 0 : false;
 
   const value = {
     subscription,
@@ -98,6 +101,7 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
     canCreateSpecialMeal,
     canCreateHealthyDrink,
     canGenerateMeal,
+    canProcessImage,
   };
 
   return (
