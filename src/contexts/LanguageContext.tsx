@@ -2607,6 +2607,26 @@ const translations = {
     "pantryMealsStarted.title": "Generación de Comidas Iniciada",
     "pantryMealsStarted.description":
       "Te avisaremos cuando tus ideas de comidas estén listas.",
+    "analyzeImageStarted.title": "Analizando tu imagen…",
+    "analyzeImageStarted.description":
+      "Te avisaremos cuando detectemos los ingredientes.",
+    "analyzeImageReady.title": "Ingredientes Detectados",
+    "analyzeImageReady.description":
+      "ingredientes detectados. Selecciona cuáles añadir a tu despensa.",
+    "analyzeImageReady.addSelected": "Añadir Seleccionados",
+    "analyzeImageReady.cancel": "Cancelar",
+    "analyzeImageReady.selectedCount": "seleccionados",
+    "analyzeImageReady.adding": "Añadiendo…",
+    "analyzeImageReady.noneDetected": "No se detectaron ingredientes en la imagen.",
+    "addIngredient.scanWithCamera": "Escanear ingredientes con la cámara",
+    "addIngredient.scanWithCameraDesc":
+      "Toma una foto o sube una imagen de tus ingredientes y los detectaremos automáticamente.",
+    "addIngredient.takePhoto": "Tomar Foto",
+    "addIngredient.uploadPhoto": "Subir Foto",
+    "addIngredient.analyzePhoto": "Analizar Foto",
+    "addIngredient.analyzing": "Analizando…",
+    "addIngredient.retake": "Elegir otra",
+    "addIngredient.back": "Atrás",
     "days.sunday": "Domingo",
     "days.monday": "Lunes",
     "days.tuesday": "Martes",
