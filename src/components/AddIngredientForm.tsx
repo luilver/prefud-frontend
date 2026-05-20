@@ -32,6 +32,7 @@ import {
 } from "@/services/pantryService";
 import { useLanguage } from "@/contexts/LanguageContext";
 import CameraProductScanner from "./CameraProductScanner";
+import AnalyzeImageCapture from "./AnalyzeImageCapture";
 
 interface IngredientFormData {
   name: string;
@@ -60,6 +61,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
   }]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [showAnalyzeImage, setShowAnalyzeImage] = useState(false);
   const [cameraIngredientIndex, setCameraIngredientIndex] = useState(0);
   const { toast } = useToast();
   const { user } = useUser();
@@ -235,6 +237,15 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
     );
   }
 
+  if (showAnalyzeImage) {
+    return (
+      <AnalyzeImageCapture
+        onBack={() => setShowAnalyzeImage(false)}
+        onJobStarted={onClose}
+      />
+    );
+  }
+
   return (
     <Card className="bg-white/90 backdrop-blur-sm border-green-200">
       <CardHeader>
@@ -248,6 +259,14 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <Button
+            type="button"
+            onClick={() => setShowAnalyzeImage(true)}
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/30"
+          >
+            <Camera className="h-4 w-4 mr-2" />
+            {t("addIngredient.scanWithCamera") || "Scan ingredients with camera"}
+          </Button>
           {ingredients.map((ingredient, index) => (
             <div key={index} className="border border-green-200 rounded-lg p-4 space-y-4">
               <div className="flex items-center justify-between">
