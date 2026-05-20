@@ -587,6 +587,26 @@ const translations = {
     "pantryMealsStarted.title": "Meal Generation Started",
     "pantryMealsStarted.description":
       "We'll notify you when your pantry meal ideas are ready.",
+    "analyzeImageStarted.title": "Analyzing your image…",
+    "analyzeImageStarted.description":
+      "We'll notify you when ingredients are detected.",
+    "analyzeImageReady.title": "Ingredients Detected",
+    "analyzeImageReady.description":
+      "ingredients detected. Select which to add to your pantry.",
+    "analyzeImageReady.addSelected": "Add Selected to Pantry",
+    "analyzeImageReady.cancel": "Cancel",
+    "analyzeImageReady.selectedCount": "selected",
+    "analyzeImageReady.adding": "Adding…",
+    "analyzeImageReady.noneDetected": "No ingredients detected in the image.",
+    "addIngredient.scanWithCamera": "Scan ingredients with camera",
+    "addIngredient.scanWithCameraDesc":
+      "Take a photo or upload an image of your ingredients and we'll detect them automatically.",
+    "addIngredient.takePhoto": "Take Photo",
+    "addIngredient.uploadPhoto": "Upload Photo",
+    "addIngredient.analyzePhoto": "Analyze Photo",
+    "addIngredient.analyzing": "Analyzing…",
+    "addIngredient.retake": "Choose another",
+    "addIngredient.back": "Back",
     //new keys
     //Checkout and cart
     "mealPlanView.addToCart": "Add to Cart",
