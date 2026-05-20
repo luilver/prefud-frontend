@@ -124,6 +124,16 @@ const IngredientTracker = () => {
   }, [user?.id]);
 
   useEffect(() => {
+    const handler = () => {
+      console.log("pantry:ingredients-added event received, refreshing pantry");
+      fetchPantryItems();
+    };
+    window.addEventListener("pantry:ingredients-added", handler);
+    return () => window.removeEventListener("pantry:ingredients-added", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  useEffect(() => {
     console.log("Ingredients updated in IngredientTracker:", ingredients);
   }, [ingredients]);
 
