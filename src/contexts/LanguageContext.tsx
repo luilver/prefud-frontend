@@ -2289,6 +2289,8 @@ const translations = {
     "profile.active": "Activo",
     "profile.cancelSubscription": "Cancelar suscripción",
     "profile.subscriptionDesc": "Límites y uso de su plan actual",
+    "profile.processImages": "Procesar Imágenes",
+    "profile.processImagesDesc": "Escaneos de ingredientes por imagen",
 
     // Delete Account
     "profile.deleteAccount.section": "Zona de Peligro",
