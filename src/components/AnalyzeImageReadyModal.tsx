@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { CheckCircle, Sparkles, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAnalyzeImageJob } from "@/contexts/AnalyzeImageJobContext";
 import { useUser } from "@/contexts/UserContext";
-import { addIngredientsToPantry } from "@/services/pantryService";
+import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
@@ -16,13 +17,16 @@ const AnalyzeImageReadyModal = () => {
   const { user } = useUser();
   const { toast } = useToast();
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [items, setItems] = useState<PantryIngredient[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (readyIngredients) {
       setSelected(new Set(readyIngredients.map((i) => i.id)));
+      setItems(readyIngredients.map((i) => ({ ...i })));
     } else {
       setSelected(new Set());
+      setItems([]);
     }
   }, [readyIngredients]);
 
@@ -37,6 +41,10 @@ const AnalyzeImageReadyModal = () => {
     });
   };
 
+  const updateItem = (id: string, patch: Partial<PantryIngredient>) => {
+    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patch } : it)));
+  };
+
   const handleAdd = async () => {
     if (!user?.id) {
       toast({
@@ -46,9 +54,20 @@ const AnalyzeImageReadyModal = () => {
       });
       return;
     }
-    const chosen = readyIngredients.filter((i) => selected.has(i.id));
+    const chosen = items.filter((i) => selected.has(i.id));
     if (chosen.length === 0) {
       dismissReadyIngredients();
+      return;
+    }
+    const invalid = chosen.find(
+      (i) => !i.name.trim() || !(Number(i.quantity) > 0)
+    );
+    if (invalid) {
+      toast({
+        title: t("addIngredient.error") || "Error",
+        description: "Each selected ingredient needs a name and quantity greater than 0.",
+        variant: "destructive",
+      });
       return;
     }
     setIsSaving(true);
@@ -93,30 +112,60 @@ const AnalyzeImageReadyModal = () => {
 
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground text-center">
-            {readyIngredients.length} {t("analyzeImageReady.description") || "ingredients detected. Select which to add to your pantry."}
+            {items.length} {t("analyzeImageReady.description") || "ingredients detected. Edit and select which to add to your pantry."}
           </p>
 
           <div className="space-y-2 max-h-72 overflow-y-auto rounded-lg border border-emerald-100 p-2">
-            {readyIngredients.map((ing) => {
+            {items.map((ing) => {
               const checked = selected.has(ing.id);
               return (
-                <label
+                <div
                   key={ing.id}
-                  className="flex items-start gap-3 rounded-md p-2 hover:bg-emerald-50 cursor-pointer"
+                  className="flex items-start gap-3 rounded-md p-2 hover:bg-emerald-50"
                 >
-                  <Checkbox checked={checked} onCheckedChange={() => toggle(ing.id)} className="mt-1" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm capitalize truncate">{ing.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {ing.quantity} {ing.unit} · <span className="capitalize">{ing.category}</span>
-                    </p>
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={() => toggle(ing.id)}
+                    className="mt-3"
+                  />
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    <Input
+                      value={ing.name}
+                      onChange={(e) => updateItem(ing.id, { name: e.target.value })}
+                      placeholder="Name"
+                      className="h-9 text-sm capitalize"
+                      disabled={!checked}
+                    />
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        min={0}
+                        step={0.1}
+                        value={ing.quantity}
+                        onChange={(e) =>
+                          updateItem(ing.id, { quantity: parseFloat(e.target.value) || 0 })
+                        }
+                        className="h-9 text-sm w-24"
+                        disabled={!checked}
+                      />
+                      <Input
+                        value={ing.unit}
+                        onChange={(e) => updateItem(ing.id, { unit: e.target.value })}
+                        placeholder="unit"
+                        className="h-9 text-sm w-24"
+                        disabled={!checked}
+                      />
+                      <span className="flex-1 text-xs text-muted-foreground self-center capitalize truncate">
+                        {ing.category}
+                      </span>
+                    </div>
                     {ing.expiryDate && (
                       <p className="text-xs text-muted-foreground">
                         Expires {format(new Date(ing.expiryDate), "MMM d, yyyy")}
                       </p>
                     )}
                   </div>
-                </label>
+                </div>
               );
             })}
           </div>

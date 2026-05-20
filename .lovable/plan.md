@@ -1,37 +1,32 @@
-## Switch analyze-image to multipart/form-data upload
+## Goal
+Let the user edit detected ingredients (name + quantity, plus unit) in the "Ingredients Detected" modal before adding them to the pantry.
 
-The endpoint now expects `multipart/form-data` with `userId` and a binary `image` file instead of JSON `{ user_id, image: base64 }`. The response shape (`{ jobId }`) and the socket flow are unchanged, so only the upload path needs to be adapted.
+## Scope
+Single file change: `src/components/AnalyzeImageReadyModal.tsx`. No backend, socket, or service changes — the modal already receives the normalized list and calls `addIngredientsToPantry` on confirm.
 
-### 1. `src/services/pantryService.ts`
-- Change `analyzeImageJob` signature to accept a `File | Blob` instead of a base64 string:
-  - `analyzeImageJob(userId: string, image: File | Blob, filename?: string) → { jobId }`
-- Build a `FormData`:
-  - `form.append("userId", userId)`
-  - `form.append("image", image, filename ?? (image as File).name ?? "photo.jpg")`
-- POST to `${BASE_URL}/meal-plan/analyze-image` with the FormData body.
-- Do NOT set `Content-Type` manually — let axios/browser set the correct `multipart/form-data; boundary=…`.
-- Keep the `Authorization: Bearer <token>` header when `localStorage.authToken` exists.
-- Keep the `jobId` validation and error throw.
-- Remove the base64 stripping logic (no longer needed).
+## Changes
 
-### 2. `src/components/AnalyzeImageCapture.tsx`
-- Keep the two entry points (Take Photo / Upload Photo) and the preview UX as-is.
-- Track the picked `File` in state alongside the data-URL preview:
-  - `const [file, setFile] = useState<File | null>(null);`
-  - `const [preview, setPreview] = useState<string | null>(null);`
-  - In `handleFile`: store the `File` and generate a data-URL only for the `<img>` preview.
-- In `handleAnalyze`: call `analyzeImageJob(user.id, file, file.name)` instead of passing the base64 string.
-- On "Choose another": reset both `file` and `preview`.
+### `src/components/AnalyzeImageReadyModal.tsx`
+1. Replace the read-only `readyIngredients` rendering with a local editable state:
+   - On mount / when `readyIngredients` changes, copy the array into local state `items: PantryIngredient[]` (alongside the existing `selected` set).
+2. For each row, render editable inputs instead of static text:
+   - `Input` for `name` (text)
+   - `Input` for `quantity` (number, min 0, step 0.1)
+   - `Input` (or compact `Select`) for `unit` (free text, short width)
+   - Keep `category` and expiry shown as read-only metadata (out of scope to edit).
+   - Keep the `Checkbox` for include/exclude.
+3. Add an `updateItem(id, patch)` helper that updates the local `items` array immutably.
+4. On "Add Selected to Pantry":
+   - Filter `items` by `selected`.
+   - Validate: non-empty `name`, `quantity > 0`. If invalid, show a destructive toast and abort.
+   - Pass the edited objects to `addIngredientsToPantry` (same call signature as today).
+5. Preserve current UX: emerald gradient button, cancel, selected counter, scroll container, loading state, dismiss-on-success.
 
-### 3. No changes required
-- `src/contexts/AnalyzeImageJobContext.tsx` — socket events, `normalizeIngredients`, and `readyIngredients` flow are unchanged because the response shape is the same.
-- `src/components/AnalyzeImageReadyModal.tsx`, `AnalyzeImageJobIndicator.tsx`, `AddIngredientForm.tsx`, `IngredientTracker.tsx`, `App.tsx`, `LanguageContext.tsx` — untouched.
+## Out of scope
+- Editing category, expiry date, notes, carbon footprint.
+- Adding new rows manually (user already has the standard "Add Ingredient" form for that).
+- Any change to the socket flow, normalization, or services.
 
-### Technical notes
-- Using native `FormData` + `File` keeps the request browser-native; `<input type="file" accept="image/*" capture="environment">` already returns a `File`, which axios sends as binary inside the multipart part — matching the `curl --form 'image=@…'` shape.
-- Letting axios infer the `Content-Type` ensures the multipart boundary is correct; manually setting `multipart/form-data` would break the request.
-- Auth header behavior, `jobId` handling, and socket subscription stay identical, so the indicator + ready-modal flow continues to work unchanged.
-
-### Files touched
-- edit `src/services/pantryService.ts`
-- edit `src/components/AnalyzeImageCapture.tsx`
+## Technical notes
+- Inputs use existing `@/components/ui/input` to stay on the design system; min font-size already 16px per project rules to avoid iOS zoom.
+- Keep strings behind `t(...)` with English fallbacks consistent with current file; add fallback labels only (no new translation keys required for plan approval — can be added inline).
