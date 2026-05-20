@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import type { CreateMealPlanRequest } from "./mealPlanService";
 
 const API_BASE_URL = import.meta.env.VITE_PANTRY_URL || "https://pantry-ms-brain.onrender.com";
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "ws://pantry-ms-brain.onrender.com";
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "wss://pantry-ms-brain.onrender.com";
 
 export interface CreateMealPlanJobResponse {
   jobId: string;
