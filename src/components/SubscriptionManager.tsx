@@ -53,7 +53,8 @@ const SubscriptionManager = () => {
         `${apiPlan.mealPlans} Meal Plans per month`,
         `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
         `${apiPlan.healthyDrinks} Healthy Drinks per month`,
-        `${apiPlan.specialMeals} Special Meals per month`
+        `${apiPlan.specialMeals} Special Meals per month`,
+        `${apiPlan.processImages ?? 0} Process Images per month`
       ];
 
       // Add additional features based on plan type
