@@ -330,6 +330,7 @@ export interface ApiSubscriptionType {
   healthyDrinks: number;
   specialMeals: number;
   generatedMeals: number;
+  processImages: number;
   updatedAt?: string;
   description: string;
 }
