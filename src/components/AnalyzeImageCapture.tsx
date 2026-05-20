@@ -35,6 +35,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
 
   const handleTakePhoto = async () => {
     try {
+      const { Camera: CapCamera, CameraResultType, CameraSource } = await import("@capacitor/camera");
       // Request permission explicitly (native). On web this resolves immediately.
       try {
         const perm = await CapCamera.checkPermissions();
