@@ -1,45 +1,105 @@
+# Hybrid RevenueCat implementation for native subscriptions
+
+## Current state (audit)
+
+- `src/services/revenueCatService.ts` only exports `isNativePlatform()` — **no RevenueCat SDK is installed or used**. The filename is misleading.
+- All subscription UI is hidden on native via `isNative` guards:
+  - `SubscriptionManager.tsx` returns `null` when native.
+  - `UserProfile.tsx` hides the "Manage subscription" CTA when native (line 531).
+  - `Dashboard.tsx` hides upgrade banners and `<SubscriptionManager />` on native.
+  - `DeleteAccountModal.tsx` shows an "manage in store" warning on native.
+- Subscription persistence is backend-driven via `subscribeUser(userId, subscriptionTypeId, rukusubscriptionID)` → `POST {BASE_URL}/subscription/subscribe/:userId`. Today the `rukusubscriptionID` is a Stripe subscription id; the same endpoint can be reused for an RC entitlement/transaction id.
+- Memory rule "native = reader-only, no subscription UI" is the blocker. The user is explicitly asking to lift it for subscriptions only (cart/signup remain blocked).
+- Capacitor is already wired (`capacitor.config.ts`, iOS Podfile lists `@capacitor/camera`, etc.), so adding another Capacitor plugin follows the same install/sync flow.
+
 ## Goal
 
-Add a fifth usage card "Process Images" to the subscription section on the profile page (tracks `processImages` — image-to-ingredients analyses available), wire the new field through types/contexts, and polish the 5-card layout so it scales cleanly.
+Allow paid plan purchase on iOS/Android via RevenueCat (Apple/Google billing) while keeping Stripe on web — single subscription state synced to the existing backend (`/subscription/...`).
 
-## Changes
+## Plan
 
-### 1. Data layer — surface `processImages`
-- `src/components/UserProfile.tsx`: add `processImages: number` to both the subscription-type interface (limit) and the current-subscription-info interface (remaining).
-- `src/contexts/SubscriptionContext.tsx`: add `processImages: number` to `SubscriptionInfo` + a derived `canProcessImage` boolean.
-- `src/utils/mapSubscriptionPlans.ts` and `src/services/payments.ts` (`ApiSubscriptionType`): add `processImages` and include a `Process Images: N` row in plan features.
-- `src/components/SubscriptionManager.tsx` + `src/components/SubscriptionPurchase.tsx`: include the new field in the features list per plan.
+### 1. Install + configure RevenueCat
+- Add `@revenuecat/purchases-capacitor` (and peer `@revenuecat/purchases-typescript-internal` if required by the version).
+- Add two env vars used at runtime: `VITE_RC_IOS_KEY`, `VITE_RC_ANDROID_KEY` (public SDK keys, safe in the bundle). Document in README that the user must paste their RC public SDK keys.
+- iOS: add StoreKit capability via Xcode (manual step documented for the user). Android: add `com.android.vending.BILLING` permission to `AndroidManifest.xml`.
+- User must run `npx cap sync` after install (documented in handoff).
 
-No endpoint URL changes — `/subscriptionType/all` simply exposes the new attribute.
+### 2. Replace the stub `revenueCatService.ts` with a real service
+Rewrite `src/services/revenueCatService.ts` to expose:
+- `isNativePlatform()` (keep existing export, all current imports keep working).
+- `initRevenueCat(appUserId: string)` — calls `Purchases.configure({ apiKey, appUserID })` once per session; no-op on web.
+- `getNativeOfferings()` — returns RC `Offerings` (mapped to a small `{ identifier, priceString, product }[]`).
+- `purchaseNativePackage(pkg)` — wraps `Purchases.purchasePackage`, returns `{ customerInfo, transactionIdentifier, productIdentifier }`.
+- `restoreNativePurchases()` — wraps `Purchases.restorePurchases`.
+- `getActiveEntitlement(customerInfo)` — helper to read the active entitlement id (e.g. `family`, `professional`).
+- All methods are safe no-ops / throw a friendly "web uses Stripe" error when `!isNativePlatform()`.
 
-### 2. New card + visual polish (UserProfile subscription section)
-Add the fifth card:
-- Icon: `Camera` (lucide-react), accent `violet` (`text-violet-600`, `border-violet-100`) — distinct from existing emerald/teal/cyan/orange.
-- Label: "Process Images" / sublabel: "Image ingredient scans".
-- Value: `currentSubscriptionInfo?.processImages || 0` over `currentSubscriptionType.processImages`.
+### 3. Map RC products ↔ backend subscription types
+Each `ApiSubscriptionType` from `/subscriptionType/all` already has `_id` and `name`. Add a tiny client-side map (in `revenueCatService.ts` or new `src/utils/rcProductMap.ts`):
 
-5-card grid redesign:
-- Grid: `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3`. On lg all 5 in one row; on sm 3 + 2; on mobile 2 per row with the 5th spanning full width.
-- Unified card style: subtle gradient (`bg-gradient-to-br from-{color}-50 to-white`), soft border, `rounded-xl`, `hover:shadow-md hover:-translate-y-0.5 transition`.
-- Header: icon in a tinted circular badge (`h-9 w-9 rounded-full bg-{color}-100`); value/limit right-aligned (`text-2xl font-bold` over muted limit).
-- Thin usage progress bar at the bottom of each card (1.5px, accent color) showing `remaining / limit`.
-- Normalize paddings to `p-4`, label `text-sm font-medium`, sublabel `text-xs text-muted-foreground`.
+```text
+RC product identifier  ->  backend subscriptionTypeId resolver
+"family_monthly"       ->  apiPlans.find(p => p.name === "family")._id
+"professional_monthly" ->  apiPlans.find(p => p.name === "professional")._id
+```
 
-### 3. i18n
-Add new keys to `src/contexts/LanguageContext.tsx` for EN, ES, PT using the existing flat dot-notation pattern:
-- `profile.processImages`
-- `profile.processImagesDesc`
+Placeholder identifiers; user fills in real ones from App Store Connect / Play Console.
+
+### 4. Hybrid purchase flow in `SubscriptionManager`
+- Remove the `if (isNative) return null;` early return.
+- On native: replace the Stripe `PaymentMethodModal` branch with:
+  1. `initRevenueCat(user.userId)` on mount (once).
+  2. Show plans built from RC `Offerings` (price/period come from the store, not Stripe).
+  3. On "Get plan" → `purchaseNativePackage(pkg)`.
+  4. On success → call existing `subscribeUser(userId, subscriptionTypeId, customerInfo.originalAppUserId or transactionIdentifier)` so the backend stores the entitlement reference in the same field used for Stripe today.
+  5. Refresh user subscription (existing `updateSubscription` in `AuthContext`).
+- Add a "Restore purchases" button (Apple requirement) that calls `restoreNativePurchases()` then re-syncs via `subscribeUser`.
+
+### 5. Re-enable subscription affordances on native (scoped)
+- `UserProfile.tsx` line 531: allow the "Manage subscription" CTA on native too, but on native open a native paywall sheet (RC offerings) instead of the Stripe modal.
+- `Dashboard.tsx`: re-enable upgrade banners and `<SubscriptionManager />` on native.
+- `DeleteAccountModal.tsx`: keep the existing "cancel in App Store / Play Store" warning (still correct — cancellation is store-side).
+- Keep cart + signup still blocked natively — only subscription UI is unblocked.
+
+### 6. Cancellation + management
+- Cancellation cannot be done in-app for store subscriptions. Replace the Stripe "Cancel" button on native with a button that deep-links to:
+  - iOS: `https://apps.apple.com/account/subscriptions`
+  - Android: `https://play.google.com/store/account/subscriptions?sku=<productId>&package=<bundleId>`
+- Web continues to use the existing Stripe cancel flow.
+
+### 7. Backend sync (out of scope but flagged)
+- The existing `POST /subscription/subscribe/:userId` is reused with the RC `originalTransactionIdentifier` in `rukusubscriptionID`. **No backend change is strictly required for client-driven sync**, but for production you'll want a RevenueCat webhook → backend so renewals/expirations update without requiring the app to be open. Flag this for the backend team; do not implement here.
+
+### 8. i18n
+Add `subscription.restore`, `subscription.manageInStore`, `subscription.nativeUnavailable` keys to `src/contexts/LanguageContext.tsx` (EN/ES/PT).
+
+### 9. Memory update
+After implementation, update `mem://constraints/native-platform-restrictions` and the Core index line to: **"Native apps: cart and signup blocked; subscriptions ARE allowed via RevenueCat (Apple/Google billing)."**
+
+## Files to touch
+
+- `package.json` (add `@revenuecat/purchases-capacitor`)
+- `ios/App/Podfile` (auto via `cap sync`) and `android/app/src/main/AndroidManifest.xml` (BILLING permission)
+- `src/services/revenueCatService.ts` (full rewrite, keep `isNativePlatform` export)
+- `src/utils/rcProductMap.ts` (new, small mapping helper)
+- `src/components/SubscriptionManager.tsx` (hybrid branch, remove native short-circuit, add Restore button)
+- `src/components/UserProfile.tsx` (allow CTA on native, route to RC paywall)
+- `src/components/Dashboard.tsx` (drop native guards around upgrade UI)
+- `src/components/DeleteAccountModal.tsx` (link to store subscriptions page)
+- `src/contexts/LanguageContext.tsx` (new keys)
+- Memory files (constraint update)
 
 ## Out of scope
-- No backend/endpoint changes.
-- No changes to the analyze-image flow itself.
-- Native (Capacitor) reader-app restrictions unchanged — profile usage display only, no commerce.
 
-## Files touched
-- `src/components/UserProfile.tsx`
-- `src/contexts/SubscriptionContext.tsx`
-- `src/contexts/LanguageContext.tsx`
-- `src/utils/mapSubscriptionPlans.ts`
-- `src/services/payments.ts`
-- `src/components/SubscriptionManager.tsx`
-- `src/components/SubscriptionPurchase.tsx`
+- Backend webhook integration with RevenueCat.
+- Migrating existing Stripe subscribers to RC or vice versa.
+- Cart and signup remain blocked natively.
+- Real product identifiers — placeholders until the user provides them from App Store Connect / Play Console.
+
+## Handoff steps for the user (after implementation)
+
+1. Create products + entitlements in RevenueCat dashboard, App Store Connect, Play Console.
+2. Paste public SDK keys into `VITE_RC_IOS_KEY` / `VITE_RC_ANDROID_KEY`.
+3. Update the identifiers in `src/utils/rcProductMap.ts`.
+4. Run `npm install` then `npx cap sync ios && npx cap sync android`.
+5. Test sandbox purchases on a real device (simulators don't support StoreKit purchases well).
