@@ -37,7 +37,6 @@ import UserProfileForm from "./UserProfileForm";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import PaymentForm from "./PaymentForm";
-import WelcomeModal from "./WelcomeModal";
 import axios from "axios";
 import { getAllSubscriptionTypes } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
@@ -84,7 +83,6 @@ const SignupSteps = () => {
     wantsSubscription: false,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
   const { t } = useLanguage();
@@ -296,19 +294,15 @@ const SignupSteps = () => {
 
       await signup(userData);
 
-      console.log("Mock: Signup completed, showing welcome modal");
-
-      setTimeout(() => {
-        setShowWelcome(true);
-      }, 100);
+      console.log("Mock: Signup completed, flagging welcome modal for dashboard");
+      try {
+        localStorage.setItem("pantry_show_welcome", "1");
+      } catch (e) {
+        console.warn("Could not set welcome flag", e);
+      }
     } catch (error) {
       console.error("Mock: Signup failed:", error);
     }
-  };
-
-  const handleWelcomeClose = () => {
-    console.log("Mock: Welcome modal closed, user should now see dashboard");
-    setShowWelcome(false);
   };
 
   const stepItems = [
@@ -322,10 +316,6 @@ const SignupSteps = () => {
       color: "from-secondary to-primary",
     },
   ];
-
-  if (showWelcome) {
-    return <WelcomeModal onClose={handleWelcomeClose} />;
-  }
 
   return (
     <div className="max-w-full mx-auto space-y-4 sm:space-y-6">

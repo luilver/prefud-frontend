@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PartyPopper, Sparkles, ChefHat, Calendar, TrendingUp, Camera } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WelcomeModalProps {
@@ -13,7 +12,6 @@ interface WelcomeModalProps {
 
 const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
 
   const slides = [
@@ -70,7 +68,6 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
 
   const handleComplete = () => {
     onClose();
-    navigate('/');
   };
 
   const IconComponent = slides[currentSlide].icon;
