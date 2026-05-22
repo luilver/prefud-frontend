@@ -1,38 +1,61 @@
-## Goal
-Move the post-signup Welcome tutorial modal **into the Dashboard**, so it appears only on the user's first login right after completing signup (free or paid). Right now `SignupSteps` renders `WelcomeModal` as a fullscreen replacement before the user reaches the dashboard, which interrupts the login → dashboard flow.
+## Problem
+After signup completes (free or paid), `completeSignup()` in `SignupSteps.tsx` only calls the mock `useUser().signup(userData)` and sets the `pantry_show_welcome` flag. It never calls the real `useAuth().login(email, password)` against `/security/login`, so `AuthContext.user` stays null. As a result the user is not actually authenticated, `Index` redirects to `/signin`, and the dashboard (and welcome modal inside it) is never reached.
 
-## Behavior after change
-1. User completes signup (free plan OR paid plan via `subscriptionTypeId` endpoint).
-2. `SignupSteps` finishes `signup(...)`, sets a one-time flag, and lets the normal auth flow route the user into `/` (Dashboard).
-3. `Dashboard` mounts, detects the flag, and renders `<WelcomeModal />` overlayed on top of the dashboard.
-4. When the user closes/finishes the modal, the flag is cleared. Subsequent logins never show the modal again.
+The pattern that works is already in `src/pages/SignIn.tsx`: call `useAuth().login(email, password)` (which hits the login endpoint, stores token in localStorage, dispatches `pantry-sync` / `subscription-sync`), then `navigate("/")`.
 
-## Changes
+## Fix — only `src/components/SignupSteps.tsx`
 
-### 1. `src/components/SignupSteps.tsx`
-- Remove the `WelcomeModal` import, the `showWelcome` state, the `handleWelcomeClose` handler, and the `if (showWelcome) return <WelcomeModal .../>` block.
-- In `handleSignupComplete` (the function currently calling `setShowWelcome(true)` after `await signup(userData)`), replace that with:
-  ```ts
-  localStorage.setItem("pantry_show_welcome", "1");
-  ```
-  Then let the existing auth/redirect flow take the user into the dashboard (no manual navigation change needed — `UserContext.signup` already logs the user in).
+1. Import `useAuth` and `useNavigate`:
+   ```ts
+   import { useAuth } from "@/contexts/AuthContext";
+   import { useLocation, useNavigate } from "react-router-dom";
+   ```
+   Inside the component:
+   ```ts
+   const { login } = useAuth();
+   const navigate = useNavigate();
+   ```
 
-### 2. `src/components/Dashboard.tsx`
-- Import `WelcomeModal`.
-- Add local state `const [showWelcome, setShowWelcome] = useState(false);`.
-- In a `useEffect` on mount, check `localStorage.getItem("pantry_show_welcome") === "1"` and, if true, `setShowWelcome(true)`.
-- Render `{showWelcome && <WelcomeModal onClose={handleWelcomeClose} />}` at the end of `DashboardContent`'s JSX.
-- `handleWelcomeClose` clears the flag (`localStorage.removeItem("pantry_show_welcome")`) and sets `showWelcome(false)`.
+2. Update `completeSignup()` so that, after the subscription endpoint has succeeded and the mock `signup(userData)` runs, it performs the real login and routes into the dashboard:
+   ```ts
+   const completeSignup = async () => {
+     try {
+       const userData = { /* unchanged */ };
+       await signup(userData); // keep mock user-context bootstrap
 
-### 3. `src/components/WelcomeModal.tsx`
-- Currently `handleComplete` does `onClose(); navigate('/')`. Since the modal will already be inside the dashboard, drop the `navigate('/')` call (keep `onClose()`), so closing the modal just dismisses the overlay and leaves the user on the dashboard.
-- No visual changes; it already uses a `Dialog` overlay which composes cleanly over the dashboard.
+       // Flag welcome modal BEFORE navigating so Dashboard's mount effect picks it up
+       try { localStorage.setItem("pantry_show_welcome", "1"); } catch {}
+
+       // Real authentication so AuthContext.user is set and routes unlock
+       try {
+         await login(signupData.email, signupData.password);
+         navigate("/", { replace: true });
+       } catch (loginErr) {
+         console.error("Auto-login after signup failed:", loginErr);
+         toast({
+           title: "Account created",
+           description: "Please sign in to continue.",
+           duration: 5000,
+         });
+         navigate("/signin", { replace: true });
+       }
+     } catch (error) {
+       console.error("Signup completion failed:", error);
+     }
+   };
+   ```
+
+3. No changes needed elsewhere:
+   - `handleFreeSubscription` already calls `completeSignup()` after `POST /subscription/{userId}` succeeds.
+   - `handlePaymentSuccess` already calls `completeSignup()` after Stripe success — the paid flow uses the same subscription endpoint inside `PaymentForm` (unchanged).
+   - `Dashboard` already reads `pantry_show_welcome` on mount and renders `<WelcomeModal />`, so the welcome tutorial appears inside the dashboard after navigation.
+   - The incomplete-account branch (user already exists, just finishing profile) still has `signupData.password` from step 1; if they came back without a password we keep the fallback `navigate("/signin")`.
 
 ## Out of scope
-- No changes to subscription assignment logic, payments, or `subscriptionTypeId` endpoint calls.
-- No changes to translations or styling of the modal itself.
-- No new "first-login" flag in the backend — `localStorage` is sufficient since the modal is purely a one-time onboarding tutorial.
+- No changes to subscription endpoint, RevenueCat, payment flow, or `UserContext.signup`.
+- No new translation keys, styling, or routing config changes.
 
-## Edge cases
-- If signup succeeds but the user closes the tab before the dashboard mounts, the flag persists and the modal will show on their next login — acceptable (it is still effectively their first dashboard visit).
-- Existing logged-in users won't have the flag set, so they won't see the modal — matches the requested "only during signup's first login" behavior.
+## Verification
+- Free plan: complete steps 1→3, pick Free → `POST /subscription/{userId}` → auto `login()` → land on `/` with welcome modal overlayed on dashboard.
+- Paid plan: complete Stripe → `handlePaymentSuccess` → same auto-login + navigate.
+- Login failure fallback: toast + redirect to `/signin` with email prefilled by existing SignIn behavior.
