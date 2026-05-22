@@ -6082,6 +6082,9 @@ const translations = {
     "subscription.cardDetails": "Detalhes do Cartão",
     "subscription.paymentSecure": "Seu pagamento está seguro com Rukupay LLC",
     "subscription.processing": "Processando...",
+    "subscription.restore": "Restaurar compras",
+    "subscription.manageInStore": "Gerenciar na loja",
+    "subscription.nativeUnavailable": "Este plano não está disponível para compra no aplicativo.",
     "mealPlanner.pagination.previous": "Antigo",
     "mealPlanner.pagination.next": "Seguindo",
 
