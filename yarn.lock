@@ -1846,6 +1846,18 @@
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.23.2.tgz#156c4b481c0bee22a19f7924728a67120de06971"
   integrity sha512-Ic6m2U/rMjTkhERIa/0ZtXJP17QUi2CbWE7cqx4J58M8aA3QTfW+2UlQ4psvTX9IO1RfNVhK3pcpdjej7L+t2w==
 
+"@revenuecat/purchases-capacitor@13.0.0":
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/@revenuecat/purchases-capacitor/-/purchases-capacitor-13.0.0.tgz#e7344f05c952ac0834127d0e9adf586e27f0d2a9"
+  integrity sha512-KhNKMWiU+i6stB1OB0t4fb/NUM78qQHcK1qICjbsBhRKPYDe8plGGp5JiAy0zlnkna1UY/oDnmrG9QnQkckYZQ==
+  dependencies:
+    "@revenuecat/purchases-typescript-internal-esm" "18.0.0"
+
+"@revenuecat/purchases-typescript-internal-esm@18.0.0":
+  version "18.0.0"
+  resolved "https://registry.yarnpkg.com/@revenuecat/purchases-typescript-internal-esm/-/purchases-typescript-internal-esm-18.0.0.tgz#c574259c9f8db56f7805d169c659d425b9e2dec0"
+  integrity sha512-0TZugjpcitrZ1jh+2W3yMEmCCfuu4OV4B1xuOF7ItdBOon9JDd5nBLp6favdSgrQoM8JGQPZDjBfhN15u3/+Ng==
+
 "@rolldown/pluginutils@1.0.0-beta.27":
   version "1.0.0-beta.27"
   resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz#47d2bf4cef6d470b22f5831b420f8964e0bf755f"

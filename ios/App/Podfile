@@ -14,6 +14,7 @@ def capacitor_pods
   pod 'CapacitorCommunityTextToSpeech', :path => '../../node_modules/@capacitor-community/text-to-speech'
   pod 'CapacitorFirebaseAnalytics', :path => '../../node_modules/@capacitor-firebase/analytics'
   pod 'CapacitorCamera', :path => '../../node_modules/@capacitor/camera'
+  pod 'RevenuecatPurchasesCapacitor', :path => '../../node_modules/@revenuecat/purchases-capacitor'
 end
 
 target 'App' do
