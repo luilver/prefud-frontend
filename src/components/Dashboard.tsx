@@ -20,6 +20,7 @@ import ShoppingList from "./ShoppingList";
 import UserProfile from "./UserProfile";
 import SubscriptionManager from "./SubscriptionManager";
 import { isNativePlatform } from "@/services/revenueCatService";
+import WelcomeModal from "./WelcomeModal";
 import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
@@ -36,6 +37,26 @@ const DashboardContent = () => {
   const { isCollapsed } = useSidebar();
   const navigate = useNavigate();
   const isNative = isNativePlatform();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("pantry_show_welcome") === "1") {
+        setShowWelcome(true);
+      }
+    } catch (e) {
+      console.warn("Could not read welcome flag", e);
+    }
+  }, []);
+
+  const handleWelcomeClose = () => {
+    try {
+      localStorage.removeItem("pantry_show_welcome");
+    } catch (e) {
+      console.warn("Could not clear welcome flag", e);
+    }
+    setShowWelcome(false);
+  };
 
   // Handle hash navigation to switch tabs
   useEffect(() => {
