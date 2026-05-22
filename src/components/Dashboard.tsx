@@ -336,7 +336,7 @@ const DashboardContent = () => {
                 <TabsContent value="profile" className="mt-0">
                   <div className="grid gap-6">
                     <UserProfile />
-                    {!isNative && <SubscriptionManager />}
+                    <SubscriptionManager />
                   </div>
                 </TabsContent>
               </Tabs>

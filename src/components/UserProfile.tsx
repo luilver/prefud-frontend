@@ -527,8 +527,7 @@ const UserProfile = () => {
         </CardContent>
       </Card>
 
-        {/* Subscription Information Accordion - hidden on native platforms */}
-        {!isNativePlatform() && (
+        {/* Subscription Information Accordion */}
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="p-0">
             <Accordion type="single" collapsible>
@@ -656,7 +655,6 @@ const UserProfile = () => {
           </Accordion>
         </CardContent>
       </Card>
-        )}
 
         {/* Calorie Tracking Accordion */}
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
