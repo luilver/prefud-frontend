@@ -1924,6 +1924,8 @@ const translations = {
     "welcome.trackProgress": "Track Your Progress",
     "welcome.monitorGoals":
       "Monitor your nutrition goals and see your healthy habits grow over time.",
+    "welcome.scanIngredients": "Scan Ingredients",
+    "welcome.planWeekDescription": "Plan your meals for the week in minutes with AI assistance.",
 
     //  Subscription
     "subscription.complete": "Complete Your Subscription",
@@ -3999,6 +4001,8 @@ const translations = {
     "welcome.trackProgress": "Sigue tu progreso",
     "welcome.monitorGoals":
       "Monitorea tus objetivos de nutrición y observa cómo crecen tus hábitos saludables con el tiempo",
+      "welcome.scanIngredients": "Escanea ingredientes fácilmente",
+    "welcome.planWeekDescription": "Planifica tu semana de comidas en minutos con sugerencias personalizadas basadas en lo que ya tienes en tu despensa.",
 
     // Subscription
     "subscription.complete": "Completa tu suscripción",
@@ -6071,6 +6075,8 @@ const translations = {
     "welcome.trackProgress": "Acompanhe seu progresso",
     "welcome.monitorGoals":
       "Monitore seus objetivos nutricionais e veja seus hábitos saudáveis crescerem ao longo do tempo",
+      "welcome.scanIngredients": "Escaneie ingredientes com a câmera para adicioná-los à sua despensa em segundos.",
+    "welcome.planWeekDescription": "Planeje sua semana de refeições em minutos com sugestões personalizadas de IA baseadas nos ingredientes que você já tem.",
 
     // Subscription
     "subscription.complete": "Conclua sua assinatura",
