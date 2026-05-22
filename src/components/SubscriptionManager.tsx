@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star, XCircle } from "lucide-react";
+import { Check, Crown, Star, XCircle, RotateCw, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAllSubscriptionTypes, ApiSubscriptionType, subscribeUser } from "@/services/payments";
@@ -10,7 +10,17 @@ import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import PaymentMethodModal from "./PaymentMethodModal";
 import SubscriptionSuccessModal from "./SubscriptionSuccessModal";
 import { trackEvent } from "@/services/analytics";
-import { isNativePlatform } from "@/services/revenueCatService";
+import {
+  isNativePlatform,
+  initRevenueCat,
+  getNativeOfferings,
+  purchaseNativePackage,
+  restoreNativePurchases,
+  getActiveEntitlement,
+  openManageSubscriptions,
+} from "@/services/revenueCatService";
+import { resolveSubscriptionTypeId, RC_PRODUCT_TO_PLAN_NAME } from "@/utils/rcProductMap";
+import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 
 
 interface SubscriptionPlan {
@@ -38,7 +48,11 @@ const SubscriptionManager = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  
+  const [nativePackages, setNativePackages] = useState<PurchasesPackage[]>([]);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const rcInitedRef = useRef(false);
+
   const { toast } = useToast();
   const { user, updateSubscription } = useAuth();
   const isNative = isNativePlatform();
@@ -130,6 +144,113 @@ const SubscriptionManager = () => {
     fetchSubscriptionTypes();
   }, [toast, user?.subscription?.subscriptionTypeId, isNative]);
 
+  // Initialise RevenueCat + load offerings on native
+  useEffect(() => {
+    if (!isNative || rcInitedRef.current) return;
+    rcInitedRef.current = true;
+    (async () => {
+      await initRevenueCat(user?.userId);
+      const pkgs = await getNativeOfferings();
+      setNativePackages(pkgs);
+    })();
+  }, [isNative, user?.userId]);
+
+  const findNativePackageForPlan = (plan: SubscriptionPlan): PurchasesPackage | null => {
+    if (!isNative || nativePackages.length === 0) return null;
+    return (
+      nativePackages.find((pkg) => {
+        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
+        return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+      }) ?? null
+    );
+  };
+
+  const handleNativePurchase = async (plan: SubscriptionPlan) => {
+    const pkg = findNativePackageForPlan(plan);
+    if (!pkg) {
+      toast({
+        title: "Plan unavailable",
+        description:
+          "This plan is not configured for in-app purchase yet. Try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      setIsPurchasing(true);
+      const { customerInfo, productIdentifier, transactionIdentifier } =
+        await purchaseNativePackage(pkg);
+      const activeEntitlement = getActiveEntitlement(customerInfo);
+      if (!activeEntitlement) {
+        toast({
+          title: "Purchase incomplete",
+          description: "No active entitlement found after purchase.",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Persist on our backend (reuses the Stripe persistence endpoint).
+      await subscribeUser(user?.userId || "", plan.id, transactionIdentifier);
+      setCurrentSubscriptionId(plan.id);
+      setCurrentSubscriptionName(plan.name);
+      setSelectedPlan(plan);
+      setShowSuccessModal(true);
+      trackEvent("subscription_purchase_native", {
+        plan: plan.name,
+        productId: productIdentifier,
+      });
+    } catch (err: any) {
+      if (err?.userCancelled || err?.code === "1") {
+        // User cancelled the Apple/Google sheet
+        return;
+      }
+      console.error("Native purchase failed", err);
+      toast({
+        title: "Purchase failed",
+        description: err?.message || "Could not complete the purchase.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      setIsRestoring(true);
+      const customerInfo = await restoreNativePurchases();
+      const activeEntitlement = getActiveEntitlement(customerInfo);
+      if (!activeEntitlement) {
+        toast({
+          title: "No purchases to restore",
+          description: "We could not find any active subscription on this account.",
+        });
+        return;
+      }
+      // Find which plan matches the active entitlement (entitlement id === plan name by convention)
+      const matched = plans.find(
+        (p) => p.name.toLowerCase() === activeEntitlement.toLowerCase()
+      );
+      if (matched) {
+        await subscribeUser(user?.userId || "", matched.id, activeEntitlement);
+        setCurrentSubscriptionId(matched.id);
+        setCurrentSubscriptionName(matched.name);
+      }
+      toast({
+        title: "Purchases restored",
+        description: "Your subscription has been restored.",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Restore failed",
+        description: err?.message || "Could not restore purchases.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
   const handleSelectPlan = async (plan: SubscriptionPlan) => {
     if (plan.id === currentSubscriptionId) return;
     console.log('selected plan during selection ', plan)
@@ -141,6 +262,9 @@ const SubscriptionManager = () => {
       } else {
         handleSubscriptionSuccess();
       }
+    } else if (isNative) {
+      // Native → use Apple/Google billing via RevenueCat
+      await handleNativePurchase(plan);
     } else {
       // Web → use Stripe payment modal
       setShowPaymentModal(true);
@@ -222,8 +346,6 @@ const SubscriptionManager = () => {
     );
   }
 
-  if (isNative) return null;
-
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="text-center space-y-4">
@@ -240,15 +362,27 @@ const SubscriptionManager = () => {
                   Current: {currentSubscriptionName} Plan
                 </span>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowCancelModal(true)}
-                className="text-red-600 border-red-200 hover:bg-red-50"
-              >
-                <XCircle className="h-4 w-4 mr-1" />
-                Cancel
-              </Button>
+              {isNative ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openManageSubscriptions}
+                  className="text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  Manage in Store
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCancelModal(true)}
+                  className="text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+              )}
             </div>
           </div>
         )}
@@ -256,6 +390,19 @@ const SubscriptionManager = () => {
         <p className="text-gray-600 max-w-2xl mx-auto">
           Select the perfect plan for your meal planning needs. Upgrade or downgrade anytime.
         </p>
+        {isNative && (
+          <div className="flex justify-center pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRestore}
+              disabled={isRestoring}
+            >
+              <RotateCw className={`h-4 w-4 mr-1 ${isRestoring ? "animate-spin" : ""}`} />
+              {isRestoring ? "Restoring..." : "Restore Purchases"}
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -321,9 +468,13 @@ const SubscriptionManager = () => {
                       ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600'
                       : 'bg-gray-800 hover:bg-gray-700'
                   }`}
-                  disabled={isCurrentPlan}
+                  disabled={isCurrentPlan || isPurchasing}
                 >
-                  {isCurrentPlan ? 'Current Plan' : `Get ${plan.name}`}
+                  {isCurrentPlan
+                    ? 'Current Plan'
+                    : isPurchasing && selectedPlan?.id === plan.id
+                    ? 'Processing...'
+                    : `Get ${plan.name}`}
                 </Button>
               </CardContent>
             </Card>
