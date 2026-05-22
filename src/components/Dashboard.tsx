@@ -365,6 +365,7 @@ const DashboardContent = () => {
           </div>
         </div>
       </div>
+      {showWelcome && <WelcomeModal onClose={handleWelcomeClose} />}
     </div>
   );
 };
