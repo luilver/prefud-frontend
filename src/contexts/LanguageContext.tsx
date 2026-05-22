@@ -1935,6 +1935,9 @@ const translations = {
     "subscription.cardDetails": "Card Details",
     "subscription.paymentSecure": "Your payment is secured by Rukupay LLC",
     "subscription.processing": "Processing...",
+    "subscription.restore": "Restore Purchases",
+    "subscription.manageInStore": "Manage in Store",
+    "subscription.nativeUnavailable": "This plan is not available for in-app purchase.",
     "mealPlanner.pagination.previous": "Before",
     "mealPlanner.pagination.next": "Next",
 
@@ -4008,6 +4011,9 @@ const translations = {
     "subscription.cardDetails": "Detalles de la Tarjeta",
     "subscription.paymentSecure": "Tu pago esta asegurado por Rukupay LLC",
     "subscription.processing": "Procesando...",
+    "subscription.restore": "Restaurar compras",
+    "subscription.manageInStore": "Gestionar en la tienda",
+    "subscription.nativeUnavailable": "Este plan no está disponible para compra dentro de la app.",
     "mealPlanner.pagination.previous": "Anterior",
     "mealPlanner.pagination.next": "Siguiente",
 
