@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,6 +29,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "@/hooks/use-toast";
@@ -85,6 +86,8 @@ const SignupSteps = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const [customerId, setCustomerId] = useState<string>("");
@@ -294,14 +297,32 @@ const SignupSteps = () => {
 
       await signup(userData);
 
-      console.log("Mock: Signup completed, flagging welcome modal for dashboard");
+      console.log("Signup completed, flagging welcome modal for dashboard");
       try {
         localStorage.setItem("pantry_show_welcome", "1");
       } catch (e) {
         console.warn("Could not set welcome flag", e);
       }
+
+      // Real authentication so AuthContext.user is set and routes unlock
+      if (signupData.email && signupData.password) {
+        try {
+          await login(signupData.email, signupData.password);
+          navigate("/", { replace: true });
+        } catch (loginErr) {
+          console.error("Auto-login after signup failed:", loginErr);
+          toast({
+            title: "Account created",
+            description: "Please sign in to continue.",
+            duration: 5000,
+          });
+          navigate("/signin", { replace: true });
+        }
+      } else {
+        navigate("/signin", { replace: true });
+      }
     } catch (error) {
-      console.error("Mock: Signup failed:", error);
+      console.error("Signup completion failed:", error);
     }
   };
 
