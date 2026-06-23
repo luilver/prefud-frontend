@@ -41,7 +41,7 @@ const translations = {
     "dashboard.nav.planner": "Planner",
     "dashboard.nav.meals": "Meals",
     "dashboard.nav.drinks": "Drinks",
-    "dashboard.nav.pantry": "Prefud",
+    "dashboard.nav.pantry": "Pantry",
     "dashboard.nav.shopping": "Shopping",
     "dashboard.nav.environment": "Environment",
     "dashboard.nav.calories": "Calories",
@@ -59,7 +59,7 @@ const translations = {
     "highlights.plans-used": "Plans Used",
     "highlights.todays-calories": "Today's Calories",
     "highlights.shopping-items": "Shopping Items",
-    "highlights.pantry-items": "Prefud Items",
+    "highlights.pantry-items": "Pantry Items",
 
     // Home page
     "home.title": "Smart Meal Planning Made Simple",
@@ -208,7 +208,7 @@ const translations = {
     "cart.empty.backButton": "Back to Dashboard",
     "cart.actions.title": "Cart Actions",
     "cart.actions.addToShoppingList": "Add to Shopping List",
-    "cart.actions.addToPantry": "Add to Prefud",
+    "cart.actions.addToPantry": "Add to Pantry",
 
     // Diet Types
     "signup.diet.vegetarian": "Vegetarian",
@@ -533,9 +533,9 @@ const translations = {
     "mealPlanView.selected": "selected",
     "mealPlanView.estimated": "estimated",
     "mealPlanView.selectAll": "Select All",
-    "mealPlanView.addToPantry": "Add to Prefud",
+    "mealPlanView.addToPantry": "Add to Pantry",
     "mealPlanView.orderOnline": "Order Online",
-    "mealPlanView.addToPantryOne": "Add to Prefud",
+    "mealPlanView.addToPantryOne": "Add to Pantry",
     "mealPlanView.orderOnlineOne": "Order Online",
     "mealPlanView.other": "Other",
     "mealPlanView.noShoppingList":
@@ -551,7 +551,7 @@ const translations = {
     "mealPlanView.kidsUnder5": "Kids < 5",
     "mealPlanView.kids5to12": "Kids 5-12",
     "mealPlanView.noMeals": "No meals",
-    "mealPlanView.addedToPantry": "Added to Prefud",
+    "mealPlanView.addedToPantry": "Added to Pantry",
     "mealPlanView.planDetails": "Plan Details",
     "mealPlanView.maxCookingTime": "Max Cooking Time",
     "mealPlanView.skillLevel": "Skill Level",
@@ -580,7 +580,7 @@ const translations = {
     "aiMealStarted.title": "Meal Generation Started",
     "aiMealStarted.description":
       "We'll notify you when your meal is ready.",
-    "pantryMealsReady.title": "Your Prefud Meals are Ready! 🍽️",
+    "pantryMealsReady.title": "Your Pantry Meals are Ready! 🍽️",
     "pantryMealsReady.description":
       "Fresh AI meal ideas based on your pantry are ready to explore.",
     "pantryMealsReady.viewMeals": "View Meals",
@@ -595,7 +595,7 @@ const translations = {
     "analyzeImageReady.title": "Ingredients Detected",
     "analyzeImageReady.description":
       "ingredients detected. Select which to add to your pantry.",
-    "analyzeImageReady.addSelected": "Add Selected to Prefud",
+    "analyzeImageReady.addSelected": "Add Selected to Pantry",
     "analyzeImageReady.cancel": "Cancel",
     "analyzeImageReady.selectedCount": "selected",
     "analyzeImageReady.adding": "Adding…",
@@ -715,7 +715,7 @@ const translations = {
       "Select ingredients to add to pantry or request delivery",
     "mealShopping.selectAll": "Select All",
     "mealShopping.clearAll": "Clear All",
-    "mealShopping.addToPantry": "Add to Prefud",
+    "mealShopping.addToPantry": "Add to Pantry",
     "mealShopping.requestDelivery": "Request Delivery",
     "mealShopping.chooseDeliveryTime": "Choose Delivery Time",
     "mealShopping.deliveryPrompt":
@@ -1066,7 +1066,7 @@ const translations = {
     "aiMealGenerator.of": "of",
     "aiMealGenerator.selectAll": "Select All",
     "aiMealGenerator.clearAll": "Unselect All",
-    "aiMealGenerator.addToPantry": "Add to Prefud",
+    "aiMealGenerator.addToPantry": "Add to Pantry",
     "aiMealGenerator.orderOnline": "Order Online",
     "aiMealGenerator.selectedItems": "Selected Items",
     "aiMealGenerator.totalCost": "Total Cost",
@@ -1168,7 +1168,7 @@ const translations = {
     "aiMealView.deselectAll": "Deselect All",
     "aiMealView.selectIngredientsDesc":
       "Select ingredients to add to your pantry or cart",
-    "aiMealView.addToPantry": "Add to Prefud",
+    "aiMealView.addToPantry": "Add to Pantry",
     "aiMealView.addToCart": "Add to Cart",
 
     // AI Drink Creator
@@ -1429,7 +1429,7 @@ const translations = {
       "Failed to create shopping list. Please try again.",
     "drinkDetailView.expires": "Expires in",
     "drinkDetailView.days": "days",
-    "drinkDetailView.addToPantry": "Add to Prefud",
+    "drinkDetailView.addToPantry": "Add to Pantry",
     "drinkDetailView.orderOnline": "Order Online",
     "drinkDetailView.ingredientsSelected": "ingredients selected",
     "drinkDetailView.healthGoals": "Health Goals",
@@ -1452,8 +1452,8 @@ const translations = {
       "Please select ingredients to add to pantry.",
     "drinkShoppingModal.noDeliveryDesc":
       "Please select ingredients for delivery.",
-    "drinkShoppingModal.addedToPantryTitle": "Added to Prefud!",
-    "drinkDetailView.addedToPantry": "Added to Prefud!",
+    "drinkShoppingModal.addedToPantryTitle": "Added to Pantry!",
+    "drinkDetailView.addedToPantry": "Added to Pantry!",
     "drinkDetailView.ingredientsToPantry": "ingredients to your pantry.",
     "drinkShoppingModal.added": "Added",
     "drinkShoppingModal.ingredientsToPantry": "ingredients to your pantry.",
@@ -1466,7 +1466,7 @@ const translations = {
       "Select ingredients to add to pantry or request delivery",
     "drinkShoppingModal.selectAll": "Select All",
     "drinkShoppingModal.clearAll": "Clear All",
-    "drinkShoppingModal.addToPantry": "Add to Prefud",
+    "drinkShoppingModal.addToPantry": "Add to Pantry",
     "drinkShoppingModal.requestDelivery": "Request Delivery",
     "drinkShoppingModal.chooseDeliveryTime": "Choose Delivery Time",
     "drinkShoppingModal.whenDelivery":
@@ -1539,9 +1539,9 @@ const translations = {
     "recipeView.deselectAll": "Deselect All",
     "recipeView.selectIngredientsDesc":
       "Select ingredients to add to your pantry or cart",
-    "recipeView.addToPantry": "Add to Prefud",
+    "recipeView.addToPantry": "Add to Pantry",
     "recipeView.addToCart": "Add to Cart",
-    "recipeView.addedToPantry": "Added to Prefud",
+    "recipeView.addedToPantry": "Added to Pantry",
 
     // Cooking Mode
     "cookingMode.title": "Cooking Mode",
@@ -1615,7 +1615,7 @@ const translations = {
     "pricing.features.meal-plans": "Meal Plans per month",
     "pricing.features.basic-recipes": "Basic Recipe Collection",
     "pricing.features.shopping-list": "Shopping List Generator",
-    "pricing.features.pantry-management": "Prefud Management",
+    "pricing.features.pantry-management": "Pantry Management",
     "pricing.features.email-support": "Email Support",
     "pricing.features.meal-creations": "Meal Creations with pantry ingredients",
     "pricing.features.ai-recommendations": "AI Meal Recommendations",
@@ -1834,7 +1834,7 @@ const translations = {
     "addIngredient.units.box.value": "box",
 
     //IngredientTracker
-    "ingredientTracker.title": "My Prefud",
+    "ingredientTracker.title": "My Pantry",
     "ingredientTracker.description":
       "Keep track of your ingredients and their expiration dates",
     "ingredientTracker.refresh": "Refresh",
@@ -1847,7 +1847,7 @@ const translations = {
     "ingredientTracker.expired": "Expired",
     "ingredientTracker.today": "Today",
     "ingredientTracker.allFresh": "All ingredients are fresh!",
-    "ingredientTracker.yourPantry": "Your Prefud",
+    "ingredientTracker.yourPantry": "Your Pantry",
     "ingredientTracker.organizedByCategory":
       "All your ingredients organized by category",
     "ingredientTracker.searchPlaceholder": "Search ingredients...",
@@ -1857,7 +1857,7 @@ const translations = {
       "Your pantry is empty. Try refreshing or add some ingredients.",
     "ingredientTracker.startAdding":
       "Start by adding some ingredients to your pantry",
-    "ingredientTracker.pantryTab": "Prefud",
+    "ingredientTracker.pantryTab": "Pantry",
     "ingredientTracker.expiringTab": "Expiring Soon",
     "ingredientTracker.categoriesTab": "Categories",
     "ingredientTracker.lowStockTab": "Low Stock",
@@ -1988,7 +1988,7 @@ const translations = {
     "landing.feature3Title": "Step-by-Step Cooking",
     "landing.feature3Desc":
       "Clear instructions so you can cook every meal confidently.",
-    "landing.feature4Title": "Prefud Tracking",
+    "landing.feature4Title": "Pantry Tracking",
     "landing.feature4Desc": "Know exactly what ingredients you have at home.",
     "landing.feature5Title": "Save Money",
     "landing.feature5Desc": "Buy only what you need and reduce food waste.",
