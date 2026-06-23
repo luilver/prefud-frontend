@@ -55,7 +55,7 @@ const PrivacyPolicy = () => {
               Information We Collect
             </h2>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Pantry collects the following personal information solely for the functionality of our AI-powered meal planning 
+              Prefud collects the following personal information solely for the functionality of our AI-powered meal planning 
               service and to deliver relevant advertisements:
             </p>
             <div className="grid gap-4 md:grid-cols-3">
@@ -185,7 +185,7 @@ const PrivacyPolicy = () => {
                 <h3 className="text-xl font-semibold text-foreground mb-4">1. Data Controller</h3>
                 <div className="text-muted-foreground leading-relaxed">
                   <p>
-                    Pantry acts as the data controller for the personal data we collect. We determine the purposes and means 
+                    Prefud acts as the data controller for the personal data we collect. We determine the purposes and means 
                     of processing your personal data in accordance with GDPR requirements.
                   </p>
                 </div>

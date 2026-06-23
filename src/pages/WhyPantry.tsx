@@ -20,7 +20,7 @@ const WhyPantry = () => {
               <Utensils className="h-6 w-6 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold text-primary">
-              Pantry
+              Prefud
             </h1>
           </div>
           <div className="flex items-center space-x-4">

@@ -66,7 +66,7 @@ const Index = () => {
               </div>
               <div className="flex flex-col">
                 <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Pantry
+                  Prefud
                 </h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">
                   Smart Meal Planning
@@ -420,7 +420,7 @@ const Index = () => {
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4 border border-primary/20">
               <Heart className="h-4 w-4" />
-              <span className="text-sm font-medium">Why Choose Pantry</span>
+              <span className="text-sm font-medium">Why Choose Prefud</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {t("home.features.title")}
@@ -515,7 +515,7 @@ const Index = () => {
                 <Utensils className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Pantry
+                Prefud
               </span>
             </div>
             <div className="flex items-center justify-center space-x-6 mb-4 text-sm text-muted-foreground">
@@ -544,7 +544,7 @@ const Index = () => {
                 to="/why-pantry"
                 className="hover:text-primary transition-colors duration-200"
               >
-                Why Pantry
+                Why Prefud
               </Link>
             </div>
             <p className="text-muted-foreground">
