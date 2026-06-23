@@ -51,7 +51,7 @@ const TermsAndConditions = () => {
               </h2>
               <div className="text-foreground/90 leading-relaxed space-y-4">
                 <p>
-                  By accessing and using Pantry ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. 
+                  By accessing and using Prefud ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. 
                   If you do not agree to abide by the above, please do not use this service.
                 </p>
                 <p>
@@ -69,7 +69,7 @@ const TermsAndConditions = () => {
               </h2>
               <div className="text-foreground/90 leading-relaxed space-y-4">
                 <p>
-                  Pantry utilizes artificial intelligence and machine learning technologies to provide personalized meal recommendations, 
+                  Prefud utilizes artificial intelligence and machine learning technologies to provide personalized meal recommendations, 
                   nutritional analysis, and cooking suggestions. You acknowledge and agree that:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
@@ -90,7 +90,7 @@ const TermsAndConditions = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">3. User Responsibilities</h2>
               <div className="text-foreground/90 leading-relaxed space-y-4">
-                <p>As a user of Pantry, you agree to:</p>
+                <p>As a user of Prefud, you agree to:</p>
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Provide accurate information about dietary preferences, allergies, and restrictions</li>
                   <li>Use the service for personal, non-commercial purposes only</li>
@@ -127,7 +127,7 @@ const TermsAndConditions = () => {
               <h2 className="text-2xl font-bold text-foreground mb-4">5. Health and Safety Disclaimers</h2>
               <div className="text-foreground/90 leading-relaxed space-y-4">
                 <p className="font-semibold text-amber-600 dark:text-amber-400">
-                  IMPORTANT: Pantry is not a substitute for professional medical or nutritional advice.
+                  IMPORTANT: Prefud is not a substitute for professional medical or nutritional advice.
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Always consult healthcare professionals for medical dietary requirements</li>
@@ -144,7 +144,7 @@ const TermsAndConditions = () => {
               <h2 className="text-2xl font-bold text-foreground mb-4">6. Subscription and Billing</h2>
               <div className="text-foreground/90 leading-relaxed space-y-4">
                 <p>
-                  Premium features of Pantry are available through subscription plans:
+                  Premium features of Prefud are available through subscription plans:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Subscriptions automatically renew unless cancelled</li>
@@ -161,7 +161,7 @@ const TermsAndConditions = () => {
               <h2 className="text-2xl font-bold text-foreground mb-4">7. Limitation of Liability</h2>
               <div className="text-foreground/90 leading-relaxed space-y-4">
                 <p>
-                  Pantry and its operators shall not be liable for any direct, indirect, incidental, or consequential damages 
+                  Prefud and its operators shall not be liable for any direct, indirect, incidental, or consequential damages 
                   resulting from the use of our service, including but not limited to:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">

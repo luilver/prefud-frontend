@@ -573,7 +573,7 @@ export const en = {
     "feature2Desc": "Prefud automatically creates a shopping list for missing ingredients.",
     "feature3Title": "Step-by-Step Cooking",
     "feature3Desc": "Clear instructions so you can cook every meal confidently.",
-    "feature4Title": "Prefud Tracking",
+    "feature4Title": "Pantry Tracking",
     "feature4Desc": "Know exactly what ingredients you have at home.",
     "feature5Title": "Save Money",
     "feature5Desc": "Buy only what you need and reduce food waste.",

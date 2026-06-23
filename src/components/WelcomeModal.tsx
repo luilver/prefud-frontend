@@ -17,7 +17,7 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
   const slides = [
     {
       icon: PartyPopper,
-      title: t("welcome.message") || "Welcome to Pantry!",
+      title: t("welcome.message") || "Welcome to Prefud!",
       description: t("welcome.subtitle") || "Your smart kitchen companion is ready to transform your cooking experience.",
       color: "text-purple-600",
       image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=250&fit=crop"

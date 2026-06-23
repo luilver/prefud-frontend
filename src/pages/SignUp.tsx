@@ -39,7 +39,7 @@ const SignUp = () => {
                 <Utensils className="h-5 w-5 text-emerald-400" />
               </div>
               <span className="text-xl font-semibold text-white/90 tracking-tight">
-                Pantry
+                Prefud
               </span>
             </button>
             
