@@ -232,7 +232,7 @@ const DashboardContent = () => {
                 </div>
                 <div>
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                    Pantry
+                    Prefud
                   </h1>
                   <p className="text-xs sm:text-sm text-emerald-300/80 font-medium hidden sm:block">Smart Kitchen Assistant</p>
                 </div>

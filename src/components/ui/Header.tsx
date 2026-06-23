@@ -10,7 +10,7 @@ export const Header = () => {
           {/* Left side - Logo/Brand */}
           <div className="flex-shrink-0">
             <Link to="/" className="text-xl font-bold text-gray-900">
-              MealGenius
+              Prefud
             </Link>
           </div>
 

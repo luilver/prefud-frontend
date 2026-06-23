@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.bessel.mypantryapp",
-  appName: "Pantry AI",
+  appId: "com.bessel.prefud",
+  appName: "Prefud",
   webDir: "dist",
   android: {
     // Enable edge-to-edge display and respect system insets

@@ -174,7 +174,7 @@ export const es = {
     accountIncompleteDesc: "Tu cuenta necesita ser completada. Verifica tu correo y termina el registro.",
   },
   index: {
-    title: "Bienvenido a Pantry",
+    title: "Bienvenido a Prefud",
     description:
       "La mejor aplicación para gestionar tus comidas y llevar una vida saludable.",
     button: "Empieza ahora",
@@ -188,9 +188,9 @@ export const es = {
     testimonials: {
       title: "Testimonios",
       user1:
-        "Pantry me ha ayudado a comer de forma más saludable y a ahorrar tiempo en la cocina.",
+        "Prefud me ha ayudado a comer de forma más saludable y a ahorrar tiempo en la cocina.",
       user2:
-        "Con Pantry, planificar mis comidas es más fácil que nunca. ¡Lo recomiendo!",
+        "Con Prefud, planificar mis comidas es más fácil que nunca. ¡Lo recomiendo!",
     },
   },
   pricing: {
@@ -218,15 +218,15 @@ export const es = {
     monthly: "mensual",
   },
   whyPantry: {
-    title: "¿Por qué elegir Pantry?",
+    title: "¿Por qué elegir Prefud?",
     reason1: "Ahorra tiempo y dinero",
     reason2: "Come de forma más saludable",
     reason3: "Planifica tus comidas fácilmente",
     reason4: "Gestiona tus recetas en un solo lugar",
     description1:
-      "Con Pantry, puedes planificar tus comidas de forma rápida y sencilla, ahorrando tiempo y dinero en la compra.",
+      "Con Prefud, puedes planificar tus comidas de forma rápida y sencilla, ahorrando tiempo y dinero en la compra.",
     description2:
-      "Pantry te ayuda a comer de forma más saludable, ofreciéndote recetas y planes de comidas equilibrados.",
+      "Prefud te ayuda a comer de forma más saludable, ofreciéndote recetas y planes de comidas equilibrados.",
     description3:
       "Planifica tus comidas semanales en pocos minutos y olvídate de pensar qué comer cada día.",
     description4:
@@ -547,7 +547,7 @@ export const es = {
     "badge": "Tu asistente de cocina con IA",
     "headline": "Cocina platos increíbles con lo que",
     "headlineHighlight": "ya tienes",
-    "subheadline": "Pantry usa IA para planificar comidas, generar listas de compras, guiarte paso a paso mientras cocinas y ayudarte a ahorrar dinero usando los ingredientes que ya tienes en casa.",
+    "subheadline": "Prefud usa IA para planificar comidas, generar listas de compras, guiarte paso a paso mientras cocinas y ayudarte a ahorrar dinero usando los ingredientes que ya tienes en casa.",
     "ctaPrimary": "Empieza Gratis",
     "ctaSecondary": "Mira Cómo Funciona",
     "noCreditCard": "No se requiere tarjeta de crédito",
@@ -557,24 +557,24 @@ export const es = {
     "problem2": "Comida caducando en la nevera",
     "problem3": "Gastar más de lo necesario",
     "problem4": "No saber qué cocinar",
-    "problemFix": "Pantry soluciona eso con IA.",
-    "howTitle": "Cómo funciona Pantry",
+    "problemFix": "Prefud soluciona eso con IA.",
+    "howTitle": "Cómo funciona Prefud",
     "howSubtitle": "Cinco pasos simples para una cocina más inteligente",
     "step1Title": "Agrega lo que tienes",
     "step1Desc": "Agrega rápidamente los ingredientes de tu nevera y despensa.",
     "step2Title": "La IA planifica tus comidas",
-    "step2Desc": "Pantry sugiere comidas usando lo que ya tienes.",
+    "step2Desc": "Prefud sugiere comidas usando lo que ya tienes.",
     "step3Title": "Lista de compras inteligente",
     "step3Desc": "Compra solo lo que realmente necesitas.",
     "step4Title": "La IA genera tu lista",
     "step4Desc": "¿No tienes ingredientes? No hay problema. La IA crea planes de comida completos y listas de compras para que sepas exactamente qué comprar en el mercado.",
     "step5Title": "Cocina paso a paso",
     "step5Desc": "Sigue instrucciones simples generadas para cada receta.",
-    "featuresTitle": "Lo que hace poderoso a Pantry",
+    "featuresTitle": "Lo que hace poderoso a Prefud",
     "feature1Title": "Planificación con IA",
     "feature1Desc": "Recibe sugerencias personalizadas basadas en los ingredientes que ya tienes.",
     "feature2Title": "Listas de Compras Inteligentes",
-    "feature2Desc": "Pantry crea automáticamente una lista de compras con los ingredientes faltantes.",
+    "feature2Desc": "Prefud crea automáticamente una lista de compras con los ingredientes faltantes.",
     "feature3Title": "Cocina Paso a Paso",
     "feature3Desc": "Instrucciones claras para cocinar cada comida con confianza.",
     "feature4Title": "Control de Despensa",
@@ -584,7 +584,7 @@ export const es = {
     "feature6Title": "Reduce el Desperdicio",
     "feature6Desc": "Usa lo que tienes antes de que expire. Bueno para ti y el planeta.",
     "imagineTitle": "Imagina tu cocina funcionando así",
-    "imagineSubtitle": "Abre Pantry y ve al instante:",
+    "imagineSubtitle": "Abre Prefud y ve al instante:",
     "imagine1": "Ingredientes que ya tienes",
     "imagine2": "Comidas que puedes cocinar ahora",
     "imagine3": "Lo que necesitas comprar",
@@ -597,7 +597,7 @@ export const es = {
     "realLife4": "Planifica tu semana fácilmente",
     "realLifeFooter": "Todo en un solo lugar.",
     "finalTitle": "Empieza a cocinar más inteligente hoy",
-    "finalSubtitle": "Únete a los primeros usuarios que usan Pantry para simplificar su cocina.",
+    "finalSubtitle": "Únete a los primeros usuarios que usan Prefud para simplificar su cocina.",
     "terms": "Términos",
     "privacy": "Privacidad"
   }

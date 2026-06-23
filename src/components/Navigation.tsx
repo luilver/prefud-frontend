@@ -103,7 +103,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white">
-                  Pantry
+                  Prefud
                 </h2>
                 <p className="text-sm text-emerald-300/80">Smart Kitchen</p>
               </div>

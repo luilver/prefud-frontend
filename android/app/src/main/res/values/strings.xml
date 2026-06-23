@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Pantry AI</string>
-    <string name="title_activity_main">Pantry AI</string>
-    <string name="package_name">com.bessel.mypantryapp</string>
-    <string name="custom_url_scheme">com.bessel.mypantryapp</string>
+    <string name="app_name">Prefud</string>
+    <string name="title_activity_main">Prefud</string>
+    <string name="package_name">com.bessel.prefud</string>
+    <string name="custom_url_scheme">com.bessel.prefud</string>
 </resources>
 
