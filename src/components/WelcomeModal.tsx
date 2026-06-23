@@ -17,7 +17,7 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
   const slides = [
     {
       icon: PartyPopper,
-      title: t("welcome.message") || "Welcome to Pantry!",
+      title: t("welcome.message") || "Welcome to Prefud!",
       description: t("welcome.subtitle") || "Your smart kitchen companion is ready to transform your cooking experience.",
       color: "text-purple-600",
       image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=250&fit=crop"
@@ -38,7 +38,7 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
     },
     {
       icon: Camera,
-      title: t("welcome.smartPantry") || "Smart Pantry Scanning",
+      title: t("welcome.smartPantry") || "Smart Prefud Scanning",
       description: t("welcome.scanIngredients") || "Use your camera to scan ingredients and automatically add them to your pantry.",
       color: "text-orange-600",
       image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=250&fit=crop"

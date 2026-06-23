@@ -24,7 +24,7 @@ const translations = {
     // Navigation
     "nav.home": "Home",
     "nav.pricing": "Pricing",
-    "nav.why-pantry": "Why Pantry",
+    "nav.why-pantry": "Why Prefud",
     "nav.signin": "Sign In",
     "nav.signup": "Sign Up",
     "nav.language": "Language",
@@ -41,7 +41,7 @@ const translations = {
     "dashboard.nav.planner": "Planner",
     "dashboard.nav.meals": "Meals",
     "dashboard.nav.drinks": "Drinks",
-    "dashboard.nav.pantry": "Pantry",
+    "dashboard.nav.pantry": "Prefud",
     "dashboard.nav.shopping": "Shopping",
     "dashboard.nav.environment": "Environment",
     "dashboard.nav.calories": "Calories",
@@ -59,15 +59,15 @@ const translations = {
     "highlights.plans-used": "Plans Used",
     "highlights.todays-calories": "Today's Calories",
     "highlights.shopping-items": "Shopping Items",
-    "highlights.pantry-items": "Pantry Items",
+    "highlights.pantry-items": "Prefud Items",
 
     // Home page
     "home.title": "Smart Meal Planning Made Simple",
     "home.subtitle":
-      "Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Pantry.",
+      "Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Prefud.",
     "home.cta.primary": "Start Free Trial",
     "home.cta.secondary": "Learn More",
-    "home.features.title": "Why Pantry?",
+    "home.features.title": "Why Prefud?",
     "home.features.subtitle":
       "Save time, money, and reduce food waste with intelligent meal planning",
     "home.features.smart-planning.title": "Smart Planning",
@@ -79,12 +79,12 @@ const translations = {
     "home.features.save-money.title": "Save Money",
     "home.features.save-money.description": "Shop smarter with automated lists",
     "home.footer.copyright":
-      "© 2025 Pantry by Bessel LLC. All rights reserved.",
-    "home.nav.why-pantry": "Why Pantry?",
+      "© 2025 Prefud by Bessel LLC. All rights reserved.",
+    "home.nav.why-pantry": "Why Prefud?",
     "home.nav.get-started": "Get Started",
 
     // Signup
-    "signup.title": "Join Pantry",
+    "signup.title": "Join Prefud",
     "signup.subtitle":
       "Create your account and start your smart kitchen journey",
     "signup.language.title": "Preferred Language",
@@ -208,7 +208,7 @@ const translations = {
     "cart.empty.backButton": "Back to Dashboard",
     "cart.actions.title": "Cart Actions",
     "cart.actions.addToShoppingList": "Add to Shopping List",
-    "cart.actions.addToPantry": "Add to Pantry",
+    "cart.actions.addToPantry": "Add to Prefud",
 
     // Diet Types
     "signup.diet.vegetarian": "Vegetarian",
@@ -250,7 +250,7 @@ const translations = {
 
     // Signin
     "signin.title": "Welcome Back",
-    "signin.subtitle": "Sign in to your Pantry account",
+    "signin.subtitle": "Sign in to your Prefud account",
     "signin.email": "Email Address",
     "signin.email.placeholder": "Enter your email",
     "signin.password": "Password",
@@ -533,9 +533,9 @@ const translations = {
     "mealPlanView.selected": "selected",
     "mealPlanView.estimated": "estimated",
     "mealPlanView.selectAll": "Select All",
-    "mealPlanView.addToPantry": "Add to Pantry",
+    "mealPlanView.addToPantry": "Add to Prefud",
     "mealPlanView.orderOnline": "Order Online",
-    "mealPlanView.addToPantryOne": "Add to Pantry",
+    "mealPlanView.addToPantryOne": "Add to Prefud",
     "mealPlanView.orderOnlineOne": "Order Online",
     "mealPlanView.other": "Other",
     "mealPlanView.noShoppingList":
@@ -551,7 +551,7 @@ const translations = {
     "mealPlanView.kidsUnder5": "Kids < 5",
     "mealPlanView.kids5to12": "Kids 5-12",
     "mealPlanView.noMeals": "No meals",
-    "mealPlanView.addedToPantry": "Added to Pantry",
+    "mealPlanView.addedToPantry": "Added to Prefud",
     "mealPlanView.planDetails": "Plan Details",
     "mealPlanView.maxCookingTime": "Max Cooking Time",
     "mealPlanView.skillLevel": "Skill Level",
@@ -580,7 +580,7 @@ const translations = {
     "aiMealStarted.title": "Meal Generation Started",
     "aiMealStarted.description":
       "We'll notify you when your meal is ready.",
-    "pantryMealsReady.title": "Your Pantry Meals are Ready! 🍽️",
+    "pantryMealsReady.title": "Your Prefud Meals are Ready! 🍽️",
     "pantryMealsReady.description":
       "Fresh AI meal ideas based on your pantry are ready to explore.",
     "pantryMealsReady.viewMeals": "View Meals",
@@ -595,7 +595,7 @@ const translations = {
     "analyzeImageReady.title": "Ingredients Detected",
     "analyzeImageReady.description":
       "ingredients detected. Select which to add to your pantry.",
-    "analyzeImageReady.addSelected": "Add Selected to Pantry",
+    "analyzeImageReady.addSelected": "Add Selected to Prefud",
     "analyzeImageReady.cancel": "Cancel",
     "analyzeImageReady.selectedCount": "selected",
     "analyzeImageReady.adding": "Adding…",
@@ -698,7 +698,7 @@ const translations = {
     "checkout.summary.deliveryTime": "Delivery Time",
     "checkout.confirmation.estimatedDelivery": "Estimated Delivery Time",
     "checkout.confirmation.deliveryAddress": "Delivery Address",
-    "checkout.confirmation.thankYou": "Thank you for choosing Pantry!",
+    "checkout.confirmation.thankYou": "Thank you for choosing Prefud!",
 
     //until here
     "days.sunday": "Sunday",
@@ -715,7 +715,7 @@ const translations = {
       "Select ingredients to add to pantry or request delivery",
     "mealShopping.selectAll": "Select All",
     "mealShopping.clearAll": "Clear All",
-    "mealShopping.addToPantry": "Add to Pantry",
+    "mealShopping.addToPantry": "Add to Prefud",
     "mealShopping.requestDelivery": "Request Delivery",
     "mealShopping.chooseDeliveryTime": "Choose Delivery Time",
     "mealShopping.deliveryPrompt":
@@ -1066,7 +1066,7 @@ const translations = {
     "aiMealGenerator.of": "of",
     "aiMealGenerator.selectAll": "Select All",
     "aiMealGenerator.clearAll": "Unselect All",
-    "aiMealGenerator.addToPantry": "Add to Pantry",
+    "aiMealGenerator.addToPantry": "Add to Prefud",
     "aiMealGenerator.orderOnline": "Order Online",
     "aiMealGenerator.selectedItems": "Selected Items",
     "aiMealGenerator.totalCost": "Total Cost",
@@ -1168,7 +1168,7 @@ const translations = {
     "aiMealView.deselectAll": "Deselect All",
     "aiMealView.selectIngredientsDesc":
       "Select ingredients to add to your pantry or cart",
-    "aiMealView.addToPantry": "Add to Pantry",
+    "aiMealView.addToPantry": "Add to Prefud",
     "aiMealView.addToCart": "Add to Cart",
 
     // AI Drink Creator
@@ -1429,7 +1429,7 @@ const translations = {
       "Failed to create shopping list. Please try again.",
     "drinkDetailView.expires": "Expires in",
     "drinkDetailView.days": "days",
-    "drinkDetailView.addToPantry": "Add to Pantry",
+    "drinkDetailView.addToPantry": "Add to Prefud",
     "drinkDetailView.orderOnline": "Order Online",
     "drinkDetailView.ingredientsSelected": "ingredients selected",
     "drinkDetailView.healthGoals": "Health Goals",
@@ -1452,8 +1452,8 @@ const translations = {
       "Please select ingredients to add to pantry.",
     "drinkShoppingModal.noDeliveryDesc":
       "Please select ingredients for delivery.",
-    "drinkShoppingModal.addedToPantryTitle": "Added to Pantry!",
-    "drinkDetailView.addedToPantry": "Added to Pantry!",
+    "drinkShoppingModal.addedToPantryTitle": "Added to Prefud!",
+    "drinkDetailView.addedToPantry": "Added to Prefud!",
     "drinkDetailView.ingredientsToPantry": "ingredients to your pantry.",
     "drinkShoppingModal.added": "Added",
     "drinkShoppingModal.ingredientsToPantry": "ingredients to your pantry.",
@@ -1466,7 +1466,7 @@ const translations = {
       "Select ingredients to add to pantry or request delivery",
     "drinkShoppingModal.selectAll": "Select All",
     "drinkShoppingModal.clearAll": "Clear All",
-    "drinkShoppingModal.addToPantry": "Add to Pantry",
+    "drinkShoppingModal.addToPantry": "Add to Prefud",
     "drinkShoppingModal.requestDelivery": "Request Delivery",
     "drinkShoppingModal.chooseDeliveryTime": "Choose Delivery Time",
     "drinkShoppingModal.whenDelivery":
@@ -1539,9 +1539,9 @@ const translations = {
     "recipeView.deselectAll": "Deselect All",
     "recipeView.selectIngredientsDesc":
       "Select ingredients to add to your pantry or cart",
-    "recipeView.addToPantry": "Add to Pantry",
+    "recipeView.addToPantry": "Add to Prefud",
     "recipeView.addToCart": "Add to Cart",
-    "recipeView.addedToPantry": "Added to Pantry",
+    "recipeView.addedToPantry": "Added to Prefud",
 
     // Cooking Mode
     "cookingMode.title": "Cooking Mode",
@@ -1615,7 +1615,7 @@ const translations = {
     "pricing.features.meal-plans": "Meal Plans per month",
     "pricing.features.basic-recipes": "Basic Recipe Collection",
     "pricing.features.shopping-list": "Shopping List Generator",
-    "pricing.features.pantry-management": "Pantry Management",
+    "pricing.features.pantry-management": "Prefud Management",
     "pricing.features.email-support": "Email Support",
     "pricing.features.meal-creations": "Meal Creations with pantry ingredients",
     "pricing.features.ai-recommendations": "AI Meal Recommendations",
@@ -1648,18 +1648,18 @@ const translations = {
     "pricing.faq.limits.answer":
       "We'll notify you when you're approaching your limits and offer options to upgrade your plan or wait for the next billing cycle.",
 
-    // Why Pantry
-    "why-pantry.title.main": "Why Pantry is",
+    // Why Prefud
+    "why-pantry.title.main": "Why Prefud is",
     "why-pantry.title.sub": "Changing the World",
     "why-pantry.hero.description":
-      "Every day, millions of tons of food are wasted while people struggle with meal planning and grocery shopping. Pantry is revolutionizing how we think about food, sustainability, and smart living.",
+      "Every day, millions of tons of food are wasted while people struggle with meal planning and grocery shopping. Prefud is revolutionizing how we think about food, sustainability, and smart living.",
     "why-pantry.stats.food-waste": "Food Waste Reduced",
     "why-pantry.stats.yearly-savings": "Average Yearly Savings",
     "why-pantry.stats.time-saved": "Weekly Time Saved",
     "why-pantry.stats.co2-reduced": "CO₂ Reduced/Year",
     "why-pantry.eliminate-waste.title": "Eliminate Food Waste",
     "why-pantry.eliminate-waste.description":
-      "Did you know that the average household throws away $1,500 worth of food every year? Pantry's intelligent tracking system monitors expiration dates, suggests recipes based on what's about to expire, and sends you timely alerts to use ingredients before they go bad.",
+      "Did you know that the average household throws away $1,500 worth of food every year? Prefud's intelligent tracking system monitors expiration dates, suggests recipes based on what's about to expire, and sends you timely alerts to use ingredients before they go bad.",
     "why-pantry.eliminate-waste.feature1": "Smart expiration date tracking",
     "why-pantry.eliminate-waste.feature2":
       "Recipe suggestions for expiring items",
@@ -1669,7 +1669,7 @@ const translations = {
       "Average reduction in food waste per household",
     "why-pantry.optimize-time.title": "Optimize Your Time",
     "why-pantry.optimize-time.description":
-      "Stop spending hours planning meals and making multiple grocery trips. Pantry's AI creates personalized meal plans based on your preferences, generates smart shopping lists, and even tracks your pantry inventory automatically. More time for what matters most.",
+      "Stop spending hours planning meals and making multiple grocery trips. Prefud's AI creates personalized meal plans based on your preferences, generates smart shopping lists, and even tracks your pantry inventory automatically. More time for what matters most.",
     "why-pantry.optimize-time.feature1": "AI-powered meal planning in minutes",
     "why-pantry.optimize-time.feature2": "Automated shopping list generation",
     "why-pantry.optimize-time.feature3": "Smart grocery trip optimization",
@@ -1678,7 +1678,7 @@ const translations = {
       "Every week on meal planning and shopping",
     "why-pantry.save-money.title": "Save Serious Money",
     "why-pantry.save-money.description":
-      "Our users save an average of $1,200 per year by reducing food waste, buying only what they need, and taking advantage of Pantry's smart shopping features. The app pays for itself in the first month!",
+      "Our users save an average of $1,200 per year by reducing food waste, buying only what they need, and taking advantage of Prefud's smart shopping features. The app pays for itself in the first month!",
     "why-pantry.save-money.stat1": "Average savings",
     "why-pantry.save-money.stat2": "Less",
     "why-pantry.save-money.stat2-desc": "Grocery spending",
@@ -1688,7 +1688,7 @@ const translations = {
     "why-pantry.save-money.breakdown.coupons": "Coupon integration",
     "why-pantry.carbon-footprint.title": "Reduce Carbon Footprint",
     "why-pantry.carbon-footprint.description":
-      "Food waste is responsible for 8% of global greenhouse gas emissions. By using Pantry, you're not just saving money - you're helping save the planet. Every meal planned efficiently and every ingredient saved from the trash makes a real environmental impact.",
+      "Food waste is responsible for 8% of global greenhouse gas emissions. By using Prefud, you're not just saving money - you're helping save the planet. Every meal planned efficiently and every ingredient saved from the trash makes a real environmental impact.",
     "why-pantry.carbon-footprint.feature1": "Reduce methane from food waste",
     "why-pantry.carbon-footprint.feature2": "Lower transportation emissions",
     "why-pantry.carbon-footprint.feature3": "Support sustainable food systems",
@@ -1696,7 +1696,7 @@ const translations = {
     "why-pantry.carbon-footprint.stat-desc": "Reduced per household annually",
     "why-pantry.carbon-footprint.equivalent":
       "Equivalent to taking a car off the road for 5,800 miles or planting 105 trees",
-    "why-pantry.features.title": "How Pantry Makes It All Possible",
+    "why-pantry.features.title": "How Prefud Makes It All Possible",
     "why-pantry.features.shopping-lists.title": "Smart Shopping Lists",
     "why-pantry.features.shopping-lists.description":
       "Automatically generated based on your meal plans, pantry inventory, and store layouts. Never forget an ingredient or buy duplicates again.",
@@ -1708,7 +1708,7 @@ const translations = {
       "Track your progress with detailed analytics on food waste reduction, money saved, and environmental impact.",
     "why-pantry.cta.title": "Join the Food Revolution Today",
     "why-pantry.cta.description":
-      "Start saving money, time, and the planet with Pantry's intelligent kitchen management system.",
+      "Start saving money, time, and the planet with Prefud's intelligent kitchen management system.",
     "why-pantry.cta.primary": "Free",
     "why-pantry.cta.secondary": "Learn More",
 
@@ -1834,7 +1834,7 @@ const translations = {
     "addIngredient.units.box.value": "box",
 
     //IngredientTracker
-    "ingredientTracker.title": "My Pantry",
+    "ingredientTracker.title": "My Prefud",
     "ingredientTracker.description":
       "Keep track of your ingredients and their expiration dates",
     "ingredientTracker.refresh": "Refresh",
@@ -1847,7 +1847,7 @@ const translations = {
     "ingredientTracker.expired": "Expired",
     "ingredientTracker.today": "Today",
     "ingredientTracker.allFresh": "All ingredients are fresh!",
-    "ingredientTracker.yourPantry": "Your Pantry",
+    "ingredientTracker.yourPantry": "Your Prefud",
     "ingredientTracker.organizedByCategory":
       "All your ingredients organized by category",
     "ingredientTracker.searchPlaceholder": "Search ingredients...",
@@ -1857,7 +1857,7 @@ const translations = {
       "Your pantry is empty. Try refreshing or add some ingredients.",
     "ingredientTracker.startAdding":
       "Start by adding some ingredients to your pantry",
-    "ingredientTracker.pantryTab": "Pantry",
+    "ingredientTracker.pantryTab": "Prefud",
     "ingredientTracker.expiringTab": "Expiring Soon",
     "ingredientTracker.categoriesTab": "Categories",
     "ingredientTracker.lowStockTab": "Low Stock",
@@ -1912,7 +1912,7 @@ const translations = {
     "aiSuggestions.cal": "cal",
 
     //Welcome
-    "welcome.message": "Welcome to Pantry!",
+    "welcome.message": "Welcome to Prefud!",
     "welcome.subtitle":
       "Your smart kitchen companion is ready to transform your cooking experience.",
     "welcome.aiMealPlanning": "AI-Powered Meal Planning",
@@ -1954,7 +1954,7 @@ const translations = {
     "landing.headline": "Cook amazing meals with what you",
     "landing.headlineHighlight": "already have",
     "landing.subheadline":
-      "Pantry uses AI to plan meals, generate shopping lists, guide you step-by-step while cooking, and help you save money by using the ingredients you already have at home.",
+      "Prefud uses AI to plan meals, generate shopping lists, guide you step-by-step while cooking, and help you save money by using the ingredients you already have at home.",
     "landing.ctaPrimary": "Start Free",
     "landing.ctaSecondary": "See How It Works",
     "landing.noCreditCard": "Credit card required",
@@ -1965,30 +1965,30 @@ const translations = {
     "landing.problem2": "Food expiring in the fridge",
     "landing.problem3": "Spending more than necessary",
     "landing.problem4": "Not knowing what to cook",
-    "landing.problemFix": "Pantry fixes that with AI.",
-    "landing.howTitle": "How Pantry Works",
+    "landing.problemFix": "Prefud fixes that with AI.",
+    "landing.howTitle": "How Prefud Works",
     "landing.howSubtitle": "Four simple steps to a smarter kitchen",
     "landing.step1Title": "Add what you have",
     "landing.step1Desc":
       "Quickly add the ingredients in your fridge and pantry.",
     "landing.step2Title": "AI plans your meals",
-    "landing.step2Desc": "Pantry suggests meals using what you already own.",
+    "landing.step2Desc": "Prefud suggests meals using what you already own.",
     "landing.step3Title": "Smart shopping list",
     "landing.step3Desc": "Only buy what you actually need.",
     "landing.step4Title": "Cook step by step",
     "landing.step4Desc":
       "Follow simple instructions generated for each recipe.",
-    "landing.featuresTitle": "What makes Pantry powerful",
+    "landing.featuresTitle": "What makes Prefud powerful",
     "landing.feature1Title": "AI Meal Planning",
     "landing.feature1Desc":
       "Get personalized meal suggestions based on the ingredients you already have.",
     "landing.feature2Title": "Smart Grocery Lists",
     "landing.feature2Desc":
-      "Pantry automatically creates a shopping list for missing ingredients.",
+      "Prefud automatically creates a shopping list for missing ingredients.",
     "landing.feature3Title": "Step-by-Step Cooking",
     "landing.feature3Desc":
       "Clear instructions so you can cook every meal confidently.",
-    "landing.feature4Title": "Pantry Tracking",
+    "landing.feature4Title": "Prefud Tracking",
     "landing.feature4Desc": "Know exactly what ingredients you have at home.",
     "landing.feature5Title": "Save Money",
     "landing.feature5Desc": "Buy only what you need and reduce food waste.",
@@ -1996,7 +1996,7 @@ const translations = {
     "landing.feature6Desc":
       "Use what you have before it expires. Good for you and the planet.",
     "landing.imagineTitle": "Imagine your kitchen working like this",
-    "landing.imagineSubtitle": "Open Pantry and instantly see:",
+    "landing.imagineSubtitle": "Open Prefud and instantly see:",
     "landing.imagine1": "Ingredients you already have",
     "landing.imagine2": "Meals you can cook right now",
     "landing.imagine3": "What you need to buy",
@@ -2011,7 +2011,7 @@ const translations = {
     "landing.realLifeFooter": "All in one place.",
     "landing.finalTitle": "Start cooking smarter today",
     "landing.finalSubtitle":
-      "Join early users using Pantry to simplify their kitchen.",
+      "Join early users using Prefud to simplify their kitchen.",
     "landing.terms": "Terms",
     "landing.privacy": "Privacy",
   },
@@ -2030,7 +2030,7 @@ const translations = {
     // Navigation
     "nav.home": "Inicio",
     "nav.pricing": "Precios",
-    "nav.why-pantry": "Por qué Pantry",
+    "nav.why-pantry": "Por qué Prefud",
     "nav.signin": "Iniciar Sesión",
     "nav.signup": "Registrarse",
     "nav.language": "Idioma",
@@ -2070,10 +2070,10 @@ const translations = {
     // Home page
     "home.title": "Planificación Inteligente de Comidas Simplificada",
     "home.subtitle":
-      "Transforma tu cocina con planificación de comidas impulsada por IA, reduce el desperdicio de alimentos, ahorra dinero y come más saludable con Pantry.",
+      "Transforma tu cocina con planificación de comidas impulsada por IA, reduce el desperdicio de alimentos, ahorra dinero y come más saludable con Prefud.",
     "home.cta.primary": "Comenzar Prueba Gratuita",
     "home.cta.secondary": "Saber Más",
-    "home.features.title": "¿Por qué Pantry?",
+    "home.features.title": "¿Por qué Prefud?",
     "home.features.subtitle":
       "Ahorra tiempo, dinero y reduce el desperdicio de alimentos con planificación inteligente de comidas",
     "home.features.smart-planning.title": "Planificación Inteligente",
@@ -2086,12 +2086,12 @@ const translations = {
     "home.features.save-money.description":
       "Compra más inteligentemente con listas automatizadas",
     "home.footer.copyright":
-      "© 2025 Pantry de Bessel LLC. Todos los derechos reservados.",
-    "home.nav.why-pantry": "¿Por qué Pantry?",
+      "© 2025 Prefud de Bessel LLC. Todos los derechos reservados.",
+    "home.nav.why-pantry": "¿Por qué Prefud?",
     "home.nav.get-started": "Comenzar",
 
     // Signup
-    "signup.title": "Únete a Pantry",
+    "signup.title": "Únete a Prefud",
     "signup.subtitle":
       "Crea tu cuenta y comienza tu viaje de cocina inteligente",
     "signup.language.title": "Idioma Preferido",
@@ -2261,7 +2261,7 @@ const translations = {
 
     // Signin
     "signin.title": "Bienvenido de Vuelta",
-    "signin.subtitle": "Inicia sesión en tu cuenta de Pantry",
+    "signin.subtitle": "Inicia sesión en tu cuenta de Prefud",
     "signin.email": "Dirección de Email",
     "signin.email.placeholder": "Ingresa tu email",
     "signin.password": "Contraseña",
@@ -3359,7 +3359,7 @@ const translations = {
     "checkout.confirmation.done": "Listo",
     "checkout.confirmation.estimatedDelivery": "Hora estimada de entrega",
     "checkout.confirmation.deliveryAddress": "Dirección de entrega",
-    "checkout.confirmation.thankYou": "¡Gracias por elegir Pantry!",
+    "checkout.confirmation.thankYou": "¡Gracias por elegir Prefud!",
 
     "checkout.address.delivery.title": "Dirección de entrega",
     "checkout.address.delivery.subtitle":
@@ -3708,18 +3708,18 @@ const translations = {
     "pricing.faq.limits.answer":
       "Te notificaremos cuando te estés acercando a tus límites y te ofreceremos opciones para actualizar tu plan o esperar al próximo ciclo de facturación.",
 
-    // Why Pantry
-    "why-pantry.title.main": "Por qué Pantry está",
+    // Why Prefud
+    "why-pantry.title.main": "Por qué Prefud está",
     "why-pantry.title.sub": "Cambiando el Mundo",
     "why-pantry.hero.description":
-      "Cada día, millones de toneladas de alimentos se desperdician mientras las personas luchan con la planificación de comidas y las compras de comestibles. Pantry está revolucionando cómo pensamos sobre la comida, la sostenibilidad y la vida inteligente.",
+      "Cada día, millones de toneladas de alimentos se desperdician mientras las personas luchan con la planificación de comidas y las compras de comestibles. Prefud está revolucionando cómo pensamos sobre la comida, la sostenibilidad y la vida inteligente.",
     "why-pantry.stats.food-waste": "Desperdicio de Alimentos Reducido",
     "why-pantry.stats.yearly-savings": "Ahorros Anuales Promedio",
     "why-pantry.stats.time-saved": "Tiempo Ahorrado Semanalmente",
     "why-pantry.stats.co2-reduced": "CO₂ Reducido/Año",
     "why-pantry.eliminate-waste.title": "Eliminar el Desperdicio de Alimentos",
     "why-pantry.eliminate-waste.description":
-      "¿Sabías que el hogar promedio tira $1,500 en comida cada año? El sistema de seguimiento inteligente de Pantry monitorea las fechas de vencimiento, sugiere recetas basadas en lo que está a punto de vencer y te envía alertas oportunas para usar ingredientes antes de que se echen a perder.",
+      "¿Sabías que el hogar promedio tira $1,500 en comida cada año? El sistema de seguimiento inteligente de Prefud monitorea las fechas de vencimiento, sugiere recetas basadas en lo que está a punto de vencer y te envía alertas oportunas para usar ingredientes antes de que se echen a perder.",
     "why-pantry.eliminate-waste.feature1":
       "Seguimiento inteligente de fechas de vencimiento",
     "why-pantry.eliminate-waste.feature2":
@@ -3731,7 +3731,7 @@ const translations = {
       "Reducción promedio en desperdicio de alimentos por hogar",
     "why-pantry.optimize-time.title": "Optimiza Tu Tiempo",
     "why-pantry.optimize-time.description":
-      "Deja de pasar horas planeando comidas y haciendo múltiples viajes al supermercado. La IA de Pantry crea planes de comidas personalizados basados en tus preferencias, genera listas de compras inteligentes e incluso rastrea el inventario de tu despensa automáticamente. Más tiempo para lo que más importa.",
+      "Deja de pasar horas planeando comidas y haciendo múltiples viajes al supermercado. La IA de Prefud crea planes de comidas personalizados basados en tus preferencias, genera listas de compras inteligentes e incluso rastrea el inventario de tu despensa automáticamente. Más tiempo para lo que más importa.",
     "why-pantry.optimize-time.feature1":
       "Planificación de comidas impulsada por IA en minutos",
     "why-pantry.optimize-time.feature2":
@@ -3743,7 +3743,7 @@ const translations = {
       "Cada semana en planificación de comidas y compras",
     "why-pantry.save-money.title": "Ahorra Dinero en Serio",
     "why-pantry.save-money.description":
-      "Nuestros usuarios ahorran un promedio de $1,200 por año reduciendo el desperdicio de alimentos, comprando solo lo que necesitan y aprovechando las características de compras inteligentes de Pantry. ¡La aplicación se paga por sí misma en el primer mes!",
+      "Nuestros usuarios ahorran un promedio de $1,200 por año reduciendo el desperdicio de alimentos, comprando solo lo que necesitan y aprovechando las características de compras inteligentes de Prefud. ¡La aplicación se paga por sí misma en el primer mes!",
     "why-pantry.save-money.stat1": "Ahorros promedio",
     "why-pantry.save-money.stat2": "Menos",
     "why-pantry.save-money.stat2-desc": "Gasto en comestibles",
@@ -3755,7 +3755,7 @@ const translations = {
     "why-pantry.save-money.breakdown.coupons": "Integración de cupones",
     "why-pantry.carbon-footprint.title": "Reducir la Huella de Carbono",
     "why-pantry.carbon-footprint.description":
-      "El desperdicio de alimentos es responsable del 8% de las emisiones globales de gases de efecto invernadero. Al usar Pantry, no solo estás ahorrando dinero - estás ayudando a salvar el planeta. Cada comida planificada eficientemente y cada ingrediente salvado de la basura hace un impacto ambiental real.",
+      "El desperdicio de alimentos es responsable del 8% de las emisiones globales de gases de efecto invernadero. Al usar Prefud, no solo estás ahorrando dinero - estás ayudando a salvar el planeta. Cada comida planificada eficientemente y cada ingrediente salvado de la basura hace un impacto ambiental real.",
     "why-pantry.carbon-footprint.feature1":
       "Reducir metano del desperdicio de alimentos",
     "why-pantry.carbon-footprint.feature2": "Disminuir emisiones de transporte",
@@ -3765,7 +3765,7 @@ const translations = {
     "why-pantry.carbon-footprint.stat-desc": "Reducidas por hogar anualmente",
     "why-pantry.carbon-footprint.equivalent":
       "Equivalente a sacar un coche de la carretera por 5,800 millas o plantar 105 árboles",
-    "why-pantry.features.title": "Cómo Pantry Hace Todo Esto Posible",
+    "why-pantry.features.title": "Cómo Prefud Hace Todo Esto Posible",
     "why-pantry.features.shopping-lists.title":
       "Listas de Compras Inteligentes",
     "why-pantry.features.shopping-lists.description":
@@ -3779,7 +3779,7 @@ const translations = {
       "Rastrea tu progreso con análisis detallados sobre reducción de desperdicio de alimentos, dinero ahorrado e impacto ambiental.",
     "why-pantry.cta.title": "Únete a la Revolución Alimentaria Hoy",
     "why-pantry.cta.description":
-      "Comienza a ahorrar dinero, tiempo y el planeta con el sistema inteligente de gestión de cocina de Pantry.",
+      "Comienza a ahorrar dinero, tiempo y el planeta con el sistema inteligente de gestión de cocina de Prefud.",
     "why-pantry.cta.primary": "Gratis",
     "why-pantry.cta.secondary": "Saber Más",
 
@@ -3989,7 +3989,7 @@ const translations = {
     "aiSuggestions.cal": "cal",
 
     //Welcome
-    "welcome.message": "¡Bienvenido a Pantry!",
+    "welcome.message": "¡Bienvenido a Prefud!",
     "welcome.subtitle":
       "Tu compañero inteligente de cocina está listo para transformar tu experiencia culinaria.",
     "welcome.aiMealPlanning": "Planificación de comidas con IA",
@@ -4032,7 +4032,7 @@ const translations = {
     "landing.headline": "Cocina platos increíbles con lo que",
     "landing.headlineHighlight": "ya tienes",
     "landing.subheadline":
-      "Pantry usa IA para planificar comidas, generar listas de compras, guiarte paso a paso mientras cocinas y ayudarte a ahorrar dinero usando los ingredientes que ya tienes en casa.",
+      "Prefud usa IA para planificar comidas, generar listas de compras, guiarte paso a paso mientras cocinas y ayudarte a ahorrar dinero usando los ingredientes que ya tienes en casa.",
     "landing.ctaPrimary": "Empieza Gratis",
     "landing.ctaSecondary": "Mira Cómo Funciona",
     "landing.noCreditCard": "No se requiere tarjeta de crédito",
@@ -4043,27 +4043,27 @@ const translations = {
     "landing.problem2": "Comida caducando en la nevera",
     "landing.problem3": "Gastar más de lo necesario",
     "landing.problem4": "No saber qué cocinar",
-    "landing.problemFix": "Pantry soluciona eso con IA.",
-    "landing.howTitle": "Cómo funciona Pantry",
+    "landing.problemFix": "Prefud soluciona eso con IA.",
+    "landing.howTitle": "Cómo funciona Prefud",
     "landing.howSubtitle":
       "Cuatro pasos simples para una cocina más inteligente",
     "landing.step1Title": "Agrega lo que tienes",
     "landing.step1Desc":
       "Agrega rápidamente los ingredientes de tu nevera y despensa.",
     "landing.step2Title": "La IA planifica tus comidas",
-    "landing.step2Desc": "Pantry sugiere comidas usando lo que ya tienes.",
+    "landing.step2Desc": "Prefud sugiere comidas usando lo que ya tienes.",
     "landing.step3Title": "Lista de compras inteligente",
     "landing.step3Desc": "Compra solo lo que realmente necesitas.",
     "landing.step4Title": "Cocina paso a paso",
     "landing.step4Desc":
       "Sigue instrucciones simples generadas para cada receta.",
-    "landing.featuresTitle": "Lo que hace poderoso a Pantry",
+    "landing.featuresTitle": "Lo que hace poderoso a Prefud",
     "landing.feature1Title": "Planificación con IA",
     "landing.feature1Desc":
       "Recibe sugerencias personalizadas basadas en los ingredientes que ya tienes.",
     "landing.feature2Title": "Listas de Compras Inteligentes",
     "landing.feature2Desc":
-      "Pantry crea automáticamente una lista de compras con los ingredientes faltantes.",
+      "Prefud crea automáticamente una lista de compras con los ingredientes faltantes.",
     "landing.feature3Title": "Cocina Paso a Paso",
     "landing.feature3Desc":
       "Instrucciones claras para cocinar cada comida con confianza.",
@@ -4075,7 +4075,7 @@ const translations = {
     "landing.feature6Desc":
       "Usa lo que tienes antes de que expire. Bueno para ti y el planeta.",
     "landing.imagineTitle": "Imagina tu cocina funcionando así",
-    "landing.imagineSubtitle": "Abre Pantry y ve al instante:",
+    "landing.imagineSubtitle": "Abre Prefud y ve al instante:",
     "landing.imagine1": "Ingredientes que ya tienes",
     "landing.imagine2": "Comidas que puedes cocinar ahora",
     "landing.imagine3": "Lo que necesitas comprar",
@@ -4090,7 +4090,7 @@ const translations = {
     "landing.realLifeFooter": "Todo en un solo lugar.",
     "landing.finalTitle": "Empieza a cocinar más inteligente hoy",
     "landing.finalSubtitle":
-      "Únete a los primeros usuarios que usan Pantry para simplificar su cocina.",
+      "Únete a los primeros usuarios que usan Prefud para simplificar su cocina.",
     "landing.terms": "Términos",
     "landing.privacy": "Privacidad",
   },
@@ -4109,7 +4109,7 @@ const translations = {
     // Navigation
     "nav.home": "Início",
     "nav.pricing": "Preços",
-    "nav.why-pantry": "Por que Pantry",
+    "nav.why-pantry": "Por que Prefud",
     "nav.signin": "Entrar",
     "nav.signup": "Cadastrar",
     "nav.language": "Idioma",
@@ -4149,10 +4149,10 @@ const translations = {
     // Home page
     "home.title": "Planejamento Inteligente de Refeições Simplificado",
     "home.subtitle":
-      "Transforme sua cozinha com planejamento de refeições com IA, reduza o desperdício de alimentos, economize dinheiro e coma mais saudável com o Pantry.",
+      "Transforme sua cozinha com planejamento de refeições com IA, reduza o desperdício de alimentos, economize dinheiro e coma mais saudável com o Prefud.",
     "home.cta.primary": "Começar Teste Gratuito",
     "home.cta.secondary": "Saiba Mais",
-    "home.features.title": "Por que Pantry?",
+    "home.features.title": "Por que Prefud?",
     "home.features.subtitle":
       "Economize tempo, dinheiro e reduza o desperdício de alimentos com planejamento inteligente de refeições",
     "home.features.smart-planning.title": "Planejamento Inteligente",
@@ -4165,12 +4165,12 @@ const translations = {
     "home.features.save-money.description":
       "Compre mais inteligentemente com listas automatizadas",
     "home.footer.copyright":
-      "© 2025 Pantry do Bessel LLC. Todos os direitos reservados.",
-    "home.nav.why-pantry": "Por que Pantry?",
+      "© 2025 Prefud do Bessel LLC. Todos os direitos reservados.",
+    "home.nav.why-pantry": "Por que Prefud?",
     "home.nav.get-started": "Começar",
 
     // Signup
-    "signup.title": "Junte-se ao Pantry",
+    "signup.title": "Junte-se ao Prefud",
     "signup.subtitle":
       "Crie sua conta e comece sua jornada de cozinha inteligente",
     "signup.language.title": "Idioma Preferido",
@@ -4340,7 +4340,7 @@ const translations = {
 
     // Signin
     "signin.title": "Bem-vindo de Volta",
-    "signin.subtitle": "Entre na sua conta Pantry",
+    "signin.subtitle": "Entre na sua conta Prefud",
     "signin.email": "Endereço de Email",
     "signin.email.placeholder": "Digite seu email",
     "signin.password": "Senha",
@@ -4821,7 +4821,7 @@ const translations = {
     "checkout.confirmation.done": "Concluir",
     "checkout.confirmation.estimatedDelivery": "Tempo estimado de entrega",
     "checkout.confirmation.deliveryAddress": "Endereço de entrega",
-    "checkout.confirmation.thankYou": "Obrigado por escolher a Pantry!",
+    "checkout.confirmation.thankYou": "Obrigado por escolher a Prefud!",
 
     "checkout.address.delivery.title": "Endereço de entrega",
     "checkout.address.delivery.subtitle":
@@ -5781,18 +5781,18 @@ const translations = {
     "pricing.faq.limits.answer":
       "Vamos notificá-lo quando você estiver se aproximando dos seus limites e oferecer opções para fazer upgrade do seu plano ou aguardar o próximo ciclo de cobrança.",
 
-    // Why Pantry
-    "why-pantry.title.main": "Por que o Pantry está",
+    // Why Prefud
+    "why-pantry.title.main": "Por que o Prefud está",
     "why-pantry.title.sub": "Mudando o Mundo",
     "why-pantry.hero.description":
-      "Todos os dias, milhões de toneladas de alimentos são desperdiçados enquanto as pessoas lutam com o planejamento de refeições e compras de supermercado. O Pantry está revolucionando como pensamos sobre comida, sustentabilidade e vida inteligente.",
+      "Todos os dias, milhões de toneladas de alimentos são desperdiçados enquanto as pessoas lutam com o planejamento de refeições e compras de supermercado. O Prefud está revolucionando como pensamos sobre comida, sustentabilidade e vida inteligente.",
     "why-pantry.stats.food-waste": "Desperdício de Alimentos Reduzido",
     "why-pantry.stats.yearly-savings": "Economia Anual Média",
     "why-pantry.stats.time-saved": "Tempo Economizado Semanalmente",
     "why-pantry.stats.co2-reduced": "CO₂ Reduzido/Ano",
     "why-pantry.eliminate-waste.title": "Eliminar o Desperdício de Alimentos",
     "why-pantry.eliminate-waste.description":
-      "Você sabia que a família média joga fora $1,500 em comida todo ano? O sistema de rastreamento inteligente do Pantry monitora datas de validade, sugere receitas baseadas no que está prestes a vencer e envia alertas oportunos para usar ingredientes antes que estraguem.",
+      "Você sabia que a família média joga fora $1,500 em comida todo ano? O sistema de rastreamento inteligente do Prefud monitora datas de validade, sugere receitas baseadas no que está prestes a vencer e envia alertas oportunos para usar ingredientes antes que estraguem.",
     "why-pantry.eliminate-waste.feature1":
       "Rastreamento inteligente de datas de validade",
     "why-pantry.eliminate-waste.feature2":
@@ -5804,7 +5804,7 @@ const translations = {
       "Redução média no desperdício de alimentos por residência",
     "why-pantry.optimize-time.title": "Otimize Seu Tempo",
     "why-pantry.optimize-time.description":
-      "Pare de gastar horas planejando refeições e fazendo múltiplas viagens ao supermercado. A IA do Pantry cria planos de refeições personalizados baseados nas suas preferências, gera listas de compras inteligentes e até rastreia o inventário da sua despensa automaticamente. Mais tempo para o que realmente importa.",
+      "Pare de gastar horas planejando refeições e fazendo múltiplas viagens ao supermercado. A IA do Prefud cria planos de refeições personalizados baseados nas suas preferências, gera listas de compras inteligentes e até rastreia o inventário da sua despensa automaticamente. Mais tempo para o que realmente importa.",
     "why-pantry.optimize-time.feature1":
       "Planejamento de refeições com IA em minutos",
     "why-pantry.optimize-time.feature2":
@@ -5816,7 +5816,7 @@ const translations = {
       "Toda semana no planejamento de refeições e compras",
     "why-pantry.save-money.title": "Economize Dinheiro de Verdade",
     "why-pantry.save-money.description":
-      "Nossos usuários economizam em média $1,200 por ano reduzindo o desperdício de alimentos, comprando apenas o que precisam e aproveitando os recursos de compras inteligentes do Pantry. O aplicativo se paga no primeiro mês!",
+      "Nossos usuários economizam em média $1,200 por ano reduzindo o desperdício de alimentos, comprando apenas o que precisam e aproveitando os recursos de compras inteligentes do Prefud. O aplicativo se paga no primeiro mês!",
     "why-pantry.save-money.stat1": "Economia média",
     "why-pantry.save-money.stat2": "Menos",
     "why-pantry.save-money.stat2-desc": "Gastos com supermercado",
@@ -5828,7 +5828,7 @@ const translations = {
     "why-pantry.save-money.breakdown.coupons": "Integração de cupons",
     "why-pantry.carbon-footprint.title": "Reduzir a Pegada de Carbono",
     "why-pantry.carbon-footprint.description":
-      "O desperdício de alimentos é responsável por 8% das emissões globais de gases do efeito estufa. Ao usar o Pantry, você não está apenas economizando dinheiro - está ajudando a salvar o planeta. Cada refeição planejada eficientemente e cada ingrediente salvo do lixo faz um impacto ambiental real.",
+      "O desperdício de alimentos é responsável por 8% das emissões globais de gases do efeito estufa. Ao usar o Prefud, você não está apenas economizando dinheiro - está ajudando a salvar o planeta. Cada refeição planejada eficientemente e cada ingrediente salvo do lixo faz um impacto ambiental real.",
     "why-pantry.carbon-footprint.feature1":
       "Reduzir metano do desperdício de alimentos",
     "why-pantry.carbon-footprint.feature2": "Diminuir emissões de transporte",
@@ -5839,7 +5839,7 @@ const translations = {
       "Reduzidas por residência anualmente",
     "why-pantry.carbon-footprint.equivalent":
       "Equivalente a tirar um carro da estrada por 5,800 milhas ou plantar 105 árvores",
-    "why-pantry.features.title": "Como o Pantry Torna Tudo Isso Possível",
+    "why-pantry.features.title": "Como o Prefud Torna Tudo Isso Possível",
     "why-pantry.features.shopping-lists.title":
       "Listas de Compras Inteligentes",
     "why-pantry.features.shopping-lists.description":
@@ -5853,7 +5853,7 @@ const translations = {
       "Acompanhe seu progresso com análises detalhadas sobre redução de desperdício de alimentos, dinheiro economizado e impacto ambiental.",
     "why-pantry.cta.title": "Junte-se à Revolução Alimentar Hoje",
     "why-pantry.cta.description":
-      "Comece a economizar dinheiro, tempo e o planeta com o sistema inteligente de gestão de cozinha do Pantry.",
+      "Comece a economizar dinheiro, tempo e o planeta com o sistema inteligente de gestão de cozinha do Prefud.",
     "why-pantry.cta.primary": "Grátis",
     "why-pantry.cta.secondary": "Saiba Mais",
 
@@ -6063,7 +6063,7 @@ const translations = {
     "aiSuggestions.cal": "cal",
 
     //Welcome
-    "welcome.message": "Bem-vindo ao Pantry!",
+    "welcome.message": "Bem-vindo ao Prefud!",
     "welcome.subtitle":
       "Seu companheiro de cozinha inteligente está pronto para transformar sua experiência culinária.",
     "welcome.aiMealPlanning": "Planejamento de refeições com IA",
@@ -6105,7 +6105,7 @@ const translations = {
     "landing.headline": "Cozinhe pratos incríveis com o que você",
     "landing.headlineHighlight": "já tem",
     "landing.subheadline":
-      "O Pantry usa IA para planejar refeições, gerar listas de compras, te guiar passo a passo enquanto cozinha e te ajudar a economizar dinheiro usando os ingredientes que você já tem em casa.",
+      "O Prefud usa IA para planejar refeições, gerar listas de compras, te guiar passo a passo enquanto cozinha e te ajudar a economizar dinheiro usando os ingredientes que você já tem em casa.",
     "landing.ctaPrimary": "Comece Grátis",
     "landing.ctaSecondary": "Veja Como Funciona",
     "landing.noCreditCard": "Não é necessário cartão de crédito",
@@ -6116,26 +6116,26 @@ const translations = {
     "landing.problem2": "Comida vencendo na geladeira",
     "landing.problem3": "Gastar mais do que o necessário",
     "landing.problem4": "Não saber o que cozinhar",
-    "landing.problemFix": "O Pantry resolve isso com IA.",
-    "landing.howTitle": "Como o Pantry Funciona",
+    "landing.problemFix": "O Prefud resolve isso com IA.",
+    "landing.howTitle": "Como o Prefud Funciona",
     "landing.howSubtitle":
       "Quatro passos simples para uma cozinha mais inteligente",
     "landing.step1Title": "Adicione o que você tem",
     "landing.step1Desc":
       "Adicione rapidamente os ingredientes da sua geladeira e despensa.",
     "landing.step2Title": "A IA planeja suas refeições",
-    "landing.step2Desc": "O Pantry sugere refeições usando o que você já tem.",
+    "landing.step2Desc": "O Prefud sugere refeições usando o que você já tem.",
     "landing.step3Title": "Lista de compras inteligente",
     "landing.step3Desc": "Compre apenas o que você realmente precisa.",
     "landing.step4Title": "Cozinhe passo a passo",
     "landing.step4Desc": "Siga instruções simples geradas para cada receita.",
-    "landing.featuresTitle": "O que torna o Pantry poderoso",
+    "landing.featuresTitle": "O que torna o Prefud poderoso",
     "landing.feature1Title": "Planejamento com IA",
     "landing.feature1Desc":
       "Receba sugestões personalizadas baseadas nos ingredientes que você já tem.",
     "landing.feature2Title": "Listas de Compras Inteligentes",
     "landing.feature2Desc":
-      "O Pantry cria automaticamente uma lista de compras com os ingredientes que faltam.",
+      "O Prefud cria automaticamente uma lista de compras com os ingredientes que faltam.",
     "landing.feature3Title": "Cozinha Passo a Passo",
     "landing.feature3Desc":
       "Instruções claras para cozinhar cada refeição com confiança.",
@@ -6149,7 +6149,7 @@ const translations = {
     "landing.feature6Desc":
       "Use o que você tem antes de vencer. Bom para você e o planeta.",
     "landing.imagineTitle": "Imagine sua cozinha funcionando assim",
-    "landing.imagineSubtitle": "Abra o Pantry e veja instantaneamente:",
+    "landing.imagineSubtitle": "Abra o Prefud e veja instantaneamente:",
     "landing.imagine1": "Ingredientes que você já tem",
     "landing.imagine2": "Refeições que você pode fazer agora",
     "landing.imagine3": "O que você precisa comprar",
@@ -6164,7 +6164,7 @@ const translations = {
     "landing.realLifeFooter": "Tudo em um só lugar.",
     "landing.finalTitle": "Comece a cozinhar de forma mais inteligente hoje",
     "landing.finalSubtitle":
-      "Junte-se aos primeiros usuários que usam o Pantry para simplificar sua cozinha.",
+      "Junte-se aos primeiros usuários que usam o Prefud para simplificar sua cozinha.",
     "landing.terms": "Termos",
     "landing.privacy": "Privacidade",
   },
