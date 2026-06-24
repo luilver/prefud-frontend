@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyCUTTjP_iJ7J2oAzoMcVhg_MIR7lSZ8iBU</string>
+	<string>AIzaSyCVK-KtpZpnFlwqPMA0_s5MaHdiFm_ql4U</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1065578643515</string>
+	<string>507413119491</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.bessel.mypantryapp</string>
+	<string>com.bessel.prefud</string>
 	<key>PROJECT_ID</key>
-	<string>icodetech-c2c1b</string>
+	<string>prefud</string>
 	<key>STORAGE_BUCKET</key>
-	<string>icodetech-c2c1b.appspot.com</string>
+	<string>prefud.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1065578643515:ios:aad7438f38f14692071c1e</string>
+	<string>1:507413119491:ios:89e92afda55632811ac436</string>
 </dict>
 </plist>
