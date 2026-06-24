@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Utensils, ArrowLeft, Sparkles } from "lucide-react";
+import { Utensils, ArrowLeft, Sparkles, Shield, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import SignupSteps from "@/components/SignupSteps";
@@ -12,115 +11,109 @@ const SignUp = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10 relative overflow-hidden">
-      {/* Animated background elements with brand colors */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-primary/10 to-accent/15 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-gradient-to-r from-accent/10 to-primary/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-r from-secondary/10 to-primary/15 rounded-full blur-3xl animate-pulse delay-2000"></div>
-        <div className="absolute bottom-40 right-10 w-64 h-64 bg-gradient-to-r from-primary/15 to-accent/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden flex flex-col">
+      {/* Premium Food Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+        }}
+      />
+      
+      {/* Dark Overlay for Readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+      
+      {/* Subtle Warm Accent */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-amber-900/20 via-transparent to-emerald-900/10" />
 
-      {/* Enhanced header with brand colors */}
-      <header className="relative bg-card/90 backdrop-blur-md border-b border-border/50 shadow-lg">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 sm:p-2.5 bg-gradient-to-r from-primary via-accent to-primary rounded-xl shadow-lg">
-              <Utensils className="h-6 w-6 sm:h-7 sm:w-7 text-primary-foreground" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Pantry
-            </h1>
-          </div>
-          <div className="flex items-center space-x-3">
-            <LanguageSelector variant="button" />
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')} 
-              className="flex items-center space-x-2 text-sm sm:text-base px-3 sm:px-4 py-2 rounded-xl hover:bg-muted/80 transition-all duration-200 backdrop-blur-sm"
+      {/* Content */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Minimal Header */}
+        <header className="py-4 px-4 md:py-6">
+          <div className="container mx-auto flex items-center justify-between">
+            <button 
+              onClick={() => navigate("/")}
+              className="flex items-center gap-2.5 group"
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("signup.backToStart") || "Back to Start"}</span>
-              <span className="sm:hidden">{t('common.back')}</span>
-            </Button>
+              <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
+                <Utensils className="h-5 w-5 text-emerald-400" />
+              </div>
+              <span className="text-xl font-semibold text-white/90 tracking-tight">
+                Prefud
+              </span>
+            </button>
+            
+            <div className="flex items-center gap-2">
+              <LanguageSelector variant="button" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/")}
+                className="text-white/70 hover:text-white hover:bg-white/10 transition-all"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1.5" />
+                <span className="hidden sm:inline">{t("signup.backToStart")}</span>
+              </Button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Compact main content with better mobile optimization */}
-      <section className="relative py-4 sm:py-6 px-3 sm:px-4">
-        <div className="container mx-auto max-w-full sm:max-w-6xl">
-          {/* Compact welcome card - reduced size significantly */}
-          <div className="relative mb-6 sm:mb-8 lg:hidden">
-            <Card className="relative bg-card/95 backdrop-blur-md border-border shadow-xl rounded-2xl overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
-              
-              <CardHeader className="text-center px-4 py-6">
-                <div className="flex justify-center mb-3">
-                  <div className="p-2.5 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-lg">
-                    <Sparkles className="h-6 w-6 text-primary-foreground" />
-                  </div>
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col items-center px-4 py-6 md:py-10">
+          <div className="w-full max-w-4xl">
+            {/* Welcome Card */}
+            <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden mb-6">
+              <CardHeader className="text-center space-y-3 pt-6 pb-4 px-6">
+                <div className="mx-auto p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl w-fit shadow-lg shadow-emerald-500/30">
+                  <Sparkles className="h-6 w-6 text-white" />
                 </div>
-                
-                <CardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
+                <CardTitle className="text-xl md:text-2xl font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
                   {t('signup.title')}
                 </CardTitle>
-                
-                <CardDescription className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                <CardDescription className="text-neutral-500 dark:text-neutral-400 text-sm md:text-base max-w-xl mx-auto">
                   {t('signup.subtitle')}
                 </CardDescription>
               </CardHeader>
             </Card>
-          </div>
-
-          {/* Desktop welcome card - even more compact */}
-          <div className="relative mb-6 sm:mb-8 hidden lg:block">
-            <Card className="relative bg-card/95 backdrop-blur-md border-border shadow-xl rounded-2xl overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
-              
-              <CardHeader className="text-center px-6 py-8">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-lg">
-                    <Sparkles className="h-8 w-8 text-primary-foreground" />
-                  </div>
-                </div>
-                
-                <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
-                  {t('signup.title')}
-                </CardTitle>
-                
-                <CardDescription className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                  {t('signup.subtitle')}
-                </CardDescription>
-              </CardHeader>
+            
+            {/* Signup Steps Container */}
+            <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
+              <CardContent className="p-4 md:p-6">
+                <SignupSteps />
+              </CardContent>
             </Card>
-          </div>
-          
-          {/* Signup steps container - now takes more space */}
-          <div className="px-0">
-            <SignupSteps />
-          </div>
-          
-          {/* Compact footer */}
-          <div className="mt-6 sm:mt-8 text-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-card/60 backdrop-blur-sm rounded-xl"></div>
-              <div className="relative p-4 sm:p-6">
-                <p className="text-muted-foreground text-sm sm:text-base">
+            
+            {/* Footer */}
+            <div className="mt-6 text-center">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-2xl px-5 py-3 border border-white/10">
+                <p className="text-white/80 text-sm">
                   {t('signup.already-account')}{' '}
                   <Button
                     variant="link"
                     onClick={() => navigate('/signin')}
-                    className="text-primary hover:text-accent p-0 font-bold text-sm sm:text-base transition-colors duration-200"
+                    className="text-emerald-400 hover:text-emerald-300 p-0 h-auto font-semibold text-sm"
                   >
                     {t('signup.signin-here')}
                   </Button>
                 </p>
               </div>
             </div>
+
+            {/* Trust Indicators */}
+            <div className="flex justify-center items-center gap-5 mt-5">
+              <div className="flex items-center gap-1.5 text-white/60">
+                <Shield className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">Secure</span>
+              </div>
+              <div className="w-1 h-1 bg-white/30 rounded-full" />
+              <div className="flex items-center gap-1.5 text-white/60">
+                <Lock className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">256-bit SSL</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </main>
+      </div>
     </div>
   );
 };

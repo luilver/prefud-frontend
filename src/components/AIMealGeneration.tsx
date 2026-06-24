@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Clock, Users, ChefHat, Play, BookOpen, Heart, Share2, Check, Timer, Flame, Maximize, X, ShoppingCart, Package, Plus, CheckSquare, CreditCard, MapPin } from "lucide-react";
+import { Clock, Users, ChefHat, BookOpen, Check, Timer, Flame, ShoppingCart, Package, CheckSquare, CreditCard, MapPin } from "lucide-react";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -45,7 +45,11 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const { user, addPantryItem, paymentMethods, getPaymentMethods } = useUser();
   const { language, t } = useLanguage();
 
+  const hasGeneratedRef = useRef(false);
+
   useEffect(() => {
+    if (hasGeneratedRef.current) return;
+    hasGeneratedRef.current = true;
     generateMeal();
   }, []);
 
@@ -206,7 +210,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
         quantity: ingredient.quantity,
         unit: ingredient.unit,
         category: ingredient.classification || getCategoryForIngredient(ingredient.name),
-        estimatedPrice: Math.floor(Math.random() * 800) + 200, // $2-10
+        
         mealName: meal.name,
         notes: `For ${meal.name} recipe`
       }));
@@ -341,9 +345,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
     }
 
     // Simulate order processing
-    const totalCost = selectedItems.reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100;
-    
-    toast.success(`Order placed successfully! ${selectedItems.length} items ordered for $${totalCost.toFixed(2)}`);
+    toast.success(`Order placed successfully! ${selectedItems.length} items ordered.`);
     
     // Reset state
     setCheckedIngredients(new Set());
@@ -373,7 +375,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   const handleSaveMeal = () => {
     if (meal) {
       onMealCreated(meal);
-      toast.success(t("aiMealGenerator.save") || "Meal saved successfully!");
     }
   };
 
@@ -425,10 +426,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
   // Shopping List View
   if (showShoppingList) {
     const selectedCount = checkedIngredients.size;
-    const totalCost = shoppingList
-      .filter(item => checkedIngredients.has(item.id))
-      .reduce((total, item) => total + (item.estimatedPrice || 0), 0) / 100;
-
     return (
       <>
         <div className="max-w-4xl mx-auto space-y-6 p-4">
@@ -487,9 +484,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                       {item.quantity} {item.unit}
                     </p>
                   </div>
-                  <div className="text-sm font-medium text-green-600">
-                    ${(item.estimatedPrice / 100).toFixed(2)}
-                  </div>
                 </div>
               ))}
             </div>
@@ -544,9 +538,6 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                     .filter(item => checkedIngredients.has(item.id))
                     .map(item => item.name)
                     .join(', ')}
-                </div>
-                <div className="text-lg font-semibold text-green-600 mt-2">
-                  {t('mealShopping.total') || 'Total'}: ${totalCost.toFixed(2)}
                 </div>
               </div>
 
@@ -747,13 +738,31 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
           </CardHeader>
         </Card>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        {/* Nutrition Stats - Mobile-friendly horizontal scroll */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.calories") || "Calories"}</p>
+            <p className="text-lg font-bold text-purple-600">{nutrition?.calories}</p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.protein") || "Protein"}</p>
+            <p className="text-lg font-bold text-blue-600">{nutrition?.protein}g</p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.carbs") || "Carbs"}</p>
+            <p className="text-lg font-bold text-orange-600">{nutrition?.carbohydrates || nutrition?.carbs}g</p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border">
+            <p className="text-xs text-gray-500">{t("mealSidebar.fat") || "Fat"}</p>
+            <p className="text-lg font-bold text-red-600">{nutrition?.fat}g</p>
+          </div>
+        </div>
+
+        {/* Main Content - Single column on mobile */}
+        <div className="space-y-6">
             <Tabs defaultValue="recipe" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-1">
                 <TabsTrigger value="recipe">{t("mealTabs.recipe") || "Recipe"}</TabsTrigger>
-                <TabsTrigger value="video">{t("mealTabs.video") || "Video Tutorial"}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="recipe" className="space-y-6">
@@ -854,178 +863,43 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="video">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Play className="h-5 w-5 text-red-600" />
-                      <span>{t("mealTabs.video") || "Video Tutorial"}</span>
-                    </CardTitle>
-                    <CardDescription>
-                      {t("mealTabs.videoDesc") || "Watch step-by-step preparation for"} {meal.name}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
-                      {!isVideoPlaying ? (
-                        <div className="text-center space-y-4">
-                          <Button
-                            onClick={() => setIsVideoPlaying(true)}
-                            size="lg"
-                            className="bg-red-600 hover:bg-red-700 rounded-full"
-                          >
-                            <Play className="h-6 w-6 mr-2" />
-                            {t("mealTabs.playVideo") || "Play Video"}
-                          </Button>
-                          <Button
-                            onClick={openFullscreenVideo}
-                            variant="outline"
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <Maximize className="h-4 w-4 mr-2" />
-                            {t("mealTabs.fullscreen") || "Fullscreen"}
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="text-white text-center space-y-4">
-                          <iframe
-                            width="100%"
-                            height="315"
-                            src="https://www.youtube.com/embed/ixpYIgHlU60"
-                            title="Recipe Video Tutorial"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="rounded-lg"
-                          ></iframe>
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              onClick={() => setIsVideoPlaying(false)}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              {t("mealTabs.closeVideo") || "Close Video"}
-                            </Button>
-                            <Button
-                              onClick={openFullscreenVideo}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              <Maximize className="h-4 w-4 mr-2" />
-                              {t("mealTabs.fullscreen") || "Fullscreen"}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </Tabs>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Nutrition */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("mealSidebar.nutrition") || "Nutrition (per serving)"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="font-medium">{t("mealSidebar.calories") || "Calories"}</span>
-                    <span>{nutrition?.calories}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.protein") || "Protein"}</span>
-                    <span>{nutrition?.protein}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.carbs") || "Carbs"}</span>
-                    <span>{nutrition?.carbohydrates || nutrition?.carbs}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.fat") || "Fat"}</span>
-                    <span>{nutrition?.fat}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("mealSidebar.fiber") || "Fiber"}</span>
-                    <span>{nutrition?.fiber}g</span>
-                  </div>
-                  {nutrition?.vitamins && (
-                    <div className="pt-2 border-t">
-                      <p className="text-sm font-medium mb-1">{t("mealSidebar.vitamins") || "Vitamins"}:</p>
-                      <p className="text-xs text-gray-600">{nutrition.vitamins.join(', ')}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Cooking Progress */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t("mealSidebar.progress") || "Cooking Progress"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
+          {/* Cooking Progress */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
                   <div className="text-2xl font-bold text-purple-600">
                     {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
                   </div>
                   <p className="text-sm text-gray-600">
                     {completedSteps.length} {t("mealSidebar.of") || "of"} {enhancedInstructions.length} {t("mealSidebar.stepsCompleted") || "steps completed"}
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div
-                      className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
-                    ></div>
-                  </div>
-                  {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
-                    <div className="mt-3 p-2 bg-purple-100 rounded-lg">
-                      <p className="text-sm text-purple-700 font-medium">🎉 {t("mealSidebar.recipeCompleted") || "Recipe completed!"}</p>
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+                {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
+                  <span className="text-sm text-purple-700 font-medium">🎉</span>
+                )}
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(completedSteps.length / enhancedInstructions.length) * 100}%` }}
+                ></div>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Action Button */}
-            <Button 
-              onClick={handleSaveMeal}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-              size="lg"
-            >
-              {t("mealSidebar.saveMeal") || "Save This Meal"}
-            </Button>
-          </div>
+          {/* Action Button */}
+          <Button 
+            onClick={handleSaveMeal}
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+            size="lg"
+          >
+            {t("mealSidebar.saveMeal") || "Save This Meal"}
+          </Button>
         </div>
       </div>
-
-      {/* Fullscreen Video Modal */}
-      {isFullscreen && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="relative w-full h-full">
-            <Button
-              onClick={closeFullscreenVideo}
-              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-2"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/ixpYIgHlU60?autoplay=1"
-              title="Recipe Video Tutorial - Fullscreen"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            ></iframe>
-          </div>
-        </div>
-      )}
 
       <SubscriptionUpgradeModal
         isOpen={showUpgradeModal}

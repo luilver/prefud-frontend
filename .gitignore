@@ -23,4 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
-android
+ios/App/App/GoogleService-Info.plist
+
+# android keys
+android/app/my-release-key.jks
+android/app/google-services.json

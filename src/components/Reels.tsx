@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Bookmark, Play, Pause, Volume2, VolumeX, Share2, ChefHat, Loader2, Eye } from "lucide-react";
+import { Heart, Bookmark, Play, Pause, Share2, ChefHat, Loader2, Eye, Clock, Flame, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ReelRecipeModal from "./ReelRecipeModal";
+import { getReelsPaginated, Reel, ReelsMeta } from "@/services/reelsService";
+import { useToast } from "@/hooks/use-toast";
 
-interface Recipe {
+interface DisplayRecipe {
   id: string;
   title: string;
   chef: string;
@@ -17,166 +19,301 @@ interface Recipe {
   isLiked: boolean;
   isSaved: boolean;
   description: string;
+  steps?: string[];
+  ingredients?: Array<{ name: string; quantity: number; unit: string }>;
+  calories?: number;
+  nutritionalInfo?: {
+    protein: number;
+    fat: number;
+    carbohydrates: number;
+    fiber: number;
+  };
+  prepTip?: string;
+  benefits?: string[];
+  mealType?: string;
+  servings?: number;
 }
 
-const mockRecipes: Recipe[] = [
-  {
-    id: "1",
-    title: "Perfect Pasta Carbonara",
-    chef: "Chef Marco",
-    duration: "15 min",
-    difficulty: "Easy",
-    videoUrl: "",
-    thumbnail: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?q=80&w=1000",
-    likes: 1205,
+const mapReelToDisplayRecipe = (reel: Reel): DisplayRecipe => {
+  let difficulty = 'Easy';
+  if (reel.cookingTime > 60) difficulty = 'Hard';
+  else if (reel.cookingTime > 30) difficulty = 'Medium';
+
+  return {
+    id: reel._id,
+    title: reel.name,
+    chef: reel.author,
+    duration: `${reel.cookingTime} min`,
+    difficulty,
+    videoUrl: reel.videoUrl,
+    thumbnail: reel.videoUrl, // Use video URL - browser will extract first frame via preload
+    likes: reel.likes,
     isLiked: false,
     isSaved: false,
-    description: "Learn the authentic Italian way to make creamy carbonara without cream!"
-  },
-  {
-    id: "2",
-    title: "Fluffy Japanese Pancakes",
-    chef: "Chef Yuki",
-    duration: "25 min",
-    difficulty: "Medium",
-    videoUrl: "",
-    thumbnail: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1000",
-    likes: 892,
-    isLiked: true,
-    isSaved: false,
-    description: "Master the technique for super fluffy, jiggly Japanese-style pancakes."
-  },
-  {
-    id: "3",
-    title: "Homemade Pizza Dough",
-    chef: "Chef Isabella",
-    duration: "2 hours",
-    difficulty: "Medium",
-    videoUrl: "",
-    thumbnail: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?q=80&w=1000",
-    likes: 2341,
-    isLiked: false,
-    isSaved: true,
-    description: "The secret to perfect pizza dough that's crispy outside and chewy inside."
-  },
-  {
-    id: "4",
-    title: "Chocolate Lava Cake",
-    chef: "Chef Pierre",
-    duration: "30 min",
-    difficulty: "Hard",
-    videoUrl: "",
-    thumbnail: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?q=80&w=1000",
-    likes: 3456,
-    isLiked: true,
-    isSaved: true,
-    description: "Create the perfect molten chocolate center with this foolproof technique."
-  }
-];
-
-const generateMoreRecipes = (startId: number, count: number): Recipe[] => {
-  const additionalRecipes = [
-    {
-      title: "Thai Green Curry",
-      chef: "Chef Siriporn",
-      duration: "30 min",
-      difficulty: "Medium",
-      thumbnail: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?q=80&w=1000",
-      description: "Authentic Thai green curry with fresh herbs and coconut milk."
-    },
-    {
-      title: "French Croissants",
-      chef: "Chef Antoine",
-      duration: "4 hours",
-      difficulty: "Hard",
-      thumbnail: "https://images.unsplash.com/photo-1555507036-ab794f4afe5b?q=80&w=1000",
-      description: "Master the art of laminated dough for perfect buttery croissants."
-    },
-    {
-      title: "Korean Bibimbap",
-      chef: "Chef Min-jun",
-      duration: "45 min",
-      difficulty: "Medium",
-      thumbnail: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?q=80&w=1000",
-      description: "Colorful Korean rice bowl with vegetables and spicy gochujang."
-    },
-    {
-      title: "Indian Butter Chicken",
-      chef: "Chef Priya",
-      duration: "1 hour",
-      difficulty: "Medium",
-      thumbnail: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1000",
-      description: "Creamy and aromatic butter chicken with fragrant basmati rice."
-    },
-    {
-      title: "Mexican Tacos Al Pastor",
-      chef: "Chef Carlos",
-      duration: "40 min",
-      difficulty: "Easy",
-      thumbnail: "https://images.unsplash.com/photo-1565299585323-38174c97e30d?q=80&w=1000",
-      description: "Traditional Mexican tacos with marinated pork and pineapple."
-    },
-    {
-      title: "Japanese Ramen",
-      chef: "Chef Takeshi",
-      duration: "3 hours",
-      difficulty: "Hard",
-      thumbnail: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?q=80&w=1000",
-      description: "Rich tonkotsu ramen with perfectly cooked noodles and toppings."
-    }
-  ];
-
-  return Array.from({ length: count }, (_, index) => {
-    const recipeTemplate = additionalRecipes[index % additionalRecipes.length];
-    return {
-      id: (startId + index).toString(),
-      ...recipeTemplate,
-      videoUrl: "",
-      likes: Math.floor(Math.random() * 5000) + 100,
-      isLiked: Math.random() > 0.7,
-      isSaved: Math.random() > 0.8,
-    };
-  });
-};
-
-const fetchMoreRecipes = async (page: number, limit: number = 8): Promise<Recipe[]> => {
-  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
-  
-  const startId = (page - 1) * limit + mockRecipes.length + 1;
-  return generateMoreRecipes(startId, limit);
+    description: reel.description,
+    steps: reel.steps,
+    ingredients: reel.ingredientsList?.map(ing => ({
+      name: ing.name,
+      quantity: ing.quantity,
+      unit: ing.unit
+    })) || [],
+    calories: reel.calories,
+    nutritionalInfo: reel.nutritionalInfo,
+    prepTip: reel.prepTip,
+    benefits: reel.benefits,
+    mealType: reel.mealType,
+    servings: reel.servings
+  };
 };
 
 const Reels = () => {
   const { t } = useLanguage();
-  const [recipes, setRecipes] = useState<Recipe[]>(mockRecipes);
-  const [currentVideo, setCurrentVideo] = useState<string | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const { toast } = useToast();
+  const [recipes, setRecipes] = useState<DisplayRecipe[]>([]);
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set());
+  const [globalMuted, setGlobalMuted] = useState(true); // Track global mute preference
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [meta, setMeta] = useState<ReelsMeta | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<DisplayRecipe | null>(null);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
+  const [loadedIds, setLoadedIds] = useState<Set<string>>(new Set());
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const manuallyPausedRef = useRef<Set<string>>(new Set());
+  const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
+  
+  // Use refs to track current values inside observer callback without causing re-renders
+  const playingVideoRef = useRef<string | null>(null);
+  const globalMutedRef = useRef(true);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    playingVideoRef.current = playingVideo;
+  }, [playingVideo]);
+  
+  useEffect(() => {
+    globalMutedRef.current = globalMuted;
+  }, [globalMuted]);
+
+  const toggleFullscreen = async (recipeId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRefs.current.get(recipeId);
+    if (!video) return;
+
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        setFullscreenVideo(null);
+      } else {
+        await video.requestFullscreen();
+        setFullscreenVideo(recipeId);
+        // Ensure video is playing in fullscreen
+        if (video.paused) {
+          video.play().catch(console.error);
+          setPlayingVideo(recipeId);
+        }
+      }
+    } catch (error) {
+      console.error('Fullscreen error:', error);
+    }
+  };
+
+  // Listen for fullscreen change events
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setFullscreenVideo(null);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    const fetchInitialReels = async () => {
+      try {
+        setIsInitialLoading(true);
+        // Backend pagination is 1-based
+        const response = await getReelsPaginated(1, 8);
+        const mappedRecipes = response.data.map(mapReelToDisplayRecipe);
+        const newIds = new Set(mappedRecipes.map((r) => r.id));
+        setLoadedIds(newIds);
+        setRecipes(mappedRecipes);
+        setMeta(response.meta);
+        setPage(response.meta.currentPage);
+      } catch (error) {
+        console.error('Error fetching initial reels:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load recipes. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    fetchInitialReels();
+  }, [toast]);
 
   const loadMoreRecipes = useCallback(async () => {
-    if (isLoading || !hasMore) return;
+    if (isLoading || !meta?.hasNextPage) return;
+
+    const nextPage = (meta?.currentPage ?? page) + 1;
+    if (meta?.totalPages && nextPage > meta.totalPages) return;
 
     setIsLoading(true);
     try {
-      const newRecipes = await fetchMoreRecipes(page + 1);
-      
-      if (newRecipes.length === 0) {
-        setHasMore(false);
-      } else {
-        setRecipes(prev => [...prev, ...newRecipes]);
-        setPage(prev => prev + 1);
+      const response = await getReelsPaginated(nextPage, 8);
+      const mappedRecipes = response.data.map(mapReelToDisplayRecipe);
+
+      // Filter out duplicates
+      const newRecipes = mappedRecipes.filter((r) => !loadedIds.has(r.id));
+
+      if (newRecipes.length > 0) {
+        setLoadedIds((prev) => {
+          const updated = new Set(prev);
+          newRecipes.forEach((r) => updated.add(r.id));
+          return updated;
+        });
+        setRecipes((prev) => [...prev, ...newRecipes]);
       }
+
+      setMeta(response.meta);
+      setPage(response.meta.currentPage);
     } catch (error) {
       console.error('Error loading more recipes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load more recipes.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, page]);
+  }, [isLoading, meta, page, loadedIds, toast]);
 
+  const toggleVideoPlay = (recipeId: string) => {
+    const video = videoRefs.current.get(recipeId);
+    if (!video) return;
+
+    if (playingVideo === recipeId) {
+      // User is manually pausing - track this so auto-play doesn't restart it
+      manuallyPausedRef.current.add(recipeId);
+      video.pause();
+      setPlayingVideo(null);
+    } else {
+      // User is manually playing - remove from manually paused set
+      manuallyPausedRef.current.delete(recipeId);
+      // Pause any currently playing video
+      if (playingVideo) {
+        const currentVideo = videoRefs.current.get(playingVideo);
+        currentVideo?.pause();
+      }
+      video.play().catch(console.error);
+      setPlayingVideo(recipeId);
+    }
+  };
+
+  const toggleMute = (recipeId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRefs.current.get(recipeId);
+    if (!video) return;
+
+    setMutedVideos(prev => {
+      const updated = new Set(prev);
+      if (updated.has(recipeId)) {
+        updated.delete(recipeId);
+        video.muted = false;
+        setGlobalMuted(false); // User unmuted - remember preference
+      } else {
+        updated.add(recipeId);
+        video.muted = true;
+        setGlobalMuted(true); // User muted - remember preference
+      }
+      return updated;
+    });
+  };
+
+  // Intersection Observer for auto-play - only on mobile/tablet (single column view)
+  useEffect(() => {
+    // Skip auto-play on desktop where multiple videos are visible
+    const isMobileView = window.innerWidth < 640; // sm breakpoint
+    
+    if (!isMobileView) {
+      // On desktop, don't auto-play - user controls playback manually
+      return;
+    }
+    
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const recipeId = entry.target.getAttribute('data-recipe-id');
+          if (!recipeId) return;
+
+          const video = videoRefs.current.get(recipeId);
+          if (!video) return;
+
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            // Skip if user manually paused this video
+            if (manuallyPausedRef.current.has(recipeId)) return;
+            
+            // Video is in view - play it (only one at a time on mobile)
+            if (playingVideoRef.current !== recipeId) {
+              // Pause currently playing video
+              if (playingVideoRef.current) {
+                const currentVideo = videoRefs.current.get(playingVideoRef.current);
+                currentVideo?.pause();
+              }
+              // Play new video - use global mute preference
+              video.muted = globalMutedRef.current;
+              if (globalMutedRef.current) {
+                setMutedVideos(prev => new Set(prev).add(recipeId));
+              } else {
+                setMutedVideos(prev => {
+                  const updated = new Set(prev);
+                  updated.delete(recipeId);
+                  return updated;
+                });
+              }
+              video.play().catch(console.error);
+              setPlayingVideo(recipeId);
+            }
+          } else if (!entry.isIntersecting) {
+            // Video left view - pause it and clear manually paused flag
+            if (playingVideoRef.current === recipeId) {
+              video.pause();
+              setPlayingVideo(null);
+            }
+            manuallyPausedRef.current.delete(recipeId);
+          }
+        });
+      },
+      {
+        threshold: [0.6],
+        rootMargin: '0px'
+      }
+    );
+
+    // Observe all card elements
+    cardRefs.current.forEach((cardEl) => {
+      if (cardEl) {
+        observerRef.current?.observe(cardEl);
+      }
+    });
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [recipes]); // Only recreate when recipes change, not on every state update
+
+  // Scroll event for infinite loading
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
@@ -204,7 +341,7 @@ const Reels = () => {
     ));
   };
 
-  const handleViewRecipe = (recipe: Recipe) => {
+  const handleViewRecipe = (recipe: DisplayRecipe) => {
     setSelectedRecipe(recipe);
     setShowRecipeModal(true);
   };
@@ -217,6 +354,29 @@ const Reels = () => {
       default: return 'text-gray-600 bg-gray-100';
     }
   };
+
+  const getMealTypeColor = (mealType?: string) => {
+    switch (mealType?.toLowerCase()) {
+      case 'breakfast': return 'bg-yellow-100 text-yellow-700';
+      case 'lunch': return 'bg-blue-100 text-blue-700';
+      case 'dinner': return 'bg-purple-100 text-purple-700';
+      case 'dessert': return 'bg-pink-100 text-pink-700';
+      case 'snack': return 'bg-green-100 text-green-700';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  if (isInitialLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-primary/20 rounded-full animate-pulse" />
+          <div className="absolute inset-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+        <p className="text-muted-foreground animate-pulse">Loading delicious recipes...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -233,45 +393,102 @@ const Reels = () => {
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Discover amazing recipes through short cooking videos. Learn new techniques, get inspired, and save your favorites!
         </p>
+        {meta && (
+          <p className="text-sm text-muted-foreground">
+            Showing {recipes.length} of {meta.totalItems} recipes
+          </p>
+        )}
       </div>
 
       {/* Recipe Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {recipes.map((recipe) => (
-          <Card key={recipe.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 bg-card/70 backdrop-blur-sm">
+          <Card 
+            key={recipe.id} 
+            ref={(el) => {
+              if (el) cardRefs.current.set(recipe.id, el);
+            }}
+            data-recipe-id={recipe.id}
+            className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 bg-card/70 backdrop-blur-sm"
+          >
             <div className="relative">
               {/* Video Thumbnail */}
-              <div className="relative aspect-[9/16] overflow-hidden rounded-t-lg">
-                <img 
-                  src={recipe.thumbnail} 
-                  alt={recipe.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button 
-                    size="lg" 
-                    className="rounded-full w-16 h-16 bg-white/90 hover:bg-white text-black hover:text-black shadow-lg"
-                    onClick={() => setCurrentVideo(currentVideo === recipe.id ? null : recipe.id)}
-                  >
-                    {currentVideo === recipe.id ? (
-                      <Pause className="h-6 w-6" />
-                    ) : (
-                      <Play className="h-6 w-6 ml-1" />
+              <div 
+                className="relative aspect-[9/16] overflow-hidden rounded-t-lg bg-muted cursor-pointer"
+                onClick={() => recipe.videoUrl && toggleVideoPlay(recipe.id)}
+              >
+                {recipe.videoUrl ? (
+                  <>
+                    <video 
+                      ref={(el) => {
+                        if (el) videoRefs.current.set(recipe.id, el);
+                      }}
+                      src={recipe.videoUrl}
+                      className="w-full h-full object-cover"
+                      muted={mutedVideos.has(recipe.id)}
+                      loop
+                      playsInline
+                      preload="metadata"
+                    />
+                    {/* Play/Pause Overlay */}
+                    <div className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity duration-300 ${playingVideo === recipe.id ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
+                      <div className="rounded-full w-16 h-16 bg-white/90 flex items-center justify-center shadow-lg">
+                        {playingVideo === recipe.id ? (
+                          <Pause className="h-6 w-6 text-black" />
+                        ) : (
+                          <Play className="h-6 w-6 text-black ml-1" />
+                        )}
+                      </div>
+                    </div>
+                    {/* Mute Button */}
+                    {playingVideo === recipe.id && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="absolute bottom-3 left-3 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border-0 z-10"
+                        onClick={(e) => toggleMute(recipe.id, e)}
+                      >
+                        {mutedVideos.has(recipe.id) ? (
+                          <VolumeX className="h-4 w-4" />
+                        ) : (
+                          <Volume2 className="h-4 w-4" />
+                        )}
+                      </Button>
                     )}
-                  </Button>
-                </div>
+                  </>
+                ) : (
+                  <img 
+                    src={recipe.thumbnail} 
+                    alt={recipe.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                )}
 
                 {/* Duration Badge */}
-                <div className="absolute top-3 left-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs font-medium">
+                <div className="absolute top-3 left-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
                   {recipe.duration}
                 </div>
+
+                {/* Meal Type Badge */}
+                {recipe.mealType && (
+                  <div className={`absolute top-10 left-3 px-2 py-1 rounded-md text-xs font-medium capitalize ${getMealTypeColor(recipe.mealType)}`}>
+                    {recipe.mealType}
+                  </div>
+                )}
 
                 {/* Difficulty Badge */}
                 <div className={`absolute top-3 right-3 px-2 py-1 rounded-md text-xs font-medium ${getDifficultyColor(recipe.difficulty)}`}>
                   {recipe.difficulty}
                 </div>
+
+                {/* Calories Badge */}
+                {recipe.calories && (
+                  <div className="absolute top-10 right-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1">
+                    <Flame className="h-3 w-3 text-orange-400" />
+                    {recipe.calories} cal
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="absolute bottom-3 right-3 flex flex-col space-y-2">
@@ -305,6 +522,19 @@ const Reels = () => {
                     className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border-0"
                   >
                     <Share2 className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border-0"
+                    onClick={(e) => toggleFullscreen(recipe.id, e)}
+                  >
+                    {fullscreenVideo === recipe.id ? (
+                      <Minimize className="h-4 w-4" />
+                    ) : (
+                      <Maximize className="h-4 w-4" />
+                    )}
                   </Button>
                   
                   <Button
@@ -369,9 +599,18 @@ const Reels = () => {
       )}
 
       {/* End of Content Message */}
-      {!hasMore && recipes.length > mockRecipes.length && (
+      {meta && !meta.hasNextPage && recipes.length > 0 && (
         <div className="text-center py-8">
           <p className="text-muted-foreground">You've reached the end! No more recipes to load.</p>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isInitialLoading && recipes.length === 0 && (
+        <div className="text-center py-16">
+          <ChefHat className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No recipes found</h3>
+          <p className="text-muted-foreground">Check back later for delicious recipes!</p>
         </div>
       )}
 

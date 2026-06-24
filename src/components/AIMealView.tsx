@@ -25,10 +25,13 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
 import MealShoppingModal from "./MealShoppingModal";
-import OrderOnlineModal from "./OrderOnlineModal";
+import CookingMode from "./CookingMode";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import { addIngredientsToPantry, updatePantry } from "@/services/pantryService";
+import { useCart } from "@/contexts/CartContext";
+import AddToCartButton from "./AddToCartButton";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 interface AIMealViewProps {
   meal: any;
@@ -40,11 +43,12 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showCookingMode, setShowCookingMode] = useState(false);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const { deleteAIMeal, addShoppingItem, pantryItems, setPantryItems, user } =
     useUser();
   const { t } = useLanguage();
+  const { addItem } = useCart();
 
   const toggleStep = (stepIndex: number) => {
     if (completedSteps.includes(stepIndex)) {
@@ -197,8 +201,22 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
     }
   };
 
-  const handleOrderOnline = () => {
-    setShowOrderModal(true);
+  const { handleAddToCart } = useAddToCart({
+    ingredients: getIngredientsForShopping().map(ingredient => ({
+      ...ingredient,
+      category: ingredient.classification || "ingredient"
+    })),
+    selectedIngredients,
+    onSuccess: () => setSelectedIngredients([])
+  });
+
+  const handleSelectAllIngredients = () => {
+    const allIngredients = getIngredientsForShopping();
+    if (selectedIngredients.length === allIngredients.length) {
+      setSelectedIngredients([]);
+    } else {
+      setSelectedIngredients(allIngredients.map(ingredient => ingredient.name));
+    }
   };
 
   const getSelectedIngredientsForOrder = () => {
@@ -301,443 +319,366 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto space-y-6 p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <Button variant="ghost" onClick={onBack} className="self-start">
-            ← {t("aiMealView.backToAiMeals") || "Back to AI Meals"}
-          </Button>
-          <div className="flex flex-wrap gap-2">
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+        {/* Mobile-first header with sticky positioning */}
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b">
+          <div className="flex items-center justify-between px-4 py-3">
+            <Button variant="ghost" onClick={onBack} size="sm" className="p-2">
+              ← {t("aiMealView.backToAiMeals") || "Back"}
+            </Button>
             <Button
-              onClick={openShoppingModal}
-              className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
+              onClick={() => setShowCookingMode(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
               size="sm"
             >
-              <ShoppingCart className="h-4 w-4 mr-1" />
-              {t("aiMealView.shoppingList") || "Shopping List"}
+              <ChefHat className="h-4 w-4 mr-2" />
+              {t("cookingMode.enter") || "Cooking Mode"}
             </Button>
           </div>
         </div>
 
-        <Card className="bg-white/70 backdrop-blur-sm border-purple-200">
-          <CardHeader>
-            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 break-words">
+        <div className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
+          {/* Hero Card - Mobile Optimized */}
+          <Card className="overflow-hidden border-0 shadow-lg">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10" />
+              <CardHeader className="relative pb-4">
+                <CardTitle className="text-xl md:text-3xl font-bold mb-2 leading-tight">
                   {meal.name}
                 </CardTitle>
-                <CardDescription className="text-base sm:text-lg break-words">
+                <CardDescription className="text-base md:text-lg mb-4">
                   {meal.description}
                 </CardDescription>
 
-                <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">
-                      {meal.cookingTime || meal.prepTime}{" "}
-                      {t("aiMealView.minutes") || "minutes"}
+                {/* Stats - Mobile Grid */}
+                <div className="grid grid-cols-3 gap-3 mt-4">
+                  <div className="flex flex-col items-center p-3 bg-background/60 rounded-lg backdrop-blur-sm">
+                    <Clock className="h-5 w-5 text-primary mb-1" />
+                    <span className="text-xs font-medium text-center">
+                      {meal.cookingTime || meal.prepTime}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {t("aiMealView.minutes") || "min"}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                    <span className="font-medium text-sm sm:text-base">
-                      2 {t("aiMealView.servings") || "servings"}
+                  <div className="flex flex-col items-center p-3 bg-background/60 rounded-lg backdrop-blur-sm">
+                    <Users className="h-5 w-5 text-primary mb-1" />
+                    <span className="text-xs font-medium text-center">2</span>
+                    <span className="text-xs text-muted-foreground">
+                      {t("aiMealView.servings") || "servings"}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
-                    <span className="font-medium capitalize text-sm sm:text-base">
+                  <div className="flex flex-col items-center p-3 bg-background/60 rounded-lg backdrop-blur-sm">
+                    <ChefHat className="h-5 w-5 text-primary mb-1" />
+                    <span className="text-xs font-medium text-center capitalize">
                       {meal.difficulty}
                     </span>
+                    <span className="text-xs text-muted-foreground">level</span>
                   </div>
                 </div>
-              </div>
-
-              <div className="w-full sm:w-48 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <ChefHat className="h-12 w-12 sm:h-16 sm:w-16 text-purple-600 opacity-50" />
-              </div>
+              </CardHeader>
             </div>
-          </CardHeader>
-        </Card>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <Tabs defaultValue="recipe" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="recipe">
+          </Card>
+          {/* Mobile-first Tabs */}
+          <Tabs defaultValue="recipe" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
+              <TabsTrigger value="recipe" className="text-sm">
+                <BookOpen className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">
                   {t("aiMealView.recipeTab") || "Recipe"}
-                </TabsTrigger>
-                <TabsTrigger value="ingredients">
+                </span>
+                <span className="sm:hidden">Recipe</span>
+              </TabsTrigger>
+              <TabsTrigger value="ingredients" className="text-sm">
+                <Package className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">
                   {t("aiMealView.ingredientsSelector") || "Ingredients"}
-                </TabsTrigger>
-                <TabsTrigger value="video">
-                  {t("aiMealView.videoTab") || "Video Tutorial"}
-                </TabsTrigger>
-              </TabsList>
+                </span>
+                <span className="sm:hidden">Items</span>
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="recipe" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <BookOpen className="h-5 w-5 text-purple-600" />
-                      <span>
-                        {t("aiMealView.ingredientsTitle") || "Ingredients"}
-                      </span>
-                    </CardTitle>
-                    <CardDescription>
-                      {t("aiMealView.ingredientsDesc") ||
-                        "Everything you need for this recipe"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-3">
-                      {enhancedIngredients.map(
-                        (ingredient: string, index: number) => (
+            <TabsContent value="recipe" className="space-y-6">
+              {/* Ingredients Card - Mobile Optimized */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center space-x-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <span>{t("aiMealView.ingredientsTitle") || "Ingredients"}</span>
+                  </CardTitle>
+                  <CardDescription>
+                    {t("aiMealView.ingredientsDesc") || "Everything you need for this recipe"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {enhancedIngredients.map((ingredient: string, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-start space-x-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="flex-1 text-sm md:text-base leading-relaxed">
+                          {ingredient}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Instructions Card - Mobile Optimized */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Flame className="h-5 w-5 text-orange-600" />
+                    <span>{t("aiMealView.instructionsTitle") || "Cooking Steps"}</span>
+                  </CardTitle>
+                  <CardDescription>
+                    {t("aiMealView.instructionsDesc") || "Tap each step when completed"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {enhancedInstructions.map((instruction, index) => (
+                      <div
+                        key={index}
+                        className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer active:scale-95 ${
+                          completedSteps.includes(index)
+                            ? "bg-primary/10 border-primary shadow-md"
+                            : "bg-background border-border hover:border-primary/50 hover:shadow-lg"
+                        }`}
+                        onClick={() => toggleStep(index)}
+                      >
+                        <div className="flex items-start space-x-4">
                           <div
-                            key={index}
-                            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0 ${
+                              completedSteps.includes(index)
+                                ? "bg-primary text-primary-foreground shadow-lg scale-110"
+                                : "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md"
+                            }`}
                           >
-                            <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0"></div>
-                            <span className="flex-1 break-words">
-                              {ingredient}
-                            </span>
+                            {completedSteps.includes(index) ? (
+                              <Check className="h-5 w-5" />
+                            ) : (
+                              index + 1
+                            )}
                           </div>
-                        )
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Flame className="h-5 w-5 text-orange-600" />
-                      <span>
-                        {t("aiMealView.instructionsTitle") ||
-                          "Cooking Instructions"}
-                      </span>
-                    </CardTitle>
-                    <CardDescription>
-                      {t("aiMealView.instructionsDesc") ||
-                        "Follow these steps for the perfect result"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {enhancedInstructions.map((instruction, index) => (
-                        <div
-                          key={index}
-                          className={`relative p-4 rounded-lg border transition-all duration-300 cursor-pointer transform hover:scale-[1.02] ${
-                            completedSteps.includes(index)
-                              ? "bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 shadow-md"
-                              : "bg-gradient-to-r from-gray-50 to-blue-50 border-gray-200 hover:border-purple-200 hover:shadow-lg"
-                          }`}
-                          onClick={() => toggleStep(index)}
-                        >
-                          <div className="flex items-start space-x-4">
-                            <div
-                              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0 ${
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className={`text-sm md:text-base leading-relaxed transition-all duration-300 ${
                                 completedSteps.includes(index)
-                                  ? "bg-purple-500 text-white shadow-lg scale-110"
-                                  : "bg-gradient-to-br from-purple-400 to-pink-400 text-white shadow-md"
+                                  ? "line-through text-muted-foreground"
+                                  : "text-foreground"
                               }`}
                             >
-                              {completedSteps.includes(index) ? (
-                                <Check className="h-4 w-4" />
-                              ) : (
-                                index + 1
-                              )}
-                            </div>
+                              {instruction.text}
+                            </p>
 
-                            <div className="flex-1 min-w-0">
-                              <p
-                                className={`text-base leading-relaxed transition-all duration-300 break-words ${
-                                  completedSteps.includes(index)
-                                    ? "line-through text-gray-500"
-                                    : "text-gray-800"
-                                }`}
-                              >
-                                {instruction.text}
-                              </p>
-
-                              {!completedSteps.includes(index) && (
-                                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
-                                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">
-                                    <Timer className="h-3 w-3 mr-1" />~
-                                    {instruction.estimatedTime} min
-                                  </span>
-                                  <span className="text-gray-600 italic">
-                                    {instruction.tip}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {completedSteps.includes(index) && (
-                            <div className="absolute top-2 right-2">
-                              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center animate-pulse">
-                                <Check className="h-3 w-3 text-white" />
+                            {!completedSteps.includes(index) && (
+                              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                                <span className="inline-flex items-center px-2 py-1 rounded-full bg-primary/10 text-primary">
+                                  <Timer className="h-3 w-3 mr-1" />~
+                                  {instruction.estimatedTime} min
+                                </span>
+                                <span className="text-muted-foreground italic">
+                                  {instruction.tip}
+                                </span>
                               </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="ingredients" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Package className="h-5 w-5 text-blue-600" />
-                        <span>Ingredients Selector</span>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {selectedIngredients.length} selected
-                      </span>
-                    </CardTitle>
-                    <CardDescription>
-                      Select ingredients to add to your pantry or order online
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-3 max-h-64 overflow-y-auto">
-                      {getIngredientsForShopping().map((ingredient, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <Checkbox
-                            id={`ingredient-${index}`}
-                            checked={selectedIngredients.includes(
-                              ingredient.name
                             )}
-                            onCheckedChange={() =>
-                              handleIngredientToggle(ingredient.name)
-                            }
-                          />
-                          <label
-                            htmlFor={`ingredient-${index}`}
-                            className="flex-1 cursor-pointer"
-                          >
-                            <div className="font-medium">{ingredient.name}</div>
-                            <div className="text-sm text-gray-600">
-                              {ingredient.quantity} {ingredient.unit}
-                            </div>
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-
-                    {selectedIngredients.length > 0 && (
-                      <div className="flex gap-3 pt-4 border-t">
-                        <Button
-                          onClick={handleAddToPantry}
-                          className="flex-1 bg-green-600 hover:bg-green-700"
-                        >
-                          <Package className="h-4 w-4 mr-2" />
-                          Add to Pantry ({selectedIngredients.length})
-                        </Button>
-                        <Button
-                          onClick={handleOrderOnline}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
-                        >
-                          <ShoppingCart className="h-4 w-4 mr-2" />
-                          Order Online ({selectedIngredients.length})
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="video">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Play className="h-5 w-5 text-red-600" />
-                      <span>
-                        {t("aiMealView.videoTitle") || "Video Tutorial"}
-                      </span>
-                    </CardTitle>
-                    <CardDescription>
-                      {t("aiMealView.videoDesc") ||
-                        "Watch step-by-step preparation"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center relative">
-                      {!isVideoPlaying ? (
-                        <div className="text-center space-y-4">
-                          <Button
-                            onClick={() => setIsVideoPlaying(true)}
-                            size="lg"
-                            className="bg-red-600 hover:bg-red-700 rounded-full"
-                          >
-                            <Play className="h-6 w-6 mr-2" />
-                            {t("aiMealView.playVideo") || "Play Video"}
-                          </Button>
-                          <Button
-                            onClick={openFullscreenVideo}
-                            variant="outline"
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <Maximize className="h-4 w-4 mr-2" />
-                            {t("aiMealView.fullscreen") || "Fullscreen"}
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="text-white text-center space-y-4">
-                          <iframe
-                            width="100%"
-                            height="315"
-                            src="https://www.youtube.com/embed/ixpYIgHlU60"
-                            title="Recipe Video Tutorial"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="rounded-lg"
-                          ></iframe>
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              onClick={() => setIsVideoPlaying(false)}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              {t("aiMealView.closeVideo") || "Close Video"}
-                            </Button>
-                            <Button
-                              onClick={openFullscreenVideo}
-                              variant="ghost"
-                              className="text-white hover:bg-white/20"
-                            >
-                              <Maximize className="h-4 w-4 mr-2" />
-                              {t("aiMealView.fullscreen") || "Fullscreen"}
-                            </Button>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
 
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {t("aiMealView.nutritionFacts") || "Nutrition Facts"}
+                        {completedSteps.includes(index) && (
+                          <div className="absolute top-3 right-3">
+                            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-pulse">
+                              <Check className="h-3 w-3 text-primary-foreground" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="ingredients" className="space-y-4">
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Package className="h-5 w-5 text-primary" />
+                      <span>{t("aiMealView.ingredientsSelector") || "Ingredients Selector"}</span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSelectAllIngredients}
+                      className="text-xs"
+                    >
+                      {selectedIngredients.length === getIngredientsForShopping().length
+                        ? (t("aiMealView.deselectAll") || "Deselect All")
+                        : (t("aiMealView.selectAll") || "Select All")
+                      }
+                    </Button>
+                  </CardTitle>
+                  <CardDescription>
+                    {t("aiMealView.selectIngredientsDesc") || "Select ingredients to add to your pantry or cart"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3 max-h-80 overflow-y-auto">
+                    {getIngredientsForShopping().map((ingredient, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center space-x-3 p-4 border-2 rounded-xl hover:bg-muted/30 transition-colors active:scale-95"
+                      >
+                        <Checkbox
+                          id={`ingredient-${index}`}
+                          checked={selectedIngredients.includes(ingredient.name)}
+                          onCheckedChange={() => handleIngredientToggle(ingredient.name)}
+                          className="w-5 h-5"
+                        />
+                        <label
+                          htmlFor={`ingredient-${index}`}
+                          className="flex-1 cursor-pointer"
+                        >
+                          <div className="font-medium text-sm md:text-base">{ingredient.name}</div>
+                          <div className="text-xs md:text-sm text-muted-foreground">
+                            {ingredient.quantity} {ingredient.unit}
+                          </div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
+                  {selectedIngredients.length > 0 && (
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                      <Button
+                        onClick={handleAddToPantry}
+                        variant="outline"
+                        className="flex-1 h-12"
+                        size="lg"
+                      >
+                        <Package className="h-5 w-5 mr-2" />
+                        {t("aiMealView.addToPantry") || "Add to Pantry"} ({selectedIngredients.length})
+                      </Button>
+                      <Button
+                        onClick={() => handleAddToCart()}
+                        className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-12"
+                        size="lg"
+                      >
+                        <ShoppingCart className="h-5 w-5 mr-2" />
+                        {t("aiMealView.addToCart") || "Add to Cart"} ({selectedIngredients.length})
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+          </Tabs>
+
+          {/* Mobile-optimized Info Cards */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Nutrition Facts */}
+            <Card className="md:col-span-1">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center space-x-2">
+                  <Flame className="h-5 w-5 text-orange-500" />
+                  <span>{t("aiMealView.nutritionFacts") || "Nutrition Facts"}</span>
                 </CardTitle>
                 <CardDescription>
                   {t("aiMealView.perServing") || "Per serving"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="font-medium">
-                      {t("aiMealView.calories") || "Calories"}
-                    </span>
-                    <span>{nutrition.calories}</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col items-center p-3 bg-muted/30 rounded-lg">
+                    <span className="text-lg font-bold text-primary">{nutrition.calories}</span>
+                    <span className="text-xs text-muted-foreground">{t("aiMealView.calories") || "Calories"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>{t("aiMealView.protein") || "Protein"}</span>
-                    <span>{nutrition.protein}g</span>
+                  <div className="flex flex-col items-center p-3 bg-muted/30 rounded-lg">
+                    <span className="text-lg font-bold text-primary">{nutrition.protein}g</span>
+                    <span className="text-xs text-muted-foreground">{t("aiMealView.protein") || "Protein"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>{t("aiMealView.carbs") || "Carbs"}</span>
-                    <span>{nutrition.carbs}g</span>
+                  <div className="flex flex-col items-center p-3 bg-muted/30 rounded-lg">
+                    <span className="text-lg font-bold text-primary">{nutrition.carbs}g</span>
+                    <span className="text-xs text-muted-foreground">{t("aiMealView.carbs") || "Carbs"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>{t("aiMealView.fat") || "Fat"}</span>
-                    <span>{nutrition.fat}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("aiMealView.fiber") || "Fiber"}</span>
-                    <span>{nutrition.fiber}g</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{t("aiMealView.sodium") || "Sodium"}</span>
-                    <span>{nutrition.sodium}mg</span>
+                  <div className="flex flex-col items-center p-3 bg-muted/30 rounded-lg">
+                    <span className="text-lg font-bold text-primary">{nutrition.fat}g</span>
+                    <span className="text-xs text-muted-foreground">{t("aiMealView.fat") || "Fat"}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {t("aiMealView.quickActions") || "Quick Actions"}
+            {/* Quick Actions */}
+            <Card className="md:col-span-1">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center space-x-2">
+                  <BookOpen className="h-5 w-5 text-blue-500" />
+                  <span>{t("aiMealView.quickActions") || "Quick Actions"}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
                   onClick={handleCreateShoppingList}
-                  className="w-full justify-start"
+                  className="w-full h-12 justify-start"
                   variant="outline"
                 >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {t("aiMealView.addToQuickShopping") ||
-                    "Add to Quick Shopping"}
+                  <ShoppingCart className="h-5 w-5 mr-3" />
+                  <span className="text-sm">{t("aiMealView.addToQuickShopping") || "Add to Shopping"}</span>
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  {t("aiMealView.markAsFavorite") || "Mark as Favorite"}
+                <Button className="w-full h-12 justify-start" variant="outline">
+                  <BookOpen className="h-5 w-5 mr-3" />
+                  <span className="text-sm">{t("aiMealView.markAsFavorite") || "Mark Favorite"}</span>
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <ChefHat className="h-4 w-4 mr-2" />
-                  {t("aiMealView.markAsCooked") || "Mark as Cooked"}
+                <Button className="w-full h-12 justify-start" variant="outline">
+                  <ChefHat className="h-5 w-5 mr-3" />
+                  <span className="text-sm">{t("aiMealView.markAsCooked") || "Mark Cooked"}</span>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {t("aiMealView.cookingProgress") || "Cooking Progress"}
+            {/* Cooking Progress */}
+            <Card className="md:col-span-2 lg:col-span-1">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center space-x-2">
+                  <Timer className="h-5 w-5 text-green-500" />
+                  <span>{t("aiMealView.cookingProgress") || "Progress"}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">
-                    {Math.round(
-                      (completedSteps.length / enhancedInstructions.length) *
-                        100
-                    )}
-                    %
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {completedSteps.length} {t("aiMealView.of") || "of"}{" "}
-                    {enhancedInstructions.length}{" "}
-                    {t("aiMealView.stepsCompleted") || "steps completed"}
-                  </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div
-                      className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                <div className="text-center space-y-4">
+                  <div className="relative w-24 h-24 mx-auto">
+                    <div className="absolute inset-0 rounded-full border-8 border-muted"></div>
+                    <div 
+                      className="absolute inset-0 rounded-full border-8 border-primary border-t-transparent transform -rotate-90 transition-all duration-500"
                       style={{
-                        width: `${
-                          (completedSteps.length /
-                            enhancedInstructions.length) *
-                          100
-                        }%`,
+                        background: `conic-gradient(from 0deg, hsl(var(--primary)) ${(completedSteps.length / enhancedInstructions.length) * 100}%, transparent 0%)`
                       }}
                     ></div>
+                    <div className="absolute inset-2 bg-background rounded-full flex items-center justify-center">
+                      <span className="text-lg font-bold text-primary">
+                        {Math.round((completedSteps.length / enhancedInstructions.length) * 100)}%
+                      </span>
+                    </div>
                   </div>
-                  {completedSteps.length === enhancedInstructions.length &&
-                    enhancedInstructions.length > 0 && (
-                      <div className="mt-3 p-2 bg-purple-100 rounded-lg">
-                        <p className="text-sm text-purple-700 font-medium">
-                          🎉{" "}
-                          {t("aiMealView.recipeCompleted") ||
-                            "Congratulations! Recipe completed!"}
-                        </p>
-                      </div>
-                    )}
+                  <p className="text-sm text-muted-foreground">
+                    {completedSteps.length} {t("aiMealView.of") || "of"} {enhancedInstructions.length}{" "}
+                    {t("aiMealView.stepsCompleted") || "steps completed"}
+                  </p>
+                  {completedSteps.length === enhancedInstructions.length && enhancedInstructions.length > 0 && (
+                    <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                      <p className="text-sm text-primary font-medium">
+                        🎉 {t("aiMealView.recipeCompleted") || "Congratulations! Recipe completed!"}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -745,12 +686,14 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         </div>
       </div>
 
+      {/* Fullscreen Video Modal */}
       {isFullscreen && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <div className="relative w-full h-full">
             <Button
               onClick={closeFullscreenVideo}
-              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-2"
+              className="absolute top-4 right-4 z-10 bg-red-600 hover:bg-red-700 rounded-full p-3"
+              size="sm"
             >
               <X className="h-6 w-6" />
             </Button>
@@ -768,18 +711,21 @@ const AIMealView = ({ meal, onBack }: AIMealViewProps) => {
         </div>
       )}
 
+      {/* Modals */}
       <MealShoppingModal
         meal={meal}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
       />
 
-      <OrderOnlineModal
-        isOpen={showOrderModal}
-        onClose={() => setShowOrderModal(false)}
-        items={getSelectedIngredientsForOrder()}
-        mealPlanName={meal.name}
-      />
+      {showCookingMode && (
+        <CookingMode
+          meal={meal}
+          ingredients={enhancedIngredients}
+          instructions={enhancedInstructions}
+          onClose={() => setShowCookingMode(false)}
+        />
+      )}
     </>
   );
 };

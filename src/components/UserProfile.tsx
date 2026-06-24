@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { isNativePlatform } from "@/services/revenueCatService";
 import {
   User,
   Mail,
@@ -41,6 +42,7 @@ import {
   TrendingDown,
   Activity,
   Heart,
+  Camera,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -49,6 +51,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PasswordUpdate from "./PasswordUpdate";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
+import DeleteAccountModal from "./DeleteAccountModal";
 import { authService } from "@/services/authService";
 import axios from "axios";
 
@@ -60,6 +63,7 @@ interface SubscriptionType {
   healthyDrinks: number;
   specialMeals: number;
   generatedMeals: number;
+  processImages?: number;
 }
 
 interface CurrentSubscriptionInfo {
@@ -72,8 +76,42 @@ interface CurrentSubscriptionInfo {
   specialMeals: number;
   healthyDrinks: number;
   generateMeals: number;
+  processImages?: number;
   _id: string;
 }
+
+interface CalorieTrack {
+  _id: string;
+  year: string;
+  month: string;
+  user_id: string;
+  caloriesConsumed: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CarbonTrack {
+  _id: string;
+  year: string;
+  month: string;
+  user_id: string;
+  carbonConsumed: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface HealthGoals {
+  dailyCaloriesGoal: number;
+  goals: string[];
+  _id: string;
+}
+
+interface TrackingData {
+  caloriesTrak: CalorieTrack | null;
+  carbonTrak: CarbonTrack | null;
+  healthGoals: HealthGoals | null;
+}
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -90,20 +128,23 @@ const UserProfile = () => {
   const [currentSubscriptionInfo, setCurrentSubscriptionInfo] = 
     useState<CurrentSubscriptionInfo | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || "",
     email: user?.email || "",
     phone: user?.phone || "",
     country: user?.country || "",
   });
+  const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
 
-  // Fetch subscription types and current subscription data on component mount
+  // Fetch subscription types, current subscription, and tracking data on component mount
   useEffect(() => {
     const fetchSubscriptionData = async () => {
       try {
         // Fetch subscription types
         const typesResponse = await axios.get(
-          "https://pantry-auth-1.onrender.com/subscriptionType/all"
+          `${API_BASE_URL}/subscriptionType/all`
         );
         setSubscriptionTypes(typesResponse.data);
 
@@ -117,8 +158,36 @@ const UserProfile = () => {
       }
     };
 
+    const fetchTrackingData = async () => {
+      try {
+        if (authUser?.userId) {
+          const response = await axios.get(
+            `${API_BASE_URL}/meal-plan/trakking/${authUser.userId}?type=all`
+          );
+          setTrackingData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching tracking data:", error);
+      }
+    };
+
     fetchSubscriptionData();
+    fetchTrackingData();
   }, [authUser?.userId]);
+
+  // Calculate daily average for calories
+  const getDaysInCurrentMonth = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  };
+
+  const caloriesConsumed = trackingData?.caloriesTrak?.caloriesConsumed ?? 0;
+  const dailyCaloriesAverage = caloriesConsumed > 0 
+    ? Math.round(caloriesConsumed / getDaysInCurrentMonth()) 
+    : 0;
+  const carbonConsumed = trackingData?.carbonTrak?.carbonConsumed ?? 0;
+  const dailyCaloriesGoal = trackingData?.healthGoals?.dailyCaloriesGoal ?? authUser?.profile?.healthGoals?.dailyCaloriesGoal ?? 2000;
+  const healthGoals = trackingData?.healthGoals?.goals ?? [];
 
   // Find current subscription name and type based on subscriptionTypeId
   const [currentSubscriptionType, setCurrentSubscriptionType] = useState<SubscriptionType | null>(null);
@@ -168,9 +237,22 @@ const UserProfile = () => {
   };
 
   const handleCancelSubscription = () => {
-    // Simulate switching to free plan
     setCurrentSubscriptionName("Free");
     setShowCancelModal(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      // TODO: Call actual delete account API
+      // await authService.deleteAccount(authUser?.userId);
+      logout();
+    } catch (error) {
+      console.error("Error deleting account:", error);
+    } finally {
+      setIsDeletingAccount(false);
+      setShowDeleteAccountModal(false);
+    }
   };
 
   const getLanguageDisplay = (langCode?: string) => {
@@ -199,19 +281,47 @@ const UserProfile = () => {
     currentSubscriptionName && currentSubscriptionName.toLowerCase() !== "free";
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
-      {/* Profile Information Accordion */}
-      <Card>
-        <CardContent className="p-0">
-          <Accordion type="single" collapsible>
-            <AccordionItem value="profile-info" className="border-none">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  <span className="text-lg sm:text-xl font-semibold">
-                    {t("profile.title") || "Profile Information"}
-                  </span>
-                </div>
+    <div className="min-h-screen relative">
+      {/* Beautiful Profile Background */}
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2070&auto=format&fit=crop')`
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+      </div>
+
+      <div className="relative z-10 space-y-4 sm:space-y-6 max-w-4xl mx-auto p-4">
+        {/* Header */}
+        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+              <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold text-white">
+                {t("profile.title") || "My Profile"}
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                {t("profile.description") || "Manage your personal information and preferences"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Profile Information Accordion */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-0">
+            <Accordion type="single" collapsible>
+              <AccordionItem value="profile-info" className="border-none">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                    <span className="text-lg sm:text-xl font-semibold">
+                      {t("profile.personalInfo") || "Profile Information"}
+                    </span>
+                  </div>
                 {!isEditing && (
                   <Button
                     variant="outline"
@@ -220,7 +330,7 @@ const UserProfile = () => {
                       e.stopPropagation();
                       setIsEditing(true);
                     }}
-                    className="border-green-500 text-green-600 hover:bg-green-50 ml-4"
+                    className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 ml-4"
                   >
                     <Edit2 className="h-4 w-4 mr-2" />
                     {t("profile.edit") || "Edit"}
@@ -243,7 +353,7 @@ const UserProfile = () => {
                       <Button
                         size="sm"
                         onClick={handleSave}
-                        className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+                        className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto"
                       >
                         <Save className="h-4 w-4 mr-2" />
                         {t("common.save")}
@@ -273,7 +383,7 @@ const UserProfile = () => {
                             onChange={(e) =>
                               setEditData((prev) => ({ ...prev, name: e.target.value }))
                             }
-                            className="border-green-200 focus:border-green-400 text-sm"
+                            className="border-emerald-200 focus:border-emerald-400 text-sm"
                           />
                         ) : (
                           <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
@@ -298,7 +408,7 @@ const UserProfile = () => {
                                 email: e.target.value,
                               }))
                             }
-                            className="border-green-200 focus:border-green-400 text-sm"
+                            className="border-emerald-200 focus:border-emerald-400 text-sm"
                           />
                         ) : (
                           <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
@@ -319,7 +429,7 @@ const UserProfile = () => {
                               setEditData((prev) => ({ ...prev, country: value }))
                             }
                             placeholder={t("profile.selectCountry") || "Select country"}
-                            className="border-green-200 focus:border-green-400 text-sm"
+                            className="border-emerald-200 focus:border-emerald-400 text-sm"
                           />
                         ) : (
                           <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
@@ -349,7 +459,7 @@ const UserProfile = () => {
                               <Input
                                 value={countryDisplay?.prefix || ""}
                                 disabled
-                                className="border-green-200 bg-gray-50 text-center text-sm"
+                                className="border-emerald-200 bg-gray-50 text-center text-sm"
                               />
                             </div>
                             <Input
@@ -367,8 +477,8 @@ const UserProfile = () => {
                                   }`,
                                 }))
                               }
-                              className="border-green-200 focus:border-green-400 flex-1 text-sm"
-                            />
+                              className="border-emerald-200 focus:border-emerald-400 flex-1 text-sm"
+                              />
                           </div>
                         ) : (
                           <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
@@ -417,143 +527,148 @@ const UserProfile = () => {
         </CardContent>
       </Card>
 
-      {/* Subscription Information Accordion */}
-      <Card>
-        <CardContent className="p-0">
-          <Accordion type="single" collapsible>
-            <AccordionItem value="subscription-info" className="border-none">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  <span className="text-lg sm:text-xl font-semibold">
-                    {t("profile.subscription") || "My Subscription"}
-                  </span>
-                  <div className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                    {currentSubscriptionName} Plan
+        {/* Subscription Information Accordion */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-0">
+            <Accordion type="single" collapsible>
+              <AccordionItem value="subscription-info" className="border-none">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center space-x-2">
+                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                    <span className="text-lg sm:text-xl font-semibold">
+                      {t("profile.subscription") || "My Subscription"}
+                    </span>
+                    <div className="ml-2 px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-full">
+                      {currentSubscriptionName} Plan
+                    </div>
                   </div>
-                </div>
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-sm text-muted-foreground mb-4">
                   {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
                 </p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Meal Plans */}
-            <div className="bg-white rounded-lg p-4 border border-green-100">
-              <div className="flex items-center justify-between mb-2">
-                <Calendar className="h-5 w-5 text-green-600" />
-                 <div className="text-right">
-                   <span className="text-xl font-bold text-green-600">
-                     {currentSubscriptionInfo?.mealPlans || 0}
-                   </span>
-                   {currentSubscriptionType && (
-                     <span className="text-lg text-gray-400">
-                       /{currentSubscriptionType.mealPlans}
-                     </span>
-                   )}
-                 </div>
-              </div>
-              <p className="text-sm font-medium text-gray-700">Meal Plans</p>
-              <p className="text-xs text-gray-500">Available this month</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {[
+                {
+                  icon: Calendar,
+                  label: "Meal Plans",
+                  desc: "Available this month",
+                  remaining: currentSubscriptionInfo?.mealPlans,
+                  limit: currentSubscriptionType?.mealPlans,
+                  color: "emerald",
+                },
+                {
+                  icon: Star,
+                  label: "Special Meals",
+                  desc: "Premium recipes",
+                  remaining: currentSubscriptionInfo?.specialMeals,
+                  limit: currentSubscriptionType?.specialMeals,
+                  color: "teal",
+                },
+                {
+                  icon: Coffee,
+                  label: "Healthy Drinks",
+                  desc: "Custom beverages",
+                  remaining: currentSubscriptionInfo?.healthyDrinks,
+                  limit: currentSubscriptionType?.healthyDrinks,
+                  color: "cyan",
+                },
+                {
+                  icon: ChefHat,
+                  label: "Generated Meals",
+                  desc: "AI-powered recipes",
+                  remaining: currentSubscriptionInfo?.generateMeals,
+                  limit: currentSubscriptionType?.generatedMeals,
+                  color: "orange",
+                },
+                {
+                  icon: Camera,
+                  label: t("profile.processImages") || "Process Images",
+                  desc: t("profile.processImagesDesc") || "Image ingredient scans",
+                  remaining: currentSubscriptionInfo?.processImages,
+                  limit: currentSubscriptionType?.processImages,
+                  color: "violet",
+                },
+              ].map((card, idx) => {
+                const Icon = card.icon;
+                const remaining = card.remaining ?? 0;
+                const limit = card.limit ?? 0;
+                const pct = limit > 0 ? Math.min(100, Math.round((remaining / limit) * 100)) : 0;
+                const palette: Record<string, { ring: string; bg: string; badgeBg: string; text: string; bar: string; from: string }> = {
+                  emerald: { ring: "border-emerald-100", bg: "from-emerald-50", badgeBg: "bg-emerald-100", text: "text-emerald-600", bar: "bg-emerald-500", from: "" },
+                  teal:    { ring: "border-teal-100",    bg: "from-teal-50",    badgeBg: "bg-teal-100",    text: "text-teal-600",    bar: "bg-teal-500",    from: "" },
+                  cyan:    { ring: "border-cyan-100",    bg: "from-cyan-50",    badgeBg: "bg-cyan-100",    text: "text-cyan-600",    bar: "bg-cyan-500",    from: "" },
+                  orange:  { ring: "border-orange-100",  bg: "from-orange-50",  badgeBg: "bg-orange-100",  text: "text-orange-600",  bar: "bg-orange-500",  from: "" },
+                  violet:  { ring: "border-violet-100",  bg: "from-violet-50",  badgeBg: "bg-violet-100",  text: "text-violet-600",  bar: "bg-violet-500",  from: "" },
+                };
+                const c = palette[card.color];
+                return (
+                  <div
+                    key={idx}
+                    className={`group bg-gradient-to-br ${c.bg} to-white rounded-xl p-4 border ${c.ring} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between ${idx === 4 ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""}`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`h-9 w-9 rounded-full ${c.badgeBg} flex items-center justify-center`}>
+                        <Icon className={`h-4 w-4 ${c.text}`} />
+                      </div>
+                      <div className="text-right leading-none">
+                        <span className={`text-2xl font-bold ${c.text}`}>{remaining}</span>
+                        {currentSubscriptionType && (
+                          <span className="text-sm text-muted-foreground">/{limit}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800 leading-tight">{card.label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{card.desc}</p>
+                      <div className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                        <div className={`h-full ${c.bar} transition-all duration-500`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Special Meals */}
-            <div className="bg-white rounded-lg p-4 border border-blue-100">
-              <div className="flex items-center justify-between mb-2">
-                <Star className="h-5 w-5 text-blue-600" />
-                 <div className="text-right">
-                   <span className="text-xl font-bold text-blue-600">
-                     {currentSubscriptionInfo?.specialMeals || 0}
-                   </span>
-                   {currentSubscriptionType && (
-                     <span className="text-lg text-gray-400">
-                       /{currentSubscriptionType.specialMeals}
-                     </span>
-                   )}
-                 </div>
-              </div>
-              <p className="text-sm font-medium text-gray-700">Special Meals</p>
-              <p className="text-xs text-gray-500">Premium recipes</p>
-            </div>
-
-            {/* Healthy Drinks */}
-            <div className="bg-white rounded-lg p-4 border border-purple-100">
-              <div className="flex items-center justify-between mb-2">
-                <Coffee className="h-5 w-5 text-purple-600" />
-                 <div className="text-right">
-                   <span className="text-xl font-bold text-purple-600">
-                     {currentSubscriptionInfo?.healthyDrinks || 0}
-                   </span>
-                   {currentSubscriptionType && (
-                     <span className="text-lg text-gray-400">
-                       /{currentSubscriptionType.healthyDrinks}
-                     </span>
-                   )}
-                 </div>
-              </div>
-              <p className="text-sm font-medium text-gray-700">Healthy Drinks</p>
-              <p className="text-xs text-gray-500">Custom beverages</p>
-            </div>
-
-            {/* Generated Meals */}
-            <div className="bg-white rounded-lg p-4 border border-orange-100">
-              <div className="flex items-center justify-between mb-2">
-                <ChefHat className="h-5 w-5 text-orange-600" />
-                 <div className="text-right">
-                   <span className="text-xl font-bold text-orange-600">
-                     {currentSubscriptionInfo?.generateMeals || 0}
-                   </span>
-                   {currentSubscriptionType && (
-                     <span className="text-lg text-gray-400">
-                       /{currentSubscriptionType.generatedMeals}
-                     </span>
-                   )}
-                 </div>
-              </div>
-              <p className="text-sm font-medium text-gray-700">Generated Meals</p>
-              <p className="text-xs text-gray-500">AI-powered recipes</p>
-            </div>
-          </div>
-
-          {/* Subscription Status */}
-          <div className="mt-6 p-4 bg-white rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Target className="h-4 w-4 text-green-600" />
-                <span className="font-medium">Plan Status</span>
-              </div>
-               <div className="flex items-center space-x-2">
-                 <div className={`w-2 h-2 rounded-full ${currentSubscriptionInfo?.status ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                 <span className={`text-sm font-medium ${currentSubscriptionInfo?.status ? 'text-green-600' : 'text-red-600'}`}>
-                   {currentSubscriptionInfo?.status ? 'Active' : 'Inactive'}
-                 </span>
-               </div>
-            </div>
-             {currentSubscriptionInfo?.dateStarted && (
-               <p className="text-xs text-gray-500 mt-2">
-                 Started: {new Date(currentSubscriptionInfo.dateStarted).toLocaleDateString()}
-               </p>
-             )}
+            {/* Subscription Status */}
+            <div className="mt-6 p-4 bg-white rounded-lg border">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Target className="h-4 w-4 text-emerald-600" />
+                  <span className="font-medium">Plan Status</span>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${currentSubscriptionInfo?.status ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                  <span className={`text-sm font-medium ${currentSubscriptionInfo?.status ? 'text-emerald-600' : 'text-red-600'}`}>
+                    {currentSubscriptionInfo?.status ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              </div>
+              {currentSubscriptionInfo?.dateStarted && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Started: {new Date(currentSubscriptionInfo.dateStarted).toLocaleDateString()}
+                </p>
+              )}
+            </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </CardContent>
       </Card>
 
-      {/* Calorie Tracking Accordion */}
-      <Card>
-        <CardContent className="p-0">
-          <Accordion type="single" collapsible>
-            <AccordionItem value="calorie-tracking" className="border-none">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                <div className="flex items-center space-x-2">
-                  <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
-                  <span className="text-lg sm:text-xl font-semibold">
-                    {t("profile.calorieTracking.title") || "Calorie Tracking"}
-                  </span>
-                </div>
-              </AccordionTrigger>
+        {/* Calorie Tracking Accordion */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-0">
+            <Accordion type="single" collapsible>
+              <AccordionItem value="calorie-tracking" className="border-none">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center space-x-2">
+                    <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
+                    <span className="text-lg sm:text-xl font-semibold">
+                      {t("profile.calorieTracking.title") || "Calorie Tracking"}
+                    </span>
+                  </div>
+                </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-sm text-muted-foreground mb-4">
                   {t("profile.calorieTracking.description") || "Track your monthly calorie consumption and goals"}
@@ -565,7 +680,7 @@ const UserProfile = () => {
                     <div className="flex items-center justify-between mb-2">
                       <Target className="h-5 w-5 text-orange-600" />
                       <span className="text-2xl font-bold text-orange-600">
-                        {authUser?.profile?.healthGoals?.dailyCaloriesGoal || 2000}
+                        {dailyCaloriesGoal.toLocaleString()}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyGoal") || "Daily Goal"}</p>
@@ -577,7 +692,7 @@ const UserProfile = () => {
                     <div className="flex items-center justify-between mb-2">
                       <Activity className="h-5 w-5 text-red-600" />
                       <span className="text-2xl font-bold text-red-600">
-                        24,680
+                        {caloriesConsumed.toLocaleString()}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.thisMonth") || "This Month"}</p>
@@ -589,7 +704,7 @@ const UserProfile = () => {
                     <div className="flex items-center justify-between mb-2">
                       <TrendingDown className="h-5 w-5 text-blue-600" />
                       <span className="text-2xl font-bold text-blue-600">
-                        1,956
+                        {dailyCaloriesAverage.toLocaleString()}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyAverage") || "Daily Average"}</p>
@@ -600,22 +715,23 @@ const UserProfile = () => {
                 <div className="mt-6">
                   <h4 className="text-base font-medium mb-3">{t("profile.calorieTracking.healthGoalsProgress") || "Health Goals Progress"}</h4>
                   <div className="space-y-2">
-                    {["Gain muscle", "Lose weight", "Better digestion", "Heart health"].map((goal, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-sm font-medium">{goal}</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-green-600 h-2 rounded-full" 
-                              style={{ width: `${Math.floor(Math.random() * 100)}%` }}
-                            />
+                    {healthGoals.length > 0 ? (
+                      healthGoals.map((goal, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <span className="text-sm font-medium">{goal}</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-4 h-4 bg-emerald-100 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-emerald-600 rounded-full" />
+                            </div>
+                            <span className="text-xs text-emerald-600">Active</span>
                           </div>
-                          <span className="text-xs text-gray-500">
-                            {Math.floor(Math.random() * 100)}%
-                          </span>
                         </div>
+                      ))
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-lg text-center">
+                        <span className="text-sm text-gray-500">{t("profile.calorieTracking.noGoals") || "No health goals set"}</span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </AccordionContent>
@@ -624,81 +740,68 @@ const UserProfile = () => {
         </CardContent>
       </Card>
 
-      {/* Environmental Impact Accordion */}
-      <Card>
-        <CardContent className="p-0">
-          <Accordion type="single" collapsible>
-            <AccordionItem value="environmental-impact" className="border-none">
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                <div className="flex items-center space-x-2">
-                  <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  <span className="text-lg sm:text-xl font-semibold">
-                    {t("profile.environmental.title") || "Environmental Impact"}
-                  </span>
-                </div>
-              </AccordionTrigger>
+        {/* Environmental Impact Accordion */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-0">
+            <Accordion type="single" collapsible>
+              <AccordionItem value="environmental-impact" className="border-none">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center space-x-2">
+                    <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                    <span className="text-lg sm:text-xl font-semibold">
+                      {t("profile.environmental.title") || "Environmental Impact"}
+                    </span>
+                  </div>
+                </AccordionTrigger>
               <AccordionContent className="px-6 pb-6">
                 <p className="text-sm text-muted-foreground mb-4">
                   {t("profile.environmental.description") || "Track your monthly carbon emissions from ingredients and meals"}
                 </p>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                  {/* Expired Ingredients Impact */}
-                  <div className="bg-red-50 rounded-lg p-4 border border-red-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <XCircle className="h-5 w-5 text-red-600" />
-                      <div className="text-right">
-                        <span className="text-2xl font-bold text-red-600">2.4</span>
-                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
-                      </div>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.expiredIngredients") || "Expired Ingredients"}</p>
-                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonWasted") || "Carbon footprint wasted"}</p>
-                  </div>
-
                   {/* Consumed Meals Impact */}
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
                     <div className="flex items-center justify-between mb-2">
-                      <Utensils className="h-5 w-5 text-green-600" />
+                      <Utensils className="h-5 w-5 text-emerald-600" />
                       <div className="text-right">
-                        <span className="text-2xl font-bold text-green-600">8.7</span>
+                        <span className="text-2xl font-bold text-emerald-600">{carbonConsumed.toLocaleString()}</span>
                         <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
                       </div>
                     </div>
                     <p className="text-sm font-medium text-gray-700">{t("profile.environmental.consumedMeals") || "Consumed Meals"}</p>
                     <p className="text-xs text-gray-500">{t("profile.environmental.carbonUsed") || "Carbon footprint used"}</p>
                   </div>
-                </div>
 
-                {/* Total Monthly Impact */}
-                <div className="bg-blue-50 rounded-lg p-4 border border-blue-100 mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <Leaf className="h-6 w-6 text-blue-600" />
-                    <div className="text-right">
-                      <span className="text-3xl font-bold text-blue-600">11.1</span>
-                      <span className="text-lg text-gray-500 ml-1">kg CO₂</span>
+                  {/* Total Monthly Impact */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Leaf className="h-6 w-6 text-blue-600" />
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-blue-600">{carbonConsumed.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
+                      </div>
                     </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
                   </div>
-                  <p className="text-base font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
-                  <p className="text-sm text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
                 </div>
 
                 {/* Environmental Tips */}
                 <div className="space-y-3">
                   <h4 className="text-base font-medium">💡 {t("profile.environmental.sustainabilityTips") || "Sustainability Tips"}</h4>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-                      <p className="text-sm font-medium text-green-800">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
-                      <p className="text-xs text-green-600">
-                        {t("profile.environmental.preventedWaste") || "You've prevented 2.1 kg CO₂ by using ingredients before expiration"}
-                      </p>
-                    </div>
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                      <p className="text-sm font-medium text-blue-800">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
-                      <p className="text-xs text-blue-600">
-                        {t("profile.environmental.wasteReduction") || "Your meal planning has reduced food waste by 78% this month"}
-                      </p>
-                    </div>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                        <p className="text-sm font-medium text-emerald-800">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
+                        <p className="text-xs text-emerald-600">
+                          {t("profile.environmental.preventedWaste") || "You've prevented 2.1 kg CO₂ by using ingredients before expiration"}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-teal-50 rounded-lg border border-teal-100">
+                        <p className="text-sm font-medium text-teal-800">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
+                        <p className="text-xs text-teal-600">
+                          {t("profile.environmental.wasteReduction") || "Your meal planning has reduced food waste by 78% this month"}
+                        </p>
+                      </div>
                     <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
                       <p className="text-sm font-medium text-yellow-800">{t("profile.environmental.improvementOpportunity") || "Improvement Opportunity"}</p>
                       <p className="text-xs text-yellow-600">
@@ -713,46 +816,79 @@ const UserProfile = () => {
         </CardContent>
       </Card>
 
-      {/* Check Favorites Button */}
-      <Card>
-        <CardContent className="p-4">
-          <Button
-            onClick={() => navigate("/favorites")}
-            className="w-full bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:from-primary/90 hover:to-secondary/90 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
-          >
-            <Heart className="h-4 w-4" />
-            <span>{t("profile.checkFavorites")}</span>
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Mobile Logout Button */}
-      {isMobile && (
-        <Card>
+        {/* Check Favorites Button */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="p-4">
             <Button
-              variant="outline"
-              onClick={logout}
-              className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 flex items-center justify-center space-x-2"
+              onClick={() => navigate("/favorites")}
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
             >
-              <LogOut className="h-4 w-4" />
-              <span>{t('dashboard.header.logout')}</span>
+              <Heart className="h-4 w-4" />
+              <span>{t("profile.checkFavorites")}</span>
             </Button>
           </CardContent>
         </Card>
-      )}
 
-      {/* Password Update Section */}
-      <PasswordUpdate />
+        {/* Mobile Logout Button */}
+        {isMobile && (
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-4">
+              <Button
+                variant="outline"
+                onClick={logout}
+                className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 flex items-center justify-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>{t('dashboard.header.logout')}</span>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Cancel Subscription Modal */}
-      <SubscriptionCancelModal
-        isOpen={showCancelModal}
-        onClose={() => setShowCancelModal(false)}
-        onConfirm={handleCancelSubscription}
-        currentPlan={currentSubscriptionName}
-        userId={authUser?.userId || ""}
-      />
+        {/* Password Update Section */}
+        <PasswordUpdate />
+
+        {/* Delete Account Section */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-red-600">
+                  {t("profile.deleteAccount.section") || "Danger Zone"}
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {t("profile.deleteAccount.sectionDesc") || "Permanently delete your account and all data"}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteAccountModal(true)}
+                className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+              >
+                {t("profile.deleteAccount.button") || "Delete Account"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Cancel Subscription Modal */}
+        <SubscriptionCancelModal
+          isOpen={showCancelModal}
+          onClose={() => setShowCancelModal(false)}
+          onConfirm={handleCancelSubscription}
+          currentPlan={currentSubscriptionName}
+          userId={authUser?.userId || ""}
+        />
+
+        {/* Delete Account Modal */}
+        <DeleteAccountModal
+          isOpen={showDeleteAccountModal}
+          onClose={() => setShowDeleteAccountModal(false)}
+          onConfirm={handleDeleteAccount}
+          isProcessing={isDeletingAccount}
+        />
+      </div>
     </div>
   );
 };

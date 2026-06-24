@@ -24,7 +24,7 @@ const translations = {
     // Navigation
     "nav.home": "Home",
     "nav.pricing": "Pricing",
-    "nav.why-pantry": "Why Pantry",
+    "nav.why-pantry": "Why Prefud",
     "nav.signin": "Sign In",
     "nav.signup": "Sign Up",
     "nav.language": "Language",
@@ -64,10 +64,10 @@ const translations = {
     // Home page
     "home.title": "Smart Meal Planning Made Simple",
     "home.subtitle":
-      "Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Pantry.",
+      "Transform your kitchen with AI-powered meal planning, reduce food waste, save money, and eat healthier with Prefud.",
     "home.cta.primary": "Start Free Trial",
     "home.cta.secondary": "Learn More",
-    "home.features.title": "Why Pantry?",
+    "home.features.title": "Why Prefud?",
     "home.features.subtitle":
       "Save time, money, and reduce food waste with intelligent meal planning",
     "home.features.smart-planning.title": "Smart Planning",
@@ -79,12 +79,12 @@ const translations = {
     "home.features.save-money.title": "Save Money",
     "home.features.save-money.description": "Shop smarter with automated lists",
     "home.footer.copyright":
-      "© 2025 Pantry by Bessel LLC. All rights reserved.",
-    "home.nav.why-pantry": "Why Pantry?",
+      "© 2025 Prefud by Bessel LLC. All rights reserved.",
+    "home.nav.why-pantry": "Why Prefud?",
     "home.nav.get-started": "Get Started",
 
     // Signup
-    "signup.title": "Join Pantry",
+    "signup.title": "Join Prefud",
     "signup.subtitle":
       "Create your account and start your smart kitchen journey",
     "signup.language.title": "Preferred Language",
@@ -100,7 +100,8 @@ const translations = {
     "signup.already-account": "Already have an account?",
     "signup.signin-here": "Sign in here",
     "signup.emailStep.title": "Recover Password",
-    "signup.emailStep.description": "Enter your email address and we'll send you a verification code.",
+    "signup.emailStep.description":
+      "Enter your email address and we'll send you a verification code.",
     "signup.emailStep.label": "Email Address",
     "signup.emailStep.placeholder": "Enter your email",
     "signup.emailPlaceholder": "Enter your email address",
@@ -117,8 +118,9 @@ const translations = {
     "signup.didntReceiveCode": "Didn't receive the code?",
     "signup.resendCode": "Resend Code",
     "signup.backToStart": "Back to Start",
-    "signup.aboutYourself":"Tell us about yourself",
-    "signup.personalizeMealPlan": "Help us personalize your meal planning experience.",
+    "signup.aboutYourself": "Tell us about yourself",
+    "signup.personalizeMealPlan":
+      "Help us personalize your meal planning experience.",
     "signup.personalInformation": "Personal Information",
     "signup.firstName": "First Name",
     "signup.lastName": "Last Name",
@@ -139,7 +141,8 @@ const translations = {
     "signup.agreement": "Agreement",
     "signup.agreementText": "I agree to the ",
     "signup.termsAndConditions": "Terms and Conditions",
-    "signup.agreementDescription": "By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning.",
+    "signup.agreementDescription":
+      "By checking this box, you acknowledge that you have read and agree to our terms, including the use of AI for meal planning.",
 
     // Health Goals
     "signup.healthGoals.loseWeight": "Lose weight",
@@ -150,10 +153,11 @@ const translations = {
     "signup.healthGoals.heartHealth": "Heart health",
     "signup.healthGoals.lowerCholesterol": "Lower cholesterol",
     "signup.healthGoals.manageDiabetes": "Manage diabetes",
-    
+
     // Calorie Tracking
     "profile.calorieTracking.title": "Calorie Tracking",
-    "profile.calorieTracking.description": "Track your monthly calorie consumption and goals",
+    "profile.calorieTracking.description":
+      "Track your monthly calorie consumption and goals",
     "profile.calorieTracking.dailyGoal": "Daily Goal",
     "profile.calorieTracking.caloriesPerDay": "Calories per day",
     "profile.calorieTracking.thisMonth": "This Month",
@@ -161,10 +165,11 @@ const translations = {
     "profile.calorieTracking.dailyAverage": "Daily Average",
     "profile.calorieTracking.healthGoalsProgress": "Health Goals Progress",
     "profile.calorieTracking.noHealthGoals": "No health goals set",
-    
-     // Environmental Impact
+
+    // Environmental Impact
     "profile.environmental.title": "Environmental Impact",
-    "profile.environmental.description": "Track your monthly carbon emissions from ingredients and meals",
+    "profile.environmental.description":
+      "Track your monthly carbon emissions from ingredients and meals",
     "profile.environmental.expiredIngredients": "Expired Ingredients",
     "profile.environmental.carbonWasted": "Carbon footprint wasted",
     "profile.environmental.consumedMeals": "Consumed Meals",
@@ -173,20 +178,38 @@ const translations = {
     "profile.environmental.combinedFootprint": "Combined carbon footprint",
     "profile.environmental.sustainabilityTips": "Sustainability Tips",
     "profile.environmental.reduceFoodWaste": "Reduce Food Waste",
-    "profile.environmental.preventedWaste": "You've prevented 2.1 kg CO₂ by using ingredients before expiration",
+    "profile.environmental.preventedWaste":
+      "You've prevented 2.1 kg CO₂ by using ingredients before expiration",
     "profile.environmental.mealPlanBenefits": "Meal Planning Benefits",
-    "profile.environmental.wasteReduction": "Your meal planning has reduced food waste by 78% this month",
+    "profile.environmental.wasteReduction":
+      "Your meal planning has reduced food waste by 78% this month",
     "profile.environmental.improvementOpportunity": "Improvement Opportunity",
-    "profile.environmental.checkExpiration": "Check expiration dates more frequently to reduce waste by 15%",
-    
+    "profile.environmental.checkExpiration":
+      "Check expiration dates more frequently to reduce waste by 15%",
+
     // Favorites
     "profile.checkFavorites": "Check Favorites",
     "favorites.title": "My Favorite Recipes",
     "favorites.subtitle": "Your collection of beloved recipes",
     "favorites.empty.title": "No favorite recipes yet",
-    "favorites.empty.description": "Start exploring recipes and mark your favorites to see them here!",
+    "favorites.empty.description":
+      "Start exploring recipes and mark your favorites to see them here!",
     "favorites.empty.cta": "Discover Recipes",
-    
+
+    // Cart
+    "cart.title": "Shopping Cart",
+    "cart.items": "items",
+    "cart.unit": "Unit",
+    "cart.addedAt": "Added",
+    "cart.clearAll": "Clear All",
+    "cart.empty.title": "Your cart is empty",
+    "cart.empty.description":
+      "Add ingredients from recipes or meal plans to start building your shopping list.",
+    "cart.empty.backButton": "Back to Dashboard",
+    "cart.actions.title": "Cart Actions",
+    "cart.actions.addToShoppingList": "Add to Shopping List",
+    "cart.actions.addToPantry": "Add to Pantry",
+
     // Diet Types
     "signup.diet.vegetarian": "Vegetarian",
     "signup.diet.vegan": "Vegan",
@@ -211,6 +234,9 @@ const translations = {
     "signup.allergy.none": "None",
 
     "signup.caloriesRange": "Recommended range: 1200-3000 calories per day.",
+    "signup.ageError.title": "❌ Age Requirement",
+    "signup.ageError.description":
+      "You must be at least 18 years old to create an account.",
 
     //Plan
     "signup.choosePlan": "Choose your plan",
@@ -219,12 +245,12 @@ const translations = {
     "signup.plan.free": "Free",
     "signup.plan.whatsIncluded": "What's included",
     "signup.plan.choose": "Choose",
-    "signup.selectPlanDescription": "Select the perfect plan to start your personalized meal planning ",
-
+    "signup.selectPlanDescription":
+      "Select the perfect plan to start your personalized meal planning ",
 
     // Signin
     "signin.title": "Welcome Back",
-    "signin.subtitle": "Sign in to your Pantry account",
+    "signin.subtitle": "Sign in to your Prefud account",
     "signin.email": "Email Address",
     "signin.email.placeholder": "Enter your email",
     "signin.password": "Password",
@@ -234,6 +260,9 @@ const translations = {
     "signin.signing-in": "Signing in...",
     "signin.no-account": "Don't have an account?",
     "signin.create-here": "Create one here",
+    "signin.accountIncomplete": "Account Incomplete",
+    "signin.accountIncompleteDesc":
+      "Your account needs to be completed. Please verify your email to continue.",
 
     // Profile
     "profile.title": "Profile Information",
@@ -253,7 +282,28 @@ const translations = {
     "profile.plan": "Plan",
     "profile.active": "Active",
     "profile.cancelSubscription": "Cancel Subscription",
-    "profile.subscriptionDesc":"Your current plan usage and limits",
+    "profile.subscriptionDesc": "Your current plan usage and limits",
+    "profile.processImages": "Process Images",
+    "profile.processImagesDesc": "Image ingredient scans",
+
+    // Delete Account
+    "profile.deleteAccount.section": "Danger Zone",
+    "profile.deleteAccount.sectionDesc":
+      "Permanently delete your account and all data",
+    "profile.deleteAccount.button": "Delete Account",
+    "profile.deleteAccount.title": "Delete Account",
+    "profile.deleteAccount.description":
+      "This action is permanent and cannot be undone.",
+    "profile.deleteAccount.warningTitle": "By deleting your account:",
+    "profile.deleteAccount.cancelSub":
+      "Your active subscription will be cancelled immediately",
+    "profile.deleteAccount.deleteData":
+      "All your personal data, meal plans, and recipes will be permanently deleted",
+    "profile.deleteAccount.noRecovery":
+      "You will not be able to recover your account or data",
+    "profile.deleteAccount.goBack": "Go Back",
+    "profile.deleteAccount.confirm": "Delete My Account",
+    "profile.deleteAccount.deleting": "Deleting...",
 
     // Meal Planner
     "mealPlanner.title": "Meal Planner",
@@ -265,7 +315,9 @@ const translations = {
     "mealPlanner.loadingPlans": "Loading your meal plans...",
     "mealPlanner.day": "day",
     "mealPlanner.for": "For",
-    "mealPlanner.people": "people",
+    "mealPlanner.people": "adults",
+    "mealPlanner.kidsbelow5": "kids below 5",
+    "mealPlanner.kidsover5": "kids 5 to 12",
     "mealPlanner.mealsPDay": "meals per day",
     "mealPlanner.cuisine": "Cuisine",
     "mealPlanner.diet": "Diet",
@@ -278,6 +330,7 @@ const translations = {
     "mealPlanner.getCustomizedRecipes":
       "Get customized recipes based on your preferences, dietary needs, and cooking skills",
     "mealPlanner.createYourFirstAIMeal": "Create Your First AI Meal Plan",
+    "mealPlanner.noMorePlans":"No more meal plans to show",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Create AI Meal Plan",
@@ -385,9 +438,54 @@ const translations = {
     "mealPlanCreator.cuisine.chinese": "Chinese",
     "mealPlanCreator.cuisine.indian": "Indian",
     "mealPlanCreator.cuisine.customCountry": "Add Country Cuisine",
-    "mealPlanCreator.cuisine.customCountryPlaceholder": "Enter a country for its cuisine (e.g., Brazil, Morocco)",
+    "mealPlanCreator.cuisine.customCountryPlaceholder":
+      "Enter a country for its cuisine (e.g., Brazil, Morocco)",
     "mealPlanCreator.generate.btn": "Generate Plan with AI",
     "mealPlanCreator.generate.btnLoad": "Generating Plan with AI...",
+    "mealPlanCreator.cuisine.other": "Other",
+    "mealPlanCreator.cuisine.otherPlaceholder": "Type your cuisine...",
+    "mealPlanCreator.allergy.other": "Other",
+    "mealPlanCreator.allergy.otherPlaceholder": "Type your allergy...",
+    "mealPlanCreator.chat.welcome":
+      "👋 Hi! Let's create your personalized meal plan. What would you like to name it?",
+    "mealPlanCreator.chat.description":
+      "📝 Add a brief description for your plan. (Optional)",
+    "mealPlanCreator.chat.startDate": "📅 When should your meal plan start?",
+    "mealPlanCreator.chat.numberOfDays":
+      "📆 How many days should the plan cover?",
+    "mealPlanCreator.chat.numberOfPersons":
+      "👥 How many adults will be eating?",
+    "mealPlanCreator.chat.kidsUnder5": "👶 How many kids under 5 years?",
+    "mealPlanCreator.chat.kids5to12": "🧒 How many kids between 5 and 12?",
+    "mealPlanCreator.chat.mealsPerDay": "🍽️ How many meals per day?",
+    "mealPlanCreator.chat.dietary":
+      "🥗 Any dietary restrictions? Select all that apply.",
+    "mealPlanCreator.chat.cuisine":
+      "🌍 Any cuisine preferences? Select all that apply.",
+    "mealPlanCreator.chat.maxCookTime":
+      "⏱️ What's the maximum cooking time per meal (in minutes)?",
+    "mealPlanCreator.chat.skillLevel": "👨‍🍳 What's your cooking skill level?",
+    "mealPlanCreator.chat.budget": "💰 What's your budget range?",
+    "mealPlanCreator.chat.allergies": "⚠️ Any allergies or food intolerances?",
+    "mealPlanCreator.chat.healthGoals": "💪 Any health goals for this plan?",
+    "mealPlanCreator.chat.extras":
+      "📝 Any dislikes or special requests? (Optional)",
+    "mealPlanCreator.chat.extrasPlaceholder": "Type here or skip...",
+    "mealPlanCreator.chat.none": "None",
+    "mealPlanCreator.chat.skipped": "Skipped",
+    "mealPlanCreator.chat.summaryTitle": "Here's your meal plan summary:",
+    "mealPlanCreator.chat.confirmPrompt":
+      "Looks good? Hit **Generate** to create your meal plan! 🚀",
+    "mealPlanCreator.chat.letsGo": "Let's go! 🚀",
+    "mealPlanCreator.chat.loaderMessage":
+      "Analyzing your preferences and creating your perfect meal plan...",
+    "mealPlanCreator.chat.missingName": "Please enter a plan name.",
+    "mealPlanCreator.chat.missingDate": "Please select a start date.",
+    "mealPlanCreator.chat.confirm": "Confirm",
+    "mealPlanCreator.chat.skip": "Skip →",
+    "mealPlanCreator.chat.continue": "Continue",
+    "mealPlanCreator.chat.editTitle": "Edit Meal Plan",
+    "mealPlanCreator.chat.createTitle": "AI Meal Plan",
 
     // Meal Plan Creator
     "levels.beginner": "Beginner",
@@ -449,7 +547,160 @@ const translations = {
     "mealPlanView.mealUncompleted": "Meal marked as uncompleted",
     "mealPlanView.mealCompletedDesc": "Great job on completing your meal!",
     "mealPlanView.mealUncompletedDesc": "Meal has been marked as uncompleted.",
+    "mealPlanView.calendarView": "Calendar View",
+    "mealPlanView.kidsUnder5": "Kids < 5",
+    "mealPlanView.kids5to12": "Kids 5-12",
+    "mealPlanView.noMeals": "No meals",
+    "mealPlanView.addedToPantry": "Added to Pantry",
+    "mealPlanView.planDetails": "Plan Details",
+    "mealPlanView.maxCookingTime": "Max Cooking Time",
+    "mealPlanView.skillLevel": "Skill Level",
+    "mealPlanView.budget": "Budget",
+    "mealPlanView.cuisines": "Cuisines",
+    "mealPlanView.healthGoals": "Health Goals",
+    "mealPlanView.dislikes": "Disliked Cuisines",
+    "mealPlanReady.title": "Your Meal Plan is Ready! 🎉",
+    "mealPlanReady.description":
+      "Your personalized AI meal plan has been created and is ready to use. You can view the details of your meal plan, add ingredients to your pantry, or order online for delivery.",
+    "mealPlanReady.viewPlan": "View Meal Plan",
+    "mealPlanReady.later": "View Later",
+    "drinkReady.title": "Your Healthy Drink is Ready! 🥤",
+    "drinkReady.description":
+      "Your personalized healthy drink has been mixed and is ready to enjoy.",
+    "drinkReady.viewDrink": "View Drink",
+    "drinkReady.later": "View Later",
+    "drinkStarted.title": "Drink Generation Started",
+    "drinkStarted.description":
+      "We'll notify you when your healthy drink is ready.",
+    "aiMealReady.title": "Your AI Meal is Ready! 🍽️",
+    "aiMealReady.description":
+      "Your personalized AI meal has been created and is ready to explore.",
+    "aiMealReady.viewMeal": "View Meal",
+    "aiMealReady.later": "View Later",
+    "aiMealStarted.title": "Meal Generation Started",
+    "aiMealStarted.description":
+      "We'll notify you when your meal is ready.",
+    "pantryMealsReady.title": "Your Pantry Meals are Ready! 🍽️",
+    "pantryMealsReady.description":
+      "Fresh AI meal ideas based on your pantry are ready to explore.",
+    "pantryMealsReady.viewMeals": "View Meals",
+    "pantryMealsReady.later": "View Later",
+    "pantryMealsReady.mealsGenerated": "meals generated",
+    "pantryMealsStarted.title": "Meal Generation Started",
+    "pantryMealsStarted.description":
+      "We'll notify you when your pantry meal ideas are ready.",
+    "analyzeImageStarted.title": "Analyzing your image…",
+    "analyzeImageStarted.description":
+      "We'll notify you when ingredients are detected.",
+    "analyzeImageReady.title": "Ingredients Detected",
+    "analyzeImageReady.description":
+      "ingredients detected. Select which to add to your pantry.",
+    "analyzeImageReady.addSelected": "Add Selected to Pantry",
+    "analyzeImageReady.cancel": "Cancel",
+    "analyzeImageReady.selectedCount": "selected",
+    "analyzeImageReady.adding": "Adding…",
+    "analyzeImageReady.noneDetected": "No ingredients detected in the image.",
+    "addIngredient.scanWithCamera": "Scan ingredients with camera",
+    "addIngredient.scanWithCameraDesc":
+      "Take a photo or upload an image of your ingredients and we'll detect them automatically.",
+    "addIngredient.takePhoto": "Take Photo",
+    "addIngredient.uploadPhoto": "Upload Photo",
+    "addIngredient.analyzePhoto": "Analyze Photo",
+    "addIngredient.analyzing": "Analyzing…",
+    "addIngredient.retake": "Choose another",
+    "addIngredient.back": "Back",
+    //new keys
+    //Checkout and cart
+    "mealPlanView.addToCart": "Add to Cart",
+    "cart.checkout.proceedToCheckout": "Proceed to Checkout",
+    "cart.inCart": "in cart",
+    "checkout.steps.deliveryMethod": "Delivery Method",
+    "checkout.deliveryMethod.title":
+      "How would you like to receive your order?",
+    "checkout.deliveryMethod.subtitle":
+      " Select how you would like to receive your order",
 
+    "checkout.steps.deliveryMethod.title": "Choose Delivery Method",
+    "checkout.deliveryMethod.delivery.title": "Delivery",
+    "checkout.deliveryMethod.delivery.description":
+      "Get your groceries delivered to your doorstep",
+    "checkout.deliveryMethod.delivery.fee": "Delivery Fee",
+    "checkout.deliveryMethod.pickup.title": "Pickup",
+    "checkout.deliveryMethod.pickup.description":
+      "Pick up your order from the store",
+    "checkout.deliveryMethod.pickup.fee": "No Delivery Fee",
+
+    "mealPlanView.addedToCart": "Added to Cart",
+
+    "checkout.steps.storeSelection": "Store Selection",
+    "checkout.steps.address": "Address",
+    "checkout.steps.payment": "Payment",
+    "checkout.steps.summary": "Summary",
+    "checkout.steps.confirmation": "Confirmation",
+
+    "checkout.storeSelection.title": "Select Store",
+    "checkout.storeSelection.subtitle":
+      "Choose your preferred store for pickup or delivery",
+    "checkout.address.pickup.title": "Pickup Address",
+    "checkout.address.pickup.subtitle": "Select the store location for pickup",
+    "checkout.payment.title": "Payment Method",
+    "checkout.payment.subtitle": "Choose your payment method",
+    "checkout.payment.default": "Default",
+    "checkout.payment.expires": "Expires",
+    "checkout.payment.addNew": "Add New Payment Method",
+    "checkout.payment.form.name": "Name on Card",
+    "checkout.payment.form.number": "Card Number",
+    "checkout.payment.form.expiry": "Expiry Date (MM/YY)",
+    "checkout.payment.form.cvc": "CVC",
+    "checkout.payment.form.save": "Save Card",
+    "checkout.summary.title": "Order Summary",
+    "checkout.summary.subtitle": "Review your order details before confirming",
+    "checkout.summary.items": "Items",
+    "checkout.summary.pickup": "Pickup",
+    "checkout.summary.pickupTime": "Pickup Time",
+    "checkout.summary.payment": "Payment Method",
+    "checkout.summary.subtotal": "Subtotal",
+    "checkout.summary.serviceFee": "Service Fee",
+    "checkout.summary.total": "Total",
+    "checkout.summary.processPayment": "Process Payment",
+    "checkout.payment.form.cvv": "CVV",
+    "checkout.summary.deliveryFee": "Delivery Fee",
+
+    //falta confirmation
+    "checkout.confirmation.title": "Order Confirmed!",
+    "checkout.confirmation.subtitle":
+      "Thank you for your order. Your order number is",
+    "checkout.confirmation.orderNumber": "Order Number",
+    "checkout.confirmation.estimatedPickup": "Estimated Pickup Time",
+    "checkout.confirmation.today": "Today at",
+    "checkout.confirmation.pickupLocation": "Pickup Location",
+    "checkout.confirmation.total": "Total Paid",
+    "checkout.confirmation.items": "Items Ordered",
+    "checkout.confirmation.nextSteps": "Next Steps",
+    "checkout.confirmation.step1":
+      "You will receive a confirmation email shortly.",
+    "checkout.confirmation.step2": "Prepare for pickup at the selected store.",
+    "checkout.confirmation.step3": "Enjoy your groceries!",
+    "checkout.confirmation.done": "Done",
+    "checkout.address.delivery.title": "Delivery Address",
+    "checkout.address.delivery.subtitle":
+      "Enter the address where you want your order delivered",
+    "checkout.address.default": "Default Address",
+    "checkout.address.addNew": "Add New Address",
+    "checkout.address.form.street": "Street Address",
+    "checkout.address.form.apartment": "Apartment, suite, etc. (optional)",
+    "checkout.address.form.state": "State/Province",
+    "checkout.address.form.city": "City",
+    "checkout.address.form.zipCode": "ZIP/Postal Code",
+    "checkout.address.form.country": "Country",
+    "checkout.address.form.save": "Save Address",
+    "checkout.summary.delivery": "Delivery",
+    "checkout.summary.deliveryTime": "Delivery Time",
+    "checkout.confirmation.estimatedDelivery": "Estimated Delivery Time",
+    "checkout.confirmation.deliveryAddress": "Delivery Address",
+    "checkout.confirmation.thankYou": "Thank you for choosing Prefud!",
+
+    //until here
     "days.sunday": "Sunday",
     "days.monday": "Monday",
     "days.tuesday": "Tuesday",
@@ -475,6 +726,7 @@ const translations = {
     "mealShopping.withinWeek": "Within a Week",
     "mealShopping.ingredientCount": "ingredients",
     "mealShopping.backToIngredients": "Back to Ingredients",
+    "mealShopping.selectedItems": "Items selected",
 
     // AIMealCreator
     "aiMealCreator.createMealTitle": "Create a Meal",
@@ -493,6 +745,7 @@ const translations = {
     "aiMealCreator.noMealsTitle": "No Meals created yet",
     "aiMealCreator.noMealsDesc":
       "Start creating your first AI-powered meal based on your preferences and ingredients.",
+      "aiMealCreator.noMoreMeals":"No more meals to show",
 
     // AIMealCreator Stepper
     "aiMealCreatorStepper.step1Title": "Meal Details",
@@ -561,6 +814,8 @@ const translations = {
     "aiMealCreatorStepper.cuisine.greek": "Greek",
     "aiMealCreatorStepper.cuisine.spanish": "Spanish",
     "aiMealCreatorStepper.cuisine.chinese": "Chinese",
+    "aiMealCreatorStepper.cuisine.other": "Other",
+    "aiMealCreatorStepper.cuisine.otherPlaceholder": "Type your cuisine...",
     "aiMealCreatorStepper.healthGoalsLabel": "Health Goals",
     "aiMealCreatorStepper.health.weightloss": "Weight Loss",
     "aiMealCreatorStepper.health.musclegain": "Muscle Gain",
@@ -580,6 +835,8 @@ const translations = {
     "aiMealCreatorStepper.allergy.fish": "Fish",
     "aiMealCreatorStepper.allergy.wheat": "Wheat",
     "aiMealCreatorStepper.allergy.sesame": "Sesame",
+    "aiMealCreatorStepper.allergy.other": "Other",
+    "aiMealCreatorStepper.allergy.otherPlaceholder": "Type your allergy...",
     "aiMealCreatorStepper.allergy.sulfites": "Sulfites",
     "aiMealCreatorStepper.customAllergiesLabel":
       "Custom Allergies/Intolerances (Optional)",
@@ -617,7 +874,150 @@ const translations = {
     "aiMealCreatorStepper.dishName": "Dish Name",
     "aiMealCreatorStepper.review.dish": " Dish",
 
-    // AI Meal Generation
+    // AI Meal Creator Chat
+    "aiMealCreatorStepper.chat.welcome":
+      "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
+    "aiMealCreatorStepper.chat.mealName":
+      "Great choice! 🎉 Do you have a name for this meal? (Optional - just type or skip)",
+    "aiMealCreatorStepper.chat.dishName":
+      "🍽️ Do you have a specific dish in mind? e.g. Mac and Cheese (Optional)",
+    "aiMealCreatorStepper.chat.details":
+      "⚡ Let's set up the details — servings, cooking time, skill level, and budget.",
+    "aiMealCreatorStepper.chat.dietary":
+      "🥗 Any dietary restrictions? Select all that apply.",
+    "aiMealCreatorStepper.chat.cuisine":
+      "🌍 Any cuisine preferences? Select all that sound good!",
+    "aiMealCreatorStepper.chat.healthGoals":
+      "💪 Any health goals for this meal?",
+    "aiMealCreatorStepper.chat.allergies":
+      "⚠️ Any allergies or food intolerances I should know about?",
+    "aiMealCreatorStepper.chat.extras":
+      "📝 Anything else? Dislikes, special requests, or custom allergies? (Optional)",
+    "aiMealCreatorStepper.chat.none": "None",
+    "aiMealCreatorStepper.chat.skipped": "Skipped",
+    "aiMealCreatorStepper.chat.confirm": "Confirm",
+    "aiMealCreatorStepper.chat.skip": "Skip →",
+    "aiMealCreatorStepper.chat.continue": "Continue",
+    "aiMealCreatorStepper.chat.generate": "Generate My Meal",
+    "aiMealCreatorStepper.chat.letsGo": "Let's go! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle": "Here's your meal plan summary:",
+    "aiMealCreatorStepper.chat.confirmPrompt":
+      "Looks good? Hit **Generate** to create your meal! 🚀",
+    "aiMealCreatorStepper.chat.typePlaceholder": "Type here or skip...",
+    "aiMealCreatorStepper.chat.dishPlaceholder": "e.g., Mac and Cheese",
+    "aiMealCreatorStepper.chat.servingsLabel": "servings",
+    "aiMealCreatorStepper.chat.budgetSuffix": "budget",
+    "aiMealCreatorStepper.chat.servings": "👥 How many servings do you need?",
+    "aiMealCreatorStepper.chat.cookTime":
+      "⏱️ What's the maximum cooking time (in minutes)?",
+    "aiMealCreatorStepper.chat.skill": "👨‍🍳 What's your cooking skill level?",
+    "aiMealCreatorStepper.chat.budget":
+      "💰 What's your budget range for this meal?",
+    "aiMealCreator.markAsDoneSuccess": "Meal marked as completed",
+    "aiMealCreator.markAsUndoneSuccess": "Meal marked as uncompleted",
+    "aiDrinkCreator.markAsDoneSuccess":
+      "Drink marked as consumed successfully!",
+    "aiDrinkCreator.markAsDoneError": "Failed to mark drink as consumed",
+
+    // AI Drink Creator Chat
+    "aiDrinkChat.welcome":
+      "👋 Hi! I'm your AI drink assistant. Let's create a healthy drink just for you! What type of drink would you like?",
+    "aiDrinkChat.drinkName":
+      "Great choice! 🎉 What would you like to name your drink? (Optional)",
+    "aiDrinkChat.servings": "👥 How many servings do you need?",
+    "aiDrinkChat.cookTime": "⏱️ What's the maximum prep time (in minutes)?",
+    "aiDrinkChat.skill": "👨‍🍳 What's your skill level?",
+    "aiDrinkChat.budget": "💰 What's your budget range for this drink?",
+    "aiDrinkChat.healthGoals":
+      "💪 What are your health goals? Select all that apply.",
+    "aiDrinkChat.dietary":
+      "🥗 Any dietary restrictions? Select all that apply.",
+    "aiDrinkChat.cuisine": "🌍 Any cuisine or flavor preferences?",
+    "aiDrinkChat.allergies":
+      "⚠️ Any allergies or intolerances I should know about?",
+    "aiDrinkChat.extras":
+      "📝 Anything else? Dislikes or special requests? (Optional)",
+    "aiDrinkChat.none": "None",
+    "aiDrinkChat.skipped": "Skipped",
+    "aiDrinkChat.confirm": "Confirm",
+    "aiDrinkChat.skip": "Skip →",
+    "aiDrinkChat.continue": "Continue",
+    "aiDrinkChat.generate": "Generate My Drink",
+    "aiDrinkChat.letsGo": "Let's go! 🚀",
+    "aiDrinkChat.readyTitle": "Here's your drink summary:",
+    "aiDrinkChat.confirmPrompt":
+      "Looks good? Hit **Generate** to create your drink! 🚀",
+    "aiDrinkChat.loaderMessage": "Mixing the perfect healthy drink for you...",
+    "aiDrinkChat.back": "Back",
+    "aiDrinkChat.title": "AI Drink Creator",
+    "aiDrinkChat.servingsLabel": "Servings",
+    "aiDrinkChat.prepTimeLabel": "Time (min)",
+    "aiDrinkChat.drinkNamePlaceholder": "e.g., Morning Energy Smoothie",
+    "aiDrinkChat.extrasPlaceholder": "Type here or skip...",
+    "aiDrinkChat.type.smoothie": "🥤 Smoothie",
+    "aiDrinkChat.type.juice": "🧃 Fresh Juice",
+    "aiDrinkChat.type.tea": "🍵 Wellness Tea",
+    "aiDrinkChat.type.protein": "💪 Protein Shake",
+    "aiDrinkChat.type.detox": "🌿 Detox Drink",
+    "aiDrinkChat.type.energy": "⚡ Energy Boost",
+    "aiDrinkChat.goal.energy": "⚡ Energy Boost",
+    "aiDrinkChat.goal.weightLoss": "⚖️ Weight Management",
+    "aiDrinkChat.goal.immunity": "🛡️ Immune Support",
+    "aiDrinkChat.goal.digestive": "🌱 Digestive Health",
+    "aiDrinkChat.goal.skin": "✨ Skin Health",
+    "aiDrinkChat.goal.detox": "🌿 Detoxification",
+    "aiDrinkChat.diet.keto": "Keto",
+    "aiDrinkChat.diet.paleo": "Paleo",
+    "aiDrinkChat.diet.vegan": "Vegan",
+    "aiDrinkChat.diet.vegetarian": "Vegetarian",
+    "aiDrinkChat.diet.glutenFree": "Gluten Free",
+    "aiDrinkChat.diet.dairyFree": "Dairy Free",
+    "aiDrinkChat.diet.lowCarb": "Low Carb",
+    "aiDrinkChat.diet.diabeticFriendly": "Diabetic Friendly",
+    "aiDrinkChat.skill.beginner": "Beginner",
+    "aiDrinkChat.skill.intermediate": "Intermediate",
+    "aiDrinkChat.skill.advanced": "Advanced",
+    "aiDrinkChat.budget.low": "Low",
+    "aiDrinkChat.budget.medium": "Medium",
+    "aiDrinkChat.budget.high": "High",
+    "aiDrinkChat.review.type": "Type",
+    "aiDrinkChat.review.name": "Name",
+    "aiDrinkChat.review.servings": "Servings",
+    "aiDrinkChat.review.prepTime": "Prep Time",
+    "aiDrinkChat.review.skill": "Skill",
+    "aiDrinkChat.review.budget": "Budget",
+    "aiDrinkChat.review.goals": "Goals",
+    "aiDrinkChat.review.diet": "Diet",
+    "aiDrinkChat.review.cuisine": "Cuisine",
+    "aiDrinkChat.review.allergies": "Allergies",
+    "aiDrinkChat.review.notes": "Notes",
+    "aiDrinkChat.cuisine.ecuadorian": "Ecuadorian",
+    "aiDrinkChat.cuisine.american": "American",
+    "aiDrinkChat.cuisine.japanese": "Japanese",
+    "aiDrinkChat.cuisine.mexican": "Mexican",
+    "aiDrinkChat.cuisine.indian": "Indian",
+    "aiDrinkChat.cuisine.thai": "Thai",
+    "aiDrinkChat.cuisine.chinese": "Chinese",
+    "aiDrinkChat.cuisine.mediterranean": "Mediterranean",
+    "aiDrinkChat.cuisine.brazilian": "Brazilian",
+    "aiDrinkChat.cuisine.korean": "Korean",
+    "aiDrinkChat.allergy.peanuts": "Peanuts",
+    "aiDrinkChat.allergy.treeNuts": "Tree Nuts",
+    "aiDrinkChat.allergy.dairy": "Dairy",
+    "aiDrinkChat.allergy.eggs": "Eggs",
+    "aiDrinkChat.allergy.soy": "Soy",
+    "aiDrinkChat.allergy.shellfish": "Shellfish",
+    "aiDrinkChat.allergy.wheat": "Wheat",
+    "aiDrinkChat.allergy.sesame": "Sesame",
+    "aiDrinkChat.allergy.sulfites": "Sulfites",
+    "aiDrinkChat.cuisine.other": "✏️ Other",
+    "aiDrinkChat.cuisine.otherPlaceholder": "Type your preference...",
+    "aiDrinkChat.allergy.other": "✏️ Other",
+    "aiDrinkChat.allergy.otherPlaceholder": "Type your allergy...",
+    "aiDrinkChat.drinkCreatedSuccess": "Healthy drink created successfully!",
+    "aiDrinkChat.drinkCreatedError":
+      "Failed to generate drink. Please try again.",
+
     "aiMealGenerator.loaderMessage":
       "Creating your personalized meal with AI...",
     "aiMealGenerator.createAIMealTitle": "Your AI-generated meal is ready!",
@@ -764,6 +1164,12 @@ const translations = {
     "aiMealView.stepsCompleted": "steps completed",
     "aiMealView.recipeCompleted": "Congratulations! Recipe completed!",
     "aiMealView.ingredientsSelector": "Shopping List",
+    "aiMealView.selectAll": "Select All",
+    "aiMealView.deselectAll": "Deselect All",
+    "aiMealView.selectIngredientsDesc":
+      "Select ingredients to add to your pantry or cart",
+    "aiMealView.addToPantry": "Add to Pantry",
+    "aiMealView.addToCart": "Add to Cart",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Create Your Perfect Healthy Drink",
@@ -802,6 +1208,7 @@ const translations = {
     "aiDrinkCreatorStepper.stepGeneration": "AI Generation",
     "aiDrinkCreatorStepper.previous": "Previous",
     "aiDrinkCreatorStepper.next": "Next",
+    "aiDrinkCreator.noMoreDrinks":"No more drinks to show",
 
     // AI Drink Type
     "aiDrinkType.chooseTitle": "Choose Your Drink Type",
@@ -1026,6 +1433,18 @@ const translations = {
     "drinkDetailView.orderOnline": "Order Online",
     "drinkDetailView.ingredientsSelected": "ingredients selected",
     "drinkDetailView.healthGoals": "Health Goals",
+    "drinkDetailView.shoppingList": "Shopping List",
+    "drinkDetailView.selectAll": "Select All",
+    "drinkDetailView.deselectAll": "Deselect All",
+    "drinkDetailView.selectIngredients": "Select ingredients to add to cart",
+    "drinkDetailView.addToCart": "Add to Cart",
+    "drinkDetailView.addedToCart": "Added to Cart",
+    "drinkDetailView.itemsAddedToCart": "items added to your shopping cart",
+    "drinkDetailView.noIngredientsSelected": "No ingredients selected",
+    "drinkDetailView.selectIngredientsFirst":
+      "Please select ingredients first.",
+    "drinkDetailView.pantryFailed":
+      "Failed to add ingredients to pantry. Please try again.",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No ingredients selected",
@@ -1105,15 +1524,44 @@ const translations = {
     "recipeView.mealCookedDesc": "Great job on completing this recipe!",
     "recipeView.mealUncookedDesc": "Recipe status updated successfully",
     "recipeView.updateError": "Update failed",
-    "recipeView.updateErrorDesc": "Failed to update recipe status. Please try again.",
-    "recipeView.missingDataError": "Missing plan or meal information. Please try again from the meal plan.",
+    "recipeView.updateErrorDesc":
+      "Failed to update recipe status. Please try again.",
+    "recipeView.missingDataError":
+      "Missing plan or meal information. Please try again from the meal plan.",
     "recipeView.cookingProgress": "Cooking Progress",
     "recipeView.of": "of",
     "recipeView.stepsCompleted": "steps completed",
     "recipeView.completed": "🎉 Congratulations! Recipe completed!",
     "recipeView.videoTitleFullscreen": "Recipe Video Tutorial - Fullscreen",
+    "recipeView.shoppingTab": "Shopping List",
+    "recipeView.ingredientsSelector": "Ingredients",
+    "recipeView.selectAll": "Select All",
+    "recipeView.deselectAll": "Deselect All",
+    "recipeView.selectIngredientsDesc":
+      "Select ingredients to add to your pantry or cart",
+    "recipeView.addToPantry": "Add to Pantry",
+    "recipeView.addToCart": "Add to Cart",
+    "recipeView.addedToPantry": "Added to Pantry",
 
-    // Password
+    // Cooking Mode
+    "cookingMode.title": "Cooking Mode",
+    "cookingMode.enter": "Cooking Mode",
+    "cookingMode.ingredients": "Ingredients",
+    "cookingMode.steps": "Steps",
+    "cookingMode.ingredientsList": "Ingredients List",
+    "cookingMode.cookingSteps": "Cooking Steps",
+    "cookingMode.step": "Step",
+    "cookingMode.listen": "Listen",
+    "cookingMode.listenAll": "Listen All",
+    "cookingMode.stop": "Stop",
+    "cookingMode.completed": "All steps completed! Enjoy your meal!",
+    "cookingMode.stepsCompleted": "steps",
+    "cookingMode.repeat": "Repeat",
+    "cookingMode.viewAll": "View All",
+    "cookingMode.ultraFocus": "Ultra Focus",
+    "cookingMode.autoPlay": "Auto",
+    "cookingMode.markDone": "Mark as done",
+    "cookingMode.undoStep": "Undo",
     "password.security.title": "Password Security",
     "password.security.description":
       "Keep your account secure by updating your password regularly.",
@@ -1200,18 +1648,18 @@ const translations = {
     "pricing.faq.limits.answer":
       "We'll notify you when you're approaching your limits and offer options to upgrade your plan or wait for the next billing cycle.",
 
-    // Why Pantry
-    "why-pantry.title.main": "Why Pantry is",
+    // Why Prefud
+    "why-pantry.title.main": "Why Prefud is",
     "why-pantry.title.sub": "Changing the World",
     "why-pantry.hero.description":
-      "Every day, millions of tons of food are wasted while people struggle with meal planning and grocery shopping. Pantry is revolutionizing how we think about food, sustainability, and smart living.",
+      "Every day, millions of tons of food are wasted while people struggle with meal planning and grocery shopping. Prefud is revolutionizing how we think about food, sustainability, and smart living.",
     "why-pantry.stats.food-waste": "Food Waste Reduced",
     "why-pantry.stats.yearly-savings": "Average Yearly Savings",
     "why-pantry.stats.time-saved": "Weekly Time Saved",
     "why-pantry.stats.co2-reduced": "CO₂ Reduced/Year",
     "why-pantry.eliminate-waste.title": "Eliminate Food Waste",
     "why-pantry.eliminate-waste.description":
-      "Did you know that the average household throws away $1,500 worth of food every year? Pantry's intelligent tracking system monitors expiration dates, suggests recipes based on what's about to expire, and sends you timely alerts to use ingredients before they go bad.",
+      "Did you know that the average household throws away $1,500 worth of food every year? Prefud's intelligent tracking system monitors expiration dates, suggests recipes based on what's about to expire, and sends you timely alerts to use ingredients before they go bad.",
     "why-pantry.eliminate-waste.feature1": "Smart expiration date tracking",
     "why-pantry.eliminate-waste.feature2":
       "Recipe suggestions for expiring items",
@@ -1221,7 +1669,7 @@ const translations = {
       "Average reduction in food waste per household",
     "why-pantry.optimize-time.title": "Optimize Your Time",
     "why-pantry.optimize-time.description":
-      "Stop spending hours planning meals and making multiple grocery trips. Pantry's AI creates personalized meal plans based on your preferences, generates smart shopping lists, and even tracks your pantry inventory automatically. More time for what matters most.",
+      "Stop spending hours planning meals and making multiple grocery trips. Prefud's AI creates personalized meal plans based on your preferences, generates smart shopping lists, and even tracks your pantry inventory automatically. More time for what matters most.",
     "why-pantry.optimize-time.feature1": "AI-powered meal planning in minutes",
     "why-pantry.optimize-time.feature2": "Automated shopping list generation",
     "why-pantry.optimize-time.feature3": "Smart grocery trip optimization",
@@ -1230,7 +1678,7 @@ const translations = {
       "Every week on meal planning and shopping",
     "why-pantry.save-money.title": "Save Serious Money",
     "why-pantry.save-money.description":
-      "Our users save an average of $1,200 per year by reducing food waste, buying only what they need, and taking advantage of Pantry's smart shopping features. The app pays for itself in the first month!",
+      "Our users save an average of $1,200 per year by reducing food waste, buying only what they need, and taking advantage of Prefud's smart shopping features. The app pays for itself in the first month!",
     "why-pantry.save-money.stat1": "Average savings",
     "why-pantry.save-money.stat2": "Less",
     "why-pantry.save-money.stat2-desc": "Grocery spending",
@@ -1240,7 +1688,7 @@ const translations = {
     "why-pantry.save-money.breakdown.coupons": "Coupon integration",
     "why-pantry.carbon-footprint.title": "Reduce Carbon Footprint",
     "why-pantry.carbon-footprint.description":
-      "Food waste is responsible for 8% of global greenhouse gas emissions. By using Pantry, you're not just saving money - you're helping save the planet. Every meal planned efficiently and every ingredient saved from the trash makes a real environmental impact.",
+      "Food waste is responsible for 8% of global greenhouse gas emissions. By using Prefud, you're not just saving money - you're helping save the planet. Every meal planned efficiently and every ingredient saved from the trash makes a real environmental impact.",
     "why-pantry.carbon-footprint.feature1": "Reduce methane from food waste",
     "why-pantry.carbon-footprint.feature2": "Lower transportation emissions",
     "why-pantry.carbon-footprint.feature3": "Support sustainable food systems",
@@ -1248,7 +1696,7 @@ const translations = {
     "why-pantry.carbon-footprint.stat-desc": "Reduced per household annually",
     "why-pantry.carbon-footprint.equivalent":
       "Equivalent to taking a car off the road for 5,800 miles or planting 105 trees",
-    "why-pantry.features.title": "How Pantry Makes It All Possible",
+    "why-pantry.features.title": "How Prefud Makes It All Possible",
     "why-pantry.features.shopping-lists.title": "Smart Shopping Lists",
     "why-pantry.features.shopping-lists.description":
       "Automatically generated based on your meal plans, pantry inventory, and store layouts. Never forget an ingredient or buy duplicates again.",
@@ -1260,7 +1708,7 @@ const translations = {
       "Track your progress with detailed analytics on food waste reduction, money saved, and environmental impact.",
     "why-pantry.cta.title": "Join the Food Revolution Today",
     "why-pantry.cta.description":
-      "Start saving money, time, and the planet with Pantry's intelligent kitchen management system.",
+      "Start saving money, time, and the planet with Prefud's intelligent kitchen management system.",
     "why-pantry.cta.primary": "Free",
     "why-pantry.cta.secondary": "Learn More",
 
@@ -1313,10 +1761,12 @@ const translations = {
     "addIngredient.addAllIngredients": "Add All Ingredients",
     "addIngredient.addingAllIngredients": "Adding All...",
     "addIngredient.multipleTitle": "Add Multiple Ingredients",
-    "addIngredient.multipleDescription": "Add multiple ingredients to your pantry at once",
+    "addIngredient.multipleDescription":
+      "Add multiple ingredients to your pantry at once",
     "addIngredient.ingredient": "Ingredient",
     "addIngredient.allIngredientsAdded": "All ingredients added!",
-    "addIngredient.allIngredientsAddedDesc": "ingredients have been added to your pantry.",
+    "addIngredient.allIngredientsAddedDesc":
+      "ingredients have been added to your pantry.",
     "addIngredient.scanProduct": "Scan Product with Camera",
     "addIngredient.productDetected": "Product Added!",
     "addIngredient.productDetectedDesc":
@@ -1384,8 +1834,9 @@ const translations = {
     "addIngredient.units.box.value": "box",
 
     //IngredientTracker
-    "ingredientTracker.title": "Select the perfect plan",
-    "ingredientTracker.description": "Keep track of your ingredients and their expiration dates",
+    "ingredientTracker.title": "My Pantry",
+    "ingredientTracker.description":
+      "Keep track of your ingredients and their expiration dates",
     "ingredientTracker.refresh": "Refresh",
     "ingredientTracker.addIngredient": "Add Ingredient",
     "ingredientTracker.totalItems": "Total Items",
@@ -1397,22 +1848,84 @@ const translations = {
     "ingredientTracker.today": "Today",
     "ingredientTracker.allFresh": "All ingredients are fresh!",
     "ingredientTracker.yourPantry": "Your Pantry",
-    "ingredientTracker.organizedByCategory": "All your ingredients organized by category",
+    "ingredientTracker.organizedByCategory":
+      "All your ingredients organized by category",
     "ingredientTracker.searchPlaceholder": "Search ingredients...",
     "ingredientTracker.noIngredientsFound": "No ingredients found",
     "ingredientTracker.tryDifferentSearch": "Try a different search term",
-    "ingredientTracker.pantryEmpty": "Your pantry is empty. Try refreshing or add some ingredients.",
-    "ingredientTracker.startAdding": "Start by adding some ingredients to your pantry",
+    "ingredientTracker.pantryEmpty":
+      "Your pantry is empty. Try refreshing or add some ingredients.",
+    "ingredientTracker.startAdding":
+      "Start by adding some ingredients to your pantry",
+    "ingredientTracker.pantryTab": "Pantry",
+    "ingredientTracker.expiringTab": "Expiring Soon",
+    "ingredientTracker.categoriesTab": "Categories",
+    "ingredientTracker.lowStockTab": "Low Stock",
 
-     //Welcome
-    "welcome.message": "Welcome to Pantry!",
-    "welcome.subtitle": "Your smart kitchen companion is ready to transform your cooking experience.",
+    // AI Meal Suggestions
+    "aiSuggestions.title": "AI Meal Suggestions",
+    "aiSuggestions.description":
+      "Get personalized meal suggestions based on your expiring ingredients",
+    "aiSuggestions.generate": "Generate AI Suggestions",
+    "aiSuggestions.generating": "Generating...",
+    "aiSuggestions.generateMore": "Generate More Suggestions",
+    "aiSuggestions.selectServings": "Select Number of Servings",
+    "aiSuggestions.servings": "Servings",
+    "aiSuggestions.cancel": "Cancel",
+    "aiSuggestions.generateMeals": "Generate Meals",
+    "aiSuggestions.viewDetails": "View Details",
+    "aiSuggestions.addToFavorites": "Add to Favorites",
+    "aiSuggestions.favorited": "Favorited",
+    "aiSuggestions.removedFromFavorites": "Removed from favorites",
+    "aiSuggestions.removedFromFavoritesDesc":
+      "has been removed from your favorites.",
+    "aiSuggestions.addedToFavorites": "Added to favorites!",
+    "aiSuggestions.addedToFavoritesDesc": "has been added to your favorites.",
+    "aiSuggestions.markAsConsumed": "Mark as Consumed",
+    "aiSuggestions.markedAsConsumed": "Marked as consumed!",
+    "aiSuggestions.markedAsConsumedDesc": "has been marked as consumed.",
+    "aiSuggestions.close": "Close",
+    "aiSuggestions.prepTime": "Prep Time",
+    "aiSuggestions.difficulty": "Difficulty",
+    "aiSuggestions.servingsLabel": "Servings",
+    "aiSuggestions.healthBenefits": "Health Benefits",
+    "aiSuggestions.proTip": "Pro Tip",
+    "aiSuggestions.ingredients": "Ingredients",
+    "aiSuggestions.nutritionalInfo": "Nutritional Information",
+    "aiSuggestions.calories": "Calories",
+    "aiSuggestions.protein": "Protein",
+    "aiSuggestions.carbs": "Carbs",
+    "aiSuggestions.fat": "Fat",
+    "aiSuggestions.richInVitamins": "Rich in vitamins",
+    "aiSuggestions.cookingInstructions": "Cooking Instructions",
+    "aiSuggestions.ready": "AI suggestions ready!",
+    "aiSuggestions.readyDesc": "meal suggestions. Total carbon footprint:",
+    "aiSuggestions.error": "Error",
+    "aiSuggestions.userNotFound": "User not found. Please sign in again.",
+    "aiSuggestions.failedToGenerate":
+      "Failed to generate suggestions. Please try again.",
+    "aiSuggestions.subscriptionLimit": "Subscription Limit Reached",
+    "aiSuggestions.noIngredients": "No Ingredients Found",
+    "aiSuggestions.loaderMessage":
+      "Creating delicious meal suggestions from your ingredients...",
+    "aiSuggestions.min": "min",
+    "aiSuggestions.cal": "cal",
+
+    //Welcome
+    "welcome.message": "Welcome to Prefud!",
+    "welcome.subtitle":
+      "Your smart kitchen companion is ready to transform your cooking experience.",
     "welcome.aiMealPlanning": "AI-Powered Meal Planning",
-    "welcome.personalizedMeals": "Get personalized meal suggestions based on your preferences and pantry items.",
+    "welcome.personalizedMeals":
+      "Get personalized meal suggestions based on your preferences and pantry items.",
     "welcome.weeklyPlanning": "Weekly Planning Made Easy",
-    "welcome.smartPantry": "Use your camera to scan ingredients and automatically add them to your pantry.",
+    "welcome.smartPantry":
+      "Use your camera to scan ingredients and automatically add them to your pantry.",
     "welcome.trackProgress": "Track Your Progress",
-    "welcome.monitorGoals": "Monitor your nutrition goals and see your healthy habits grow over time.",
+    "welcome.monitorGoals":
+      "Monitor your nutrition goals and see your healthy habits grow over time.",
+    "welcome.scanIngredients": "Scan Ingredients",
+    "welcome.planWeekDescription": "Plan your meals for the week in minutes with AI assistance.",
 
     //  Subscription
     "subscription.complete": "Complete Your Subscription",
@@ -1422,6 +1935,13 @@ const translations = {
     "subscription.monthly": "Monthly",
     "subscription.paymentInfo": "Payment Information",
     "subscription.cardDetails": "Card Details",
+    "subscription.paymentSecure": "Your payment is secured by Rukupay LLC",
+    "subscription.processing": "Processing...",
+    "subscription.restore": "Restore Purchases",
+    "subscription.manageInStore": "Manage in Store",
+    "subscription.nativeUnavailable": "This plan is not available for in-app purchase.",
+    "mealPlanner.pagination.previous": "Before",
+    "mealPlanner.pagination.next": "Next",
 
     // Meal Planner
     "pagination.show": "Show",
@@ -1429,6 +1949,71 @@ const translations = {
     "mealPlanner.previous": "Previous",
     "mealPlanner.next": "Next",
 
+    // Landing Page
+    "landing.badge": "Your AI kitchen assistant",
+    "landing.headline": "Cook amazing meals with what you",
+    "landing.headlineHighlight": "already have",
+    "landing.subheadline":
+      "Prefud uses AI to plan meals, generate shopping lists, guide you step-by-step while cooking, and help you save money by using the ingredients you already have at home.",
+    "landing.ctaPrimary": "Start Free",
+    "landing.ctaSecondary": "See How It Works",
+    "landing.noCreditCard": "Credit card required",
+    "landing.problemTitle": "Stop wasting food and money",
+    "landing.problemSubtitle":
+      "Most people buy groceries without knowing exactly what they already have.",
+    "landing.problem1": "Buying duplicate ingredients",
+    "landing.problem2": "Food expiring in the fridge",
+    "landing.problem3": "Spending more than necessary",
+    "landing.problem4": "Not knowing what to cook",
+    "landing.problemFix": "Prefud fixes that with AI.",
+    "landing.howTitle": "How Prefud Works",
+    "landing.howSubtitle": "Four simple steps to a smarter kitchen",
+    "landing.step1Title": "Add what you have",
+    "landing.step1Desc":
+      "Quickly add the ingredients in your fridge and pantry.",
+    "landing.step2Title": "AI plans your meals",
+    "landing.step2Desc": "Prefud suggests meals using what you already own.",
+    "landing.step3Title": "Smart shopping list",
+    "landing.step3Desc": "Only buy what you actually need.",
+    "landing.step4Title": "Cook step by step",
+    "landing.step4Desc":
+      "Follow simple instructions generated for each recipe.",
+    "landing.featuresTitle": "What makes Prefud powerful",
+    "landing.feature1Title": "AI Meal Planning",
+    "landing.feature1Desc":
+      "Get personalized meal suggestions based on the ingredients you already have.",
+    "landing.feature2Title": "Smart Grocery Lists",
+    "landing.feature2Desc":
+      "Prefud automatically creates a shopping list for missing ingredients.",
+    "landing.feature3Title": "Step-by-Step Cooking",
+    "landing.feature3Desc":
+      "Clear instructions so you can cook every meal confidently.",
+    "landing.feature4Title": "Pantry Tracking",
+    "landing.feature4Desc": "Know exactly what ingredients you have at home.",
+    "landing.feature5Title": "Save Money",
+    "landing.feature5Desc": "Buy only what you need and reduce food waste.",
+    "landing.feature6Title": "Reduce Waste",
+    "landing.feature6Desc":
+      "Use what you have before it expires. Good for you and the planet.",
+    "landing.imagineTitle": "Imagine your kitchen working like this",
+    "landing.imagineSubtitle": "Open Prefud and instantly see:",
+    "landing.imagine1": "Ingredients you already have",
+    "landing.imagine2": "Meals you can cook right now",
+    "landing.imagine3": "What you need to buy",
+    "landing.imagine4": "Simple cooking instructions",
+    "landing.imagineFooter":
+      "Your kitchen becomes organized, efficient, and smarter.",
+    "landing.realLifeTitle": "Designed for real life",
+    "landing.realLife1": "Save money on groceries",
+    "landing.realLife2": "Reduce food waste",
+    "landing.realLife3": "Cook better meals",
+    "landing.realLife4": "Plan your week easily",
+    "landing.realLifeFooter": "All in one place.",
+    "landing.finalTitle": "Start cooking smarter today",
+    "landing.finalSubtitle":
+      "Join early users using Prefud to simplify their kitchen.",
+    "landing.terms": "Terms",
+    "landing.privacy": "Privacy",
   },
   es: {
     // Language names
@@ -1445,7 +2030,7 @@ const translations = {
     // Navigation
     "nav.home": "Inicio",
     "nav.pricing": "Precios",
-    "nav.why-pantry": "Por qué Pantry",
+    "nav.why-pantry": "Por qué Prefud",
     "nav.signin": "Iniciar Sesión",
     "nav.signup": "Registrarse",
     "nav.language": "Idioma",
@@ -1485,10 +2070,10 @@ const translations = {
     // Home page
     "home.title": "Planificación Inteligente de Comidas Simplificada",
     "home.subtitle":
-      "Transforma tu cocina con planificación de comidas impulsada por IA, reduce el desperdicio de alimentos, ahorra dinero y come más saludable con Pantry.",
+      "Transforma tu cocina con planificación de comidas impulsada por IA, reduce el desperdicio de alimentos, ahorra dinero y come más saludable con Prefud.",
     "home.cta.primary": "Comenzar Prueba Gratuita",
     "home.cta.secondary": "Saber Más",
-    "home.features.title": "¿Por qué Pantry?",
+    "home.features.title": "¿Por qué Prefud?",
     "home.features.subtitle":
       "Ahorra tiempo, dinero y reduce el desperdicio de alimentos con planificación inteligente de comidas",
     "home.features.smart-planning.title": "Planificación Inteligente",
@@ -1501,12 +2086,12 @@ const translations = {
     "home.features.save-money.description":
       "Compra más inteligentemente con listas automatizadas",
     "home.footer.copyright":
-      "© 2025 Pantry de Bessel LLC. Todos los derechos reservados.",
-    "home.nav.why-pantry": "¿Por qué Pantry?",
+      "© 2025 Prefud de Bessel LLC. Todos los derechos reservados.",
+    "home.nav.why-pantry": "¿Por qué Prefud?",
     "home.nav.get-started": "Comenzar",
 
     // Signup
-    "signup.title": "Únete a Pantry",
+    "signup.title": "Únete a Prefud",
     "signup.subtitle":
       "Crea tu cuenta y comienza tu viaje de cocina inteligente",
     "signup.language.title": "Idioma Preferido",
@@ -1522,7 +2107,8 @@ const translations = {
     "signup.already-account": "¿Ya tienes una cuenta?",
     "signup.signin-here": "Inicia sesión aquí",
     "signup.emailStep.title": "Recuperar Contraseña",
-    "signup.emailStep.description": "Ingresa tu correo electrónico y te enviaremos un código de verificación.",
+    "signup.emailStep.description":
+      "Ingresa tu correo electrónico y te enviaremos un código de verificación.",
     "signup.emailStep.label": "Correo Electrónico",
     "signup.emailStep.placeholder": "Ingresa tu correo electrónico",
     "signup.emailPlaceholder": "Ingresa tu correo electrónico",
@@ -1534,13 +2120,15 @@ const translations = {
     "signup.payment": "Pago",
     "signup.verify.title": "Verifica tu correo electrónico",
     "signup.otpSent": "Hemos enviado un código de 6 dígitos a",
-    "signup.enterOTP": "Ingresa el código de verificación enviado a tu correo electrónico.",
+    "signup.enterOTP":
+      "Ingresa el código de verificación enviado a tu correo electrónico.",
     "signup.verifyEmail": "Verificar correo electrónico",
     "signup.didntReceiveCode": "¿No recibiste el código?",
     "signup.resendCode": "Reenviar código",
     "signup.backToStart": "Atrás para Comenzar",
-    "signup.aboutYourself":"Cuéntanos sobre ti",
-    "signup.personalizeMealPlan": "Ayúdanos a personalizar tu experiencia de planificación de comidas.",
+    "signup.aboutYourself": "Cuéntanos sobre ti",
+    "signup.personalizeMealPlan":
+      "Ayúdanos a personalizar tu experiencia de planificación de comidas.",
     "signup.personalInformation": "Información Personal",
     "signup.firstName": "Nombre",
     "signup.lastName": "Apellido",
@@ -1561,8 +2149,9 @@ const translations = {
     "signup.agreement": "Acuerdo",
     "signup.agreementText": "Acepto los ",
     "signup.termsAndConditions": "Términos y Condiciones",
-    "signup.agreementDescription": "Al marcar esta casilla, reconoces que has leído y aceptas nuestros términos, incluido el uso de IA para la planificación de comidas.",
-    
+    "signup.agreementDescription":
+      "Al marcar esta casilla, reconoces que has leído y aceptas nuestros términos, incluido el uso de IA para la planificación de comidas.",
+
     // Health Goals
     "signup.healthGoals.loseWeight": "Perder peso",
     "signup.healthGoals.gainMuscle": "Ganar músculo",
@@ -1572,21 +2161,25 @@ const translations = {
     "signup.healthGoals.heartHealth": "Salud del corazón",
     "signup.healthGoals.lowerCholesterol": "Reducir colesterol",
     "signup.healthGoals.manageDiabetes": "Controlar diabetes",
-    
+
     // Calorie Tracking
     "profile.calorieTracking.title": "Seguimiento de Calorías",
-    "profile.calorieTracking.description": "Rastrea tu consumo mensual de calorías y objetivos",
+    "profile.calorieTracking.description":
+      "Rastrea tu consumo mensual de calorías y objetivos",
     "profile.calorieTracking.dailyGoal": "Objetivo Diario",
     "profile.calorieTracking.caloriesPerDay": "Calorías por día",
     "profile.calorieTracking.thisMonth": "Este Mes",
     "profile.calorieTracking.caloriesConsumed": "Calorías consumidas",
     "profile.calorieTracking.dailyAverage": "Promedio Diario",
-    "profile.calorieTracking.healthGoalsProgress": "Progreso de Objetivos de Salud",
-    "profile.calorieTracking.noHealthGoals": "No hay objetivos de salud establecidos",
-    
+    "profile.calorieTracking.healthGoalsProgress":
+      "Progreso de Objetivos de Salud",
+    "profile.calorieTracking.noHealthGoals":
+      "No hay objetivos de salud establecidos",
+
     // Environmental Impact
     "profile.environmental.title": "Impacto Ambiental",
-    "profile.environmental.description": "Rastrea tus emisiones mensuales de carbono de ingredientes y comidas",
+    "profile.environmental.description":
+      "Rastrea tus emisiones mensuales de carbono de ingredientes y comidas",
     "profile.environmental.expiredIngredients": "Ingredientes Vencidos",
     "profile.environmental.carbonWasted": "Huella de carbono desperdiciada",
     "profile.environmental.consumedMeals": "Comidas Consumidas",
@@ -1595,19 +2188,38 @@ const translations = {
     "profile.environmental.combinedFootprint": "Huella de carbono combinada",
     "profile.environmental.sustainabilityTips": "Consejos de Sostenibilidad",
     "profile.environmental.reduceFoodWaste": "Reducir Desperdicio de Alimentos",
-    "profile.environmental.preventedWaste": "Has evitado 2.1 kg CO₂ al usar ingredientes antes de su vencimiento",
-    "profile.environmental.mealPlanBenefits": "Beneficios de la Planificación de Comidas",
-    "profile.environmental.wasteReduction": "Tu planificación de comidas ha reducido el desperdicio de alimentos en 78% este mes",
+    "profile.environmental.preventedWaste":
+      "Has evitado 2.1 kg CO₂ al usar ingredientes antes de su vencimiento",
+    "profile.environmental.mealPlanBenefits":
+      "Beneficios de la Planificación de Comidas",
+    "profile.environmental.wasteReduction":
+      "Tu planificación de comidas ha reducido el desperdicio de alimentos en 78% este mes",
     "profile.environmental.improvementOpportunity": "Oportunidad de Mejora",
-    "profile.environmental.checkExpiration": "Revisa las fechas de vencimiento más frecuentemente para reducir el desperdicio en 15%",
+    "profile.environmental.checkExpiration":
+      "Revisa las fechas de vencimiento más frecuentemente para reducir el desperdicio en 15%",
 
     // Favorites
     "profile.checkFavorites": "Ver Favoritos",
     "favorites.title": "Mis Recetas Favoritas",
     "favorites.subtitle": "Tu colección de recetas favoritas",
     "favorites.empty.title": "Aún no tienes recetas favoritas",
-    "favorites.empty.description": "¡Comienza a explorar recetas y marca tus favoritas para verlas aquí!",
+    "favorites.empty.description":
+      "¡Comienza a explorar recetas y marca tus favoritas para verlas aquí!",
     "favorites.empty.cta": "Descubrir Recetas",
+
+    // Cart
+    "cart.title": "Carrito de Compras",
+    "cart.items": "artículos",
+    "cart.unit": "Unidad",
+    "cart.addedAt": "Agregado",
+    "cart.clearAll": "Limpiar Todo",
+    "cart.empty.title": "Tu carrito está vacío",
+    "cart.empty.description":
+      "Agrega ingredientes de recetas o planes de comida para comenzar a construir tu lista de compras.",
+    "cart.empty.backButton": "Volver al Panel",
+    "cart.actions.title": "Acciones del Carrito",
+    "cart.actions.addToShoppingList": "Agregar a Lista de Compras",
+    "cart.actions.addToPantry": "Agregar a Despensa",
 
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",
@@ -1633,6 +2245,9 @@ const translations = {
     "signup.allergy.none": "Ninguna",
 
     "signup.caloriesRange": "Rango recomendado: 1200-3000 calorías por día.",
+    "signup.ageError.title": "❌ Requisito de edad",
+    "signup.ageError.description":
+      "Debes tener al menos 18 años para crear una cuenta.",
 
     //Plan
     "signup.choosePlan": "Elige tu plan",
@@ -1641,11 +2256,12 @@ const translations = {
     "signup.plan.free": "Gratis",
     "signup.plan.whatsIncluded": "Qué incluye",
     "signup.plan.choose": "Elegir",
-    "signup.selectPlanDescription": "Selecciona el plan perfecto para comenzar tu trayectoria de planificación de comidas ",
+    "signup.selectPlanDescription":
+      "Selecciona el plan perfecto para comenzar tu trayectoria de planificación de comidas ",
 
     // Signin
     "signin.title": "Bienvenido de Vuelta",
-    "signin.subtitle": "Inicia sesión en tu cuenta de Pantry",
+    "signin.subtitle": "Inicia sesión en tu cuenta de Prefud",
     "signin.email": "Dirección de Email",
     "signin.email.placeholder": "Ingresa tu email",
     "signin.password": "Contraseña",
@@ -1655,6 +2271,9 @@ const translations = {
     "signin.signing-in": "Iniciando sesión...",
     "signin.no-account": "¿No tienes una cuenta?",
     "signin.create-here": "Crea una aquí",
+    "signin.accountIncomplete": "Cuenta Incompleta",
+    "signin.accountIncompleteDesc":
+      "Tu cuenta necesita ser completada. Por favor verifica tu correo electrónico para continuar.",
 
     // Profile
     "profile.title": "Información del Perfil",
@@ -1674,7 +2293,28 @@ const translations = {
     "profile.plan": "Plan",
     "profile.active": "Activo",
     "profile.cancelSubscription": "Cancelar suscripción",
-    "profile.subscriptionDesc":"Límites y uso de su plan actual",
+    "profile.subscriptionDesc": "Límites y uso de su plan actual",
+    "profile.processImages": "Procesar Imágenes",
+    "profile.processImagesDesc": "Escaneos de ingredientes por imagen",
+
+    // Delete Account
+    "profile.deleteAccount.section": "Zona de Peligro",
+    "profile.deleteAccount.sectionDesc":
+      "Eliminar permanentemente tu cuenta y todos tus datos",
+    "profile.deleteAccount.button": "Eliminar Cuenta",
+    "profile.deleteAccount.title": "Eliminar Cuenta",
+    "profile.deleteAccount.description":
+      "Esta acción es permanente y no se puede deshacer.",
+    "profile.deleteAccount.warningTitle": "Al eliminar tu cuenta:",
+    "profile.deleteAccount.cancelSub":
+      "Tu suscripción activa se cancelará inmediatamente",
+    "profile.deleteAccount.deleteData":
+      "Todos tus datos personales, planes de comida y recetas serán eliminados permanentemente",
+    "profile.deleteAccount.noRecovery":
+      "No podrás recuperar tu cuenta ni tus datos",
+    "profile.deleteAccount.goBack": "Volver",
+    "profile.deleteAccount.confirm": "Eliminar Mi Cuenta",
+    "profile.deleteAccount.deleting": "Eliminando...",
 
     // Meal Planner
     "mealPlanner.title": "Planificador de Comidas",
@@ -1687,7 +2327,9 @@ const translations = {
     "mealPlanner.loadingPlans": "Cargando tus planes de comidas...",
     "mealPlanner.day": "día",
     "mealPlanner.for": "Para",
-    "mealPlanner.people": "personas",
+    "mealPlanner.people": "adultos",
+    "mealPlanner.kidsbelow5": "niños menores de 5 años",
+    "mealPlanner.kidsover5": "niños de 5 a 12 años",
     "mealPlanner.mealsPDay": "comidas por día",
     "mealPlanner.cuisine": "Cocina",
     "mealPlanner.diet": "Dieta",
@@ -1702,6 +2344,7 @@ const translations = {
       "Obtén recetas personalizadas basadas en tus preferencias, necesidades dietéticas y habilidades culinarias",
     "mealPlanner.createYourFirstAIMeal":
       "Crea Tu Primer Plan de Comidas con IA",
+      "mealPlanner.noMorePlans":"No tienes más planes de comidas.",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Crear Plan de Comidas con IA",
@@ -1814,9 +2457,60 @@ const translations = {
     "mealPlanCreator.cuisine.chinese": "China",
     "mealPlanCreator.cuisine.indian": "India",
     "mealPlanCreator.cuisine.customCountry": "Agregar Cocina de País",
-    "mealPlanCreator.cuisine.customCountryPlaceholder": "Ingresa un país para su cocina (ej: Brasil, Marruecos)",
+    "mealPlanCreator.cuisine.customCountryPlaceholder":
+      "Ingresa un país para su cocina (ej: Brasil, Marruecos)",
     "mealPlanCreator.generate.btn": "Generar plan con IA",
     "mealPlanCreator.generate.btnLoad": "Generando plan con IA...",
+    "mealPlanCreator.cuisine.other": "Otro",
+    "mealPlanCreator.cuisine.otherPlaceholder": "Escribe tu cocina...",
+    "mealPlanCreator.allergy.other": "Otro",
+    "mealPlanCreator.allergy.otherPlaceholder": "Escribe tu alergia...",
+    "mealPlanCreator.chat.welcome":
+      "👋 ¡Hola! Vamos a crear tu plan de comidas personalizado. ¿Cómo te gustaría llamarlo?",
+    "mealPlanCreator.chat.description":
+      "📝 Agrega una breve descripción para tu plan. (Opcional)",
+    "mealPlanCreator.chat.startDate":
+      "📅 ¿Cuándo debería comenzar tu plan de comidas?",
+    "mealPlanCreator.chat.numberOfDays":
+      "📆 ¿Cuántos días debe cubrir el plan?",
+    "mealPlanCreator.chat.numberOfPersons": "👥 ¿Cuántos adultos comerán?",
+    "mealPlanCreator.chat.kidsUnder5": "👶 ¿Cuántos niños menores de 5 años?",
+    "mealPlanCreator.chat.kids5to12": "🧒 ¿Cuántos niños entre 5 y 12 años?",
+    "mealPlanCreator.chat.mealsPerDay": "🍽️ ¿Cuántas comidas por día?",
+    "mealPlanCreator.chat.dietary":
+      "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+    "mealPlanCreator.chat.cuisine":
+      "🌍 ¿Preferencias de cocina? Selecciona todas las que apliquen.",
+    "mealPlanCreator.chat.maxCookTime":
+      "⏱️ ¿Cuál es el tiempo máximo de cocción por comida (en minutos)?",
+    "mealPlanCreator.chat.skillLevel":
+      "👨‍🍳 ¿Cuál es tu nivel de habilidad culinaria?",
+    "mealPlanCreator.chat.budget": "💰 ¿Cuál es tu rango de presupuesto?",
+    "mealPlanCreator.chat.allergies":
+      "⚠️ ¿Alguna alergia o intolerancia alimentaria?",
+    "mealPlanCreator.chat.healthGoals":
+      "💪 ¿Algún objetivo de salud para este plan?",
+    "mealPlanCreator.chat.extras":
+      "📝 ¿Algo que no te guste o solicitudes especiales? (Opcional)",
+    "mealPlanCreator.chat.extrasPlaceholder": "Escribe aquí o salta...",
+    "mealPlanCreator.chat.none": "Ninguno",
+    "mealPlanCreator.chat.skipped": "Saltado",
+    "mealPlanCreator.chat.summaryTitle":
+      "Aquí está el resumen de tu plan de comidas:",
+    "mealPlanCreator.chat.confirmPrompt":
+      "¿Se ve bien? ¡Haz clic en **Generar** para crear tu plan de comidas! 🚀",
+    "mealPlanCreator.chat.letsGo": "¡Vamos! 🚀",
+    "mealPlanCreator.chat.loaderMessage":
+      "Analizando tus preferencias y creando tu plan de comidas perfecto...",
+    "mealPlanCreator.chat.missingName":
+      "Por favor ingresa un nombre para el plan.",
+    "mealPlanCreator.chat.missingDate":
+      "Por favor selecciona una fecha de inicio.",
+    "mealPlanCreator.chat.confirm": "Confirmar",
+    "mealPlanCreator.chat.skip": "Saltar →",
+    "mealPlanCreator.chat.continue": "Continuar",
+    "mealPlanCreator.chat.editTitle": "Editar Plan de Comidas",
+    "mealPlanCreator.chat.createTitle": "Plan de Comidas IA",
 
     // Meal Plan Creator
     "levels.beginner": "Principiante",
@@ -1880,6 +2574,68 @@ const translations = {
     "mealPlanView.mealUncompleted": "Comida marcada como no completada",
     "mealPlanView.mealCompletedDesc": "Felicidades por completar esta comida!",
     "mealPlanView.mealUncompletedDesc": "Comida marcada como no completada.",
+    "mealPlanView.calendarView": "Vista de Calendario",
+    "mealPlanView.kidsUnder5": "Niños < 5",
+    "mealPlanView.kids5to12": "Niños 5-12",
+    "mealPlanView.noMeals": "No hay comidas",
+    "mealPlanView.addedToPantry": "Agregado a la Despensa",
+    "mealPlanView.planDetails": "Detalles del Plan",
+    "mealPlanView.maxCookingTime": "Tiempo Máximo de Cocción",
+    "mealPlanView.skillLevel": "Nivel de Habilidad",
+    "mealPlanView.budget": "Rango de Presupuesto",
+    "mealPlanView.cuisines": "Cocinas",
+    "mealPlanView.healthGoals": "Objetivos de Salud",
+    "mealPlanView.dislikes": "Cocinas que no te gustan",
+    "mealPlanReady.title": "¡Tu Plan de Comidas está Listo! 🎉",
+    "mealPlanReady.description":
+      "Tu plan de comidas personalizado con IA ha sido creado exitosamente y está listo para ayudarte a cocinar comidas deliciosas y saludables esta semana.",
+    "mealPlanReady.viewPlan": "Ver Plan de Comidas",
+    "mealPlanReady.later": "Ver Más Tarde",
+    "drinkReady.title": "¡Tu Bebida Saludable está Lista! 🥤",
+    "drinkReady.description":
+      "Tu bebida saludable personalizada ha sido preparada y está lista para disfrutar.",
+    "drinkReady.viewDrink": "Ver Bebida",
+    "drinkReady.later": "Ver Más Tarde",
+    "drinkStarted.title": "Generación de Bebida Iniciada",
+    "drinkStarted.description":
+      "Te avisaremos cuando tu bebida saludable esté lista.",
+    "aiMealReady.title": "¡Tu Comida con IA está Lista! 🍽️",
+    "aiMealReady.description":
+      "Tu comida personalizada con IA ha sido creada y está lista para explorar.",
+    "aiMealReady.viewMeal": "Ver Comida",
+    "aiMealReady.later": "Ver Más Tarde",
+    "aiMealStarted.title": "Generación de Comida Iniciada",
+    "aiMealStarted.description":
+      "Te avisaremos cuando tu comida esté lista.",
+    "pantryMealsReady.title": "¡Tus Comidas de Despensa están Listas! 🍽️",
+    "pantryMealsReady.description":
+      "Nuevas ideas de comidas con IA basadas en tu despensa están listas para explorar.",
+    "pantryMealsReady.viewMeals": "Ver Comidas",
+    "pantryMealsReady.later": "Ver Más Tarde",
+    "pantryMealsReady.mealsGenerated": "comidas generadas",
+    "pantryMealsStarted.title": "Generación de Comidas Iniciada",
+    "pantryMealsStarted.description":
+      "Te avisaremos cuando tus ideas de comidas estén listas.",
+    "analyzeImageStarted.title": "Analizando tu imagen…",
+    "analyzeImageStarted.description":
+      "Te avisaremos cuando detectemos los ingredientes.",
+    "analyzeImageReady.title": "Ingredientes Detectados",
+    "analyzeImageReady.description":
+      "ingredientes detectados. Selecciona cuáles añadir a tu despensa.",
+    "analyzeImageReady.addSelected": "Añadir Seleccionados",
+    "analyzeImageReady.cancel": "Cancelar",
+    "analyzeImageReady.selectedCount": "seleccionados",
+    "analyzeImageReady.adding": "Añadiendo…",
+    "analyzeImageReady.noneDetected": "No se detectaron ingredientes en la imagen.",
+    "addIngredient.scanWithCamera": "Escanear ingredientes con la cámara",
+    "addIngredient.scanWithCameraDesc":
+      "Toma una foto o sube una imagen de tus ingredientes y los detectaremos automáticamente.",
+    "addIngredient.takePhoto": "Tomar Foto",
+    "addIngredient.uploadPhoto": "Subir Foto",
+    "addIngredient.analyzePhoto": "Analizar Foto",
+    "addIngredient.analyzing": "Analizando…",
+    "addIngredient.retake": "Elegir otra",
+    "addIngredient.back": "Atrás",
     "days.sunday": "Domingo",
     "days.monday": "Lunes",
     "days.tuesday": "Martes",
@@ -1905,6 +2661,7 @@ const translations = {
     "mealShopping.withinWeek": "Dentro de una Semana",
     "mealShopping.ingredientCount": "ingredientes",
     "mealShopping.backToIngredients": "Volver a Ingredientes",
+    "mealShopping.selectedItems": "Items seleccionados",
 
     //AI Meal Creator
     "aiMealCreator.createMealTitle": "Crear una Comida",
@@ -1923,6 +2680,7 @@ const translations = {
     "aiMealCreator.noMealsTitle": "Aún no se han creado comidas",
     "aiMealCreator.noMealsDesc":
       "Comienza a crear tu primera comida con IA según tus preferencias e ingredientes.",
+      "aiMealCreator.noMoreMeals":"No hay más planes de comida",
 
     // AI Meal Creator Stepper
     "aiMealCreatorStepper.step1Title": "Detalles de la Comida",
@@ -1994,6 +2752,8 @@ const translations = {
     "aiMealCreatorStepper.cuisine.greek": "Griega",
     "aiMealCreatorStepper.cuisine.spanish": "Española",
     "aiMealCreatorStepper.cuisine.chinese": "China",
+    "aiMealCreatorStepper.cuisine.other": "Otro",
+    "aiMealCreatorStepper.cuisine.otherPlaceholder": "Escribe tu cocina...",
     "aiMealCreatorStepper.healthGoalsLabel": "Objetivos de Salud",
     "aiMealCreatorStepper.health.weightloss": "Pérdida de Peso",
     "aiMealCreatorStepper.health.musclegain": "Ganancia Muscular",
@@ -2013,6 +2773,8 @@ const translations = {
     "aiMealCreatorStepper.allergy.fish": "Pescado",
     "aiMealCreatorStepper.allergy.wheat": "Trigo",
     "aiMealCreatorStepper.allergy.sesame": "Sésamo",
+    "aiMealCreatorStepper.allergy.other": "Otro",
+    "aiMealCreatorStepper.allergy.otherPlaceholder": "Escribe tu alergia...",
     "aiMealCreatorStepper.allergy.sulfites": "Sulfitos",
     "aiMealCreatorStepper.customAllergiesLabel":
       "Alergias/Intolerancias Personalizadas (Opcional)",
@@ -2051,7 +2813,157 @@ const translations = {
     "aiMealCreatorStepper.dishName": "Nombre del Plato",
     "aiMealCreatorStepper.review.dish": " Plato",
 
-    // AI Meal Generator
+    // AI Meal Creator Chat
+    "aiMealCreatorStepper.chat.welcome":
+      "👋 ¡Hola! Soy tu asistente de comidas IA. ¡Creemos algo delicioso juntos! ¿Qué tipo de comida se te antoja?",
+    "aiMealCreatorStepper.chat.mealName":
+      "¡Gran elección! 🎉 ¿Tienes un nombre para esta comida? (Opcional - escribe o salta)",
+    "aiMealCreatorStepper.chat.dishName":
+      "🍽️ ¿Tienes un plato específico en mente? ej. Macarrones con Queso (Opcional)",
+    "aiMealCreatorStepper.chat.details":
+      "⚡ Configuremos los detalles — porciones, tiempo de cocción, nivel de habilidad y presupuesto.",
+    "aiMealCreatorStepper.chat.dietary":
+      "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+    "aiMealCreatorStepper.chat.cuisine":
+      "🌍 ¿Preferencias de cocina? ¡Selecciona las que te gusten!",
+    "aiMealCreatorStepper.chat.healthGoals":
+      "💪 ¿Algún objetivo de salud para esta comida?",
+    "aiMealCreatorStepper.chat.allergies":
+      "⚠️ ¿Alguna alergia o intolerancia alimentaria que deba saber?",
+    "aiMealCreatorStepper.chat.extras":
+      "📝 ¿Algo más? ¿Disgustos, solicitudes especiales o alergias personalizadas? (Opcional)",
+    "aiMealCreatorStepper.chat.none": "Ninguno",
+    "aiMealCreatorStepper.chat.skipped": "Omitido",
+    "aiMealCreatorStepper.chat.confirm": "Confirmar",
+    "aiMealCreatorStepper.chat.skip": "Saltar →",
+    "aiMealCreatorStepper.chat.continue": "Continuar",
+    "aiMealCreatorStepper.chat.generate": "Generar Mi Comida",
+    "aiMealCreatorStepper.chat.letsGo": "¡Vamos! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle":
+      "Aquí está el resumen de tu plan de comidas:",
+    "aiMealCreatorStepper.chat.confirmPrompt":
+      "¿Se ve bien? ¡Presiona **Generar** para crear tu comida! 🚀",
+    "aiMealCreatorStepper.chat.typePlaceholder": "Escribe aquí o salta...",
+    "aiMealCreatorStepper.chat.dishPlaceholder": "ej., Macarrones con Queso",
+    "aiMealCreatorStepper.chat.servingsLabel": "porciones",
+    "aiMealCreatorStepper.chat.budgetSuffix": "presupuesto",
+    "aiMealCreatorStepper.chat.servings": "👥 ¿Cuántas porciones necesitas?",
+    "aiMealCreatorStepper.chat.cookTime":
+      "⏱️ ¿Cuál es el tiempo máximo de cocción (en minutos)?",
+    "aiMealCreatorStepper.chat.skill":
+      "👨‍🍳 ¿Cuál es tu nivel de habilidad en la cocina?",
+    "aiMealCreatorStepper.chat.budget":
+      "💰 ¿Cuál es tu rango de presupuesto para esta comida?",
+    "aiMealCreator.markAsDoneSuccess": "¡Comida marcada como completada! 🎉",
+    "aiMealCreator.markAsUndoneSuccess":
+      "¡Comida marcada como no completada! 😌",
+    "aiDrinkCreator.markAsDoneSuccess":
+      "¡Bebida marcada como consumida exitosamente!",
+    "aiDrinkCreator.markAsDoneError":
+      "Error al marcar la bebida como consumida",
+
+    // AI Drink Creator Chat
+    "aiDrinkChat.welcome":
+      "👋 ¡Hola! Soy tu asistente de bebidas IA. ¡Creemos una bebida saludable para ti! ¿Qué tipo de bebida te gustaría?",
+    "aiDrinkChat.drinkName":
+      "¡Gran elección! 🎉 ¿Cómo quieres llamar a tu bebida? (Opcional)",
+    "aiDrinkChat.servings": "👥 ¿Cuántas porciones necesitas?",
+    "aiDrinkChat.cookTime":
+      "⏱️ ¿Cuál es el tiempo máximo de preparación (en minutos)?",
+    "aiDrinkChat.skill": "👨‍🍳 ¿Cuál es tu nivel de habilidad?",
+    "aiDrinkChat.budget":
+      "💰 ¿Cuál es tu rango de presupuesto para esta bebida?",
+    "aiDrinkChat.healthGoals":
+      "💪 ¿Cuáles son tus objetivos de salud? Selecciona todos los que apliquen.",
+    "aiDrinkChat.dietary":
+      "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+    "aiDrinkChat.cuisine": "🌍 ¿Preferencias de cocina o sabores?",
+    "aiDrinkChat.allergies":
+      "⚠️ ¿Alguna alergia o intolerancia que deba saber?",
+    "aiDrinkChat.extras":
+      "📝 ¿Algo más? ¿Disgustos o solicitudes especiales? (Opcional)",
+    "aiDrinkChat.none": "Ninguno",
+    "aiDrinkChat.skipped": "Omitido",
+    "aiDrinkChat.confirm": "Confirmar",
+    "aiDrinkChat.skip": "Saltar →",
+    "aiDrinkChat.continue": "Continuar",
+    "aiDrinkChat.generate": "Generar Mi Bebida",
+    "aiDrinkChat.letsGo": "¡Vamos! 🚀",
+    "aiDrinkChat.readyTitle": "Aquí está el resumen de tu bebida:",
+    "aiDrinkChat.confirmPrompt":
+      "¿Se ve bien? ¡Presiona **Generar** para crear tu bebida! 🚀",
+    "aiDrinkChat.loaderMessage":
+      "Preparando la bebida saludable perfecta para ti...",
+    "aiDrinkChat.back": "Volver",
+    "aiDrinkChat.title": "Creador de Bebidas IA",
+    "aiDrinkChat.servingsLabel": "Porciones",
+    "aiDrinkChat.prepTimeLabel": "Tiempo (min)",
+    "aiDrinkChat.drinkNamePlaceholder": "ej., Smoothie Energético Matutino",
+    "aiDrinkChat.extrasPlaceholder": "Escribe aquí o salta...",
+    "aiDrinkChat.type.smoothie": "🥤 Smoothie",
+    "aiDrinkChat.type.juice": "🧃 Jugo Fresco",
+    "aiDrinkChat.type.tea": "🍵 Té de Bienestar",
+    "aiDrinkChat.type.protein": "💪 Batido de Proteínas",
+    "aiDrinkChat.type.detox": "🌿 Bebida Detox",
+    "aiDrinkChat.type.energy": "⚡ Energizante",
+    "aiDrinkChat.goal.energy": "⚡ Energía",
+    "aiDrinkChat.goal.weightLoss": "⚖️ Control de Peso",
+    "aiDrinkChat.goal.immunity": "🛡️ Sistema Inmune",
+    "aiDrinkChat.goal.digestive": "🌱 Salud Digestiva",
+    "aiDrinkChat.goal.skin": "✨ Salud de la Piel",
+    "aiDrinkChat.goal.detox": "🌿 Desintoxicación",
+    "aiDrinkChat.diet.keto": "Keto",
+    "aiDrinkChat.diet.paleo": "Paleo",
+    "aiDrinkChat.diet.vegan": "Vegano",
+    "aiDrinkChat.diet.vegetarian": "Vegetariano",
+    "aiDrinkChat.diet.glutenFree": "Sin Gluten",
+    "aiDrinkChat.diet.dairyFree": "Sin Lácteos",
+    "aiDrinkChat.diet.lowCarb": "Bajo en Carbos",
+    "aiDrinkChat.diet.diabeticFriendly": "Apto para Diabéticos",
+    "aiDrinkChat.skill.beginner": "Principiante",
+    "aiDrinkChat.skill.intermediate": "Intermedio",
+    "aiDrinkChat.skill.advanced": "Avanzado",
+    "aiDrinkChat.budget.low": "Bajo",
+    "aiDrinkChat.budget.medium": "Medio",
+    "aiDrinkChat.budget.high": "Alto",
+    "aiDrinkChat.review.type": "Tipo",
+    "aiDrinkChat.review.name": "Nombre",
+    "aiDrinkChat.review.servings": "Porciones",
+    "aiDrinkChat.review.prepTime": "Tiempo de Prep",
+    "aiDrinkChat.review.skill": "Habilidad",
+    "aiDrinkChat.review.budget": "Presupuesto",
+    "aiDrinkChat.review.goals": "Objetivos",
+    "aiDrinkChat.review.diet": "Dieta",
+    "aiDrinkChat.review.cuisine": "Cocina",
+    "aiDrinkChat.review.allergies": "Alergias",
+    "aiDrinkChat.review.notes": "Notas",
+    "aiDrinkChat.cuisine.ecuadorian": "Ecuatoriana",
+    "aiDrinkChat.cuisine.american": "Americana",
+    "aiDrinkChat.cuisine.japanese": "Japonesa",
+    "aiDrinkChat.cuisine.mexican": "Mexicana",
+    "aiDrinkChat.cuisine.indian": "India",
+    "aiDrinkChat.cuisine.thai": "Tailandesa",
+    "aiDrinkChat.cuisine.chinese": "China",
+    "aiDrinkChat.cuisine.mediterranean": "Mediterránea",
+    "aiDrinkChat.cuisine.brazilian": "Brasileña",
+    "aiDrinkChat.cuisine.korean": "Coreana",
+    "aiDrinkChat.allergy.peanuts": "Maní",
+    "aiDrinkChat.allergy.treeNuts": "Frutos Secos",
+    "aiDrinkChat.allergy.dairy": "Lácteos",
+    "aiDrinkChat.allergy.eggs": "Huevos",
+    "aiDrinkChat.allergy.soy": "Soja",
+    "aiDrinkChat.allergy.shellfish": "Mariscos",
+    "aiDrinkChat.allergy.wheat": "Trigo",
+    "aiDrinkChat.allergy.sesame": "Sésamo",
+    "aiDrinkChat.allergy.sulfites": "Sulfitos",
+    "aiDrinkChat.cuisine.other": "✏️ Otro",
+    "aiDrinkChat.cuisine.otherPlaceholder": "Escribe tu preferencia...",
+    "aiDrinkChat.allergy.other": "✏️ Otro",
+    "aiDrinkChat.allergy.otherPlaceholder": "Escribe tu alergia...",
+    "aiDrinkChat.drinkCreatedSuccess": "¡Bebida saludable creada exitosamente!",
+    "aiDrinkChat.drinkCreatedError":
+      "Error al generar la bebida. Inténtalo de nuevo.",
+
     "aiMealGenerator.loaderMessage":
       "Creando tu comida personalizada con IA...",
     "aiMealGenerator.createAIMealTitle":
@@ -2205,6 +3117,12 @@ const translations = {
     "aiMealView.stepsCompleted": "pasos completados",
     "aiMealView.recipeCompleted": "¡Felicidades! ¡Receta completada!",
     "aiMealView.ingredientsSelector": "Lista de compras",
+    "aiMealView.selectAll": "Seleccionar Todo",
+    "aiMealView.deselectAll": "Deseleccionar Todo",
+    "aiMealView.selectIngredientsDesc":
+      "Selecciona ingredientes para añadir a tu despensa o carrito",
+    "aiMealView.addToPantry": "Añadir a la Despensa",
+    "aiMealView.addToCart": "Añadir al Carrito",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crea tu Bebida Saludable Perfecta",
@@ -2243,6 +3161,7 @@ const translations = {
     "aiDrinkCreatorStepper.stepGeneration": "Generación IA",
     "aiDrinkCreatorStepper.previous": "Anterior",
     "aiDrinkCreatorStepper.next": "Siguiente",
+    "aiDrinkCreator.noMoreDrinks":"No se encontraron más bebidas.",
 
     // AI Drink Type
     "aiDrinkType.chooseTitle": "Elige tu Tipo de Bebida",
@@ -2361,7 +3280,99 @@ const translations = {
     "aiDrinkGoals.budget.low": "Bajo",
     "aiDrinkGoals.budget.medium": "Medio",
     "aiDrinkGoals.budget.high": "Alto",
+    //Checkout and cart
+    "mealPlanView.addToCart": "Agregar al carrito",
+    "cart.checkout.proceedToCheckout": "Proceder al pago",
+    "cart.inCart": "en el carrito",
 
+    "checkout.steps.deliveryMethod": "Método de entrega",
+    "checkout.deliveryMethod.title": "¿Cómo deseas recibir tu pedido?",
+    "checkout.deliveryMethod.subtitle":
+      "Selecciona cómo deseas recibir tu pedido",
+
+    "checkout.steps.deliveryMethod.title": "Elige método de entrega",
+    "checkout.deliveryMethod.delivery.title": "Entrega a domicilio",
+    "checkout.deliveryMethod.delivery.description":
+      "Recibe tus compras en la puerta de tu casa",
+    "checkout.deliveryMethod.delivery.fee": "Costo de entrega",
+    "checkout.deliveryMethod.pickup.title": "Recoger en tienda",
+    "checkout.deliveryMethod.pickup.description":
+      "Recoge tu pedido en la tienda",
+    "checkout.deliveryMethod.pickup.fee": "Sin costo de entrega",
+
+    "mealPlanView.addedToCart": "Agregado al carrito",
+
+    "checkout.steps.storeSelection": "Selección de tienda",
+    "checkout.steps.address": "Dirección",
+    "checkout.steps.payment": "Pago",
+    "checkout.steps.summary": "Resumen",
+    "checkout.steps.confirmation": "Confirmación",
+
+    "checkout.storeSelection.title": "Seleccionar tienda",
+    "checkout.storeSelection.subtitle":
+      "Elige tu tienda preferida para recoger o recibir",
+    "checkout.address.pickup.title": "Dirección de recogida",
+    "checkout.address.pickup.subtitle":
+      "Selecciona la ubicación de la tienda para recoger",
+    "checkout.payment.title": "Método de pago",
+    "checkout.payment.subtitle": "Elige tu método de pago",
+    "checkout.payment.default": "Predeterminado",
+    "checkout.payment.expires": "Vence",
+    "checkout.payment.addNew": "Agregar nuevo método de pago",
+    "checkout.payment.form.name": "Nombre en la tarjeta",
+    "checkout.payment.form.number": "Número de tarjeta",
+    "checkout.payment.form.expiry": "Fecha de vencimiento (MM/AA)",
+    "checkout.payment.form.cvc": "CVC",
+    "checkout.payment.form.save": "Guardar tarjeta",
+
+    "checkout.summary.title": "Resumen del pedido",
+    "checkout.summary.subtitle":
+      "Revisa los detalles de tu pedido antes de confirmar",
+    "checkout.summary.items": "Artículos",
+    "checkout.summary.pickup": "Recoger en tienda",
+    "checkout.summary.pickupTime": "Hora de recogida",
+    "checkout.summary.payment": "Método de pago",
+    "checkout.summary.subtotal": "Subtotal",
+    "checkout.summary.serviceFee": "Cargo por servicio",
+    "checkout.summary.total": "Total",
+    "checkout.summary.processPayment": "Procesar pago",
+    "checkout.payment.form.cvv": "CVV",
+    "checkout.summary.deliveryFee": "Costo de entrega",
+    "checkout.summary.delivery": "Entrega a domicilio",
+    "checkout.summary.deliveryTime": "Hora de entrega",
+
+    "checkout.confirmation.title": "¡Pedido confirmado!",
+    "checkout.confirmation.subtitle":
+      "Gracias por tu pedido. Tu número de orden es",
+    "checkout.confirmation.orderNumber": "Número de orden",
+    "checkout.confirmation.estimatedPickup": "Hora estimada de recogida",
+    "checkout.confirmation.today": "Hoy a las",
+    "checkout.confirmation.pickupLocation": "Lugar de recogida",
+    "checkout.confirmation.total": "Total pagado",
+    "checkout.confirmation.items": "Artículos pedidos",
+    "checkout.confirmation.nextSteps": "Próximos pasos",
+    "checkout.confirmation.step1":
+      "Recibirás un correo de confirmación en breve.",
+    "checkout.confirmation.step2":
+      "Prepárate para recoger en la tienda seleccionada.",
+    "checkout.confirmation.step3": "¡Disfruta tus compras!",
+    "checkout.confirmation.done": "Listo",
+    "checkout.confirmation.estimatedDelivery": "Hora estimada de entrega",
+    "checkout.confirmation.deliveryAddress": "Dirección de entrega",
+    "checkout.confirmation.thankYou": "¡Gracias por elegir Prefud!",
+
+    "checkout.address.delivery.title": "Dirección de entrega",
+    "checkout.address.delivery.subtitle":
+      "Ingresa la dirección donde deseas recibir tu pedido",
+    "checkout.address.default": "Dirección predeterminada",
+    "checkout.address.addNew": "Agregar nueva dirección",
+    "checkout.address.form.street": "Calle",
+    "checkout.address.form.apartment": "Departamento, suite, etc. (opcional)",
+    "checkout.address.form.state": "Estado/Provincia",
+    "checkout.address.form.city": "Ciudad",
+    "checkout.address.form.zipCode": "Código postal",
+    "checkout.address.form.country": "País",
+    "checkout.address.form.save": "Guardar dirección",
     // AI Drink Creation
     "aiDrinkGeneration.readyTitle": "Listo para Generar tu Bebida",
     "aiDrinkGeneration.readyDesc":
@@ -2473,6 +3484,20 @@ const translations = {
     "drinkDetailView.orderOnline": "Ordenar en línea",
     "drinkDetailView.ingredientsSelected": "ingredientes seleccionados",
     "drinkDetailView.healthGoals": "Objetivos de Salud",
+    "drinkDetailView.shoppingList": "Lista de Compras",
+    "drinkDetailView.selectAll": "Seleccionar Todo",
+    "drinkDetailView.deselectAll": "Deseleccionar Todo",
+    "drinkDetailView.selectIngredients":
+      "Selecciona ingredientes para añadir al carrito",
+    "drinkDetailView.addToCart": "Añadir al Carrito",
+    "drinkDetailView.addedToCart": "Añadido al Carrito",
+    "drinkDetailView.itemsAddedToCart":
+      "artículos añadidos a tu carrito de compras",
+    "drinkDetailView.noIngredientsSelected": "No se seleccionaron ingredientes",
+    "drinkDetailView.selectIngredientsFirst":
+      "Por favor selecciona ingredientes primero.",
+    "drinkDetailView.pantryFailed":
+      "No se pudieron añadir los ingredientes a la despensa. Inténtalo de nuevo.",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "No se seleccionaron ingredientes",
@@ -2551,18 +3576,49 @@ const translations = {
     "recipeView.mealCooked": "¡Receta completada!",
     "recipeView.mealUncooked": "Receta marcada como no cocinada",
     "recipeView.mealCookedDesc": "¡Excelente trabajo completando esta receta!",
-    "recipeView.mealUncookedDesc": "Estado de la receta actualizado exitosamente",
+    "recipeView.mealUncookedDesc":
+      "Estado de la receta actualizado exitosamente",
     "recipeView.updateError": "Actualización fallida",
-    "recipeView.updateErrorDesc": "No se pudo actualizar el estado de la receta. Inténtalo de nuevo.",
-    "recipeView.missingDataError": "Falta información del plan o comida. Inténtalo de nuevo desde el plan de comidas.",
+    "recipeView.updateErrorDesc":
+      "No se pudo actualizar el estado de la receta. Inténtalo de nuevo.",
+    "recipeView.missingDataError":
+      "Falta información del plan o comida. Inténtalo de nuevo desde el plan de comidas.",
     "recipeView.cookingProgress": "Progreso de Cocina",
     "recipeView.of": "de",
     "recipeView.stepsCompleted": "pasos completados",
     "recipeView.completed": "🎉 ¡Felicidades! ¡Receta completada!",
     "recipeView.videoTitleFullscreen":
       "Video Tutorial de la Receta - Pantalla Completa",
+    "recipeView.shoppingTab": "Lista de Compras",
+    "recipeView.ingredientsSelector": "Ingredientes",
+    "recipeView.selectAll": "Seleccionar Todo",
+    "recipeView.deselectAll": "Deseleccionar Todo",
+    "recipeView.selectIngredientsDesc":
+      "Selecciona ingredientes para añadir a tu despensa o carrito",
+    "recipeView.addToPantry": "Añadir a Despensa",
+    "recipeView.addToCart": "Añadir al Carrito",
+    "recipeView.addedToPantry": "Añadido a la Despensa",
 
-    // Password
+    // Cooking Mode
+    "cookingMode.title": "Modo Cocina",
+    "cookingMode.enter": "Modo Cocina",
+    "cookingMode.ingredients": "Ingredientes",
+    "cookingMode.steps": "Pasos",
+    "cookingMode.ingredientsList": "Lista de Ingredientes",
+    "cookingMode.cookingSteps": "Pasos de Cocina",
+    "cookingMode.step": "Paso",
+    "cookingMode.listen": "Escuchar",
+    "cookingMode.listenAll": "Escuchar Todo",
+    "cookingMode.stop": "Parar",
+    "cookingMode.completed":
+      "¡Todos los pasos completados! ¡Disfruta tu comida!",
+    "cookingMode.stepsCompleted": "pasos",
+    "cookingMode.repeat": "Repetir",
+    "cookingMode.viewAll": "Ver Todo",
+    "cookingMode.ultraFocus": "Ultra Focus",
+    "cookingMode.autoPlay": "Auto",
+    "cookingMode.markDone": "Marcar como hecho",
+    "cookingMode.undoStep": "Deshacer",
     "password.security.title": "Seguridad de Contraseña",
     "password.security.description":
       "Mantén tu cuenta segura actualizando tu contraseña regularmente.",
@@ -2652,18 +3708,18 @@ const translations = {
     "pricing.faq.limits.answer":
       "Te notificaremos cuando te estés acercando a tus límites y te ofreceremos opciones para actualizar tu plan o esperar al próximo ciclo de facturación.",
 
-    // Why Pantry
-    "why-pantry.title.main": "Por qué Pantry está",
+    // Why Prefud
+    "why-pantry.title.main": "Por qué Prefud está",
     "why-pantry.title.sub": "Cambiando el Mundo",
     "why-pantry.hero.description":
-      "Cada día, millones de toneladas de alimentos se desperdician mientras las personas luchan con la planificación de comidas y las compras de comestibles. Pantry está revolucionando cómo pensamos sobre la comida, la sostenibilidad y la vida inteligente.",
+      "Cada día, millones de toneladas de alimentos se desperdician mientras las personas luchan con la planificación de comidas y las compras de comestibles. Prefud está revolucionando cómo pensamos sobre la comida, la sostenibilidad y la vida inteligente.",
     "why-pantry.stats.food-waste": "Desperdicio de Alimentos Reducido",
     "why-pantry.stats.yearly-savings": "Ahorros Anuales Promedio",
     "why-pantry.stats.time-saved": "Tiempo Ahorrado Semanalmente",
     "why-pantry.stats.co2-reduced": "CO₂ Reducido/Año",
     "why-pantry.eliminate-waste.title": "Eliminar el Desperdicio de Alimentos",
     "why-pantry.eliminate-waste.description":
-      "¿Sabías que el hogar promedio tira $1,500 en comida cada año? El sistema de seguimiento inteligente de Pantry monitorea las fechas de vencimiento, sugiere recetas basadas en lo que está a punto de vencer y te envía alertas oportunas para usar ingredientes antes de que se echen a perder.",
+      "¿Sabías que el hogar promedio tira $1,500 en comida cada año? El sistema de seguimiento inteligente de Prefud monitorea las fechas de vencimiento, sugiere recetas basadas en lo que está a punto de vencer y te envía alertas oportunas para usar ingredientes antes de que se echen a perder.",
     "why-pantry.eliminate-waste.feature1":
       "Seguimiento inteligente de fechas de vencimiento",
     "why-pantry.eliminate-waste.feature2":
@@ -2675,7 +3731,7 @@ const translations = {
       "Reducción promedio en desperdicio de alimentos por hogar",
     "why-pantry.optimize-time.title": "Optimiza Tu Tiempo",
     "why-pantry.optimize-time.description":
-      "Deja de pasar horas planeando comidas y haciendo múltiples viajes al supermercado. La IA de Pantry crea planes de comidas personalizados basados en tus preferencias, genera listas de compras inteligentes e incluso rastrea el inventario de tu despensa automáticamente. Más tiempo para lo que más importa.",
+      "Deja de pasar horas planeando comidas y haciendo múltiples viajes al supermercado. La IA de Prefud crea planes de comidas personalizados basados en tus preferencias, genera listas de compras inteligentes e incluso rastrea el inventario de tu despensa automáticamente. Más tiempo para lo que más importa.",
     "why-pantry.optimize-time.feature1":
       "Planificación de comidas impulsada por IA en minutos",
     "why-pantry.optimize-time.feature2":
@@ -2687,7 +3743,7 @@ const translations = {
       "Cada semana en planificación de comidas y compras",
     "why-pantry.save-money.title": "Ahorra Dinero en Serio",
     "why-pantry.save-money.description":
-      "Nuestros usuarios ahorran un promedio de $1,200 por año reduciendo el desperdicio de alimentos, comprando solo lo que necesitan y aprovechando las características de compras inteligentes de Pantry. ¡La aplicación se paga por sí misma en el primer mes!",
+      "Nuestros usuarios ahorran un promedio de $1,200 por año reduciendo el desperdicio de alimentos, comprando solo lo que necesitan y aprovechando las características de compras inteligentes de Prefud. ¡La aplicación se paga por sí misma en el primer mes!",
     "why-pantry.save-money.stat1": "Ahorros promedio",
     "why-pantry.save-money.stat2": "Menos",
     "why-pantry.save-money.stat2-desc": "Gasto en comestibles",
@@ -2699,7 +3755,7 @@ const translations = {
     "why-pantry.save-money.breakdown.coupons": "Integración de cupones",
     "why-pantry.carbon-footprint.title": "Reducir la Huella de Carbono",
     "why-pantry.carbon-footprint.description":
-      "El desperdicio de alimentos es responsable del 8% de las emisiones globales de gases de efecto invernadero. Al usar Pantry, no solo estás ahorrando dinero - estás ayudando a salvar el planeta. Cada comida planificada eficientemente y cada ingrediente salvado de la basura hace un impacto ambiental real.",
+      "El desperdicio de alimentos es responsable del 8% de las emisiones globales de gases de efecto invernadero. Al usar Prefud, no solo estás ahorrando dinero - estás ayudando a salvar el planeta. Cada comida planificada eficientemente y cada ingrediente salvado de la basura hace un impacto ambiental real.",
     "why-pantry.carbon-footprint.feature1":
       "Reducir metano del desperdicio de alimentos",
     "why-pantry.carbon-footprint.feature2": "Disminuir emisiones de transporte",
@@ -2709,7 +3765,7 @@ const translations = {
     "why-pantry.carbon-footprint.stat-desc": "Reducidas por hogar anualmente",
     "why-pantry.carbon-footprint.equivalent":
       "Equivalente a sacar un coche de la carretera por 5,800 millas o plantar 105 árboles",
-    "why-pantry.features.title": "Cómo Pantry Hace Todo Esto Posible",
+    "why-pantry.features.title": "Cómo Prefud Hace Todo Esto Posible",
     "why-pantry.features.shopping-lists.title":
       "Listas de Compras Inteligentes",
     "why-pantry.features.shopping-lists.description":
@@ -2723,7 +3779,7 @@ const translations = {
       "Rastrea tu progreso con análisis detallados sobre reducción de desperdicio de alimentos, dinero ahorrado e impacto ambiental.",
     "why-pantry.cta.title": "Únete a la Revolución Alimentaria Hoy",
     "why-pantry.cta.description":
-      "Comienza a ahorrar dinero, tiempo y el planeta con el sistema inteligente de gestión de cocina de Pantry.",
+      "Comienza a ahorrar dinero, tiempo y el planeta con el sistema inteligente de gestión de cocina de Prefud.",
     "why-pantry.cta.primary": "Gratis",
     "why-pantry.cta.secondary": "Saber Más",
 
@@ -2776,10 +3832,12 @@ const translations = {
     "addIngredient.addAllIngredients": "Agregar Todos los Ingredientes",
     "addIngredient.addingAllIngredients": "Agregando Todos...",
     "addIngredient.multipleTitle": "Agregar Múltiples Ingredientes",
-    "addIngredient.multipleDescription": "Agrega múltiples ingredientes a tu despensa de una vez",
+    "addIngredient.multipleDescription":
+      "Agrega múltiples ingredientes a tu despensa de una vez",
     "addIngredient.ingredient": "Ingrediente",
     "addIngredient.allIngredientsAdded": "¡Todos los ingredientes agregados!",
-    "addIngredient.allIngredientsAddedDesc": "ingredientes han sido agregados a tu despensa.",
+    "addIngredient.allIngredientsAddedDesc":
+      "ingredientes han sido agregados a tu despensa.",
     "addIngredient.scanProduct": "Escanear Producto con Cámara",
     "addIngredient.productDetected": "¡Producto Agregado!",
     "addIngredient.productDetectedDesc":
@@ -2848,46 +3906,118 @@ const translations = {
     "addIngredient.units.bag.value": "bolsa",
     "addIngredient.units.box.value": "caja",
 
-     //IngredientTracker
+    //IngredientTracker
     "ingredientTracker.title": "Gestor de Despensa",
-    "ingredientTracker.description": "Lleva el control de tus ingredientes y sus fechas de caducidad",
+    "ingredientTracker.description":
+      "Lleva el control de tus ingredientes y sus fechas de caducidad",
     "ingredientTracker.refresh": "Actualizar",
     "ingredientTracker.addIngredient": "Agregar Ingrediente",
     "ingredientTracker.expiringSoon": "A punto de caducar",
-    "ingredientTracker.useFirst": "Usa estos ingredientes primero para evitar desperdicio",
+    "ingredientTracker.useFirst":
+      "Usa estos ingredientes primero para evitar desperdicio",
     "ingredientTracker.yourPantry": "Tu Despensa",
-    "ingredientTracker.organizedByCategory": "Todos tus ingredientes organizados por categoría",
+    "ingredientTracker.organizedByCategory":
+      "Todos tus ingredientes organizados por categoría",
     "ingredientTracker.searchPlaceholder": "Buscar ingredientes...",
     "ingredientTracker.totalItems": "Total de ingredientes",
     "ingredientTracker.categories": "Categorías",
     "ingredientTracker.lowStock": "Stock Bajo",
     "ingredientTracker.allFresh": "¡Todos los ingredientes están frescos!",
     "ingredientTracker.noIngredientsFound": "No se encontraron ingredientes",
-    "ingredientTracker.tryDifferentSearch": "Prueba con un término de búsqueda diferente",
-    "ingredientTracker.pantryEmpty": "Tu despensa está vacía. Intenta actualizar o agrega algunos ingredientes",
-    "ingredientTracker.startAdding": "Comienza agregando algunos ingredientes a tu despensa",
+    "ingredientTracker.tryDifferentSearch":
+      "Prueba con un término de búsqueda diferente",
+    "ingredientTracker.pantryEmpty":
+      "Tu despensa está vacía. Intenta actualizar o agrega algunos ingredientes",
+    "ingredientTracker.startAdding":
+      "Comienza agregando algunos ingredientes a tu despensa",
+    "ingredientTracker.pantryTab": "Mi Despensa",
+    "ingredientTracker.expiringTab": "Por caducar",
+    "ingredientTracker.categoriesTab": "Categorías",
+    "ingredientTracker.lowStockTab": "Stock Bajo",
     "ingredientTracker.expired": "Caducado",
     "ingredientTracker.today": "Hoy",
 
+    // AI Meal Suggestions
+    "aiSuggestions.title": "Sugerencias de Comidas con IA",
+    "aiSuggestions.description":
+      "Obtén sugerencias personalizadas basadas en tus ingredientes próximos a vencer",
+    "aiSuggestions.generate": "Generar Sugerencias IA",
+    "aiSuggestions.generating": "Generando...",
+    "aiSuggestions.generateMore": "Generar Más Sugerencias",
+    "aiSuggestions.selectServings": "Seleccionar Número de Porciones",
+    "aiSuggestions.servings": "Porciones",
+    "aiSuggestions.cancel": "Cancelar",
+    "aiSuggestions.generateMeals": "Generar Comidas",
+    "aiSuggestions.viewDetails": "Ver Detalles",
+    "aiSuggestions.addToFavorites": "Agregar a Favoritos",
+    "aiSuggestions.favorited": "En Favoritos",
+    "aiSuggestions.removedFromFavorites": "Eliminado de favoritos",
+    "aiSuggestions.removedFromFavoritesDesc":
+      "ha sido eliminado de tus favoritos.",
+    "aiSuggestions.addedToFavorites": "¡Agregado a favoritos!",
+    "aiSuggestions.addedToFavoritesDesc": "ha sido agregado a tus favoritos.",
+    "aiSuggestions.markAsConsumed": "Marcar como Consumido",
+    "aiSuggestions.markedAsConsumed": "¡Marcado como consumido!",
+    "aiSuggestions.markedAsConsumedDesc": "ha sido marcado como consumido.",
+    "aiSuggestions.close": "Cerrar",
+    "aiSuggestions.prepTime": "Tiempo de Preparación",
+    "aiSuggestions.difficulty": "Dificultad",
+    "aiSuggestions.servingsLabel": "Porciones",
+    "aiSuggestions.healthBenefits": "Beneficios para la Salud",
+    "aiSuggestions.proTip": "Consejo Pro",
+    "aiSuggestions.ingredients": "Ingredientes",
+    "aiSuggestions.nutritionalInfo": "Información Nutricional",
+    "aiSuggestions.calories": "Calorías",
+    "aiSuggestions.protein": "Proteína",
+    "aiSuggestions.carbs": "Carbohidratos",
+    "aiSuggestions.fat": "Grasa",
+    "aiSuggestions.richInVitamins": "Rico en vitaminas",
+    "aiSuggestions.cookingInstructions": "Instrucciones de Cocina",
+    "aiSuggestions.ready": "¡Sugerencias de IA listas!",
+    "aiSuggestions.readyDesc":
+      "sugerencias de comidas. Huella de carbono total:",
+    "aiSuggestions.error": "Error",
+    "aiSuggestions.userNotFound":
+      "Usuario no encontrado. Inicia sesión de nuevo.",
+    "aiSuggestions.failedToGenerate":
+      "Error al generar sugerencias. Inténtalo de nuevo.",
+    "aiSuggestions.subscriptionLimit": "Límite de Suscripción Alcanzado",
+    "aiSuggestions.noIngredients": "No Se Encontraron Ingredientes",
+    "aiSuggestions.loaderMessage":
+      "Creando deliciosas sugerencias de comidas con tus ingredientes...",
+    "aiSuggestions.min": "min",
+    "aiSuggestions.cal": "cal",
+
     //Welcome
-    "welcome.message": "¡Bienvenido a Pantry!",
-    "welcome.subtitle": "Tu compañero inteligente de cocina está listo para transformar tu experiencia culinaria.",
+    "welcome.message": "¡Bienvenido a Prefud!",
+    "welcome.subtitle":
+      "Tu compañero inteligente de cocina está listo para transformar tu experiencia culinaria.",
     "welcome.aiMealPlanning": "Planificación de comidas con IA",
-    "welcome.personalizedMeals":"Obtén sugerencias de comidas personalizadas según tus preferencias y los ingredientes de tu despensa.",
+    "welcome.personalizedMeals":
+      "Obtén sugerencias de comidas personalizadas según tus preferencias y los ingredientes de tu despensa.",
     "welcome.weeklyPlanning": "Planificación semanal simplificada",
-    "welcome.smartPantry": "Usa tu cámara para escanear ingredientes y agregarlos automáticamente a tu despensa.",
+    "welcome.smartPantry":
+      "Usa tu cámara para escanear ingredientes y agregarlos automáticamente a tu despensa.",
     "welcome.trackProgress": "Sigue tu progreso",
-    "welcome.monitorGoals": "Monitorea tus objetivos de nutrición y observa cómo crecen tus hábitos saludables con el tiempo",
+    "welcome.monitorGoals":
+      "Monitorea tus objetivos de nutrición y observa cómo crecen tus hábitos saludables con el tiempo",
+      "welcome.scanIngredients": "Escanea ingredientes fácilmente",
+    "welcome.planWeekDescription": "Planifica tu semana de comidas en minutos con sugerencias personalizadas basadas en lo que ya tienes en tu despensa.",
 
     // Subscription
     "subscription.complete": "Completa tu suscripción",
     "subscription.securePayment": "Procesamiento de pago seguro para",
     "subscription.chooseBillingCycle": "Elige tu ciclo de facturación",
-    "subscription.selectBillingMethod": "Seleccione cómo desea que se le facture",
+    "subscription.selectBillingMethod":
+      "Seleccione cómo desea que se le facture",
     "subscription.monthly": "Mensual",
     "subscription.paymentInfo": "Información de Pago",
     "subscription.cardDetails": "Detalles de la Tarjeta",
-
+    "subscription.paymentSecure": "Tu pago esta asegurado por Rukupay LLC",
+    "subscription.processing": "Procesando...",
+    "subscription.restore": "Restaurar compras",
+    "subscription.manageInStore": "Gestionar en la tienda",
+    "subscription.nativeUnavailable": "Este plan no está disponible para compra dentro de la app.",
     "mealPlanner.pagination.previous": "Anterior",
     "mealPlanner.pagination.next": "Siguiente",
 
@@ -2896,7 +4026,73 @@ const translations = {
     "pagination.perPage": "por página",
     "mealPlanner.previous": "Anterior",
     "mealPlanner.next": "Siguiente",
-    
+
+    // Landing Page
+    "landing.badge": "Tu asistente de cocina con IA",
+    "landing.headline": "Cocina platos increíbles con lo que",
+    "landing.headlineHighlight": "ya tienes",
+    "landing.subheadline":
+      "Prefud usa IA para planificar comidas, generar listas de compras, guiarte paso a paso mientras cocinas y ayudarte a ahorrar dinero usando los ingredientes que ya tienes en casa.",
+    "landing.ctaPrimary": "Empieza Gratis",
+    "landing.ctaSecondary": "Mira Cómo Funciona",
+    "landing.noCreditCard": "No se requiere tarjeta de crédito",
+    "landing.problemTitle": "Deja de desperdiciar comida y dinero",
+    "landing.problemSubtitle":
+      "La mayoría de las personas compran sin saber exactamente lo que ya tienen.",
+    "landing.problem1": "Comprar ingredientes duplicados",
+    "landing.problem2": "Comida caducando en la nevera",
+    "landing.problem3": "Gastar más de lo necesario",
+    "landing.problem4": "No saber qué cocinar",
+    "landing.problemFix": "Prefud soluciona eso con IA.",
+    "landing.howTitle": "Cómo funciona Prefud",
+    "landing.howSubtitle":
+      "Cuatro pasos simples para una cocina más inteligente",
+    "landing.step1Title": "Agrega lo que tienes",
+    "landing.step1Desc":
+      "Agrega rápidamente los ingredientes de tu nevera y despensa.",
+    "landing.step2Title": "La IA planifica tus comidas",
+    "landing.step2Desc": "Prefud sugiere comidas usando lo que ya tienes.",
+    "landing.step3Title": "Lista de compras inteligente",
+    "landing.step3Desc": "Compra solo lo que realmente necesitas.",
+    "landing.step4Title": "Cocina paso a paso",
+    "landing.step4Desc":
+      "Sigue instrucciones simples generadas para cada receta.",
+    "landing.featuresTitle": "Lo que hace poderoso a Prefud",
+    "landing.feature1Title": "Planificación con IA",
+    "landing.feature1Desc":
+      "Recibe sugerencias personalizadas basadas en los ingredientes que ya tienes.",
+    "landing.feature2Title": "Listas de Compras Inteligentes",
+    "landing.feature2Desc":
+      "Prefud crea automáticamente una lista de compras con los ingredientes faltantes.",
+    "landing.feature3Title": "Cocina Paso a Paso",
+    "landing.feature3Desc":
+      "Instrucciones claras para cocinar cada comida con confianza.",
+    "landing.feature4Title": "Control de Despensa",
+    "landing.feature4Desc": "Sabe exactamente qué ingredientes tienes en casa.",
+    "landing.feature5Title": "Ahorra Dinero",
+    "landing.feature5Desc": "Compra solo lo necesario y reduce el desperdicio.",
+    "landing.feature6Title": "Reduce el Desperdicio",
+    "landing.feature6Desc":
+      "Usa lo que tienes antes de que expire. Bueno para ti y el planeta.",
+    "landing.imagineTitle": "Imagina tu cocina funcionando así",
+    "landing.imagineSubtitle": "Abre Prefud y ve al instante:",
+    "landing.imagine1": "Ingredientes que ya tienes",
+    "landing.imagine2": "Comidas que puedes cocinar ahora",
+    "landing.imagine3": "Lo que necesitas comprar",
+    "landing.imagine4": "Instrucciones simples para cocinar",
+    "landing.imagineFooter":
+      "Tu cocina se vuelve organizada, eficiente e inteligente.",
+    "landing.realLifeTitle": "Diseñado para la vida real",
+    "landing.realLife1": "Ahorra en compras",
+    "landing.realLife2": "Reduce el desperdicio",
+    "landing.realLife3": "Cocina mejor",
+    "landing.realLife4": "Planifica tu semana fácilmente",
+    "landing.realLifeFooter": "Todo en un solo lugar.",
+    "landing.finalTitle": "Empieza a cocinar más inteligente hoy",
+    "landing.finalSubtitle":
+      "Únete a los primeros usuarios que usan Prefud para simplificar su cocina.",
+    "landing.terms": "Términos",
+    "landing.privacy": "Privacidad",
   },
   pt: {
     // Language names
@@ -2913,7 +4109,7 @@ const translations = {
     // Navigation
     "nav.home": "Início",
     "nav.pricing": "Preços",
-    "nav.why-pantry": "Por que Pantry",
+    "nav.why-pantry": "Por que Prefud",
     "nav.signin": "Entrar",
     "nav.signup": "Cadastrar",
     "nav.language": "Idioma",
@@ -2953,10 +4149,10 @@ const translations = {
     // Home page
     "home.title": "Planejamento Inteligente de Refeições Simplificado",
     "home.subtitle":
-      "Transforme sua cozinha com planejamento de refeições com IA, reduza o desperdício de alimentos, economize dinheiro e coma mais saudável com o Pantry.",
+      "Transforme sua cozinha com planejamento de refeições com IA, reduza o desperdício de alimentos, economize dinheiro e coma mais saudável com o Prefud.",
     "home.cta.primary": "Começar Teste Gratuito",
     "home.cta.secondary": "Saiba Mais",
-    "home.features.title": "Por que Pantry?",
+    "home.features.title": "Por que Prefud?",
     "home.features.subtitle":
       "Economize tempo, dinheiro e reduza o desperdício de alimentos com planejamento inteligente de refeições",
     "home.features.smart-planning.title": "Planejamento Inteligente",
@@ -2969,12 +4165,12 @@ const translations = {
     "home.features.save-money.description":
       "Compre mais inteligentemente com listas automatizadas",
     "home.footer.copyright":
-      "© 2025 Pantry do Bessel LLC. Todos os direitos reservados.",
-    "home.nav.why-pantry": "Por que Pantry?",
+      "© 2025 Prefud do Bessel LLC. Todos os direitos reservados.",
+    "home.nav.why-pantry": "Por que Prefud?",
     "home.nav.get-started": "Começar",
 
     // Signup
-    "signup.title": "Junte-se ao Pantry",
+    "signup.title": "Junte-se ao Prefud",
     "signup.subtitle":
       "Crie sua conta e comece sua jornada de cozinha inteligente",
     "signup.language.title": "Idioma Preferido",
@@ -2989,8 +4185,9 @@ const translations = {
     "signup.account.sending": "Enviando Verificação...",
     "signup.already-account": "Já tem uma conta?",
     "signup.signin-here": "Entre aqui",
-    "signup.emailStep.title" : "Recuperar Senha",
-    "signup.emailStep.description": "Digite seu e-mail e enviaremos um código de verificação.",
+    "signup.emailStep.title": "Recuperar Senha",
+    "signup.emailStep.description":
+      "Digite seu e-mail e enviaremos um código de verificação.",
     "signup.emailStep.label": "Endereço de E-mail",
     "signup.emailStep.placeholder": "Digite seu e-mail",
     "signup.emailPlaceholder": "Digite seu e-mail",
@@ -3002,13 +4199,15 @@ const translations = {
     "signup.payment": "Pagamento",
     "signup.verify.title": "Verifique seu e-mail",
     "signup.otpSent": "Enviamos um código de 6 dígitos para",
-    "signup.enterOTP": "Digite o código de verificação enviado para o seu e-mail.",
+    "signup.enterOTP":
+      "Digite o código de verificação enviado para o seu e-mail.",
     "signup.verifyEmail": "Verificar e-mail",
     "signup.didntReceiveCode": "Não recebeu o código?",
     "signup.resendCode": "Reenviar código",
     "signup.backToStart": "Voltar para Começar",
     "signup.aboutYourself": "Fale-nos sobre você",
-    "signup.personalizeMealPlan": "Ajude-nos a personalizar sua experiência de planejamento de refeições.",
+    "signup.personalizeMealPlan":
+      "Ajude-nos a personalizar sua experiência de planejamento de refeições.",
     "signup.personalInformation": "Informações Pessoais",
     "signup.firstName": "Primeiro Nome",
     "signup.lastName": "Sobrenome",
@@ -3029,9 +4228,9 @@ const translations = {
     "signup.agreement": "Acordo",
     "signup.agreementText": "Concordo com os ",
     "signup.termsAndConditions": "Termos e Condições",
-    "signup.agreementDescription": "Ao marcar esta caixa, você reconhece que leu e concorda com nossos termos, incluindo o uso de IA para planejamento de refeições.",
+    "signup.agreementDescription":
+      "Ao marcar esta caixa, você reconhece que leu e concorda com nossos termos, incluindo o uso de IA para planejamento de refeições.",
 
-    
     // Health GoalS
     "signup.healthGoals.loseWeight": "Perder peso",
     "signup.healthGoals.gainMuscle": "Ganhar músculo",
@@ -3041,21 +4240,25 @@ const translations = {
     "signup.healthGoals.heartHealth": "Saúde do coração",
     "signup.healthGoals.lowerCholesterol": "Reduzir colesterol",
     "signup.healthGoals.manageDiabetes": "Controlar diabetes",
-    
+
     // Calorie Tracking
     "profile.calorieTracking.title": "Rastreamento de Calorias",
-    "profile.calorieTracking.description": "Acompanhe seu consumo mensal de calorias e objetivos",
+    "profile.calorieTracking.description":
+      "Acompanhe seu consumo mensal de calorias e objetivos",
     "profile.calorieTracking.dailyGoal": "Meta Diária",
     "profile.calorieTracking.caloriesPerDay": "Calorias por dia",
     "profile.calorieTracking.thisMonth": "Este Mês",
     "profile.calorieTracking.caloriesConsumed": "Calorias consumidas",
     "profile.calorieTracking.dailyAverage": "Média Diária",
-    "profile.calorieTracking.healthGoalsProgress": "Progresso dos Objetivos de Saúde",
-    "profile.calorieTracking.noHealthGoals": "Nenhum objetivo de saúde definido",
-    
+    "profile.calorieTracking.healthGoalsProgress":
+      "Progresso dos Objetivos de Saúde",
+    "profile.calorieTracking.noHealthGoals":
+      "Nenhum objetivo de saúde definido",
+
     // Environmental Impact
     "profile.environmental.title": "Impacto Ambiental",
-    "profile.environmental.description": "Acompanhe suas emissões mensais de carbono de ingredientes e refeições",
+    "profile.environmental.description":
+      "Acompanhe suas emissões mensais de carbono de ingredientes e refeições",
     "profile.environmental.expiredIngredients": "Ingredientes Vencidos",
     "profile.environmental.carbonWasted": "Pegada de carbono desperdiçada",
     "profile.environmental.consumedMeals": "Refeições Consumidas",
@@ -3064,20 +4267,39 @@ const translations = {
     "profile.environmental.combinedFootprint": "Pegada de carbono combinada",
     "profile.environmental.sustainabilityTips": "Dicas de Sustentabilidade",
     "profile.environmental.reduceFoodWaste": "Reduzir Desperdício de Alimentos",
-    "profile.environmental.preventedWaste": "Você evitou 2.1 kg CO₂ ao usar ingredientes antes do vencimento",
-    "profile.environmental.mealPlanBenefits": "Benefícios do Planejamento de Refeições",
-    "profile.environmental.wasteReduction": "Seu planejamento de refeições reduziu o desperdício de alimentos em 78% este mês",
+    "profile.environmental.preventedWaste":
+      "Você evitou 2.1 kg CO₂ ao usar ingredientes antes do vencimento",
+    "profile.environmental.mealPlanBenefits":
+      "Benefícios do Planejamento de Refeições",
+    "profile.environmental.wasteReduction":
+      "Seu planejamento de refeições reduziu o desperdício de alimentos em 78% este mês",
     "profile.environmental.improvementOpportunity": "Oportunidade de Melhoria",
-    "profile.environmental.checkExpiration": "Verifique as datas de validade com mais frequência para reduzir o desperdício em 15%",
-    
+    "profile.environmental.checkExpiration":
+      "Verifique as datas de validade com mais frequência para reduzir o desperdício em 15%",
+
     // Favorites
     "profile.checkFavorites": "Ver Favoritos",
     "favorites.title": "Minhas Receitas Favoritas",
     "favorites.subtitle": "Sua coleção de receitas queridas",
     "favorites.empty.title": "Ainda não há receitas favoritas",
-    "favorites.empty.description": "Comece a explorar receitas e marque suas favoritas para vê-las aqui!",
+    "favorites.empty.description":
+      "Comece a explorar receitas e marque suas favoritas para vê-las aqui!",
     "favorites.empty.cta": "Descobrir Receitas",
-    
+
+    // Cart
+    "cart.title": "Carrinho de Compras",
+    "cart.items": "itens",
+    "cart.unit": "Unidade",
+    "cart.addedAt": "Adicionado",
+    "cart.clearAll": "Limpar Tudo",
+    "cart.empty.title": "Seu carrinho está vazio",
+    "cart.empty.description":
+      "Adicione ingredientes de receitas ou planos de refeição para começar a construir sua lista de compras.",
+    "cart.empty.backButton": "Voltar ao Painel",
+    "cart.actions.title": "Ações do Carrinho",
+    "cart.actions.addToShoppingList": "Adicionar à Lista de Compras",
+    "cart.actions.addToPantry": "Adicionar à Despensa",
+
     // Diet Types
     "signup.diet.vegetarian": "Vegetariano",
     "signup.diet.vegan": "Vegano",
@@ -3102,6 +4324,9 @@ const translations = {
     "signup.allergy.none": "Nenhuma",
 
     "signup.caloriesRange": "Faixa recomendada: 1200-3000 calorias por dia.",
+    "signup.ageError.title": "❌ Requisito de idade",
+    "signup.ageError.description":
+      "Você deve ter pelo menos 18 anos para criar uma conta.",
 
     //Plan
     "signup.choosePlan": "Escolha seu plano",
@@ -3110,17 +4335,12 @@ const translations = {
     "signup.plan.free": "Grátis",
     "signup.plan.whatsIncluded": "O que está incluído",
     "signup.plan.choose": "Escolher",
-    "signup.selectPlanDescription": "Selecione o plano perfeito para iniciar sua jornada de planejamento de refeições ",
-
-
-
-
-
-
+    "signup.selectPlanDescription":
+      "Selecione o plano perfeito para iniciar sua jornada de planejamento de refeições ",
 
     // Signin
     "signin.title": "Bem-vindo de Volta",
-    "signin.subtitle": "Entre na sua conta Pantry",
+    "signin.subtitle": "Entre na sua conta Prefud",
     "signin.email": "Endereço de Email",
     "signin.email.placeholder": "Digite seu email",
     "signin.password": "Senha",
@@ -3130,6 +4350,9 @@ const translations = {
     "signin.signing-in": "Entrando...",
     "signin.no-account": "Não tem uma conta?",
     "signin.create-here": "Crie uma aqui",
+    "signin.accountIncomplete": "Conta Incompleta",
+    "signin.accountIncompleteDesc":
+      "Sua conta precisa ser completada. Por favor verifique seu e-mail para continuar.",
 
     // Profile
     "profile.title": "Informações do Perfil",
@@ -3149,7 +4372,28 @@ const translations = {
     "profile.plan": "Plano",
     "profile.active": "Ativo",
     "profile.cancelSubscription": "Cancelar Assinatura",
-    "profile.subscriptionDesc":"Limites e uso do seu plano atual",
+    "profile.subscriptionDesc": "Limites e uso do seu plano atual",
+    "profile.processImages": "Processar Imagens",
+    "profile.processImagesDesc": "Escaneamentos de ingredientes por imagem",
+
+    // Delete Account
+    "profile.deleteAccount.section": "Zona de Perigo",
+    "profile.deleteAccount.sectionDesc":
+      "Excluir permanentemente sua conta e todos os dados",
+    "profile.deleteAccount.button": "Excluir Conta",
+    "profile.deleteAccount.title": "Excluir Conta",
+    "profile.deleteAccount.description":
+      "Esta ação é permanente e não pode ser desfeita.",
+    "profile.deleteAccount.warningTitle": "Ao excluir sua conta:",
+    "profile.deleteAccount.cancelSub":
+      "Sua assinatura ativa será cancelada imediatamente",
+    "profile.deleteAccount.deleteData":
+      "Todos os seus dados pessoais, planos de refeição e receitas serão excluídos permanentemente",
+    "profile.deleteAccount.noRecovery":
+      "Você não poderá recuperar sua conta ou dados",
+    "profile.deleteAccount.goBack": "Voltar",
+    "profile.deleteAccount.confirm": "Excluir Minha Conta",
+    "profile.deleteAccount.deleting": "Excluindo...",
 
     // Meal Planner
     "mealPlanner.title": "Planejador de Refeições",
@@ -3162,7 +4406,9 @@ const translations = {
     "mealPlanner.loadingPlans": "Carregando seus planos de refeições...",
     "mealPlanner.day": "dia",
     "mealPlanner.for": "Para",
-    "mealPlanner.people": "pessoas",
+    "mealPlanner.people": "adultos",
+    "mealPlanner.kidsbelow5": "crianças menores de 5 anos",
+    "mealPlanner.kidsover5": "crianças de 5 a 12 anos",
     "mealPlanner.mealsPDay": "refeições por dia",
     "mealPlanner.cuisine": "Culinária",
     "mealPlanner.diet": "Dieta",
@@ -3177,6 +4423,7 @@ const translations = {
       "Obtenha receitas personalizadas com base em suas preferências, necessidades dietéticas e habilidades culinárias",
     "mealPlanner.createYourFirstAIMeal":
       "Crie Seu Primeiro Plano de Refeições com IA",
+      "mealPlanner.noMorePlans":"Não há mais planos de refeições para mostrar",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Criar Plano de Refeições com IA",
@@ -3289,9 +4536,59 @@ const translations = {
     "mealPlanCreator.cuisine.ecuadorian": "Ecuatoriana",
     "mealPlanCreator.cuisine.chinese": "China",
     "mealPlanCreator.cuisine.customCountry": "Adicionar Culinária de País",
-    "mealPlanCreator.cuisine.customCountryPlaceholder": "Digite um país para sua culinária (ex: Brasil, Marrocos)",
+    "mealPlanCreator.cuisine.customCountryPlaceholder":
+      "Digite um país para sua culinária (ex: Brasil, Marrocos)",
     "mealPlanCreator.generate.btn": "Gerar Plano com IA",
     "mealPlanCreator.generate.btnLoad": "Criando plano com IA...",
+    "mealPlanCreator.cuisine.other": "Outro",
+    "mealPlanCreator.cuisine.otherPlaceholder": "Digite sua culinária...",
+    "mealPlanCreator.allergy.other": "Outro",
+    "mealPlanCreator.allergy.otherPlaceholder": "Digite sua alergia...",
+    "mealPlanCreator.chat.welcome":
+      "👋 Olá! Vamos criar seu plano de refeições personalizado. Como você gostaria de chamá-lo?",
+    "mealPlanCreator.chat.description":
+      "📝 Adicione uma breve descrição para seu plano. (Opcional)",
+    "mealPlanCreator.chat.startDate":
+      "📅 Quando seu plano de refeições deve começar?",
+    "mealPlanCreator.chat.numberOfDays": "📆 Quantos dias o plano deve cobrir?",
+    "mealPlanCreator.chat.numberOfPersons": "👥 Quantos adultos vão comer?",
+    "mealPlanCreator.chat.kidsUnder5": "👶 Quantas crianças menores de 5 anos?",
+    "mealPlanCreator.chat.kids5to12": "🧒 Quantas crianças entre 5 e 12 anos?",
+    "mealPlanCreator.chat.mealsPerDay": "🍽️ Quantas refeições por dia?",
+    "mealPlanCreator.chat.dietary":
+      "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
+    "mealPlanCreator.chat.cuisine":
+      "🌍 Preferências de culinária? Selecione todas que se aplicam.",
+    "mealPlanCreator.chat.maxCookTime":
+      "⏱️ Qual o tempo máximo de cozimento por refeição (em minutos)?",
+    "mealPlanCreator.chat.skillLevel":
+      "👨‍🍳 Qual seu nível de habilidade culinária?",
+    "mealPlanCreator.chat.budget": "💰 Qual sua faixa de orçamento?",
+    "mealPlanCreator.chat.allergies":
+      "⚠️ Alguma alergia ou intolerância alimentar?",
+    "mealPlanCreator.chat.healthGoals":
+      "💪 Algum objetivo de saúde para este plano?",
+    "mealPlanCreator.chat.extras":
+      "📝 Algo que não goste ou pedidos especiais? (Opcional)",
+    "mealPlanCreator.chat.extrasPlaceholder": "Digite aqui ou pule...",
+    "mealPlanCreator.chat.none": "Nenhum",
+    "mealPlanCreator.chat.skipped": "Pulado",
+    "mealPlanCreator.chat.summaryTitle":
+      "Aqui está o resumo do seu plano de refeições:",
+    "mealPlanCreator.chat.confirmPrompt":
+      "Parece bom? Clique em **Gerar** para criar seu plano de refeições! 🚀",
+    "mealPlanCreator.chat.letsGo": "Vamos lá! 🚀",
+    "mealPlanCreator.chat.loaderMessage":
+      "Analisando suas preferências e criando seu plano de refeições perfeito...",
+    "mealPlanCreator.chat.missingName":
+      "Por favor, insira um nome para o plano.",
+    "mealPlanCreator.chat.missingDate":
+      "Por favor, selecione uma data de início.",
+    "mealPlanCreator.chat.confirm": "Confirmar",
+    "mealPlanCreator.chat.skip": "Pular →",
+    "mealPlanCreator.chat.continue": "Continuar",
+    "mealPlanCreator.chat.editTitle": "Editar Plano de Refeições",
+    "mealPlanCreator.chat.createTitle": "Plano de Refeições IA",
 
     // Meal Plan Creator
     "levels.beginner": "Iniciante",
@@ -3355,6 +4652,69 @@ const translations = {
     "mealPlanView.mealUncompleted": "Refeição marcada como não concluída",
     "mealPlanView.mealCompletedDesc": "Refeição marcada como concluída.",
     "mealPlanView.mealUncompletedDesc": "Refeição marcada como não concluída.",
+    "mealPlanView.calendarView": "Visualização de Calendário",
+    "mealPlanView.kidsUnder5": "Crianças com menos de 5 anos",
+    "mealPlanView.kids5to12": "Crianças de 5 a 12 anos",
+    "mealPlanView.noMeals": "Nenhuma refeição planejada para este dia",
+    "mealPlanView.addedToPantry": "Adicionado à despensa",
+    "mealPlanView.planDetails": "Detalhes do Plano",
+    "mealPlanView.maxCookingTime": "Tempo Máximo de Cozimento",
+    "mealPlanView.skillLevel": "Nível de Habilidade",
+    "mealPlanView.budget": "Presupuesto",
+    "mealPlanView.cuisines": "Culinárias",
+    "mealPlanView.healthGoals": "Objetivos de Saúde",
+    "mealPlanView.dislikes": "Culinárias que você não gosta",
+    "mealPlanReady.title": "¡Tu Plan de Comidas está Listo! 🎉",
+    "mealPlanReady.description":
+      "Seu plano de comidas personalizado com IA foi criado com sucesso e está pronto para ajudá-lo a cozinhar refeições deliciosas e saudáveis esta semana.",
+    "mealPlanReady.viewPlan": "Ver Meu Plano de Refeições",
+    "mealPlanReady.later": "Ver Mais Tarde",
+    "drinkReady.title": "Sua Bebida Saudável está Pronta! 🥤",
+    "drinkReady.description":
+      "Sua bebida saudável personalizada foi preparada e está pronta para desfrutar.",
+    "drinkReady.viewDrink": "Ver Bebida",
+    "drinkReady.later": "Ver Mais Tarde",
+    "drinkStarted.title": "Geração de Bebida Iniciada",
+    "drinkStarted.description":
+      "Avisaremos quando sua bebida saudável estiver pronta.",
+    "aiMealReady.title": "Sua Refeição com IA está Pronta! 🍽️",
+    "aiMealReady.description":
+      "Sua refeição personalizada com IA foi criada e está pronta para explorar.",
+    "aiMealReady.viewMeal": "Ver Refeição",
+    "aiMealReady.later": "Ver Mais Tarde",
+    "aiMealStarted.title": "Geração de Refeição Iniciada",
+    "aiMealStarted.description":
+      "Avisaremos quando sua refeição estiver pronta.",
+    "pantryMealsReady.title": "Suas Refeições da Despensa estão Prontas! 🍽️",
+    "pantryMealsReady.description":
+      "Novas ideias de refeições com IA baseadas em sua despensa estão prontas para explorar.",
+    "pantryMealsReady.viewMeals": "Ver Refeições",
+    "pantryMealsReady.later": "Ver Mais Tarde",
+    "pantryMealsReady.mealsGenerated": "refeições geradas",
+    "pantryMealsStarted.title": "Geração de Refeições Iniciada",
+    "pantryMealsStarted.description":
+      "Avisaremos quando suas ideias de refeições estiverem prontas.",
+    "analyzeImageStarted.title": "Analisando sua imagem…",
+    "analyzeImageStarted.description":
+      "Avisaremos quando os ingredientes forem detectados.",
+    "analyzeImageReady.title": "Ingredientes Detectados",
+    "analyzeImageReady.description":
+      "ingredientes detectados. Selecione quais adicionar à sua despensa.",
+    "analyzeImageReady.addSelected": "Adicionar Selecionados",
+    "analyzeImageReady.cancel": "Cancelar",
+    "analyzeImageReady.selectedCount": "selecionados",
+    "analyzeImageReady.adding": "Adicionando…",
+    "analyzeImageReady.noneDetected": "Nenhum ingrediente detectado na imagem.",
+    "addIngredient.scanWithCamera": "Escanear ingredientes com a câmera",
+    "addIngredient.scanWithCameraDesc":
+      "Tire uma foto ou envie uma imagem dos seus ingredientes e os detectaremos automaticamente.",
+    "addIngredient.takePhoto": "Tirar Foto",
+    "addIngredient.uploadPhoto": "Enviar Foto",
+    "addIngredient.analyzePhoto": "Analisar Foto",
+    "addIngredient.analyzing": "Analisando…",
+    "addIngredient.retake": "Escolher outra",
+    "addIngredient.back": "Voltar",
+
     "days.sunday": "Domingo",
     "days.monday": "Segunda-feira",
     "days.tuesday": "Terça-feira",
@@ -3380,6 +4740,101 @@ const translations = {
     "mealShopping.withinWeek": "Dentro de uma Semana",
     "mealShopping.ingredientCount": "ingredientes",
     "mealShopping.backToIngredients": "Voltar para Ingredientes",
+    "mealShopping.selectedItems": "Itens selecionados",
+
+    //Checkout and cart
+    "mealPlanView.addToCart": "Adicionar ao carrinho",
+    "cart.checkout.proceedToCheckout": "Ir para o pagamento",
+    "cart.inCart": "no carrinho",
+
+    "checkout.steps.deliveryMethod": "Método de entrega",
+    "checkout.deliveryMethod.title":
+      "Como você gostaria de receber seu pedido?",
+    "checkout.deliveryMethod.subtitle":
+      "Selecione como você gostaria de receber seu pedido",
+
+    "checkout.steps.deliveryMethod.title": "Escolher método de entrega",
+    "checkout.deliveryMethod.delivery.title": "Entrega",
+    "checkout.deliveryMethod.delivery.description":
+      "Receba suas compras na porta da sua casa",
+    "checkout.deliveryMethod.delivery.fee": "Taxa de entrega",
+    "checkout.deliveryMethod.pickup.title": "Retirada",
+    "checkout.deliveryMethod.pickup.description": "Retire seu pedido na loja",
+    "checkout.deliveryMethod.pickup.fee": "Sem taxa de entrega",
+
+    "mealPlanView.addedToCart": "Adicionado ao carrinho",
+
+    "checkout.steps.storeSelection": "Seleção da loja",
+    "checkout.steps.address": "Endereço",
+    "checkout.steps.payment": "Pagamento",
+    "checkout.steps.summary": "Resumo",
+    "checkout.steps.confirmation": "Confirmação",
+
+    "checkout.storeSelection.title": "Selecionar loja",
+    "checkout.storeSelection.subtitle":
+      "Escolha sua loja preferida para retirada ou entrega",
+    "checkout.address.pickup.title": "Endereço de retirada",
+    "checkout.address.pickup.subtitle":
+      "Selecione o local da loja para retirada",
+    "checkout.payment.title": "Método de pagamento",
+    "checkout.payment.subtitle": "Escolha seu método de pagamento",
+    "checkout.payment.default": "Padrão",
+    "checkout.payment.expires": "Válido até",
+    "checkout.payment.addNew": "Adicionar novo método de pagamento",
+    "checkout.payment.form.name": "Nome no cartão",
+    "checkout.payment.form.number": "Número do cartão",
+    "checkout.payment.form.expiry": "Data de validade (MM/AA)",
+    "checkout.payment.form.cvc": "CVC",
+    "checkout.payment.form.save": "Salvar cartão",
+
+    "checkout.summary.title": "Resumo do pedido",
+    "checkout.summary.subtitle":
+      "Revise os detalhes do seu pedido antes de confirmar",
+    "checkout.summary.items": "Itens",
+    "checkout.summary.pickup": "Retirada",
+    "checkout.summary.pickupTime": "Hora da retirada",
+    "checkout.summary.payment": "Método de pagamento",
+    "checkout.summary.subtotal": "Subtotal",
+    "checkout.summary.serviceFee": "Taxa de serviço",
+    "checkout.summary.total": "Total",
+    "checkout.summary.processPayment": "Processar pagamento",
+    "checkout.payment.form.cvv": "CVV",
+    "checkout.summary.deliveryFee": "Taxa de entrega",
+    "checkout.summary.delivery": "Entrega",
+    "checkout.summary.deliveryTime": "Hora da entrega",
+
+    "checkout.confirmation.title": "Pedido confirmado!",
+    "checkout.confirmation.subtitle":
+      "Obrigado pelo seu pedido. Seu número de ordem é",
+    "checkout.confirmation.orderNumber": "Número do pedido",
+    "checkout.confirmation.estimatedPickup": "Hora estimada para retirada",
+    "checkout.confirmation.today": "Hoje às",
+    "checkout.confirmation.pickupLocation": "Local de retirada",
+    "checkout.confirmation.total": "Total pago",
+    "checkout.confirmation.items": "Itens do pedido",
+    "checkout.confirmation.nextSteps": "Próximos passos",
+    "checkout.confirmation.step1":
+      "Você receberá um e-mail de confirmação em breve.",
+    "checkout.confirmation.step2":
+      "Prepare-se para a retirada na loja selecionada.",
+    "checkout.confirmation.step3": "Aproveite suas compras!",
+    "checkout.confirmation.done": "Concluir",
+    "checkout.confirmation.estimatedDelivery": "Tempo estimado de entrega",
+    "checkout.confirmation.deliveryAddress": "Endereço de entrega",
+    "checkout.confirmation.thankYou": "Obrigado por escolher a Prefud!",
+
+    "checkout.address.delivery.title": "Endereço de entrega",
+    "checkout.address.delivery.subtitle":
+      "Informe o endereço onde deseja receber seu pedido",
+    "checkout.address.default": "Endereço padrão",
+    "checkout.address.addNew": "Adicionar novo endereço",
+    "checkout.address.form.street": "Rua",
+    "checkout.address.form.apartment": "Apartamento, sala, etc. (opcional)",
+    "checkout.address.form.state": "Estado/Província",
+    "checkout.address.form.city": "Cidade",
+    "checkout.address.form.zipCode": "CEP",
+    "checkout.address.form.country": "País",
+    "checkout.address.form.save": "Salvar endereço",
 
     // AI Meal Creator
     "aiMealCreator.createMealTitle": "Criar uma Refeição",
@@ -3398,6 +4853,7 @@ const translations = {
     "aiMealCreator.noMealsTitle": "Nenhuma refeição criada ainda",
     "aiMealCreator.noMealsDesc":
       "Comece a criar sua primeira refeição com IA com base em suas preferências e ingredientes.",
+      "aiMealCreator.noMoreMeals":"Não há mais refeições para mostrar",
 
     //AI Meal Creator Stepper
     "aiMealCreatorStepper.step1Title": "Detalhes da Refeição",
@@ -3468,6 +4924,8 @@ const translations = {
     "aiMealCreatorStepper.cuisine.greek": "Grega",
     "aiMealCreatorStepper.cuisine.spanish": "Espanhola",
     "aiMealCreatorStepper.cuisine.chinese": "Chinesa",
+    "aiMealCreatorStepper.cuisine.other": "Outro",
+    "aiMealCreatorStepper.cuisine.otherPlaceholder": "Digite sua cozinha...",
     "aiMealCreatorStepper.healthGoalsLabel": "Objetivos de Saúde",
     "aiMealCreatorStepper.health.weightloss": "Perda de Peso",
     "aiMealCreatorStepper.health.musclegain": "Ganho de Massa Muscular",
@@ -3487,6 +4945,8 @@ const translations = {
     "aiMealCreatorStepper.allergy.fish": "Peixe",
     "aiMealCreatorStepper.allergy.wheat": "Trigo",
     "aiMealCreatorStepper.allergy.sesame": "Gergelim",
+    "aiMealCreatorStepper.allergy.other": "Outro",
+    "aiMealCreatorStepper.allergy.otherPlaceholder": "Digite sua alergia...",
     "aiMealCreatorStepper.allergy.sulfites": "Sulfitos",
     "aiMealCreatorStepper.customAllergiesLabel":
       "Alergias/Intolerâncias Personalizadas (Opcional)",
@@ -3525,7 +4985,153 @@ const translations = {
     "aiMealCreatorStepper.dishName": "Nome do Prato",
     "aiMealCreatorStepper.review.dish": "Prato",
 
-    //AI Meal Generation
+    // AI Meal Creator Chat
+    "aiMealCreatorStepper.chat.welcome":
+      "👋 Olá! Sou seu assistente de refeições IA. Vamos criar algo delicioso juntos! Que tipo de refeição você está desejando?",
+    "aiMealCreatorStepper.chat.mealName":
+      "Ótima escolha! 🎉 Você tem um nome para esta refeição? (Opcional - digite ou pule)",
+    "aiMealCreatorStepper.chat.dishName":
+      "🍽️ Você tem um prato específico em mente? ex. Macarrão com Queijo (Opcional)",
+    "aiMealCreatorStepper.chat.details":
+      "⚡ Vamos configurar os detalhes — porções, tempo de preparo, nível de habilidade e orçamento.",
+    "aiMealCreatorStepper.chat.dietary":
+      "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
+    "aiMealCreatorStepper.chat.cuisine":
+      "🌍 Preferências de culinária? Selecione as que te agradam!",
+    "aiMealCreatorStepper.chat.healthGoals":
+      "💪 Algum objetivo de saúde para esta refeição?",
+    "aiMealCreatorStepper.chat.allergies":
+      "⚠️ Alguma alergia ou intolerância alimentar que eu deva saber?",
+    "aiMealCreatorStepper.chat.extras":
+      "📝 Mais alguma coisa? Alimentos que não gosta, pedidos especiais ou alergias personalizadas? (Opcional)",
+    "aiMealCreatorStepper.chat.none": "Nenhum",
+    "aiMealCreatorStepper.chat.skipped": "Pulado",
+    "aiMealCreatorStepper.chat.confirm": "Confirmar",
+    "aiMealCreatorStepper.chat.skip": "Pular →",
+    "aiMealCreatorStepper.chat.continue": "Continuar",
+    "aiMealCreatorStepper.chat.generate": "Gerar Minha Refeição",
+    "aiMealCreatorStepper.chat.letsGo": "Vamos lá! 🚀",
+    "aiMealCreatorStepper.chat.readyTitle":
+      "Aqui está o resumo do seu plano de refeição:",
+    "aiMealCreatorStepper.chat.confirmPrompt":
+      "Parece bom? Clique em **Gerar** para criar sua refeição! 🚀",
+    "aiMealCreatorStepper.chat.typePlaceholder": "Digite aqui ou pule...",
+    "aiMealCreatorStepper.chat.dishPlaceholder": "ex., Macarrão com Queijo",
+    "aiMealCreatorStepper.chat.servingsLabel": "porções",
+    "aiMealCreatorStepper.chat.budgetSuffix": "orçamento",
+    "aiMealCreatorStepper.chat.servings": "👥 Quantas porções você precisa?",
+    "aiMealCreatorStepper.chat.cookTime":
+      "⏱️ Qual o tempo máximo de cozimento (em minutos)?",
+    "aiMealCreatorStepper.chat.skill":
+      "👨‍🍳 Qual é o seu nível de habilidade na cozinha?",
+    "aiMealCreatorStepper.chat.budget":
+      "💰 Qual é a sua faixa de orçamento para esta refeição?",
+    "aiMealCreator.markAsDoneSuccess": "Refeição marcada como concluída",
+    "aiMealCreator.markAsUndoneSuccess": "Refeição marcada como não concluída",
+    "aiDrinkCreator.markAsDoneSuccess":
+      "Bebida marcada como consumida com sucesso!",
+    "aiDrinkCreator.markAsDoneError": "Falha ao marcar bebida como consumida",
+
+    // AI Drink Creator Chat
+    "aiDrinkChat.welcome":
+      "👋 Olá! Sou seu assistente de bebidas IA. Vamos criar uma bebida saudável para você! Que tipo de bebida você gostaria?",
+    "aiDrinkChat.drinkName":
+      "Ótima escolha! 🎉 Como você quer chamar sua bebida? (Opcional)",
+    "aiDrinkChat.servings": "👥 Quantas porções você precisa?",
+    "aiDrinkChat.cookTime": "⏱️ Qual o tempo máximo de preparo (em minutos)?",
+    "aiDrinkChat.skill": "👨‍🍳 Qual é o seu nível de habilidade?",
+    "aiDrinkChat.budget":
+      "💰 Qual é a sua faixa de orçamento para esta bebida?",
+    "aiDrinkChat.healthGoals":
+      "💪 Quais são seus objetivos de saúde? Selecione todos que se aplicam.",
+    "aiDrinkChat.dietary":
+      "🥗 Alguma restrição alimentar? Selecione todas que se aplicam.",
+    "aiDrinkChat.cuisine": "🌍 Preferências de culinária ou sabores?",
+    "aiDrinkChat.allergies":
+      "⚠️ Alguma alergia ou intolerância que eu deva saber?",
+    "aiDrinkChat.extras":
+      "📝 Mais alguma coisa? Alimentos que não gosta ou pedidos especiais? (Opcional)",
+    "aiDrinkChat.none": "Nenhum",
+    "aiDrinkChat.skipped": "Pulado",
+    "aiDrinkChat.confirm": "Confirmar",
+    "aiDrinkChat.skip": "Pular →",
+    "aiDrinkChat.continue": "Continuar",
+    "aiDrinkChat.generate": "Gerar Minha Bebida",
+    "aiDrinkChat.letsGo": "Vamos lá! 🚀",
+    "aiDrinkChat.readyTitle": "Aqui está o resumo da sua bebida:",
+    "aiDrinkChat.confirmPrompt":
+      "Parece bom? Clique em **Gerar** para criar sua bebida! 🚀",
+    "aiDrinkChat.loaderMessage":
+      "Preparando a bebida saudável perfeita para você...",
+    "aiDrinkChat.back": "Voltar",
+    "aiDrinkChat.title": "Criador de Bebidas IA",
+    "aiDrinkChat.servingsLabel": "Porções",
+    "aiDrinkChat.prepTimeLabel": "Tempo (min)",
+    "aiDrinkChat.drinkNamePlaceholder": "ex., Smoothie Energético Matinal",
+    "aiDrinkChat.extrasPlaceholder": "Digite aqui ou pule...",
+    "aiDrinkChat.type.smoothie": "🥤 Smoothie",
+    "aiDrinkChat.type.juice": "🧃 Suco Natural",
+    "aiDrinkChat.type.tea": "🍵 Chá de Bem-estar",
+    "aiDrinkChat.type.protein": "💪 Shake de Proteína",
+    "aiDrinkChat.type.detox": "🌿 Bebida Detox",
+    "aiDrinkChat.type.energy": "⚡ Energizante",
+    "aiDrinkChat.goal.energy": "⚡ Energia",
+    "aiDrinkChat.goal.weightLoss": "⚖️ Controle de Peso",
+    "aiDrinkChat.goal.immunity": "🛡️ Sistema Imunológico",
+    "aiDrinkChat.goal.digestive": "🌱 Saúde Digestiva",
+    "aiDrinkChat.goal.skin": "✨ Saúde da Pele",
+    "aiDrinkChat.goal.detox": "🌿 Desintoxicação",
+    "aiDrinkChat.diet.keto": "Keto",
+    "aiDrinkChat.diet.paleo": "Paleo",
+    "aiDrinkChat.diet.vegan": "Vegano",
+    "aiDrinkChat.diet.vegetarian": "Vegetariano",
+    "aiDrinkChat.diet.glutenFree": "Sem Glúten",
+    "aiDrinkChat.diet.dairyFree": "Sem Laticínios",
+    "aiDrinkChat.diet.lowCarb": "Baixo Carbo",
+    "aiDrinkChat.diet.diabeticFriendly": "Para Diabéticos",
+    "aiDrinkChat.skill.beginner": "Iniciante",
+    "aiDrinkChat.skill.intermediate": "Intermediário",
+    "aiDrinkChat.skill.advanced": "Avançado",
+    "aiDrinkChat.budget.low": "Baixo",
+    "aiDrinkChat.budget.medium": "Médio",
+    "aiDrinkChat.budget.high": "Alto",
+    "aiDrinkChat.review.type": "Tipo",
+    "aiDrinkChat.review.name": "Nome",
+    "aiDrinkChat.review.servings": "Porções",
+    "aiDrinkChat.review.prepTime": "Tempo de Preparo",
+    "aiDrinkChat.review.skill": "Habilidade",
+    "aiDrinkChat.review.budget": "Orçamento",
+    "aiDrinkChat.review.goals": "Objetivos",
+    "aiDrinkChat.review.diet": "Dieta",
+    "aiDrinkChat.review.cuisine": "Culinária",
+    "aiDrinkChat.review.allergies": "Alergias",
+    "aiDrinkChat.review.notes": "Notas",
+    "aiDrinkChat.cuisine.ecuadorian": "Equatoriana",
+    "aiDrinkChat.cuisine.american": "Americana",
+    "aiDrinkChat.cuisine.japanese": "Japonesa",
+    "aiDrinkChat.cuisine.mexican": "Mexicana",
+    "aiDrinkChat.cuisine.indian": "Indiana",
+    "aiDrinkChat.cuisine.thai": "Tailandesa",
+    "aiDrinkChat.cuisine.chinese": "Chinesa",
+    "aiDrinkChat.cuisine.mediterranean": "Mediterrânea",
+    "aiDrinkChat.cuisine.brazilian": "Brasileira",
+    "aiDrinkChat.cuisine.korean": "Coreana",
+    "aiDrinkChat.allergy.peanuts": "Amendoim",
+    "aiDrinkChat.allergy.treeNuts": "Nozes",
+    "aiDrinkChat.allergy.dairy": "Laticínios",
+    "aiDrinkChat.allergy.eggs": "Ovos",
+    "aiDrinkChat.allergy.soy": "Soja",
+    "aiDrinkChat.allergy.shellfish": "Frutos do Mar",
+    "aiDrinkChat.allergy.wheat": "Trigo",
+    "aiDrinkChat.allergy.sesame": "Gergelim",
+    "aiDrinkChat.allergy.sulfites": "Sulfitos",
+    "aiDrinkChat.cuisine.other": "✏️ Outro",
+    "aiDrinkChat.cuisine.otherPlaceholder": "Digite sua preferência...",
+    "aiDrinkChat.allergy.other": "✏️ Outro",
+    "aiDrinkChat.allergy.otherPlaceholder": "Digite sua alergia...",
+    "aiDrinkChat.drinkCreatedSuccess": "Bebida saudável criada com sucesso!",
+    "aiDrinkChat.drinkCreatedError": "Falha ao gerar bebida. Tente novamente.",
+
     "aiMealGenerator.loaderMessage":
       "Criando sua refeição personalizada com IA...",
     "aiMealGenerator.createAIMealTitle":
@@ -3680,6 +5286,12 @@ const translations = {
     "aiMealView.stepsCompleted": "passos concluídos",
     "aiMealView.recipeCompleted": "Parabéns! Receita concluída!",
     "aiMealView.ingredientsSelector": "Lista de Ingredientes",
+    "aiMealView.selectAll": "Selecionar Tudo",
+    "aiMealView.deselectAll": "Desmarcar Tudo",
+    "aiMealView.selectIngredientsDesc":
+      "Selecione ingredientes para adicionar à despensa ou carrinho",
+    "aiMealView.addToPantry": "Adicionar à Despensa",
+    "aiMealView.addToCart": "Adicionar ao Carrinho",
 
     // AI Drink Creator
     "aiDrinkCreator.title": "Crie Sua Bebida Saudável Perfeita",
@@ -3718,6 +5330,7 @@ const translations = {
     "aiDrinkCreatorStepper.stepGeneration": "Geração IA",
     "aiDrinkCreatorStepper.previous": "Anterior",
     "aiDrinkCreatorStepper.next": "Próximo",
+    "aiDrinkCreator.noMoreDrinks":"Não há mais bebidas para mostrar",
 
     // AI Dtink Type
     "aiDrinkType.chooseTitle": "Escolha o Tipo de Bebida",
@@ -3948,6 +5561,20 @@ const translations = {
     "drinkDetailView.orderOnline": "Solicitar Entrega",
     "drinkDetailView.ingredientsSelected": "ingredientes selecionados",
     "drinkDetailView.healthGoals": "Objetivos de Saúde",
+    "drinkDetailView.shoppingList": "Lista de Compras",
+    "drinkDetailView.selectAll": "Selecionar Tudo",
+    "drinkDetailView.deselectAll": "Desmarcar Tudo",
+    "drinkDetailView.selectIngredients":
+      "Selecione ingredientes para adicionar ao carrinho",
+    "drinkDetailView.addToCart": "Adicionar ao Carrinho",
+    "drinkDetailView.addedToCart": "Adicionado ao Carrinho",
+    "drinkDetailView.itemsAddedToCart":
+      "itens adicionados ao seu carrinho de compras",
+    "drinkDetailView.noIngredientsSelected": "Nenhum ingrediente selecionado",
+    "drinkDetailView.selectIngredientsFirst":
+      "Por favor, selecione ingredientes primeiro.",
+    "drinkDetailView.pantryFailed":
+      "Falha ao adicionar ingredientes à despensa. Tente novamente.",
 
     // Drink Shopping Modal
     "drinkShoppingModal.noIngredientsTitle": "Nenhum ingrediente selecionado",
@@ -4027,15 +5654,45 @@ const translations = {
     "recipeView.mealCookedDesc": "Excelente trabalho completando esta receita!",
     "recipeView.mealUncookedDesc": "Status da receita atualizado com sucesso",
     "recipeView.updateError": "Atualização falhou",
-    "recipeView.updateErrorDesc": "Falha ao atualizar o status da receita. Tente novamente.",
-    "recipeView.missingDataError": "Informações do plano ou refeição em falta. Tente novamente a partir do plano de refeições.",
+    "recipeView.updateErrorDesc":
+      "Falha ao atualizar o status da receita. Tente novamente.",
+    "recipeView.missingDataError":
+      "Informações do plano ou refeição em falta. Tente novamente a partir do plano de refeições.",
     "recipeView.cookingProgress": "Progresso de Cozinha",
     "recipeView.of": "de",
     "recipeView.stepsCompleted": "passos concluídos",
     "recipeView.completed": "🎉 Parabéns! Receita concluída!",
     "recipeView.videoTitleFullscreen": "Vídeo Tutorial da Receita - Tela Cheia",
+    "recipeView.shoppingTab": "Lista de Compras",
+    "recipeView.ingredientsSelector": "Ingredientes",
+    "recipeView.selectAll": "Selecionar Tudo",
+    "recipeView.deselectAll": "Desmarcar Tudo",
+    "recipeView.selectIngredientsDesc":
+      "Selecione ingredientes para adicionar à despensa ou carrinho",
+    "recipeView.addToPantry": "Adicionar à Despensa",
+    "recipeView.addToCart": "Adicionar ao Carrinho",
+    "recipeView.addedToPantry": "Adicionado à Despensa",
 
-    // Password
+    // Cooking Mode
+    "cookingMode.title": "Modo Cozinha",
+    "cookingMode.enter": "Modo Cozinha",
+    "cookingMode.ingredients": "Ingredientes",
+    "cookingMode.steps": "Passos",
+    "cookingMode.ingredientsList": "Lista de Ingredientes",
+    "cookingMode.cookingSteps": "Passos de Cozinha",
+    "cookingMode.step": "Passo",
+    "cookingMode.listen": "Ouvir",
+    "cookingMode.listenAll": "Ouvir Tudo",
+    "cookingMode.stop": "Parar",
+    "cookingMode.completed":
+      "Todos os passos concluídos! Aproveite sua refeição!",
+    "cookingMode.stepsCompleted": "passos",
+    "cookingMode.repeat": "Repetir",
+    "cookingMode.viewAll": "Ver Tudo",
+    "cookingMode.ultraFocus": "Ultra Focus",
+    "cookingMode.autoPlay": "Auto",
+    "cookingMode.markDone": "Marcar como feito",
+    "cookingMode.undoStep": "Desfazer",
     "password.security.title": "Segurança da Senha",
     "password.security.description":
       "Mantenha sua conta segura atualizando sua senha regularmente.",
@@ -4124,18 +5781,18 @@ const translations = {
     "pricing.faq.limits.answer":
       "Vamos notificá-lo quando você estiver se aproximando dos seus limites e oferecer opções para fazer upgrade do seu plano ou aguardar o próximo ciclo de cobrança.",
 
-    // Why Pantry
-    "why-pantry.title.main": "Por que o Pantry está",
+    // Why Prefud
+    "why-pantry.title.main": "Por que o Prefud está",
     "why-pantry.title.sub": "Mudando o Mundo",
     "why-pantry.hero.description":
-      "Todos os dias, milhões de toneladas de alimentos são desperdiçados enquanto as pessoas lutam com o planejamento de refeições e compras de supermercado. O Pantry está revolucionando como pensamos sobre comida, sustentabilidade e vida inteligente.",
+      "Todos os dias, milhões de toneladas de alimentos são desperdiçados enquanto as pessoas lutam com o planejamento de refeições e compras de supermercado. O Prefud está revolucionando como pensamos sobre comida, sustentabilidade e vida inteligente.",
     "why-pantry.stats.food-waste": "Desperdício de Alimentos Reduzido",
     "why-pantry.stats.yearly-savings": "Economia Anual Média",
     "why-pantry.stats.time-saved": "Tempo Economizado Semanalmente",
     "why-pantry.stats.co2-reduced": "CO₂ Reduzido/Ano",
     "why-pantry.eliminate-waste.title": "Eliminar o Desperdício de Alimentos",
     "why-pantry.eliminate-waste.description":
-      "Você sabia que a família média joga fora $1,500 em comida todo ano? O sistema de rastreamento inteligente do Pantry monitora datas de validade, sugere receitas baseadas no que está prestes a vencer e envia alertas oportunos para usar ingredientes antes que estraguem.",
+      "Você sabia que a família média joga fora $1,500 em comida todo ano? O sistema de rastreamento inteligente do Prefud monitora datas de validade, sugere receitas baseadas no que está prestes a vencer e envia alertas oportunos para usar ingredientes antes que estraguem.",
     "why-pantry.eliminate-waste.feature1":
       "Rastreamento inteligente de datas de validade",
     "why-pantry.eliminate-waste.feature2":
@@ -4147,7 +5804,7 @@ const translations = {
       "Redução média no desperdício de alimentos por residência",
     "why-pantry.optimize-time.title": "Otimize Seu Tempo",
     "why-pantry.optimize-time.description":
-      "Pare de gastar horas planejando refeições e fazendo múltiplas viagens ao supermercado. A IA do Pantry cria planos de refeições personalizados baseados nas suas preferências, gera listas de compras inteligentes e até rastreia o inventário da sua despensa automaticamente. Mais tempo para o que realmente importa.",
+      "Pare de gastar horas planejando refeições e fazendo múltiplas viagens ao supermercado. A IA do Prefud cria planos de refeições personalizados baseados nas suas preferências, gera listas de compras inteligentes e até rastreia o inventário da sua despensa automaticamente. Mais tempo para o que realmente importa.",
     "why-pantry.optimize-time.feature1":
       "Planejamento de refeições com IA em minutos",
     "why-pantry.optimize-time.feature2":
@@ -4159,7 +5816,7 @@ const translations = {
       "Toda semana no planejamento de refeições e compras",
     "why-pantry.save-money.title": "Economize Dinheiro de Verdade",
     "why-pantry.save-money.description":
-      "Nossos usuários economizam em média $1,200 por ano reduzindo o desperdício de alimentos, comprando apenas o que precisam e aproveitando os recursos de compras inteligentes do Pantry. O aplicativo se paga no primeiro mês!",
+      "Nossos usuários economizam em média $1,200 por ano reduzindo o desperdício de alimentos, comprando apenas o que precisam e aproveitando os recursos de compras inteligentes do Prefud. O aplicativo se paga no primeiro mês!",
     "why-pantry.save-money.stat1": "Economia média",
     "why-pantry.save-money.stat2": "Menos",
     "why-pantry.save-money.stat2-desc": "Gastos com supermercado",
@@ -4171,7 +5828,7 @@ const translations = {
     "why-pantry.save-money.breakdown.coupons": "Integração de cupons",
     "why-pantry.carbon-footprint.title": "Reduzir a Pegada de Carbono",
     "why-pantry.carbon-footprint.description":
-      "O desperdício de alimentos é responsável por 8% das emissões globais de gases do efeito estufa. Ao usar o Pantry, você não está apenas economizando dinheiro - está ajudando a salvar o planeta. Cada refeição planejada eficientemente e cada ingrediente salvo do lixo faz um impacto ambiental real.",
+      "O desperdício de alimentos é responsável por 8% das emissões globais de gases do efeito estufa. Ao usar o Prefud, você não está apenas economizando dinheiro - está ajudando a salvar o planeta. Cada refeição planejada eficientemente e cada ingrediente salvo do lixo faz um impacto ambiental real.",
     "why-pantry.carbon-footprint.feature1":
       "Reduzir metano do desperdício de alimentos",
     "why-pantry.carbon-footprint.feature2": "Diminuir emissões de transporte",
@@ -4182,7 +5839,7 @@ const translations = {
       "Reduzidas por residência anualmente",
     "why-pantry.carbon-footprint.equivalent":
       "Equivalente a tirar um carro da estrada por 5,800 milhas ou plantar 105 árvores",
-    "why-pantry.features.title": "Como o Pantry Torna Tudo Isso Possível",
+    "why-pantry.features.title": "Como o Prefud Torna Tudo Isso Possível",
     "why-pantry.features.shopping-lists.title":
       "Listas de Compras Inteligentes",
     "why-pantry.features.shopping-lists.description":
@@ -4196,7 +5853,7 @@ const translations = {
       "Acompanhe seu progresso com análises detalhadas sobre redução de desperdício de alimentos, dinheiro economizado e impacto ambiental.",
     "why-pantry.cta.title": "Junte-se à Revolução Alimentar Hoje",
     "why-pantry.cta.description":
-      "Comece a economizar dinheiro, tempo e o planeta com o sistema inteligente de gestão de cozinha do Pantry.",
+      "Comece a economizar dinheiro, tempo e o planeta com o sistema inteligente de gestão de cozinha do Prefud.",
     "why-pantry.cta.primary": "Grátis",
     "why-pantry.cta.secondary": "Saiba Mais",
 
@@ -4249,10 +5906,12 @@ const translations = {
     "addIngredient.addAllIngredients": "Adicionar Todos os Ingredientes",
     "addIngredient.addingAllIngredients": "Adicionando Todos...",
     "addIngredient.multipleTitle": "Adicionar Múltiplos Ingredientes",
-    "addIngredient.multipleDescription": "Adicione múltiplos ingredientes à sua despensa de uma vez",
+    "addIngredient.multipleDescription":
+      "Adicione múltiplos ingredientes à sua despensa de uma vez",
     "addIngredient.ingredient": "Ingrediente",
     "addIngredient.allIngredientsAdded": "Todos os ingredientes adicionados!",
-    "addIngredient.allIngredientsAddedDesc": "ingredientes foram adicionados à sua despensa.",
+    "addIngredient.allIngredientsAddedDesc":
+      "ingredientes foram adicionados à sua despensa.",
     "addIngredient.scanProduct": "Escanear Produto com Câmera",
     "addIngredient.productDetected": "Produto Adicionado!",
     "addIngredient.productDetectedDesc":
@@ -4321,37 +5980,104 @@ const translations = {
     "addIngredient.units.bag.value": "saco",
     "addIngredient.units.box.value": "caixa",
 
-     //IngredientTracker
+    //IngredientTracker
     "ingredientTracker.title": "Controle de Despensa",
-    "ingredientTracker.description": "Acompanhe seus ingredientes e suas datas de validade",
+    "ingredientTracker.description":
+      "Acompanhe seus ingredientes e suas datas de validade",
     "ingredientTracker.refresh": "Atualizar",
     "ingredientTracker.addIngredient": "Adicionar Ingrediente",
     "ingredientTracker.totalItems": "Total de Itens",
     "ingredientTracker.expiringSoon": "Vencendo em Breve",
     "ingredientTracker.categories": "Categorias",
     "ingredientTracker.lowStock": "Estoque Baixo",
-    "ingredientTracker.useFirst": "Use esses ingredientes primeiro para evitar desperdício",
+    "ingredientTracker.useFirst":
+      "Use esses ingredientes primeiro para evitar desperdício",
     "ingredientTracker.expired": "Vencido",
     "ingredientTracker.today": "Hoje",
     "ingredientTracker.allFresh": "Todos os ingredientes estão frescos!",
     "ingredientTracker.yourPantry": "Sua Despensa",
-    "ingredientTracker.organizedByCategory": "Todos os seus ingredientes organizados por categoria",
+    "ingredientTracker.organizedByCategory":
+      "Todos os seus ingredientes organizados por categoria",
     "ingredientTracker.searchPlaceholder": "Pesquisar ingredientes...",
     "ingredientTracker.noIngredientsFound": "Nenhum ingrediente encontrado",
-    "ingredientTracker.tryDifferentSearch": "Tente um termo de pesquisa diferente",
-    "ingredientTracker.pantryEmpty": "Sua despensa está vazia. Tente atualizar ou adicionar ingredientes.",
-    "ingredientTracker.startAdding": "Comece adicionando alguns ingredientes à sua despensa",
+    "ingredientTracker.tryDifferentSearch":
+      "Tente um termo de pesquisa diferente",
+    "ingredientTracker.pantryEmpty":
+      "Sua despensa está vazia. Tente atualizar ou adicionar ingredientes.",
+    "ingredientTracker.startAdding":
+      "Comece adicionando alguns ingredientes à sua despensa",
+    "ingredientTracker.pantryTab": "Despensa",
+    "ingredientTracker.expiringTab": "Vencendo em Breve",
+    "ingredientTracker.categoriesTab": "Categorías",
+    "ingredientTracker.lowStockTab": "Estoque Baixo",
+
+    // AI Meal Suggestions
+    "aiSuggestions.title": "Sugestões de Refeições com IA",
+    "aiSuggestions.description":
+      "Receba sugestões personalizadas com base nos seus ingredientes próximos do vencimento",
+    "aiSuggestions.generate": "Gerar Sugestões IA",
+    "aiSuggestions.generating": "Gerando...",
+    "aiSuggestions.generateMore": "Gerar Mais Sugestões",
+    "aiSuggestions.selectServings": "Selecionar Número de Porções",
+    "aiSuggestions.servings": "Porções",
+    "aiSuggestions.cancel": "Cancelar",
+    "aiSuggestions.generateMeals": "Gerar Refeições",
+    "aiSuggestions.viewDetails": "Ver Detalhes",
+    "aiSuggestions.addToFavorites": "Adicionar aos Favoritos",
+    "aiSuggestions.favorited": "Favoritado",
+    "aiSuggestions.removedFromFavorites": "Removido dos favoritos",
+    "aiSuggestions.removedFromFavoritesDesc":
+      "foi removido dos seus favoritos.",
+    "aiSuggestions.addedToFavorites": "Adicionado aos favoritos!",
+    "aiSuggestions.addedToFavoritesDesc": "foi adicionado aos seus favoritos.",
+    "aiSuggestions.markAsConsumed": "Marcar como Consumido",
+    "aiSuggestions.markedAsConsumed": "Marcado como consumido!",
+    "aiSuggestions.markedAsConsumedDesc": "foi marcado como consumido.",
+    "aiSuggestions.close": "Fechar",
+    "aiSuggestions.prepTime": "Tempo de Preparo",
+    "aiSuggestions.difficulty": "Dificuldade",
+    "aiSuggestions.servingsLabel": "Porções",
+    "aiSuggestions.healthBenefits": "Benefícios para a Saúde",
+    "aiSuggestions.proTip": "Dica Pro",
+    "aiSuggestions.ingredients": "Ingredientes",
+    "aiSuggestions.nutritionalInfo": "Informação Nutricional",
+    "aiSuggestions.calories": "Calorias",
+    "aiSuggestions.protein": "Proteína",
+    "aiSuggestions.carbs": "Carboidratos",
+    "aiSuggestions.fat": "Gordura",
+    "aiSuggestions.richInVitamins": "Rico em vitaminas",
+    "aiSuggestions.cookingInstructions": "Instruções de Preparo",
+    "aiSuggestions.ready": "Sugestões de IA prontas!",
+    "aiSuggestions.readyDesc":
+      "sugestões de refeições. Pegada de carbono total:",
+    "aiSuggestions.error": "Erro",
+    "aiSuggestions.userNotFound":
+      "Usuário não encontrado. Faça login novamente.",
+    "aiSuggestions.failedToGenerate":
+      "Falha ao gerar sugestões. Tente novamente.",
+    "aiSuggestions.subscriptionLimit": "Limite de Assinatura Atingido",
+    "aiSuggestions.noIngredients": "Nenhum Ingrediente Encontrado",
+    "aiSuggestions.loaderMessage":
+      "Criando deliciosas sugestões de refeições com seus ingredientes...",
+    "aiSuggestions.min": "min",
+    "aiSuggestions.cal": "cal",
 
     //Welcome
-    "welcome.message": "Bem-vindo ao Pantry!",
-    "welcome.subtitle": "Seu companheiro de cozinha inteligente está pronto para transformar sua experiência culinária.",
+    "welcome.message": "Bem-vindo ao Prefud!",
+    "welcome.subtitle":
+      "Seu companheiro de cozinha inteligente está pronto para transformar sua experiência culinária.",
     "welcome.aiMealPlanning": "Planejamento de refeições com IA",
-    "welcome.personalizedMeals": "Receba sugestões de refeições personalizadas com base em suas preferências e itens da despensa.",
+    "welcome.personalizedMeals":
+      "Receba sugestões de refeições personalizadas com base em suas preferências e itens da despensa.",
     "welcome.weeklyPlanning": "Planejamento semanal facilitado",
-    "welcome.smartPantry": "Use sua câmera para escanear ingredientes e adicioná-los automaticamente à sua despensa.",
+    "welcome.smartPantry":
+      "Use sua câmera para escanear ingredientes e adicioná-los automaticamente à sua despensa.",
     "welcome.trackProgress": "Acompanhe seu progresso",
-    "welcome.monitorGoals": "Monitore seus objetivos nutricionais e veja seus hábitos saudáveis crescerem ao longo do tempo",
-  
+    "welcome.monitorGoals":
+      "Monitore seus objetivos nutricionais e veja seus hábitos saudáveis crescerem ao longo do tempo",
+      "welcome.scanIngredients": "Escaneie ingredientes com a câmera para adicioná-los à sua despensa em segundos.",
+    "welcome.planWeekDescription": "Planeje sua semana de refeições em minutos com sugestões personalizadas de IA baseadas nos ingredientes que você já tem.",
+
     // Subscription
     "subscription.complete": "Conclua sua assinatura",
     "subscription.securePayment": "Processamento de pagamento seguro para",
@@ -4360,17 +6086,92 @@ const translations = {
     "subscription.monthly": "Mensal",
     "subscription.paymentInfo": "Informações de Pagamento",
     "subscription.cardDetails": "Detalhes do Cartão",
+    "subscription.paymentSecure": "Seu pagamento está seguro com Rukupay LLC",
+    "subscription.processing": "Processando...",
+    "subscription.restore": "Restaurar compras",
+    "subscription.manageInStore": "Gerenciar na loja",
+    "subscription.nativeUnavailable": "Este plano não está disponível para compra no aplicativo.",
+    "mealPlanner.pagination.previous": "Antigo",
+    "mealPlanner.pagination.next": "Seguindo",
 
     // Meal Planner
     "pagination.show": "Mostrar",
     "pagination.perPage": "por página",
     "mealPlanner.previous": "Anterior",
     "mealPlanner.next": "Próximo",
+
+    // Landing Page
+    "landing.badge": "Seu assistente de cozinha com IA",
+    "landing.headline": "Cozinhe pratos incríveis com o que você",
+    "landing.headlineHighlight": "já tem",
+    "landing.subheadline":
+      "O Prefud usa IA para planejar refeições, gerar listas de compras, te guiar passo a passo enquanto cozinha e te ajudar a economizar dinheiro usando os ingredientes que você já tem em casa.",
+    "landing.ctaPrimary": "Comece Grátis",
+    "landing.ctaSecondary": "Veja Como Funciona",
+    "landing.noCreditCard": "Não é necessário cartão de crédito",
+    "landing.problemTitle": "Pare de desperdiçar comida e dinheiro",
+    "landing.problemSubtitle":
+      "A maioria das pessoas compra sem saber exatamente o que já tem.",
+    "landing.problem1": "Comprar ingredientes duplicados",
+    "landing.problem2": "Comida vencendo na geladeira",
+    "landing.problem3": "Gastar mais do que o necessário",
+    "landing.problem4": "Não saber o que cozinhar",
+    "landing.problemFix": "O Prefud resolve isso com IA.",
+    "landing.howTitle": "Como o Prefud Funciona",
+    "landing.howSubtitle":
+      "Quatro passos simples para uma cozinha mais inteligente",
+    "landing.step1Title": "Adicione o que você tem",
+    "landing.step1Desc":
+      "Adicione rapidamente os ingredientes da sua geladeira e despensa.",
+    "landing.step2Title": "A IA planeja suas refeições",
+    "landing.step2Desc": "O Prefud sugere refeições usando o que você já tem.",
+    "landing.step3Title": "Lista de compras inteligente",
+    "landing.step3Desc": "Compre apenas o que você realmente precisa.",
+    "landing.step4Title": "Cozinhe passo a passo",
+    "landing.step4Desc": "Siga instruções simples geradas para cada receita.",
+    "landing.featuresTitle": "O que torna o Prefud poderoso",
+    "landing.feature1Title": "Planejamento com IA",
+    "landing.feature1Desc":
+      "Receba sugestões personalizadas baseadas nos ingredientes que você já tem.",
+    "landing.feature2Title": "Listas de Compras Inteligentes",
+    "landing.feature2Desc":
+      "O Prefud cria automaticamente uma lista de compras com os ingredientes que faltam.",
+    "landing.feature3Title": "Cozinha Passo a Passo",
+    "landing.feature3Desc":
+      "Instruções claras para cozinhar cada refeição com confiança.",
+    "landing.feature4Title": "Controle da Despensa",
+    "landing.feature4Desc":
+      "Saiba exatamente quais ingredientes você tem em casa.",
+    "landing.feature5Title": "Economize Dinheiro",
+    "landing.feature5Desc":
+      "Compre apenas o necessário e reduza o desperdício.",
+    "landing.feature6Title": "Reduza o Desperdício",
+    "landing.feature6Desc":
+      "Use o que você tem antes de vencer. Bom para você e o planeta.",
+    "landing.imagineTitle": "Imagine sua cozinha funcionando assim",
+    "landing.imagineSubtitle": "Abra o Prefud e veja instantaneamente:",
+    "landing.imagine1": "Ingredientes que você já tem",
+    "landing.imagine2": "Refeições que você pode fazer agora",
+    "landing.imagine3": "O que você precisa comprar",
+    "landing.imagine4": "Instruções simples para cozinhar",
+    "landing.imagineFooter":
+      "Sua cozinha se torna organizada, eficiente e mais inteligente.",
+    "landing.realLifeTitle": "Feito para a vida real",
+    "landing.realLife1": "Economize nas compras",
+    "landing.realLife2": "Reduza o desperdício",
+    "landing.realLife3": "Cozinhe melhor",
+    "landing.realLife4": "Planeje sua semana facilmente",
+    "landing.realLifeFooter": "Tudo em um só lugar.",
+    "landing.finalTitle": "Comece a cozinhar de forma mais inteligente hoje",
+    "landing.finalSubtitle":
+      "Junte-se aos primeiros usuários que usam o Prefud para simplificar sua cozinha.",
+    "landing.terms": "Termos",
+    "landing.privacy": "Privacidade",
   },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useLanguage = () => {

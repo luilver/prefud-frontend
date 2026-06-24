@@ -38,7 +38,8 @@ yarn electron:build
 ## Depuracion
 win.webContents.openDevTools();
 
-
+# Inspect in Google Chorme to debug
+chrome://inspect/#devices
 
 
 ## how to set up in local Android Mac M1 to listen endpoints in localhost (take off in production)

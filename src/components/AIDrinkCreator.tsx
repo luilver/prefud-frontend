@@ -1,10 +1,11 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Droplets, Eye, Wine, Clock, Users, Leaf, Loader2, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import AIDrinkCreatorStepper from "./AIDrinkCreatorStepper";
 import AIDrinkView from "./AIDrinkView";
 import DrinkDetailView from "./DrinkDetailView";
@@ -26,21 +27,85 @@ const AIDrinkCreator = () => {
   const [selectedDrink, setSelectedDrink] = useState<any>(null);
   const [selectedApiDrink, setSelectedApiDrink] = useState<ApiDrink | null>(null);
   const [apiDrinks, setApiDrinks] = useState<ApiDrink[]>([]);
+  const [allApiDrinks, setAllApiDrinks] = useState<ApiDrink[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const { user, aiDrinks, addAIDrink } = useUser();
   const { t } = useLanguage();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user?.id) {
-      fetchUserDrinks(currentPage, pageSize);
+      if (isMobile) {
+        if (currentPage === 1) {
+          fetchUserDrinks(1, 5, true);
+        }
+      } else {
+        fetchUserDrinks(currentPage, pageSize, false);
+      }
     }
-  }, [user?.id, currentPage, pageSize]);
+  }, [user?.id, currentPage, pageSize, isMobile]);
 
-  const fetchUserDrinks = async (page: number = 1, limit: number = 5) => {
+  // Listen for open-drink event to navigate to the generated drink detail
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent;
+      const drink = ce.detail?.drink;
+      if (drink) {
+        setShowStepper(false);
+        setSelectedApiDrink(null);
+        setSelectedDrink(drink);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      // Refresh the user's drinks list so newly created ones show up
+      if (user?.id) {
+        setCurrentPage(1);
+        setAllApiDrinks([]);
+        fetchUserDrinks(1, isMobile ? 5 : pageSize, isMobile);
+      }
+    };
+    window.addEventListener("open-drink", handler);
+    return () => window.removeEventListener("open-drink", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isMobile, pageSize]);
+
+  // Infinite scroll observer for mobile
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && !isLoadingMore && currentPage < totalPages) {
+          loadMoreDrinks();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isMobile, loading, isLoadingMore, currentPage, totalPages]);
+
+  const loadMoreDrinks = async () => {
+    if (!user?.id || isLoadingMore) return;
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const response = await getDrinksByUser(user.id, nextPage, 5);
+      setAllApiDrinks(prev => [...prev, ...(response.data || [])]);
+      setCurrentPage(nextPage);
+      setTotalPages(response.totalPages || 1);
+    } catch (error) {
+      console.error('Error loading more drinks:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const fetchUserDrinks = async (page: number = 1, limit: number = 5, isInfiniteScroll: boolean = false) => {
     if (!user?.id) return;
     
     setLoading(true);
@@ -48,6 +113,9 @@ const AIDrinkCreator = () => {
       console.log('Fetching drinks for user:', user.id, 'page:', page, 'limit:', limit);
       
       const response = await getDrinksByUser(user.id, page, limit);
+      if (isInfiniteScroll) {
+        setAllApiDrinks(response.data || []);
+      }
       setApiDrinks(response.data || []);
       setTotalPages(response.totalPages || 1);
       console.log('Fetched user drinks:', response.data);
@@ -93,17 +161,37 @@ const AIDrinkCreator = () => {
     };
     addAIDrink(newDrink);
     setShowStepper(false);
-    // Refresh API drinks list and reset to first page
     setCurrentPage(1);
-    fetchUserDrinks(1, pageSize);
+    setAllApiDrinks([]);
+    fetchUserDrinks(1, isMobile ? 5 : pageSize, isMobile);
   };
 
   const handleViewDrink = (drink: any) => {
     setSelectedDrink(drink);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleViewApiDrink = (drink: ApiDrink) => {
     setSelectedApiDrink(drink);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleMarkAsDone = async (drinkId: string, drinkName: string, isFromApi: boolean = false) => {
+    try {
+      // TODO: Integrate with backend service when ready
+      // await markDrinkAsConsumed(drinkId, isFromApi);
+      
+      toast({
+        title: "✅ " + (t("aiDrinkCreator.markAsDoneSuccess") || "Drink marked as consumed successfully!"),
+        description: drinkName,
+      });
+    } catch (error) {
+      console.error('Failed to mark drink as done:', error);
+      toast({
+        title: t("aiDrinkCreator.markAsDoneError") || "Failed to mark drink as consumed",
+        variant: "destructive",
+      });
+    }
   };
 
   if (showStepper) {
@@ -133,246 +221,299 @@ const AIDrinkCreator = () => {
     );
   }
 
-  const totalDrinks = aiDrinks.length + apiDrinks.length;
-  const hasApiDrinks = apiDrinks.length > 0;
+  const totalDrinks = aiDrinks.length + (isMobile ? allApiDrinks.length : apiDrinks.length);
+  const hasApiDrinks = isMobile ? allApiDrinks.length > 0 : apiDrinks.length > 0;
 
   return (
-    <div className="space-y-6">
-      <Card className="border-green-200">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mb-4">
-            <Wine className="h-8 w-8 text-white" />
-          </div>
-          <CardTitle className="text-2xl text-green-800">
-            {t("aiDrinkCreator.title") || "Create Your Perfect Healthy Drink"}
-          </CardTitle>
-          <CardDescription className="text-green-600">
-            {t("aiDrinkCreator.desc") || "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-center">
-          <Button 
-            onClick={handleStartCreation}
-            className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 text-lg"
-          >
-            {t("aiDrinkCreator.start") || "Start Creating"}
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen relative">
+      {/* Food-themed Background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+      </div>
 
-      {/* API Created Drinks List */}
-      {loading ? (
-        <Card>
-          <CardContent className="py-8 text-center">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-6 w-6 animate-spin mr-2 text-green-600" />
-              <p className="text-green-600">{t("aiDrinkCreator.loading") || "Loading your drinks..."}</p>
+      <div className="relative z-10 space-y-6">
+        {/* Header Card */}
+        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+              <Wine className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-          </CardContent>
-        </Card>
-      ) : hasApiDrinks ? (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-center text-green-800">
-            {t("aiDrinkCreator.yourCreatedDrinks") || "Your Created Drinks"}
-          </h2>
-          
-          {/* Pagination Controls */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-4">
-            <PageSizeSelector 
-              pageSize={pageSize} 
-              onPageSizeChange={handlePageSizeChange}
-            />
-            <div className="text-sm text-gray-600">
-              {t("aiDrinkCreator.showingPage") || 'Showing page'} {currentPage} {t("aiDrinkCreator.of") || 'of'} {totalPages} {apiDrinks.length} {t("aiDrinkCreator.drinks") || 'drinks'}
+            <div>
+              <h1 className="text-lg sm:text-2xl font-bold text-white">
+                {t("aiDrinkCreator.title") || "Create Your Perfect Healthy Drink"}
+              </h1>
+              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                {t("aiDrinkCreator.desc") || "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences"}
+              </p>
             </div>
           </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {apiDrinks.map((drink) => (
-              <Card key={drink._id} className="border-green-200 hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <Droplets className="h-5 w-5 text-green-600" />
-                    <CardTitle className="text-lg text-green-800">{drink.drink_name}</CardTitle>
-                  </div>
-                  <CardDescription className="text-green-600">
-                    {drink.drinkPlan.healthyDrink.drinkType} • {drink.drinkPlan.healthyDrink.cookingTime} {t("aiDrinkCreator.min") || "min"} • {drink.drinkPlan.healthyDrink.calories} {t("aiDrinkCreator.cal") || "cal"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-green-700 mb-3">{drink.drinkPlan.healthyDrink.description}</p>
-                  <div className="grid grid-cols-3 gap-2 mb-3 text-xs">
-                    <div className="flex items-center space-x-1 text-gray-600">
-                      <Clock className="h-3 w-3" />
-                      <span>{drink.drinkPlan.healthyDrink.cookingTime}m</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-gray-600">
-                      <Users className="h-3 w-3" />
-                      <span>{drink.numberPeople}</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-gray-600">
-                      <Leaf className="h-3 w-3" />
-                      <span>{drink.drinkPlan.totalCarbonFootprint}kg</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {drink.drinkPlan.healthyDrink.nutritionalInfo.vitamins?.slice(0, 3).map((vitamin, index) => (
-                      <span 
-                        key={index}
-                        className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"
-                      >
-                        {t("aiDrinkCreator.vitamin") || "Vit"} {vitamin}
-                      </span>
-                    ))}
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full border-green-300 text-green-700 hover:bg-green-50"
-                    onClick={() => handleViewApiDrink(drink)}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                    if (
-                      page === 1 || 
-                      page === totalPages || 
-                      (page >= currentPage - 1 && page <= currentPage + 1)
-                    ) {
-                      return (
-                        <PaginationItem key={page}>
-                          <PaginationLink
-                            onClick={() => handlePageChange(page)}
-                            isActive={page === currentPage}
-                            className="cursor-pointer"
-                          >
-                            {page}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    } else if (
-                      (page === currentPage - 2 && currentPage > 3) ||
-                      (page === currentPage + 2 && currentPage < totalPages - 2)
-                    ) {
-                      return (
-                        <PaginationItem key={page}>
-                          <PaginationEllipsis />
-                        </PaginationItem>
-                      );
-                    }
-                    return null;
-                  })}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
-        </div>
-      ) : null}
-
-      {/* Local AI Drinks List (from context) */}
-      {aiDrinks.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-center text-green-800">
-            {t("aiDrinkCreator.yourAIDrinks") || "Your AI Created Drinks"}
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {aiDrinks.map((drink, index) => (
-              <Card key={index} className="border-green-200 hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <Droplets className="h-5 w-5 text-green-600" />
-                    <CardTitle className="text-lg text-green-800">{drink.name}</CardTitle>
-                  </div>
-                  <CardDescription className="text-green-600">
-                    {drink.type} • {drink.prepTime} • {drink.calories} cal
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-green-700 mb-3">{drink.description}</p>
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {drink.nutritionHighlights?.slice(0, 2).map((highlight: string, highlightIndex: number) => (
-                      <span 
-                        key={highlightIndex}
-                        className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"
-                      >
-                        {highlight.split(' ').slice(0, 2).join(' ')}
-                      </span>
-                    ))}
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full border-green-300 text-green-700 hover:bg-green-50"
-                    onClick={() => handleViewDrink(drink)}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="mt-3 sm:mt-4">
+            <Button 
+              onClick={handleStartCreation}
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-2 shadow-lg shadow-emerald-500/30 w-full sm:w-auto"
+            >
+              {t("aiDrinkCreator.start") || "Start Creating"}
+            </Button>
           </div>
         </div>
-      )}
 
-      {/* Empty State for no saved drinks */}
-      {totalDrinks === 0 && !loading && (
-        <>
+        {/* API Created Drinks List */}
+        {loading ? (
+          <Card className="bg-white/10 backdrop-blur-sm border-0">
+            <CardContent className="py-8 text-center">
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin mr-2 text-emerald-400" />
+                <p className="text-emerald-100">{t("aiDrinkCreator.loading") || "Loading your drinks..."}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : hasApiDrinks ? (
+          <div className="space-y-3">
+            <h2 className="text-lg sm:text-2xl font-semibold text-center text-foreground">
+              {t("aiDrinkCreator.yourCreatedDrinks") || "Your Created Drinks"}
+            </h2>
+            
+            {/* Pagination Controls - desktop only */}
+            {!isMobile && (
+              <PageSizeSelector
+                pageSize={pageSize}
+                onPageSizeChange={handlePageSizeChange}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemCount={apiDrinks.length}
+                itemLabel={t("aiDrinkCreator.drinks") || "drinks"}
+              />
+            )}
+
+            <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {(isMobile ? allApiDrinks : apiDrinks).map((drink) => (
+                <Card key={drink._id} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+                  <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                  <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shrink-0">
+                          <Droplets className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                        </div>
+                        <CardTitle className="text-sm sm:text-lg text-foreground truncate">{drink.drink_name}</CardTitle>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3 text-emerald-500" />{drink.drinkPlan.healthyDrink.cookingTime}m
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        {drink.drinkPlan.healthyDrink.drinkType}
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        {drink.drinkPlan.healthyDrink.calories} cal
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Users className="w-3 h-3 text-emerald-500" />{drink.numberPeople}
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
+                        <Leaf className="w-3 h-3 text-emerald-500" />{drink.drinkPlan.totalCarbonFootprint}kg
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-2 pb-3 sm:pb-4 px-3 sm:px-6">
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-2">{drink.drinkPlan.healthyDrink.description}</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {drink.drinkPlan.healthyDrink.nutritionalInfo.vitamins?.slice(0, 3).map((vitamin, index) => (
+                        <span key={index} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full">
+                          {t("aiDrinkCreator.vitamin") || "Vit"} {vitamin}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 pt-2 border-t border-border/50">
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleViewApiDrink(drink)}>
+                        <Eye className="h-3.5 w-3.5 mr-1" />{t("aiDrinkCreator.viewRecipe") || "View Recipe"}
+                      </Button>
+                      <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white" onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}>
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Infinite scroll sentinel for mobile */}
+            {isMobile && (
+              <>
+                <div ref={loadMoreRef} className="h-4" />
+                {isLoadingMore && (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                  </div>
+                )}
+                {currentPage >= totalPages && allApiDrinks.length > 0 && (
+                  <p className="text-center text-white/60 text-sm py-4">
+                    {t("aiDrinkCreator.noMoreDrinks") || "You've seen all your drinks"}
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* Pagination - desktop only */}
+            {!isMobile && totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <div className="bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                        if (
+                          page === 1 || 
+                          page === totalPages || 
+                          (page >= currentPage - 1 && page <= currentPage + 1)
+                        ) {
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => handlePageChange(page)}
+                                isActive={page === currentPage}
+                                className={`cursor-pointer ${page === currentPage ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'hover:bg-emerald-50'}`}
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        } else if (
+                          (page === currentPage - 2 && currentPage > 3) ||
+                          (page === currentPage + 2 && currentPage < totalPages - 2)
+                        ) {
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          );
+                        }
+                        return null;
+                      })}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : null}
+
+
+
+        {/* Local AI Drinks List (from context) */}
+        {aiDrinks.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-center text-black drop-shadow-lg">
+              {t("aiDrinkCreator.yourAIDrinks") || "Your AI Created Drinks"}
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {aiDrinks.map((drink, index) => (
+                <Card key={index} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
+                  <CardHeader>
+                    <div className="flex items-center space-x-2">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500">
+                        <Droplets className="h-5 w-5 text-white" />
+                      </div>
+                      <CardTitle className="text-lg text-gray-800">{drink.name}</CardTitle>
+                    </div>
+                    <CardDescription className="text-gray-500">
+                      {drink.type} • {drink.prepTime} • {drink.calories} cal
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 mb-3">{drink.description}</p>
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {drink.nutritionHighlights?.slice(0, 2).map((highlight: string, highlightIndex: number) => (
+                        <span 
+                          key={highlightIndex}
+                          className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"
+                        >
+                          {highlight.split(' ').slice(0, 2).join(' ')}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        onClick={() => handleViewDrink(drink)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {t("aiDrinkCreator.viewRecipe") || "View Recipe"}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                        onClick={() => handleMarkAsDone(drink.id || index.toString(), drink.name)}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State for no saved drinks */}
+        {totalDrinks === 0 && !loading && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="border-green-200">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
               <CardHeader>
-                <CardTitle className="text-green-800">🥤 {t("aiDrinkCreator.smoothies") || "Smoothies"}</CardTitle>
+                <CardTitle className="text-gray-800">🥤 {t("aiDrinkCreator.smoothies") || "Smoothies"}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-green-600">{t("aiDrinkCreator.smoothiesDesc") || "Nutrient-packed smoothies for energy and wellness"}</p>
+                <p className="text-gray-600">{t("aiDrinkCreator.smoothiesDesc") || "Nutrient-packed smoothies for energy and wellness"}</p>
               </CardContent>
             </Card>
 
-            <Card className="border-green-200">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
               <CardHeader>
-                <CardTitle className="text-green-800">🧃 {t("aiDrinkCreator.juices") || "Fresh Juices"}</CardTitle>
+                <CardTitle className="text-gray-800">🧃 {t("aiDrinkCreator.juices") || "Fresh Juices"}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-green-600">{t("aiDrinkCreator.juicesDesc") || "Vitamin-rich fresh juices for detox and health"}</p>
+                <p className="text-gray-600">{t("aiDrinkCreator.juicesDesc") || "Vitamin-rich fresh juices for detox and health"}</p>
               </CardContent>
             </Card>
 
-            <Card className="border-green-200">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
               <CardHeader>
-                <CardTitle className="text-green-800">🍵 {t("aiDrinkCreator.teas") || "Wellness Teas"}</CardTitle>
+                <CardTitle className="text-gray-800">🍵 {t("aiDrinkCreator.teas") || "Wellness Teas"}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-green-600">{t("aiDrinkCreator.teasDesc") || "Herbal and wellness teas for relaxation and health"}</p>
+                <p className="text-gray-600">{t("aiDrinkCreator.teasDesc") || "Herbal and wellness teas for relaxation and health"}</p>
               </CardContent>
             </Card>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };

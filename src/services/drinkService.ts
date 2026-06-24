@@ -145,3 +145,38 @@ export const createHealthyDrink = async (drinkData: CreateDrinkRequest): Promise
     throw error;
   }
 };
+
+export interface CreateHealthyDrinkJobResponse {
+  jobId: string;
+}
+
+export const createHealthyDrinkJob = async (
+  drinkData: CreateDrinkRequest
+): Promise<CreateHealthyDrinkJobResponse> => {
+  const response = await fetch(`${API_BASE_URL}/meal-plan/healthy-drink`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(drinkData),
+  });
+
+  const data = await response.json();
+  console.log('createHealthyDrinkJob response:', data);
+
+  if (data?.code === "03") {
+    const error = new Error(
+      data.message || "No healthy drinks available according to your subscription"
+    );
+    (error as any).code = "03";
+    throw error;
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.message || `Failed to create healthy drink: ${response.status}`);
+  }
+
+  if (!data?.jobId) {
+    throw new Error("Server did not return a jobId");
+  }
+
+  return { jobId: data.jobId };
+};

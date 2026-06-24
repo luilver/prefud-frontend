@@ -1,7 +1,7 @@
 
 export const en = {
   "home": {
-    "title": "Pantry",
+    "title": "Prefud",
     "subtitle": "Your AI-Powered Meal Planner",
     "description": "Discover personalized meal plans tailored to your dietary needs and preferences. Say hello to stress-free cooking!",
     "getStarted": "Get Started",
@@ -14,8 +14,8 @@ export const en = {
     "feature3Title": "Easy-to-Follow Recipes",
     "feature3Description": "Access simple, step-by-step recipes that anyone can follow.",
     "testimonialsTitle": "What Our Users Say",
-    "testimonial1": "Pantry has completely transformed the way I approach meal planning. It's like having a personal chef!",
-    "testimonial2": "I used to struggle with finding healthy recipes. Now, Pantry provides me with delicious options every day.",
+    "testimonial1": "Prefud has completely transformed the way I approach meal planning. It's like having a personal chef!",
+    "testimonial2": "I used to struggle with finding healthy recipes. Now, Prefud provides me with delicious options every day.",
     "pricingTitle": "Pricing Plans",
     "pricingDescription": "Choose the plan that best fits your needs and start enjoying stress-free meal planning today.",
     "contactUsTitle": "Contact Us",
@@ -24,7 +24,121 @@ export const en = {
     "email": "Email",
     "message": "Message",
     "send": "Send",
-    "footerDescription": "Pantry - Simplifying Meal Planning with AI"
+    "footerDescription": "Prefud - Simplifying Meal Planning with AI"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "items": "items",
+    "inCart": "in cart",
+    "clearAll": "Clear All",
+    "addedAt": "Added",
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "Add ingredients from your meal plans or recipes to get started.",
+      "backButton": "Back to Dashboard"
+    },
+    "checkout": {
+      "proceedToCheckout": "Proceed to Checkout"
+    }
+  },
+  "checkout": {
+    "steps": {
+      "deliveryMethod": "Delivery Method",
+      "storeSelection": "Store Selection",
+      "address": "Address",
+      "payment": "Payment",
+      "summary": "Order Summary",
+      "confirmation": "Order Confirmed"
+    },
+    "deliveryMethod": {
+      "title": "How would you like to receive your order?",
+      "subtitle": "Choose your preferred delivery method",
+      "delivery": {
+        "title": "Home Delivery",
+        "description": "Get your groceries delivered to your door",
+        "fee": "$4.99 delivery fee"
+      },
+      "pickup": {
+        "title": "Store Pickup",
+        "description": "Pick up your order at the store",
+        "fee": "$1.99 service fee"
+      }
+    },
+    "storeSelection": {
+      "title": "Choose your store",
+      "subtitle": "Select where you'd like to shop"
+    },
+    "address": {
+      "delivery": {
+        "title": "Delivery address",
+        "subtitle": "Where should we deliver your order?"
+      },
+      "pickup": {
+        "title": "Pickup location",
+        "subtitle": "Choose a store location for pickup"
+      },
+      "default": "Default",
+      "addNew": "Add New Address",
+      "form": {
+        "street": "Street Address",
+        "city": "City",
+        "state": "State",
+        "zipCode": "ZIP Code",
+        "country": "Country",
+        "save": "Save Address"
+      }
+    },
+    "payment": {
+      "title": "Payment method",
+      "subtitle": "How would you like to pay?",
+      "default": "Default",
+      "expires": "Expires",
+      "addNew": "Add New Card",
+      "form": {
+        "name": "Cardholder Name",
+        "number": "Card Number",
+        "expiry": "MM/YY",
+        "cvv": "CVV",
+        "save": "Save Card"
+      }
+    },
+    "summary": {
+      "title": "Order summary",
+      "subtitle": "Review your order before payment",
+      "items": "Order Items",
+      "delivery": "Delivery Details",
+      "pickup": "Pickup Details",
+      "payment": "Payment Method",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Delivery Fee",
+      "serviceFee": "Service Fee",
+      "total": "Total",
+      "deliveryTime": "Delivery in 1-2 hours",
+      "pickupTime": "Ready for pickup in 30 minutes",
+      "processPayment": "Process Payment"
+    },
+    "confirmation": {
+      "title": "Order Confirmed!",
+      "subtitle": "Your order has been successfully placed",
+      "orderNumber": "Order Number",
+      "estimatedDelivery": "Estimated Delivery",
+      "estimatedPickup": "Ready for Pickup",
+      "today": "Today",
+      "deliveryAddress": "Delivery Address",
+      "pickupLocation": "Pickup Location",
+      "total": "Total Paid",
+      "items": "items",
+      "nextSteps": "What's Next?",
+      "step1": "You'll receive order updates via email and SMS",
+      "step2": "Track your order status in real-time",
+      "step3": "Rate your experience after delivery/pickup",
+      "done": "Back to Dashboard"
+    }
+  },
+  "common": {
+    "back": "Back",
+    "continue": "Continue",
+    "cancel": "Cancel"
   },
   "signup": {
     "title": "Sign Up",
@@ -39,22 +153,51 @@ export const en = {
     "termsAndConditions": "Terms and Conditions",
     "alreadyAccount": "Already have an account?",
     "signIn": "Sign In",
-    "submit": "Submit"
+    "submit": "Submit",
+    "account": "Account",
+    "account.title": "Create Your Account",
+    "account.description": "Enter your email and create a password to get started",
+    "account.email": "Email Address",
+    "account.password": "Password",
+    "verify": "Verify",
+    "verify.title": "Verify Your Email",
+    "profile": "Profile",
+    "plan": "Plan",
+    "payment": "Payment",
+    "emailPlaceholder": "Enter your email address",
+    "passwordPlaceholder": "Create a secure password",
+    "otpSent": "We've sent a 6-digit code to",
+    "enterOTP": "Enter the verification code sent to your email",
+    "verifyEmail": "Verify Email",
+    "didntReceiveCode": "Didn't receive the code?",
+    "resendCode": "Resend Code",
+    "ageError.title": "❌ Age Requirement",
+    "ageError.description": "You must be at least 18 years old to create an account."
   },
   "signin": {
     "title": "Sign In",
+    "subtitle": "Enter your credentials to access your account",
     "email": "Email",
+    "email.placeholder": "Enter your email",
     "password": "Password",
+    "password.placeholder": "Enter your password",
     "noAccount": "Don't have an account?",
+    "no-account": "Don't have an account?",
     "signUp": "Sign Up",
+    "create-here": "Create one here",
     "forgotPassword": "Forgot Password?",
-    "submit": "Submit"
+    "forgot-password": "Forgot Password?",
+    "submit": "Submit",
+    "button": "Sign In",
+    "signing-in": "Signing in...",
+    "accountIncomplete": "Account Incomplete",
+    "accountIncompleteDesc": "Your account needs to be completed. Please verify your email and finish registration."
   },
   "pricing": {
     "title": "Pricing Plans",
     "description": "Choose the plan that fits your needs.",
     "freePlanTitle": "Free",
-    "freePlanDescription": "Perfect for trying out Pantry.",
+    "freePlanDescription": "Perfect for trying out Prefud.",
     "basicPlanTitle": "Basic",
     "basicPlanDescription": "Essential features for individuals.",
     "premiumPlanTitle": "Premium",
@@ -67,7 +210,7 @@ export const en = {
     "save": "Save"
   },
   "whyPantry": {
-    "title": "Why Choose Pantry?",
+    "title": "Why Choose Prefud?",
     "reason1Title": "Personalized Meal Plans",
     "reason1Description": "Get meal plans tailored to your dietary needs and preferences.",
     "reason2Title": "AI-Powered Recommendations",
@@ -75,7 +218,7 @@ export const en = {
     "reason3Title": "Easy-to-Follow Recipes",
     "reason3Description": "Access simple, step-by-step recipes that anyone can follow.",
     "reason4Title": "Save Time and Reduce Stress",
-    "reason4Description": "Let Pantry handle the meal planning so you can focus on other things.",
+    "reason4Description": "Let Prefud handle the meal planning so you can focus on other things.",
     "reason5Title": "Discover New Recipes",
     "reason5Description": "Explore a wide variety of delicious and healthy recipes.",
     "reason6Title": "Achieve Your Health Goals",
@@ -84,14 +227,14 @@ export const en = {
   "termsAndConditions": {
     "title": "Terms and Conditions",
     "lastUpdated": "Last updated: [Date]",
-    "introduction": "Welcome to Pantry! These terms and conditions outline the rules and regulations for the use of our services.",
-    "acceptance": "By accessing this website and using our services, you accept these terms and conditions in full. Do not continue to use Pantry if you do not accept all of the terms and conditions stated on this page.",
+    "introduction": "Welcome to Prefud! These terms and conditions outline the rules and regulations for the use of our services.",
+    "acceptance": "By accessing this website and using our services, you accept these terms and conditions in full. Do not continue to use Prefud if you do not accept all of the terms and conditions stated on this page.",
     "services": "Our services include providing personalized meal plans, AI-powered recommendations, and easy-to-follow recipes.",
     "userAccounts": "To access certain features, you may need to create a user account. You are responsible for maintaining the confidentiality of your account and password.",
-    "intellectualProperty": "All content on this website, including text, graphics, logos, and images, is the property of Pantry and is protected by copyright laws.",
-    "limitationOfLiability": "Pantry shall not be liable for any indirect, special, or consequential damages arising out of or in any way connected with the use of our services.",
+    "intellectualProperty": "All content on this website, including text, graphics, logos, and images, is the property of Prefud and is protected by copyright laws.",
+    "limitationOfLiability": "Prefud shall not be liable for any indirect, special, or consequential damages arising out of or in any way connected with the use of our services.",
     "governingLaw": "These terms and conditions are governed by and construed in accordance with the laws of [Your Country/State].",
-    "changesToTerms": "Pantry reserves the right to revise these terms and conditions at any time. By using this website, you agree to be bound by the current version of these terms and conditions."
+    "changesToTerms": "Prefud reserves the right to revise these terms and conditions at any time. By using this website, you agree to be bound by the current version of these terms and conditions."
   },
   "notFound": {
     "title": "404 - Page Not Found",
@@ -218,10 +361,240 @@ export const en = {
       "box": "Box"
     }
   },
+  "aiMealCreator": {
+    "markAsDoneBtn": "Mark as Done",
+    "markAsDoneSuccess": "Meal marked as consumed successfully!",
+    "markAsDoneError": "Failed to mark meal as consumed. Please try again."
+  },
   "mealPlanCreator": {
     "cuisine": {
       "customCountry": "Add Country Cuisine",
       "customCountryPlaceholder": "Enter a country for its cuisine (e.g., Brazil, Morocco)"
     }
+  },
+  "mealPlanner": {
+    "title": "Meal Planner",
+    "description": "Create and manage your weekly meal plans",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "aiMealCreatorStepper": {
+    "backToMeals": "Back",
+    "createAIMealTitle": "AI Meal Creator",
+    "loaderMessage": "Analyzing your preferences and creating the perfect meal...",
+    "servingsLabel": "Servings",
+    "cookingTimeLabel": "Time (min)",
+    "skillLevelLabel": "Skill Level",
+    "budgetLabel": "Budget",
+    "mealNamePlaceholder": "e.g., My Special Sunday Dinner",
+    "mealType": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack",
+      "dessert": "Dessert",
+      "appetizer": "Appetizer"
+    },
+    "dietary": {
+      "vegetarian": "Vegetarian",
+      "vegan": "Vegan",
+      "glutenfree": "Gluten-Free",
+      "dairyfree": "Dairy-Free",
+      "keto": "Keto",
+      "paleo": "Paleo",
+      "lowcarb": "Low-Carb",
+      "pescatarian": "Pescatarian"
+    },
+    "cuisine": {
+      "italian": "Italian",
+      "mexican": "Mexican",
+      "asian": "Asian",
+      "mediterranean": "Mediterranean",
+      "indian": "Indian",
+      "american": "American",
+      "french": "French",
+      "japanese": "Japanese",
+      "thai": "Thai",
+      "chinese": "Chinese",
+      "spanish": "Spanish",
+      "greek": "Greek"
+    },
+    "health": {
+      "weightloss": "Weight Loss",
+      "musclegain": "Muscle Gain",
+      "hearthealth": "Heart Health",
+      "energyboost": "Energy Boost",
+      "immunesupport": "Immune Support",
+      "digestivehealth": "Digestive Health",
+      "antiinflammatory": "Anti-Inflammatory",
+      "detox": "Detox"
+    },
+    "allergy": {
+      "nuts": "Nuts",
+      "peanuts": "Peanuts",
+      "shellfish": "Shellfish",
+      "eggs": "Eggs",
+      "dairy": "Dairy",
+      "soy": "Soy",
+      "wheat": "Wheat",
+      "sesame": "Sesame"
+    },
+    "skillLevel": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "budget": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "chat": {
+      "welcome": "👋 Hi! I'm your AI meal assistant. Let's create something delicious together! What type of meal are you craving?",
+      "mealName": "Great choice! 🎉 Do you have a name for this meal? (Optional - just type or skip)",
+      "dishName": "🍽️ Do you have a specific dish in mind? e.g. Mac and Cheese (Optional)",
+      "details": "⚡ Let's set up the details — servings, cooking time, skill level, and budget.",
+      "dietary": "🥗 Any dietary restrictions? Select all that apply.",
+      "cuisine": "🌍 Any cuisine preferences? Select all that sound good!",
+      "healthGoals": "💪 Any health goals for this meal?",
+      "allergies": "⚠️ Any allergies or food intolerances I should know about?",
+      "extras": "📝 Anything else? Dislikes, special requests, or custom allergies? (Optional)",
+      "none": "None",
+      "skipped": "Skipped",
+      "confirm": "Confirm",
+      "skip": "Skip →",
+      "continue": "Continue",
+      "generate": "Generate My Meal",
+      "letsGo": "Let's go! 🚀",
+      "readyTitle": "Here's your meal plan summary:",
+      "confirmPrompt": "Looks good? Hit **Generate** to create your meal! 🚀",
+      "typePlaceholder": "Type here or skip...",
+      "dishPlaceholder": "e.g., Mac and Cheese",
+      "servingsLabel": "servings",
+      "budgetSuffix": "budget"
+    },
+    "review": {
+      "mealType": "Type",
+      "mealName": "Name",
+      "dish": "Dish",
+      "servings": "Servings",
+      "cookingTime": "Time",
+      "skillLevel": "Skill",
+      "budget": "Budget",
+      "dietaryRestrictions": "Diet",
+      "cuisinePreferences": "Cuisine",
+      "healthGoals": "Goals",
+      "allergies": "Allergies",
+      "specialRequests": "Notes"
+    }
+  },
+  "mealPlanView": {
+    "editPlan": "Edit Plan",
+    "days": "Days", 
+    "persons": "Persons",
+    "mealsPerDay": "Meals/Day",
+    "mealSchedule": "Meal Schedule",
+    "shoppingList": "Shopping List",
+    "meal": "meal",
+    "planned": "planned",
+    "min": "min",
+    "calories": "calories",
+    "completed": "Completed",
+    "markAsDone": "Mark as Done",
+    "noMealsPlanned": "No meals planned for this day",
+    "shoppingSummary": "Shopping Summary",
+    "items": "items",
+    "selected": "selected",
+    "estimated": "estimated",
+    "selectAll": "Select All",
+    "addToPantry": "Add to Pantry",
+    "addToPantryOne": "Add to Pantry",
+    "addToCart": "Add to Cart",
+    "addToCartOne": "Add to Cart",
+    "addedToCart": "Added to Cart",
+    "itemsAddedToCart": "items added to your shopping cart",
+    "noShoppingList": "No shopping list available for this meal plan",
+    "confirmDelete": "Are you sure you want to delete this meal?",
+    "mealCompleted": "Meal completed!",
+    "mealCompletedDesc": "Great job on completing your meal!",
+    "mealUncompleted": "Meal marked as not done",
+    "mealUncompletedDesc": "Meal status updated successfully",
+    "updateError": "Update failed",
+    "updateErrorDesc": "Failed to update meal status. Please try again.",
+    "calendarView": "Calendar View",
+    "kidsUnder5": "Kids < 5",
+    "kids5to12": "Kids 5-12",
+    "noMeals": "No meals",
+    "addedToPantry": "Added to Pantry",
+    "planDetails": "Plan Details",
+    "maxCookingTime": "Max Cooking Time",
+    "skillLevel": "Skill Level",
+    "budget": "Budget",
+    "language": "Language",
+    "cuisines": "Cuisines",
+    "healthGoals": "Health Goals",
+    "dietaryRestrictions": "Dietary Restrictions",
+    "allergies": "Allergies & Intolerances",
+    "dislikes": "Dislikes"
+  },
+  "landing": {
+    "badge": "Your AI kitchen assistant",
+    "headline": "Cook amazing meals with what you",
+    "headlineHighlight": "already have",
+    "subheadline": "Prefud uses AI to plan meals, generate shopping lists, guide you step-by-step while cooking, and help you save money by using the ingredients you already have at home.",
+    "ctaPrimary": "Start Free",
+    "ctaSecondary": "See How It Works",
+    "noCreditCard": "Credit card required",
+    "problemTitle": "Stop wasting food and money",
+    "problemSubtitle": "Most people buy groceries without knowing exactly what they already have.",
+    "problem1": "Buying duplicate ingredients",
+    "problem2": "Food expiring in the fridge",
+    "problem3": "Spending more than necessary",
+    "problem4": "Not knowing what to cook",
+    "problemFix": "Prefud fixes that with AI.",
+    "howTitle": "How Prefud Works",
+    "howSubtitle": "Five simple steps to a smarter kitchen",
+    "step1Title": "Add what you have",
+    "step1Desc": "Quickly add the ingredients in your fridge and pantry.",
+    "step2Title": "AI plans your meals",
+    "step2Desc": "Prefud suggests meals using what you already own.",
+    "step3Title": "Smart shopping list",
+    "step3Desc": "Only buy what you actually need.",
+    "step4Title": "AI generates your list",
+    "step4Desc": "Don't have ingredients? No problem. AI creates complete meal plans and shopping lists so you know exactly what to buy at the market.",
+    "step5Title": "Cook step by step",
+    "step5Desc": "Follow simple instructions generated for each recipe.",
+    "featuresTitle": "What makes Prefud powerful",
+    "feature1Title": "AI Meal Planning",
+    "feature1Desc": "Get personalized meal suggestions based on the ingredients you already have.",
+    "feature2Title": "Smart Grocery Lists",
+    "feature2Desc": "Prefud automatically creates a shopping list for missing ingredients.",
+    "feature3Title": "Step-by-Step Cooking",
+    "feature3Desc": "Clear instructions so you can cook every meal confidently.",
+    "feature4Title": "Pantry Tracking",
+    "feature4Desc": "Know exactly what ingredients you have at home.",
+    "feature5Title": "Save Money",
+    "feature5Desc": "Buy only what you need and reduce food waste.",
+    "feature6Title": "Reduce Waste",
+    "feature6Desc": "Use what you have before it expires. Good for you and the planet.",
+    "imagineTitle": "Imagine your kitchen working like this",
+    "imagineSubtitle": "Open Prefud and instantly see:",
+    "imagine1": "Ingredients you already have",
+    "imagine2": "Meals you can cook right now",
+    "imagine3": "What you need to buy",
+    "imagine4": "Simple cooking instructions",
+    "imagineFooter": "Your kitchen becomes organized, efficient, and smarter.",
+    "realLifeTitle": "Designed for real life",
+    "realLife1": "Save money on groceries",
+    "realLife2": "Reduce food waste",
+    "realLife3": "Cook better meals",
+    "realLife4": "Plan your week easily",
+    "realLifeFooter": "All in one place.",
+    "finalTitle": "Start cooking smarter today",
+    "finalSubtitle": "Join early users using Prefud to simplify their kitchen.",
+    "terms": "Terms",
+    "privacy": "Privacy"
   }
 };

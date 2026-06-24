@@ -1,4 +1,118 @@
 export const es = {
+  "common": {
+    "back": "Volver",
+    "continue": "Continuar",
+    "cancel": "Cancelar"
+  },
+  "cart": {
+    "title": "Carrito de Compras",
+    "items": "artículos",
+    "inCart": "en el carrito",
+    "clearAll": "Limpiar Todo",
+    "addedAt": "Agregado",
+    "empty": {
+      "title": "Tu carrito está vacío",
+      "description": "Agrega ingredientes de tus planes de comida o recetas para comenzar.",
+      "backButton": "Volver al Panel"
+    },
+    "checkout": {
+      "proceedToCheckout": "Proceder al Pago"
+    }
+  },
+  "checkout": {
+    "steps": {
+      "deliveryMethod": "Método de Entrega",
+      "storeSelection": "Selección de Tienda",
+      "address": "Dirección",
+      "payment": "Pago",
+      "summary": "Resumen del Pedido",
+      "confirmation": "Pedido Confirmado"
+    },
+    "deliveryMethod": {
+      "title": "¿Cómo te gustaría recibir tu pedido?",
+      "subtitle": "Elige tu método de entrega preferido",
+      "delivery": {
+        "title": "Entrega a Domicilio",
+        "description": "Recibe tus compras en tu puerta",
+        "fee": "$4.99 tarifa de entrega"
+      },
+      "pickup": {
+        "title": "Recoger en Tienda",
+        "description": "Recoge tu pedido en la tienda",
+        "fee": "$1.99 tarifa de servicio"
+      }
+    },
+    "storeSelection": {
+      "title": "Elige tu tienda",
+      "subtitle": "Selecciona dónde te gustaría comprar"
+    },
+    "address": {
+      "delivery": {
+        "title": "Dirección de entrega",
+        "subtitle": "¿Dónde debemos entregar tu pedido?"
+      },
+      "pickup": {
+        "title": "Ubicación de recogida",
+        "subtitle": "Elige una ubicación de tienda para recoger"
+      },
+      "default": "Predeterminada",
+      "addNew": "Agregar Nueva Dirección",
+      "form": {
+        "street": "Dirección",
+        "city": "Ciudad",
+        "state": "Estado",
+        "zipCode": "Código Postal",
+        "country": "País",
+        "save": "Guardar Dirección"
+      }
+    },
+    "payment": {
+      "title": "Método de pago",
+      "subtitle": "¿Cómo te gustaría pagar?",
+      "default": "Predeterminado",
+      "expires": "Expira",
+      "addNew": "Agregar Nueva Tarjeta",
+      "form": {
+        "name": "Nombre del Titular",
+        "number": "Número de Tarjeta",
+        "expiry": "MM/AA",
+        "cvv": "CVV",
+        "save": "Guardar Tarjeta"
+      }
+    },
+    "summary": {
+      "title": "Resumen del pedido",
+      "subtitle": "Revisa tu pedido antes del pago",
+      "items": "Artículos del Pedido",
+      "delivery": "Detalles de Entrega",
+      "pickup": "Detalles de Recogida",
+      "payment": "Método de Pago",
+      "subtotal": "Subtotal",
+      "deliveryFee": "Tarifa de Entrega",
+      "serviceFee": "Tarifa de Servicio",
+      "total": "Total",
+      "deliveryTime": "Entrega en 1-2 horas",
+      "pickupTime": "Listo para recoger en 30 minutos",
+      "processPayment": "Procesar Pago"
+    },
+    "confirmation": {
+      "title": "¡Pedido Confirmado!",
+      "subtitle": "Tu pedido ha sido realizado exitosamente",
+      "orderNumber": "Número de Pedido",
+      "estimatedDelivery": "Entrega Estimada",
+      "estimatedPickup": "Listo para Recoger",
+      "today": "Hoy",
+      "deliveryAddress": "Dirección de Entrega",
+      "pickupLocation": "Ubicación de Recogida",
+      "total": "Total Pagado",
+      "items": "artículos",
+      "nextSteps": "¿Qué Sigue?",
+      "step1": "Recibirás actualizaciones del pedido por email y SMS",
+      "step2": "Rastrea el estado de tu pedido en tiempo real",
+      "step3": "Califica tu experiencia después de la entrega/recogida",
+      "done": "Volver al Dashboard"
+    }
+  },
   signup: {
     title: "Crea tu cuenta gratis",
     name: "Nombre",
@@ -17,22 +131,50 @@ export const es = {
     language: {
       select: "Selecciona tu idioma",
     },
+    account: "Cuenta",
+    "account.title": "Crea tu cuenta",
+    "account.description": "Ingresa tu correo y crea una contraseña para comenzar",
+    "account.email": "Correo electrónico",
+    "account.password": "Contraseña",
+    verify: "Verificar",
+    "verify.title": "Verifica tu correo",
+    profile: "Perfil",
+    plan: "Plan",
+    payment: "Pago",
+    emailPlaceholder: "Ingresa tu correo electrónico",
+    passwordPlaceholder: "Crea una contraseña segura",
+    otpSent: "Hemos enviado un código de 6 dígitos a",
+    enterOTP: "Ingresa el código de verificación enviado a tu correo",
+    verifyEmail: "Verificar correo",
+    didntReceiveCode: "¿No recibiste el código?",
+    resendCode: "Reenviar código",
+    "ageError.title": "❌ Requisito de edad",
+    "ageError.description": "Debes tener al menos 18 años para crear una cuenta.",
   },
   signin: {
     title: "Inicia sesión en tu cuenta",
+    subtitle: "Ingresa tus credenciales para acceder a tu cuenta",
     email: "Correo electrónico",
+    "email.placeholder": "Ingresa tu correo electrónico",
     password: "Contraseña",
+    "password.placeholder": "Ingresa tu contraseña",
     forgotPassword: "¿Olvidaste tu contraseña?",
+    "forgot-password": "¿Olvidaste tu contraseña?",
     button: "Iniciar sesión",
+    "signing-in": "Iniciando sesión...",
     noAccount: "¿No tienes una cuenta?",
+    "no-account": "¿No tienes una cuenta?",
     signUp: "Crea una cuenta",
+    "create-here": "Crea una aquí",
     emailValidation: "Por favor, introduce un correo electrónico válido",
     passwordValidation: "La contraseña debe tener al menos 6 caracteres",
     success: "Sesión iniciada con éxito",
     error: "Error al iniciar sesión",
+    accountIncomplete: "Cuenta incompleta",
+    accountIncompleteDesc: "Tu cuenta necesita ser completada. Verifica tu correo y termina el registro.",
   },
   index: {
-    title: "Bienvenido a Pantry",
+    title: "Bienvenido a Prefud",
     description:
       "La mejor aplicación para gestionar tus comidas y llevar una vida saludable.",
     button: "Empieza ahora",
@@ -46,9 +188,9 @@ export const es = {
     testimonials: {
       title: "Testimonios",
       user1:
-        "Pantry me ha ayudado a comer de forma más saludable y a ahorrar tiempo en la cocina.",
+        "Prefud me ha ayudado a comer de forma más saludable y a ahorrar tiempo en la cocina.",
       user2:
-        "Con Pantry, planificar mis comidas es más fácil que nunca. ¡Lo recomiendo!",
+        "Con Prefud, planificar mis comidas es más fácil que nunca. ¡Lo recomiendo!",
     },
   },
   pricing: {
@@ -76,15 +218,15 @@ export const es = {
     monthly: "mensual",
   },
   whyPantry: {
-    title: "¿Por qué elegir Pantry?",
+    title: "¿Por qué elegir Prefud?",
     reason1: "Ahorra tiempo y dinero",
     reason2: "Come de forma más saludable",
     reason3: "Planifica tus comidas fácilmente",
     reason4: "Gestiona tus recetas en un solo lugar",
     description1:
-      "Con Pantry, puedes planificar tus comidas de forma rápida y sencilla, ahorrando tiempo y dinero en la compra.",
+      "Con Prefud, puedes planificar tus comidas de forma rápida y sencilla, ahorrando tiempo y dinero en la compra.",
     description2:
-      "Pantry te ayuda a comer de forma más saludable, ofreciéndote recetas y planes de comidas equilibrados.",
+      "Prefud te ayuda a comer de forma más saludable, ofreciéndote recetas y planes de comidas equilibrados.",
     description3:
       "Planifica tus comidas semanales en pocos minutos y olvídate de pensar qué comer cada día.",
     description4:
@@ -223,10 +365,240 @@ export const es = {
       "box": "Caja"
     }
   },
+  "aiMealCreator": {
+    "markAsDoneBtn": "Marcar como hecha",
+    "markAsDoneSuccess": "¡Comida marcada como consumida exitosamente!",
+    "markAsDoneError": "Error al marcar la comida como consumida. Inténtalo de nuevo."
+  },
   "mealPlanCreator": {
     "cuisine": {
       "customCountry": "Agregar Cocina de País",
       "customCountryPlaceholder": "Ingresa un país para su cocina (ej., Brasil, Marruecos)"
     }
+  },
+  "mealPlanner": {
+    "title": "Planificador de Comidas",
+    "description": "Crea y gestiona tus planes de comidas semanales",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente"
+    }
+  },
+  "aiMealCreatorStepper": {
+    "backToMeals": "Volver",
+    "createAIMealTitle": "Creador de Comida IA",
+    "loaderMessage": "Analizando tus preferencias y creando la comida perfecta...",
+    "servingsLabel": "Porciones",
+    "cookingTimeLabel": "Tiempo (min)",
+    "skillLevelLabel": "Nivel de Habilidad",
+    "budgetLabel": "Presupuesto",
+    "mealNamePlaceholder": "ej., Mi Cena Especial del Domingo",
+    "mealType": {
+      "breakfast": "Desayuno",
+      "lunch": "Almuerzo",
+      "dinner": "Cena",
+      "snack": "Merienda",
+      "dessert": "Postre",
+      "appetizer": "Aperitivo"
+    },
+    "dietary": {
+      "vegetarian": "Vegetariano",
+      "vegan": "Vegano",
+      "glutenfree": "Sin Gluten",
+      "dairyfree": "Sin Lácteos",
+      "keto": "Keto",
+      "paleo": "Paleo",
+      "lowcarb": "Bajo en Carbohidratos",
+      "pescatarian": "Pescatariano"
+    },
+    "cuisine": {
+      "italian": "Italiana",
+      "mexican": "Mexicana",
+      "asian": "Asiática",
+      "mediterranean": "Mediterránea",
+      "indian": "India",
+      "american": "Americana",
+      "french": "Francesa",
+      "japanese": "Japonesa",
+      "thai": "Tailandesa",
+      "chinese": "China",
+      "spanish": "Española",
+      "greek": "Griega"
+    },
+    "health": {
+      "weightloss": "Pérdida de Peso",
+      "musclegain": "Ganancia Muscular",
+      "hearthealth": "Salud del Corazón",
+      "energyboost": "Aumento de Energía",
+      "immunesupport": "Apoyo Inmunológico",
+      "digestivehealth": "Salud Digestiva",
+      "antiinflammatory": "Antiinflamatorio",
+      "detox": "Desintoxicación"
+    },
+    "allergy": {
+      "nuts": "Frutos Secos",
+      "peanuts": "Cacahuetes",
+      "shellfish": "Mariscos",
+      "eggs": "Huevos",
+      "dairy": "Lácteos",
+      "soy": "Soja",
+      "wheat": "Trigo",
+      "sesame": "Sésamo"
+    },
+    "skillLevel": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    },
+    "budget": {
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto"
+    },
+    "chat": {
+      "welcome": "👋 ¡Hola! Soy tu asistente de comidas IA. ¡Creemos algo delicioso juntos! ¿Qué tipo de comida se te antoja?",
+      "mealName": "¡Gran elección! 🎉 ¿Tienes un nombre para esta comida? (Opcional - escribe o salta)",
+      "dishName": "🍽️ ¿Tienes un plato específico en mente? ej. Macarrones con Queso (Opcional)",
+      "details": "⚡ Configuremos los detalles — porciones, tiempo de cocción, nivel de habilidad y presupuesto.",
+      "dietary": "🥗 ¿Alguna restricción dietética? Selecciona todas las que apliquen.",
+      "cuisine": "🌍 ¿Preferencias de cocina? ¡Selecciona las que te gusten!",
+      "healthGoals": "💪 ¿Algún objetivo de salud para esta comida?",
+      "allergies": "⚠️ ¿Alguna alergia o intolerancia alimentaria que deba saber?",
+      "extras": "📝 ¿Algo más? ¿Disgustos, solicitudes especiales o alergias personalizadas? (Opcional)",
+      "none": "Ninguno",
+      "skipped": "Omitido",
+      "confirm": "Confirmar",
+      "skip": "Saltar →",
+      "continue": "Continuar",
+      "generate": "Generar Mi Comida",
+      "letsGo": "¡Vamos! 🚀",
+      "readyTitle": "Aquí está el resumen de tu plan de comidas:",
+      "confirmPrompt": "¿Se ve bien? ¡Presiona **Generar** para crear tu comida! 🚀",
+      "typePlaceholder": "Escribe aquí o salta...",
+      "dishPlaceholder": "ej., Macarrones con Queso",
+      "servingsLabel": "porciones",
+      "budgetSuffix": "presupuesto"
+    },
+    "review": {
+      "mealType": "Tipo",
+      "mealName": "Nombre",
+      "dish": "Plato",
+      "servings": "Porciones",
+      "cookingTime": "Tiempo",
+      "skillLevel": "Habilidad",
+      "budget": "Presupuesto",
+      "dietaryRestrictions": "Dieta",
+      "cuisinePreferences": "Cocina",
+      "healthGoals": "Objetivos",
+      "allergies": "Alergias",
+      "specialRequests": "Notas"
+    }
+  },
+  "mealPlanView": {
+    "editPlan": "Editar Plan",
+    "days": "Días",
+    "persons": "Personas", 
+    "mealsPerDay": "Comidas/Día",
+    "mealSchedule": "Horario de Comidas",
+    "shoppingList": "Lista de Compras",
+    "meal": "comida",
+    "planned": "planificada",
+    "min": "min",
+    "calories": "calorías",
+    "completed": "Completado",
+    "markAsDone": "Marcar como Hecho",
+    "noMealsPlanned": "No hay comidas planificadas para este día",
+    "shoppingSummary": "Resumen de Compras",
+    "items": "artículos",
+    "selected": "seleccionados",
+    "estimated": "estimado",
+    "selectAll": "Seleccionar Todo",
+    "addToPantry": "Agregar a la Despensa",
+    "addToPantryOne": "Agregar a la Despensa",
+    "addToCart": "Agregar al Carrito",
+    "addToCartOne": "Agregar al Carrito",
+    "addedToCart": "Agregado al Carrito",
+    "itemsAddedToCart": "elementos agregados a tu carrito de compras",
+    "noShoppingList": "No hay lista de compras disponible para este plan de comidas",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta comida?",
+    "mealCompleted": "¡Comida completada!",
+    "mealCompletedDesc": "¡Buen trabajo completando tu comida!",
+    "mealUncompleted": "Comida marcada como no hecha",
+    "mealUncompletedDesc": "Estado de la comida actualizado exitosamente",
+    "updateError": "Actualización falló",
+    "updateErrorDesc": "No se pudo actualizar el estado de la comida. Por favor intenta de nuevo.",
+    "calendarView": "Vista Calendario",
+    "kidsUnder5": "Niños < 5",
+    "kids5to12": "Niños 5-12",
+    "noMeals": "Sin comidas",
+    "addedToPantry": "Agregado a la Despensa",
+    "planDetails": "Detalles del Plan",
+    "maxCookingTime": "Tiempo Máximo de Cocción",
+    "skillLevel": "Nivel de Habilidad",
+    "budget": "Presupuesto",
+    "language": "Idioma",
+    "cuisines": "Cocinas",
+    "healthGoals": "Objetivos de Salud",
+    "dietaryRestrictions": "Restricciones Dietéticas",
+    "allergies": "Alergias e Intolerancias",
+    "dislikes": "No le gusta"
+  },
+  "landing": {
+    "badge": "Tu asistente de cocina con IA",
+    "headline": "Cocina platos increíbles con lo que",
+    "headlineHighlight": "ya tienes",
+    "subheadline": "Prefud usa IA para planificar comidas, generar listas de compras, guiarte paso a paso mientras cocinas y ayudarte a ahorrar dinero usando los ingredientes que ya tienes en casa.",
+    "ctaPrimary": "Empieza Gratis",
+    "ctaSecondary": "Mira Cómo Funciona",
+    "noCreditCard": "No se requiere tarjeta de crédito",
+    "problemTitle": "Deja de desperdiciar comida y dinero",
+    "problemSubtitle": "La mayoría de las personas compran sin saber exactamente lo que ya tienen.",
+    "problem1": "Comprar ingredientes duplicados",
+    "problem2": "Comida caducando en la nevera",
+    "problem3": "Gastar más de lo necesario",
+    "problem4": "No saber qué cocinar",
+    "problemFix": "Prefud soluciona eso con IA.",
+    "howTitle": "Cómo funciona Prefud",
+    "howSubtitle": "Cinco pasos simples para una cocina más inteligente",
+    "step1Title": "Agrega lo que tienes",
+    "step1Desc": "Agrega rápidamente los ingredientes de tu nevera y despensa.",
+    "step2Title": "La IA planifica tus comidas",
+    "step2Desc": "Prefud sugiere comidas usando lo que ya tienes.",
+    "step3Title": "Lista de compras inteligente",
+    "step3Desc": "Compra solo lo que realmente necesitas.",
+    "step4Title": "La IA genera tu lista",
+    "step4Desc": "¿No tienes ingredientes? No hay problema. La IA crea planes de comida completos y listas de compras para que sepas exactamente qué comprar en el mercado.",
+    "step5Title": "Cocina paso a paso",
+    "step5Desc": "Sigue instrucciones simples generadas para cada receta.",
+    "featuresTitle": "Lo que hace poderoso a Prefud",
+    "feature1Title": "Planificación con IA",
+    "feature1Desc": "Recibe sugerencias personalizadas basadas en los ingredientes que ya tienes.",
+    "feature2Title": "Listas de Compras Inteligentes",
+    "feature2Desc": "Prefud crea automáticamente una lista de compras con los ingredientes faltantes.",
+    "feature3Title": "Cocina Paso a Paso",
+    "feature3Desc": "Instrucciones claras para cocinar cada comida con confianza.",
+    "feature4Title": "Control de Despensa",
+    "feature4Desc": "Sabe exactamente qué ingredientes tienes en casa.",
+    "feature5Title": "Ahorra Dinero",
+    "feature5Desc": "Compra solo lo necesario y reduce el desperdicio.",
+    "feature6Title": "Reduce el Desperdicio",
+    "feature6Desc": "Usa lo que tienes antes de que expire. Bueno para ti y el planeta.",
+    "imagineTitle": "Imagina tu cocina funcionando así",
+    "imagineSubtitle": "Abre Prefud y ve al instante:",
+    "imagine1": "Ingredientes que ya tienes",
+    "imagine2": "Comidas que puedes cocinar ahora",
+    "imagine3": "Lo que necesitas comprar",
+    "imagine4": "Instrucciones simples para cocinar",
+    "imagineFooter": "Tu cocina se vuelve organizada, eficiente e inteligente.",
+    "realLifeTitle": "Diseñado para la vida real",
+    "realLife1": "Ahorra en compras",
+    "realLife2": "Reduce el desperdicio",
+    "realLife3": "Cocina mejor",
+    "realLife4": "Planifica tu semana fácilmente",
+    "realLifeFooter": "Todo en un solo lugar.",
+    "finalTitle": "Empieza a cocinar más inteligente hoy",
+    "finalSubtitle": "Únete a los primeros usuarios que usan Prefud para simplificar su cocina.",
+    "terms": "Términos",
+    "privacy": "Privacidad"
   }
 };

@@ -1,36 +1,30 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
-import {
   ArrowLeft,
-  ArrowRight,
+  Send,
   Sparkles,
-  Calendar,
-  Users,
-  Clock,
   ChefHat,
-  DollarSign,
-  Globe,
+  Bot,
+  User,
+  Check,
+  RotateCcw,
+  Plus,
+  Minus,
+  Utensils,
+  Calendar,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import {
-  createMealPlan,
-  transformApiMealPlanToLocal,
-} from "@/services/mealPlanService";
+import { createMealPlanJob } from "@/services/mealPlanJobService";
+import { useMealPlanJob } from "@/contexts/MealPlanJobContext";
 import { useCookingLoader } from "@/hooks/useCookingLoader";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import MealPlanTimeoutModal from "./MealPlanTimeoutModal";
 import SubscriptionUpgradeModal from "./SubscriptionUpgradeModal";
+import MealPlanView from "./MealPlanView";
+import { trackEvent } from "@/services/analytics";
 
 interface MealPlanCreatorStepperProps {
   onPlanCreated: (plan: any) => void;
@@ -39,1137 +33,525 @@ interface MealPlanCreatorStepperProps {
   isEditing?: boolean;
 }
 
+type ChatStep =
+  | "planName"
+  | "planDescription"
+  | "startDate"
+  | "numberOfDays"
+  | "numberOfPersons"
+  | "kidsUnder5"
+  | "kids5to12"
+  | "mealsPerDay"
+  | "dietary"
+  | "cuisine"
+  | "maxCookTime"
+  | "skillLevel"
+  | "budgetRange"
+  | "allergies"
+  | "healthGoals"
+  | "extras"
+  | "summary"
+  | "generating";
+
+interface ChatMessage {
+  id: string;
+  role: "bot" | "user";
+  text: string;
+  options?: { key: string; label: string }[];
+  multiSelect?: boolean;
+  inputType?: "text" | "textarea" | "date" | "stepper";
+  step?: ChatStep;
+  selected?: string[];
+  skippable?: boolean;
+}
+
 const MealPlanCreatorStepper = ({
   onPlanCreated,
   onBack,
   initialData,
   isEditing,
 }: MealPlanCreatorStepperProps) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [planData, setPlanData] = useState({
+  const { user, refreshMealPlans } = useUser();
+  const { language, t } = useLanguage();
+  const { toast } = useToast();
+  const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { startJob } = useMealPlanJob();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const [currentStep, setCurrentStep] = useState<ChatStep>("planName");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [textInput, setTextInput] = useState("");
+  const [multiSelected, setMultiSelected] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const initializedRef = useRef(false);
+
+  // Stepper values
+  const [numberOfDays, setNumberOfDays] = useState(initialData?.preferences?.numberOfDays || 7);
+  const [numberOfPersons, setNumberOfPersons] = useState(initialData?.preferences?.numberOfPersons || 1);
+  const [kidsUnder5, setKidsUnder5] = useState(initialData?.preferences?.numberKidsLessThan5 || 0);
+  const [kids5to12, setKids5to12] = useState(initialData?.preferences?.numberKids5To12 || 0);
+  const [mealsPerDay, setMealsPerDay] = useState(initialData?.preferences?.mealsPerDay || 3);
+  const [maxCookTime, setMaxCookTime] = useState(initialData?.preferences?.maxCookingTime || 30);
+
+  const [customCuisine, setCustomCuisine] = useState("");
+  const [showCustomCuisineInput, setShowCustomCuisineInput] = useState(false);
+  const [customAllergy, setCustomAllergy] = useState("");
+  const [showCustomAllergyInput, setShowCustomAllergyInput] = useState(false);
+
+  // Modals
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [createdPlan, setCreatedPlan] = useState<any>(null);
+  const [showPlanView, setShowPlanView] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
+
+  const [planData, setPlanData] = useState<any>({
     planName: initialData?.name || "",
     planDescription: initialData?.description || "",
     startDate: initialData?.startDate || "",
     numberOfDays: initialData?.preferences?.numberOfDays || 7,
-    numberOfPersons:
-      initialData?.preferences?.numberOfPersons ||
-      initialData?.preferences?.people ||
-      1,
+    numberOfPersons: initialData?.preferences?.numberOfPersons || 1,
+    numberKidsLessThan5: initialData?.preferences?.numberKidsLessThan5 || 0,
+    numberKids5To12: initialData?.preferences?.numberKids5To12 || 0,
     mealsPerDay: initialData?.preferences?.mealsPerDay || 3,
     dietaryRestrictions: initialData?.preferences?.dietaryRestrictions || [],
     cuisinePreferences: initialData?.preferences?.cuisinePreferences || [],
     allergiesIntolerances: initialData?.preferences?.allergiesIntolerance || [],
-    additionalAllergies: "",
     maxCookTime: initialData?.preferences?.maxCookingTime || 30,
     cookingSkillLevel: initialData?.preferences?.cookingSkillLevel || "",
     budgetRange: initialData?.preferences?.budgetRange || "",
-    dislikes: [],
     healthGoals: initialData?.preferences?.healthGoals || [],
-    numberKidsLessThan5: initialData?.preferences?.numberKidsLessThan5 || 0,
-    numberKids5To12: initialData?.preferences?.numberKids5To12 || 0,
+    dislikes: "",
+    additionalAllergies: "",
   });
-  const [customCuisines, setCustomCuisines] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
-  const [createdPlan, setCreatedPlan] = useState<any>(null);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  const { user, refreshMealPlans } = useUser();
-  const { language } = useLanguage();
-  const { toast } = useToast();
-  const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
-  const { t } = useLanguage();
-  const customCountryRef = useRef<HTMLInputElement | null>(null);
-
-  const steps = [
-    {
-      id: 1,
-      title: t("mealPlanCreator.planDetails") || "Plan Details",
-      description:
-        t("mealPlanCreator.planDetails.desc") ||
-        "Basic information about your meal plan",
-    },
-    {
-      id: 2,
-      title: t("mealPlanCreator.dietary.title") || "Dietary Preferences",
-      description:
-        t("mealPlanCreator.dietary.desc") ||
-        "Tell us about your dietary needs and restrictions",
-    },
-    {
-      id: 3,
-      title: t("mealPlanCreator.cuisine.label") || "Cuisine & Cooking",
-      description:
-        t("mealPlanCreator.cuisine.label.desc") ||
-        "Cuisine preferences and cooking constraints",
-    },
-    {
-      id: 4,
-      title: t("mealPlanCreator.foodPref") || "Food Preferences",
-      description:
-        t("mealPlanCreator.foodPref.desc") ||
-        "Foods you like and dislike (optional)",
-    },
-    {
-      id: 5,
-      title: t("mealPlanCreator.generatePlan") || "Generate Plan",
-      description:
-        t("mealPlanCreator.generatePlan.desc") ||
-        "Review and create your meal plan",
-    },
+  // Options
+  const dietaryOptions = [
+    { key: "Vegetarian", label: t("mealPlanCreator.dietary.vegetarian") || "Vegetarian" },
+    { key: "Vegan", label: t("mealPlanCreator.dietary.vegan") || "Vegan" },
+    { key: "Gluten-Free", label: t("mealPlanCreator.dietary.glutenFree") || "Gluten-Free" },
+    { key: "Dairy-Free", label: t("mealPlanCreator.dietary.dairyFree") || "Dairy-Free" },
+    { key: "Keto", label: t("mealPlanCreator.dietary.keto") || "Keto" },
+    { key: "Paleo", label: t("mealPlanCreator.dietary.paleo") || "Paleo" },
+    { key: "Autism", label: t("mealPlanCreator.dietary.autism") || "Autism" },
   ];
 
-  const getLanguageDisplayName = (languageCode: string) => {
-    const displayMap: { [key: string]: string } = {
-      en: "English",
-      es: "Español",
-      pt: "Português",
-      fr: "Français",
-      de: "Deutsch",
-      it: "Italiano",
+  const cuisineOptions = [
+    { key: "Italian", label: t("mealPlanCreator.cuisine.italian") || "Italian" },
+    { key: "Mexican", label: t("mealPlanCreator.cuisine.mexican") || "Mexican" },
+    { key: "Asian", label: t("mealPlanCreator.cuisine.asian") || "Asian" },
+    { key: "American", label: t("mealPlanCreator.cuisine.american") || "American" },
+    { key: "Ecuadorian", label: t("mealPlanCreator.cuisine.ecuadorian") || "Ecuadorian" },
+    { key: "Chinese", label: t("mealPlanCreator.cuisine.chinese") || "Chinese" },
+    { key: "Indian", label: t("mealPlanCreator.cuisine.indian") || "Indian" },
+    { key: "__other__", label: t("mealPlanCreator.cuisine.other") || "Other" },
+  ];
+
+  const allergiesOptions = [
+    { key: "Nuts", label: t("mealPlanCreator.dietary.allergy.nuts") || "Nuts" },
+    { key: "Shellfish", label: t("mealPlanCreator.dietary.allergy.shellfish") || "Shellfish" },
+    { key: "Soy", label: t("mealPlanCreator.dietary.allergy.soy") || "Soy" },
+    { key: "Eggs", label: t("mealPlanCreator.dietary.allergy.eggs") || "Eggs" },
+    { key: "Fish", label: t("mealPlanCreator.dietary.allergy.fish") || "Fish" },
+    { key: "__other__", label: t("mealPlanCreator.allergy.other") || "Other" },
+  ];
+
+  const healthGoalsOptions = [
+    { key: "Weight Loss", label: t("mealPlanCreator.healthGoals.weightLoss") || "Weight Loss" },
+    { key: "Muscle Gain", label: t("mealPlanCreator.healthGoals.muscleGain") || "Muscle Gain" },
+    { key: "Heart Health", label: t("mealPlanCreator.healthGoals.heartHealth") || "Heart Health" },
+    { key: "Diabetes Friendly", label: t("mealPlanCreator.healthGoals.diabetesFriendly") || "Diabetes Friendly" },
+  ];
+
+  const skillOptions = [
+    { key: "Beginner", label: t("mealPlanCreator.cooking.skillLevel.beginner") || "Beginner" },
+    { key: "Intermediate", label: t("mealPlanCreator.cooking.skillLevel.inter") || "Intermediate" },
+    { key: "Advanced", label: t("mealPlanCreator.cooking.skillLevel.adv") || "Advanced" },
+  ];
+
+  const budgetOptions = [
+    { key: "Low", label: t("mealPlanCreator.cooking.budget.low") || "Low" },
+    { key: "Medium", label: t("mealPlanCreator.cooking.budget.medium") || "Medium" },
+    { key: "High", label: t("mealPlanCreator.cooking.budget.high") || "High" },
+  ];
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, currentStep]);
+
+  // Initialize first bot message
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+    addBotMessage(
+      t("mealPlanCreator.chat.welcome") || "👋 Hi! Let's create your personalized meal plan. What would you like to name it?",
+      undefined,
+      { inputType: "text" }
+    );
+  }, []);
+
+  const addBotMessage = (text: string, options?: { key: string; label: string }[], config?: Partial<ChatMessage>) => {
+    const msg: ChatMessage = {
+      id: Date.now().toString() + Math.random(),
+      role: "bot",
+      text,
+      options,
+      ...config,
     };
-    return displayMap[languageCode.toLowerCase()] || "English";
+    setMessages((prev) => [...prev, msg]);
   };
 
-  const handleDataChange = (stepData: any) => {
-    setPlanData((prev) => ({ ...prev, ...stepData }));
+  const addUserMessage = (text: string) => {
+    const msg: ChatMessage = {
+      id: Date.now().toString() + Math.random(),
+      role: "user",
+      text,
+    };
+    setMessages((prev) => [...prev, msg]);
   };
 
-  const addCustomCuisine = (country: string) => {
-    const formattedCountry = country.trim();
-    console.log('🔍 Adding custom cuisine:', formattedCountry);
-    console.log('🔍 Current cuisinePreferences before:', planData.cuisinePreferences);
-    console.log('🔍 Current customCuisines before:', customCuisines);
-    
-    if (formattedCountry) {
-      // Check if it's not already in cuisinePreferences (case insensitive)
-      const isAlreadyInPreferences = planData.cuisinePreferences.some(cuisine => 
-        cuisine.toLowerCase() === formattedCountry.toLowerCase()
-      );
-      
-      // Check if it's not already in customCuisines (case insensitive)
-      const isAlreadyInCustom = customCuisines.some(c => 
-        c.toLowerCase() === formattedCountry.toLowerCase()
-      );
-      
-      console.log('🔍 Is already in preferences:', isAlreadyInPreferences);
-      console.log('🔍 Is already in custom:', isAlreadyInCustom);
-      
-      if (!isAlreadyInPreferences && !isAlreadyInCustom) {
-        // Add to custom cuisines for display first
-        const newCustomCuisines = [...customCuisines, formattedCountry];
-        setCustomCuisines(newCustomCuisines);
-        
-        // Add to cuisinePreferences immediately and automatically select it
-        const updatedCuisines = [...planData.cuisinePreferences, formattedCountry];
-        handleDataChange({ cuisinePreferences: updatedCuisines });
-        
-        console.log('🔍 Updated customCuisines:', newCustomCuisines);
-        console.log('🔍 Updated cuisinePreferences:', updatedCuisines);
-        
-        toast({
-          title: "Cuisine Added & Selected",
-          description: `${formattedCountry} cuisine has been added and selected automatically.`,
-        });
-      } else {
-        toast({
-          title: "Already Added",
-          description: `${formattedCountry} cuisine is already in your preferences.`,
-        });
+  const handleOptionSelect = (key: string, label: string) => {
+    if (currentStep === "skillLevel") {
+      addUserMessage(label);
+      setPlanData((prev: any) => ({ ...prev, cookingSkillLevel: key }));
+      setCurrentStep("budgetRange");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.budget") || "💰 What's your budget range?",
+          budgetOptions
+        );
+      }, 400);
+    } else if (currentStep === "budgetRange") {
+      addUserMessage(label);
+      setPlanData((prev: any) => ({ ...prev, budgetRange: key }));
+      setCurrentStep("allergies");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.allergies") || "⚠️ Any allergies or food intolerances?",
+          allergiesOptions,
+          { multiSelect: true, skippable: true }
+        );
+      }, 400);
+    }
+  };
+
+  const handleMultiSelectConfirm = () => {
+    const allOpts = [...dietaryOptions, ...cuisineOptions, ...healthGoalsOptions, ...allergiesOptions];
+    const labels = multiSelected.map((k) => allOpts.find((o) => o.key === k)?.label || k);
+
+    if (currentStep === "dietary") {
+      addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("mealPlanCreator.chat.none") || "None");
+      setPlanData((prev: any) => ({ ...prev, dietaryRestrictions: [...multiSelected] }));
+      setMultiSelected([]);
+      setCurrentStep("cuisine");
+      setShowCustomCuisineInput(false);
+      setCustomCuisine("");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.cuisine") || "🌍 Any cuisine preferences? Select all that apply.",
+          cuisineOptions,
+          { multiSelect: true, skippable: true }
+        );
+      }, 400);
+    } else if (currentStep === "cuisine") {
+      const finalCuisine = [...multiSelected.filter(k => k !== "__other__")];
+      if (customCuisine.trim()) finalCuisine.push(customCuisine.trim());
+      const displayLabels = finalCuisine.map((k) => {
+        const found = cuisineOptions.find((o) => o.key === k);
+        return found ? found.label : k;
+      });
+      addUserMessage(displayLabels.length > 0 ? displayLabels.join(", ") : t("mealPlanCreator.chat.none") || "None");
+      setPlanData((prev: any) => ({ ...prev, cuisinePreferences: finalCuisine }));
+      setMultiSelected([]);
+      setShowCustomCuisineInput(false);
+      setCustomCuisine("");
+      setCurrentStep("maxCookTime");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.maxCookTime") || "⏱️ What's the maximum cooking time per meal (in minutes)?",
+          undefined,
+          { inputType: "stepper" }
+        );
+      }, 400);
+    } else if (currentStep === "allergies") {
+      const finalAllergies = [...multiSelected.filter(k => k !== "__other__")];
+      if (customAllergy.trim()) finalAllergies.push(customAllergy.trim());
+      const displayAllergyLabels = finalAllergies.map((k) => {
+        const found = allergiesOptions.find((o) => o.key === k);
+        return found ? found.label : k;
+      });
+      addUserMessage(displayAllergyLabels.length > 0 ? displayAllergyLabels.join(", ") : t("mealPlanCreator.chat.none") || "None");
+      setPlanData((prev: any) => ({ ...prev, allergiesIntolerances: finalAllergies }));
+      setMultiSelected([]);
+      setShowCustomAllergyInput(false);
+      setCustomAllergy("");
+      setCurrentStep("healthGoals");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.healthGoals") || "💪 Any health goals for this plan?",
+          healthGoalsOptions,
+          { multiSelect: true, skippable: true }
+        );
+      }, 400);
+    } else if (currentStep === "healthGoals") {
+      addUserMessage(multiSelected.length > 0 ? labels.join(", ") : t("mealPlanCreator.chat.none") || "None");
+      setPlanData((prev: any) => ({ ...prev, healthGoals: [...multiSelected] }));
+      setMultiSelected([]);
+      setCurrentStep("extras");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.extras") || "📝 Any dislikes or special requests? (Optional)",
+          undefined,
+          { inputType: "textarea", skippable: true }
+        );
+      }, 400);
+    }
+  };
+
+  const toggleMultiSelect = (key: string) => {
+    if (key === "__other__") {
+      if (currentStep === "cuisine") {
+        setShowCustomCuisineInput((prev) => !prev);
+        if (showCustomCuisineInput) setCustomCuisine("");
+      } else if (currentStep === "allergies") {
+        setShowCustomAllergyInput((prev) => !prev);
+        if (showCustomAllergyInput) setCustomAllergy("");
       }
-    }
-  };
-
-  const validateStep = (step: number) => {
-    switch (step) {
-      case 1:
-        if (!planData.planName.trim()) {
-          toast({
-            title: "Missing Information",
-            description: "Please enter a plan name.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        if (!planData.planDescription.trim()) {
-          toast({
-            title: "Missing Information",
-            description: "Please enter a plan description.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        if (!planData.startDate) {
-          toast({
-            title: "Missing Information",
-            description: "Please select a start date.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        if (planData.numberOfDays < 1) {
-          toast({
-            title: "Invalid Information",
-            description: "Number of days must be at least 1.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        if (planData.numberOfPersons < 1) {
-          toast({
-            title: "Invalid Information",
-            description: "Number of persons must be at least 1.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        if (planData.mealsPerDay < 1) {
-          toast({
-            title: "Invalid Information",
-            description: "Meals per day must be at least 1.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        return true;
-      default:
-        return true;
-    }
-  };
-
-  const handleNext = () => {
-    if (!validateStep(currentStep)) {
       return;
     }
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+    setMultiSelected((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
+  const handleTextSubmit = () => {
+    const value = textInput.trim();
+
+    if (currentStep === "planName") {
+      if (!value) {
+        toast({ title: t("mealPlanCreator.chat.missingName") || "Please enter a plan name.", variant: "destructive" });
+        return;
+      }
+      addUserMessage(value);
+      setPlanData((prev: any) => ({ ...prev, planName: value }));
+      setTextInput("");
+      setCurrentStep("planDescription");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.description") || "📝 Add a brief description for your plan. (Optional)",
+          undefined,
+          { inputType: "text", skippable: true }
+        );
+      }, 400);
+    } else if (currentStep === "planDescription") {
+      addUserMessage(value || (t("mealPlanCreator.chat.skipped") || "Skipped"));
+      setPlanData((prev: any) => ({ ...prev, planDescription: value || `Personalized meal plan` }));
+      setTextInput("");
+      setCurrentStep("startDate");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.startDate") || "📅 When should your meal plan start?",
+          undefined,
+          { inputType: "date" }
+        );
+      }, 400);
+    } else if (currentStep === "extras") {
+      addUserMessage(value || (t("mealPlanCreator.chat.skipped") || "Skipped"));
+      setPlanData((prev: any) => ({ ...prev, dislikes: value, additionalAllergies: value }));
+      setTextInput("");
+      setCurrentStep("summary");
+      setTimeout(() => showSummary(), 400);
     }
   };
 
-  const renderStepContent = () => {
+  const handleDateSubmit = () => {
+    const value = textInput.trim();
+    if (!value) {
+      toast({ title: t("mealPlanCreator.chat.missingDate") || "Please select a start date.", variant: "destructive" });
+      return;
+    }
+    addUserMessage(value);
+    setPlanData((prev: any) => ({ ...prev, startDate: value }));
+    setTextInput("");
+    setCurrentStep("numberOfDays");
+    setTimeout(() => {
+      addBotMessage(
+        t("mealPlanCreator.chat.numberOfDays") || "📆 How many days should the plan cover?",
+        undefined,
+        { inputType: "stepper" }
+      );
+    }, 400);
+  };
+
+  // Stepper config
+  const getStepperConfig = () => {
     switch (currentStep) {
-      case 1:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5 text-purple-600" />
-                <span>
-                  {t("mealPlanCreator.planDetails") || "Plan Details"}
-                </span>
-              </CardTitle>
-              <CardDescription>
-                {t("mealPlanCreator.planDetails.desc") ||
-                  "Basic information about your meal plan"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Plan Name */}
-              <div>
-                <label
-                  htmlFor="planName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.planName") || "Plan Name"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="planName"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.planName}
-                  onChange={(e) =>
-                    handleDataChange({ planName: e.target.value })
-                  }
-                  placeholder={
-                    t("mealPlanCreator.planNamePlaceholder") ||
-                    "e.g., Weekly Healthy Meals"
-                  }
-                />
-              </div>
-
-              {/* Plan Description */}
-              <div>
-                <label
-                  htmlFor="planDescription"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.planDescription") || "Plan Description"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <Textarea
-                  id="planDescription"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.planDescription}
-                  onChange={(e) =>
-                    handleDataChange({ planDescription: e.target.value })
-                  }
-                  placeholder={
-                    t("mealPlanCreator.planDescriptionPlaceholder") ||
-                    "Describe your meal plan goals or preferences..."
-                  }
-                  rows={3}
-                />
-              </div>
-
-              {/* Start Date */}
-              <div>
-                <label
-                  htmlFor="startDate"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.startDate") || "Start Date"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="startDate"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.startDate || ""}
-                  onChange={(e) =>
-                    handleDataChange({ startDate: e.target.value })
-                  }
-                />
-              </div>
-
-              {/* Number of Days */}
-              <div>
-                <label
-                  htmlFor="numberOfDays"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.numberOfDays") || "Number of Days"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="numberOfDays"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.numberOfDays}
-                  onChange={(e) =>
-                    handleDataChange({ numberOfDays: parseInt(e.target.value) })
-                  }
-                  min="1"
-                />
-              </div>
-
-              {/* Number of Persons */}
-              <div>
-                <label
-                  htmlFor="numberOfPersons"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.numberOfPersons") || "Number of Persons"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="numberOfPersons"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.numberOfPersons}
-                  onChange={(e) =>
-                    handleDataChange({
-                      numberOfPersons: parseInt(e.target.value),
-                    })
-                  }
-                  min="1"
-                />
-              </div>
-              {/* Number of Kids under 5 */}
-              <div>
-                <label
-                  htmlFor="numberOfPersons"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.kidsUnder5") ||
-                    "Number of Kids under 5 years"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="numberKidsLessThan5"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.numberKidsLessThan5}
-                  onChange={(e) =>
-                    handleDataChange({
-                      numberKidsLessThan5: parseInt(e.target.value),
-                    })
-                  }
-                  min="0"
-                />
-              </div>
-              {/* Number of Kids from 5 to 12 */}
-              <div>
-                <label
-                  htmlFor="numberOfPersons"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.kidsFrom5to12") ||
-                    "Number of Kids from 5 to 12 years"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="numberKids5To12"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.numberKids5To12}
-                  onChange={(e) =>
-                    handleDataChange({
-                      numberKids5To12: parseInt(e.target.value),
-                    })
-                  }
-                  min="1"
-                />
-              </div>
-
-              {/* Meals Per Day */}
-              <div>
-                <label
-                  htmlFor="mealsPerDay"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.mealsPerDay") || "Meals per Day"}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="mealsPerDay"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.mealsPerDay}
-                  onChange={(e) =>
-                    handleDataChange({ mealsPerDay: parseInt(e.target.value) })
-                  }
-                  min="1"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 2:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <ChefHat className="h-5 w-5 text-green-600" />
-                <span>
-                  {t("mealPlanCreator.dietary.title") || "Dietary Preferences"}
-                </span>
-              </CardTitle>
-              <CardDescription>
-                {t("mealPlanCreator.dietary.desc") ||
-                  "Tell us about your dietary needs and restrictions"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Dietary Restrictions */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("mealPlanCreator.dietary.restrictions") ||
-                    "Dietary Restrictions"}
-                </label>
-                <div className="mt-2 space-y-2">
-                  {[
-                    {
-                      key: "Vegetarian",
-                      label:
-                        t("mealPlanCreator.dietary.vegetarian") || "Vegetarian",
-                    },
-                    {
-                      key: "Vegan",
-                      label: t("mealPlanCreator.dietary.vegan") || "Vegan",
-                    },
-                    {
-                      key: "Gluten-Free",
-                      label:
-                        t("mealPlanCreator.dietary.glutenFree") ||
-                        "Gluten-Free",
-                    },
-                    {
-                      key: "Dairy-Free",
-                      label:
-                        t("mealPlanCreator.dietary.dairyFree") || "Dairy-Free",
-                    },
-                    {
-                      key: "Keto",
-                      label: t("mealPlanCreator.dietary.keto") || "Keto",
-                    },
-                    {
-                      key: "Paleo",
-                      label: t("mealPlanCreator.dietary.paleo") || "Paleo",
-                    },
-                     {
-                      key: "Austism",
-                      label: t("mealPlanCreator.dietary.autism") || "Autism",
-                    },
-                  ].map((option) => (
-                    <div key={option.key} className="flex items-center">
-                      <input
-                        id={`dietary-${option.key}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.dietaryRestrictions.includes(
-                          option.key
-                        )}
-                        onChange={(e) => {
-                          const updatedRestrictions = e.target.checked
-                            ? [...planData.dietaryRestrictions, option.key]
-                            : planData.dietaryRestrictions.filter(
-                                (item) => item !== option.key
-                              );
-                          handleDataChange({
-                            dietaryRestrictions: updatedRestrictions,
-                          });
-                        }}
-                      />
-                      <label
-                        htmlFor={`dietary-${option.key}`}
-                        className="ml-3 block text-sm text-gray-700"
-                      >
-                        {option.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Allergies Intolerances */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("mealPlanCreator.dietary.allergies") ||
-                    "Allergies & Intolerances"}
-                </label>
-                <div className="mt-2 space-y-2">
-                  {[
-                    {
-                      key: "Nuts",
-                      label:
-                        t("mealPlanCreator.dietary.allergy.nuts") || "Nuts",
-                    },
-                    {
-                      key: "Shellfish",
-                      label:
-                        t("mealPlanCreator.dietary.allergy.shellfish") ||
-                        "Shellfish",
-                    },
-                    {
-                      key: "Soy",
-                      label: t("mealPlanCreator.dietary.allergy.soy") || "Soy",
-                    },
-                    {
-                      key: "Eggs",
-                      label:
-                        t("mealPlanCreator.dietary.allergy.eggs") || "Eggs",
-                    },
-                    {
-                      key: "Fish",
-                      label:
-                        t("mealPlanCreator.dietary.allergy.fish") || "Fish",
-                    },
-                  ].map((option) => (
-                    <div key={option.key} className="flex items-center">
-                      <input
-                        id={`allergy-${option.key}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.allergiesIntolerances.includes(
-                          option.key
-                        )}
-                        onChange={(e) => {
-                          const updatedAllergies = e.target.checked
-                            ? [...planData.allergiesIntolerances, option.key]
-                            : planData.allergiesIntolerances.filter(
-                                (item) => item !== option.key
-                              );
-                          handleDataChange({
-                            allergiesIntolerances: updatedAllergies,
-                          });
-                        }}
-                      />
-                      <label
-                        htmlFor={`allergy-${option.key}`}
-                        className="ml-3 block text-sm text-gray-700"
-                      >
-                        {option.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 3:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Clock className="h-5 w-5 text-blue-600" />
-                <span>
-                  {t("mealPlanCreator.cuisine.label") || "Cuisine & Cooking"}
-                </span>
-              </CardTitle>
-              <CardDescription>
-                {t("mealPlanCreator.cuisine.label.desc") ||
-                  "Cuisine preferences and cooking constraints"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Cuisine Preferences */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("mealPlanCreator.cuisine.title") || "Cuisine Preferences"}
-                </label>
-                <div className="mt-2 space-y-2">
-                  {[
-                    {
-                      key: "Italian",
-                      label: t("mealPlanCreator.cuisine.italian") || "Italian",
-                    },
-                    {
-                      key: "Mexican",
-                      label: t("mealPlanCreator.cuisine.mexican") || "Mexican",
-                    },
-                    {
-                      key: "Asian",
-                      label: t("mealPlanCreator.cuisine.asian") || "Asian",
-                    },
-                    {
-                      key: "American",
-                      label:
-                        t("mealPlanCreator.cuisine.american") || "American",
-                    },
-                    {
-                      key: "Ecuadorian",
-                      label:
-                        t("mealPlanCreator.cuisine.ecuadorian") || "Ecuadorian",
-                    },
-                    {
-                      key: "Chinese",
-                      label: t("mealPlanCreator.cuisine.chinese") || "Chinese",
-                    },
-                    {
-                      key: "Indian",
-                      label: t("mealPlanCreator.cuisine.indian") || "Indian",
-                    },
-                    ...customCuisines.map((cuisine) => ({
-                      key: cuisine,
-                      label: cuisine,
-                    })),
-                  ].map((option) => (
-                    <div key={option.key} className="flex items-center">
-                      <input
-                        id={`cuisine-${option.key}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.cuisinePreferences.includes(
-                          option.key
-                        )}
-                        onChange={(e) => {
-                          const updatedCuisines = e.target.checked
-                            ? [...planData.cuisinePreferences, option.key]
-                            : planData.cuisinePreferences.filter(
-                                (item) => item !== option.key
-                              );
-                          handleDataChange({
-                            cuisinePreferences: updatedCuisines,
-                          });
-                        }}
-                      />
-                      <label
-                        htmlFor={`cuisine-${option.key}`}
-                        className="ml-3 block text-sm text-gray-700"
-                      >
-                        {option.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Custom Country Cuisine Input */}
-                <div className="mt-4">
-                  <label
-                    htmlFor="customCountry"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    {t("mealPlanCreator.cuisine.customCountry") || "Add Country Cuisine"}
-                  </label>
-                  <input
-                    type="text"
-                    id="customCountry"
-                    ref={customCountryRef}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                    placeholder={t("mealPlanCreator.cuisine.customCountryPlaceholder") || "Enter a country for its cuisine (e.g., Brazil, Morocco)"}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                        e.preventDefault();
-                        addCustomCuisine(e.currentTarget.value.trim());
-                        e.currentTarget.value = '';
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const val = e.currentTarget.value.trim();
-                      if (val) {
-                        addCustomCuisine(val);
-                        e.currentTarget.value = '';
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Max Cook Time */}
-              <div>
-                <label
-                  htmlFor="maxCookTime"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.cooking.maxCook") ||
-                    "Max Cook Time (minutes)"}
-                </label>
-                <input
-                  type="number"
-                  id="maxCookTime"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.maxCookTime}
-                  onChange={(e) =>
-                    handleDataChange({ maxCookTime: parseInt(e.target.value) })
-                  }
-                />
-              </div>
-
-              {/* Cooking Skill Level */}
-              <div>
-                <label
-                  htmlFor="cookingSkillLevel"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.cooking.skillLevel") ||
-                    "Cooking Skill Level"}
-                </label>
-                <select
-                  id="cookingSkillLevel"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.cookingSkillLevel}
-                  onChange={(e) =>
-                    handleDataChange({ cookingSkillLevel: e.target.value })
-                  }
-                >
-                  <option value="">
-                    {t("mealPlanCreator.cooking.skillLevel.select") ||
-                      "Select Skill Level"}
-                  </option>
-                  <option value="Beginner">
-                    {t("mealPlanCreator.cooking.skillLevel.beginner") ||
-                      "Beginner"}
-                  </option>
-                  <option value="Intermediate">
-                    {t("mealPlanCreator.cooking.skillLevel.inter") ||
-                      "Intermediate"}
-                  </option>
-                  <option value="Advanced">
-                    {t("mealPlanCreator.cooking.skillLevel.adv") || "Advanced"}
-                  </option>
-                </select>
-              </div>
-
-              {/* Budget Range */}
-              <div>
-                <label
-                  htmlFor="budgetRange"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.cooking.budget") || "Budget Range"}
-                </label>
-                <select
-                  id="budgetRange"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.budgetRange}
-                  onChange={(e) =>
-                    handleDataChange({ budgetRange: e.target.value })
-                  }
-                >
-                  <option value="">
-                    {t("mealPlanCreator.cooking.budget.select") ||
-                      "Select Budget Range"}
-                  </option>
-                  <option value="Low">
-                    {t("mealPlanCreator.cooking.budget.low") || "Low"}
-                  </option>
-                  <option value="Medium">
-                    {t("mealPlanCreator.cooking.budget.medium") || "Medium"}
-                  </option>
-                  <option value="High">
-                    {t("mealPlanCreator.cooking.budget.high") || "High"}
-                  </option>
-                </select>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 4:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5 text-orange-600" />
-                <span>
-                  {t("mealPlanCreator.foodPref") || "Food Preferences"}
-                </span>
-              </CardTitle>
-              <CardDescription>
-                {t("mealPlanCreator.foodPref.desc") ||
-                  "Foods you like and dislike (optional)"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Dislikes */}
-              <div>
-                <label
-                  htmlFor="dislikes"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t("mealPlanCreator.dislikes") ||
-                    "Dislikes (comma-separated)"}
-                </label>
-                <input
-                  type="text"
-                  id="dislikes"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                  value={planData.dislikes}
-                  onChange={(e) =>
-                    handleDataChange({ dislikes: e.target.value.split(",") })
-                  }
-                />
-              </div>
-
-              {/* Health Goals */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("mealPlanCreator.dietary.healthGoals") || "Health Goals"}
-                </label>
-                <div className="mt-2 space-y-2">
-                  {[
-                    {
-                      key: "Weight Loss",
-                      label:
-                        t("mealPlanCreator.healthGoals.weightLoss") ||
-                        "Weight Loss",
-                    },
-                    {
-                      key: "Muscle Gain",
-                      label:
-                        t("mealPlanCreator.healthGoals.muscleGain") ||
-                        "Muscle Gain",
-                    },
-                    {
-                      key: "Heart Health",
-                      label:
-                        t("mealPlanCreator.healthGoals.heartHealth") ||
-                        "Heart Health",
-                    },
-                    {
-                      key: "Diabetes Friendly",
-                      label:
-                        t("mealPlanCreator.healthGoals.diabetesFriendly") ||
-                        "Diabetes Friendly",
-                    },
-                  ].map((option) => (
-                    <div key={option.key} className="flex items-center">
-                      <input
-                        id={`health-${option.key}`}
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        checked={planData.healthGoals.includes(option.key)}
-                        onChange={(e) => {
-                          const updatedGoals = e.target.checked
-                            ? [...planData.healthGoals, option.key]
-                            : planData.healthGoals.filter(
-                                (item) => item !== option.key
-                              );
-                          handleDataChange({ healthGoals: updatedGoals });
-                        }}
-                      />
-                      <label
-                        htmlFor={`health-${option.key}`}
-                        className="ml-3 block text-sm text-gray-700"
-                      >
-                        {option.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-
-      case 5:
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5 text-purple-600" />
-                <span>
-                  {t("mealPlanCreator.generate.title") || "Generate Your Plan"}
-                </span>
-              </CardTitle>
-              <CardDescription>
-                {t("mealPlanCreator.generate.desc.alt") ||
-                  "Review your preferences and create your personalized meal plan"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-3">
-                  {t("mealPlanCreator.generate.planSummary") || "Plan Summary"}:
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p>
-                      <strong>{t("mealPlanCreator.name") || "Name"}:</strong>{" "}
-                      {planData.planName}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.description") || "Description"}:
-                      </strong>{" "}
-                      {planData.planDescription}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.people") || "Adults"}:
-                      </strong>{" "}
-                      {planData.numberOfPersons}{" "}
-                      {t("mealPlanCreator.persons") || "persons"}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.people") || "Kids 5 to 12"}:
-                      </strong>{" "}
-                      {planData.numberKids5To12}{" "}
-                      {t("mealPlanCreator.kids5to12") || "kids"}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.people") || "Kids under 5"}:
-                      </strong>{" "}
-                      {planData.numberKidsLessThan5}{" "}
-                      {t("mealPlanCreator.kidsless5") || "kids"}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.duration") || "Duration"}:
-                      </strong>{" "}
-                      {planData.numberOfDays}{" "}
-                      {t("mealPlanCreator.days") || "days"}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.mealsPerDay") || "Meals per Day"}:
-                      </strong>{" "}
-                      {planData.mealsPerDay}
-                    </p>
-                  </div>
-                  <div>
-                    <p>
-                      <strong>
-                        {t("mealPlanner.skillLevel") || "Skill Level"}:
-                      </strong>{" "}
-                      {planData.cookingSkillLevel}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.budget") || "Budget"}:
-                      </strong>{" "}
-                      {planData.budgetRange}
-                    </p>
-                    <p>
-                      <strong>
-                        {t("mealPlanCreator.dietary.restrictions") ||
-                          "Dietary Restrictions"}
-                        :
-                      </strong>{" "}
-                      {planData.dietaryRestrictions.length > 0
-                        ? planData.dietaryRestrictions.join(", ")
-                        : "None"}
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <Globe className="h-3 w-3" />
-                      <strong>
-                        {t("mealPlanCreator.language") || "Language"}:
-                      </strong>{" "}
-                      {getLanguageDisplayName(language)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={generateMealPlan}
-                disabled={isGenerating}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg py-6"
-              >
-                <Sparkles className="h-5 w-5 mr-2" />
-                {isGenerating
-                  ? t("mealPlanCreator.generate.btnLoad")
-                  : t("mealPlanCreator.generate.btn")}
-              </Button>
-
-              {isGenerating && (
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
-                    <span>
-                      {t("mealPlanCreator.generate.analyzing") ||
-                        "Analyzing your preferences..."}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {t("mealPlanCreator.generate.takeAFewMoments") ||
-                      "This may take a few moments while we create your personalized meal plan."}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        );
-
-      default:
-        return null;
+      case "numberOfDays": return { value: numberOfDays, set: setNumberOfDays, min: 1, max: 30, step: 1, label: t("mealPlanCreator.numberOfDays") || "Days" };
+      case "numberOfPersons": return { value: numberOfPersons, set: setNumberOfPersons, min: 1, max: 20, step: 1, label: t("mealPlanCreator.numberOfPersons") || "Persons" };
+      case "kidsUnder5": return { value: kidsUnder5, set: setKidsUnder5, min: 0, max: 10, step: 1, label: t("mealPlanCreator.kidsUnder5") || "Kids under 5" };
+      case "kids5to12": return { value: kids5to12, set: setKids5to12, min: 0, max: 10, step: 1, label: t("mealPlanCreator.kidsFrom5to12") || "Kids 5-12" };
+      case "mealsPerDay": return { value: mealsPerDay, set: setMealsPerDay, min: 1, max: 6, step: 1, label: t("mealPlanCreator.mealsPerDay") || "Meals/Day" };
+      case "maxCookTime": return { value: maxCookTime, set: setMaxCookTime, min: 5, max: 180, step: 5, label: t("mealPlanCreator.cooking.maxCook") || "Max Cook Time (min)" };
+      default: return null;
     }
   };
 
-  const generateMealPlan = async () => {
-    console.log("🚀 Generate Meal Plan clicked!");
-    console.log("Current plan data:", planData);
-    console.log("User:", user);
-    //populate the screen of the success modal
-    setCreatedPlan({
-      name: planData.planName,
-      numberOfDays: planData.numberOfDays,
-      numberOfPersons: planData.numberOfPersons,
-      mealsPerDay: planData.mealsPerDay,
+  const handleStepperChange = (delta: number) => {
+    const config = getStepperConfig();
+    if (!config) return;
+    config.set((prev: number) => Math.max(config.min, Math.min(config.max, prev + delta * config.step)));
+  };
+
+  const handleStepperSubmit = () => {
+    const config = getStepperConfig();
+    if (!config) return;
+
+    addUserMessage(`${config.value}`);
+
+    if (currentStep === "numberOfDays") {
+      setPlanData((prev: any) => ({ ...prev, numberOfDays: numberOfDays }));
+      setCurrentStep("numberOfPersons");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.numberOfPersons") || "👥 How many adults will be eating?",
+          undefined,
+          { inputType: "stepper" }
+        );
+      }, 400);
+    } else if (currentStep === "numberOfPersons") {
+      setPlanData((prev: any) => ({ ...prev, numberOfPersons: numberOfPersons }));
+      setCurrentStep("kidsUnder5");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.kidsUnder5") || "👶 How many kids under 5 years?",
+          undefined,
+          { inputType: "stepper" }
+        );
+      }, 400);
+    } else if (currentStep === "kidsUnder5") {
+      setPlanData((prev: any) => ({ ...prev, numberKidsLessThan5: kidsUnder5 }));
+      setCurrentStep("kids5to12");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.kids5to12") || "🧒 How many kids between 5 and 12?",
+          undefined,
+          { inputType: "stepper" }
+        );
+      }, 400);
+    } else if (currentStep === "kids5to12") {
+      setPlanData((prev: any) => ({ ...prev, numberKids5To12: kids5to12 }));
+      setCurrentStep("mealsPerDay");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.mealsPerDay") || "🍽️ How many meals per day?",
+          undefined,
+          { inputType: "stepper" }
+        );
+      }, 400);
+    } else if (currentStep === "mealsPerDay") {
+      setPlanData((prev: any) => ({ ...prev, mealsPerDay: mealsPerDay }));
+      setCurrentStep("dietary");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.dietary") || "🥗 Any dietary restrictions? Select all that apply.",
+          dietaryOptions,
+          { multiSelect: true, skippable: true }
+        );
+      }, 400);
+    } else if (currentStep === "maxCookTime") {
+      setPlanData((prev: any) => ({ ...prev, maxCookTime: maxCookTime }));
+      setCurrentStep("skillLevel");
+      setTimeout(() => {
+        addBotMessage(
+          t("mealPlanCreator.chat.skillLevel") || "👨‍🍳 What's your cooking skill level?",
+          skillOptions
+        );
+      }, 400);
+    }
+  };
+
+  const showSummary = () => {
+    const d = planData;
+    const lines = [
+      `✅ **${t("mealPlanCreator.chat.summaryTitle") || "Here's your meal plan summary:"}**`,
+      "",
+      `📛 ${t("mealPlanCreator.name") || "Name"}: ${d.planName}`,
+      d.planDescription ? `📝 ${t("mealPlanCreator.description") || "Description"}: ${d.planDescription}` : "",
+      `📅 ${t("mealPlanCreator.startDate") || "Start Date"}: ${d.startDate}`,
+      `📆 ${t("mealPlanCreator.numberOfDays") || "Days"}: ${d.numberOfDays}`,
+      `👥 ${t("mealPlanCreator.numberOfPersons") || "Adults"}: ${d.numberOfPersons}`,
+      d.numberKidsLessThan5 > 0 ? `👶 ${t("mealPlanCreator.kidsUnder5") || "Kids under 5"}: ${d.numberKidsLessThan5}` : "",
+      d.numberKids5To12 > 0 ? `🧒 ${t("mealPlanCreator.kidsFrom5to12") || "Kids 5-12"}: ${d.numberKids5To12}` : "",
+      `🍽️ ${t("mealPlanCreator.mealsPerDay") || "Meals/Day"}: ${d.mealsPerDay}`,
+      `⏱️ ${t("mealPlanCreator.cooking.maxCook") || "Max Cook Time"}: ${d.maxCookTime} min`,
+      `👨‍🍳 ${t("mealPlanner.skillLevel") || "Skill Level"}: ${d.cookingSkillLevel}`,
+      `💰 ${t("mealPlanCreator.budget") || "Budget"}: ${d.budgetRange}`,
+      d.dietaryRestrictions?.length ? `🥗 ${t("mealPlanCreator.dietary.restrictions") || "Dietary"}: ${d.dietaryRestrictions.join(", ")}` : "",
+      d.cuisinePreferences?.length ? `🌍 ${t("mealPlanCreator.cuisine.title") || "Cuisine"}: ${d.cuisinePreferences.join(", ")}` : "",
+      d.allergiesIntolerances?.length ? `⚠️ ${t("mealPlanCreator.dietary.allergies") || "Allergies"}: ${d.allergiesIntolerances.join(", ")}` : "",
+      d.healthGoals?.length ? `💪 ${t("mealPlanCreator.dietary.healthGoals") || "Health Goals"}: ${d.healthGoals.join(", ")}` : "",
+      d.dislikes ? `📝 ${t("mealPlanCreator.dislikes") || "Dislikes"}: ${d.dislikes}` : "",
+      "",
+      t("mealPlanCreator.chat.confirmPrompt") || "Looks good? Hit **Generate** to create your meal plan! 🚀",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    addBotMessage(lines, undefined, { step: "summary" });
+  };
+
+  const getLanguageName = (languageCode: string) => {
+    const languageMap: { [key: string]: string } = {
+      en: "english",
+      es: "spanish",
+      pt: "portuguese",
+      fr: "french",
+      de: "german",
+      it: "italian",
+    };
+    return languageMap[languageCode.toLowerCase()] || "english";
+  };
+
+  const handleGenerate = async () => {
+    addUserMessage(t("mealPlanCreator.chat.letsGo") || "Let's go! 🚀");
+    trackEvent("button_click", {
+      button_name: "generate_plan_submit",
+      screen: "generate_mealplan_page",
     });
 
-    // Enhanced validation with toast messages
-    if (!planData.planName.trim()) {
-      console.log("❌ Validation failed: Missing plan name");
-      toast({
-        title: "Missing Information",
-        description: "Please enter a plan name.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!planData.planDescription.trim()) {
-      console.log("❌ Validation failed: Missing plan description");
-      toast({
-        title: "Missing Information",
-        description: "Please enter a plan description.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!planData.startDate) {
-      console.log("❌ Validation failed: Missing start date");
-      toast({
-        title: "Missing Information",
-        description: "Please select a start date.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!user?.id) {
-      console.log("❌ Validation failed: No user ID");
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to create a meal plan.",
-        variant: "destructive",
-      });
+      toast({ title: "Authentication Required", description: "Please log in to create a meal plan.", variant: "destructive" });
       return;
     }
 
-    // Set default values if not provided instead of blocking
-    const effectiveCookingSkillLevel =
-      planData.cookingSkillLevel || "Intermediate";
-    const effectiveBudgetRange = planData.budgetRange || "Medium";
+    const effectiveSkill = planData.cookingSkillLevel || "Intermediate";
+    const effectiveBudget = planData.budgetRange || "Medium";
 
-    console.log("✅ Validation passed, starting meal plan generation...");
-    setIsGenerating(true);
+    showLoader(t("mealPlanCreator.chat.loaderMessage") || "Analyzing your preferences and creating your perfect meal plan...");
 
-    // Show the cooking loader
-    showLoader(
-      "Analyzing your preferences and creating your perfect meal plan..."
-    );
-
-    // Set up timeout for 3 minutes (180 seconds)
     const timeout = setTimeout(() => {
-      console.log("⏰ Meal plan generation timed out after 3 minutes");
       hideLoader();
-      setIsGenerating(false);
-      toast({
-        title: "Still Cooking!",
-        description:
-          "Your meal plan is being prepared in the background. Please check your meal plans in a few minutes.",
-        duration: 5000,
-      });
-      // Navigate back and refresh
-      onBack();
-      refreshMealPlans();
-    }, 180000); // 3 minutes
-
+      setShowTimeoutModal(true);
+    }, 180000);
     setTimeoutId(timeout);
 
     try {
-      const getLanguageName = (languageCode: string) => {
-        const languageMap: { [key: string]: string } = {
-          en: "english",
-          es: "spanish",
-          pt: "portuguese",
-          fr: "french",
-          de: "german",
-          it: "italian",
-        };
-        return languageMap[languageCode.toLowerCase()] || "english";
-      };
-
-      // Ensure any pending custom country input is added
-      let cuisinePrefs = planData.cuisinePreferences;
-      const pendingCustom = customCountryRef.current?.value?.trim();
-      if (pendingCustom) {
-        const exists = cuisinePrefs.some(
-          (c) => c.toLowerCase() === pendingCustom.toLowerCase()
-        );
-        if (!exists) {
-          cuisinePrefs = [...cuisinePrefs, pendingCustom];
-          handleDataChange({ cuisinePreferences: cuisinePrefs });
-        }
-        customCountryRef.current.value = '';
-      }
-
       const requestData = {
         duration: planData.numberOfDays,
         numberPeople: planData.numberOfPersons,
-        numberKids5To12: planData.numberKids5To12,
         numberKidsLessThan5: planData.numberKidsLessThan5,
+        numberKids5To12: planData.numberKids5To12,
         mealsPerDay: planData.mealsPerDay,
         dietaryRestrictions: planData.dietaryRestrictions,
-        cuisinePreferences: cuisinePrefs,
+        cuisinePreferences: planData.cuisinePreferences,
         allergiesIntolerance: planData.allergiesIntolerances,
-        dislikes: [...planData.dislikes, planData.additionalAllergies]
-          .filter((item) => item.trim())
-          .join(", "),
+        dislikes: [planData.dislikes, planData.additionalAllergies].filter((item) => item && item.trim()).join(", "),
         maxCookingTime: planData.maxCookTime,
-        cookingSkillLevel: effectiveCookingSkillLevel,
-        budgetRange: effectiveBudgetRange,
+        cookingSkillLevel: effectiveSkill,
+        budgetRange: effectiveBudget,
         healthGoals: planData.healthGoals,
         language: getLanguageName(language),
         user_id: user.id,
@@ -1178,97 +560,118 @@ const MealPlanCreatorStepper = ({
         plan_description: planData.planDescription,
       };
 
-      console.log("📤 Sending API request with data:", requestData);
-      console.log("🍽️ cuisinePreferences in payload:", requestData.cuisinePreferences);
+      console.log("Creating meal plan job with data:", requestData);
 
-      const apiResponse = await createMealPlan(requestData);
+      const { jobId } = await createMealPlanJob(requestData);
 
-      console.log("✅ API response received:", apiResponse);
-
-      // Clear the timeout since we got a response
       if (timeout) {
         clearTimeout(timeout);
         setTimeoutId(null);
       }
 
-      // Hide the loader
       hideLoader();
-      setIsGenerating(false);
 
-      const transformedPlan = transformApiMealPlanToLocal(apiResponse);
+      startJob(jobId, requestData);
 
-      console.log("🔄 Transformed plan:", transformedPlan);
-
-      // Show success toast
       toast({
-        title: "Meal Plan Created Successfully!",
-        description: `Your  meal plan is ready to explore.`,
+        title: "🍳 Meal Plan Generation Started",
+        description: "We'll notify you as soon as it's ready. You can keep using the app.",
         duration: 5000,
       });
 
-      // Add to context and navigate
-      onPlanCreated(transformedPlan);
-
-      // Refresh meal plans from server
-      await refreshMealPlans();
+      onBack();
     } catch (error: any) {
-      console.error("❌ Error generating meal plan:", error);
-      console.log('Error code:', error.code);
+      console.error("Error generating meal plan:", error);
 
-      // Clear the timeout
       if (timeout) {
         clearTimeout(timeout);
         setTimeoutId(null);
       }
 
-      // Hide the loader
       hideLoader();
-      setIsGenerating(false);
 
-      // Handle specific subscription error
       if (
         error?.code === "03" ||
         error?.response?.data?.code === "03" ||
         (typeof error?.message === "string" && error.message.includes("No meal plans available according to your subscription"))
       ) {
-        console.log('Showing upgrade modal for meal plan stepper code 03');
         setShowUpgradeModal(true);
       } else {
         toast({
           title: "Generation Failed",
-          description:
-            error instanceof Error
-              ? error.message
-              : "Failed to generate meal plan. Please try again.",
+          description: error instanceof Error ? error.message : "Failed to generate meal plan. Please try again.",
           variant: "destructive",
         });
       }
     }
   };
 
+  const handleRestart = () => {
+    setMessages([]);
+    setPlanData({
+      planName: "",
+      planDescription: "",
+      startDate: "",
+      numberOfDays: 7,
+      numberOfPersons: 1,
+      numberKidsLessThan5: 0,
+      numberKids5To12: 0,
+      mealsPerDay: 3,
+      dietaryRestrictions: [],
+      cuisinePreferences: [],
+      allergiesIntolerances: [],
+      maxCookTime: 30,
+      cookingSkillLevel: "",
+      budgetRange: "",
+      healthGoals: [],
+      dislikes: "",
+      additionalAllergies: "",
+    });
+    setMultiSelected([]);
+    setTextInput("");
+    setNumberOfDays(7);
+    setNumberOfPersons(1);
+    setKidsUnder5(0);
+    setKids5to12(0);
+    setMealsPerDay(3);
+    setMaxCookTime(30);
+    setCurrentStep("planName");
+    setIsGenerating(false);
+    setShowCustomCuisineInput(false);
+    setShowCustomAllergyInput(false);
+    setCustomCuisine("");
+    setCustomAllergy("");
+    setTimeout(() => {
+      addBotMessage(
+        t("mealPlanCreator.chat.welcome") || "👋 Hi! Let's create your personalized meal plan. What would you like to name it?",
+        undefined,
+        { inputType: "text" }
+      );
+    }, 100);
+  };
+
   const handleSuccessModalClose = async () => {
     setShowSuccessModal(false);
-
     if (createdPlan) {
-      // Add to context and navigate
       onPlanCreated(createdPlan);
     }
-
-    // Refresh meal plans from server
     try {
       await refreshMealPlans();
     } catch (error) {
       console.error("Error refreshing meal plans:", error);
+    }
+  };
+
+  const handleViewSuccessPlan = () => {
+    if (createdPlan) {
+      setShowSuccessModal(false);
+      setShowPlanView(true);
     }
   };
 
   const handleTimeoutModalClose = async () => {
     setShowTimeoutModal(false);
-
-    // Navigate back to meal planner
     onBack();
-
-    // Refresh meal plans from server in case the plan was created in the background
     try {
       await refreshMealPlans();
     } catch (error) {
@@ -1276,75 +679,287 @@ const MealPlanCreatorStepper = ({
     }
   };
 
+  if (showPlanView && createdPlan) {
+    return (
+      <MealPlanView
+        plan={createdPlan}
+        onBack={() => { setShowPlanView(false); onBack(); }}
+        onEdit={() => setShowPlanView(false)}
+      />
+    );
+  }
+
+  const isMultiSelectStep = ["dietary", "cuisine", "healthGoals", "allergies"].includes(currentStep);
+  const isTextStep = ["planName", "planDescription", "extras"].includes(currentStep);
+  const isDateStep = currentStep === "startDate";
+  const isStepperStep = ["numberOfDays", "numberOfPersons", "kidsUnder5", "kids5to12", "mealsPerDay", "maxCookTime"].includes(currentStep);
+  const isSingleSelectStep = currentStep === "skillLevel" || currentStep === "budgetRange";
+  const isSummaryStep = currentStep === "summary";
+
+  const currentMultiOptions =
+    currentStep === "dietary" ? dietaryOptions :
+    currentStep === "cuisine" ? cuisineOptions :
+    currentStep === "healthGoals" ? healthGoalsOptions :
+    currentStep === "allergies" ? allergiesOptions : [];
+
+  const currentSingleOptions =
+    currentStep === "skillLevel" ? skillOptions :
+    currentStep === "budgetRange" ? budgetOptions : [];
+
+  const stepperConfig = getStepperConfig();
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="w-full max-w-2xl h-full max-h-[100dvh] flex flex-col">
       <LoaderComponent />
-
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="flex items-center space-x-2">
-          <Sparkles className="h-5 w-5 text-purple-600" />
-          <h1 className="text-xl font-semibold">
-            {isEditing ? "Edit" : "Create"}{" "}
-            {t("mealPlanCreator.aiMealPlan") || "AI Meal Plan"}
-          </h1>
-        </div>
-      </div>
+      <div className="flex items-center justify-between px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] shrink-0">
+            <Button variant="ghost" size="sm" onClick={onBack} className="text-white/80 hover:text-white hover:bg-white/10">
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              {t("common.back") || "Back"}
+            </Button>
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full">
+                <Utensils className="h-4 w-4 text-white" />
+              </div>
+              <h1 className="text-lg font-semibold text-white">
+                {isEditing ? t("mealPlanCreator.chat.editTitle") || "Edit Meal Plan" : t("mealPlanCreator.chat.createTitle") || "AI Meal Plan"}
+              </h1>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleRestart} className="text-white/80 hover:text-white hover:bg-white/10">
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
 
-      {/* Progress Steps */}
-      <div className="space-y-4">
-        <Progress
-          value={(currentStep / steps.length) * 100}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs text-gray-500">
-          {steps.map((step) => (
-            <span
-              key={step.id}
-              className={
-                currentStep >= step.id ? "text-purple-600 font-medium" : ""
-              }
-            >
-              {step.title}
-            </span>
-          ))}
-        </div>
-      </div>
+          {/* Chat Messages */}
+          <div className="flex-1 overflow-y-auto px-3 space-y-3 pb-3" ref={scrollRef}>
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`flex gap-2 max-w-[85%] md:max-w-[70%] ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+                  <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 ${
+                    msg.role === "bot" ? "bg-gradient-to-r from-emerald-500 to-teal-500" : "bg-white/20"
+                  }`}>
+                    {msg.role === "bot" ? <Bot className="h-4 w-4 text-white" /> : <User className="h-4 w-4 text-white" />}
+                  </div>
+                  <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
+                    msg.role === "bot"
+                      ? "bg-white/95 text-gray-800 rounded-tl-sm shadow-md"
+                      : "bg-emerald-500 text-white rounded-tr-sm shadow-md"
+                  }`}>
+                    {msg.text}
+                  </div>
+                </div>
+              </div>
+            ))}
 
-      {/* Step Content */}
-      <div className="min-h-[400px]">{renderStepContent()}</div>
+            {/* Active multi-select chips */}
+            {isMultiSelectStep && (
+              <div className="flex justify-start">
+                <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
+                  <div className="shrink-0 w-7 h-7" />
+                  <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md w-full">
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {currentMultiOptions.map((opt) => (
+                        <button
+                          key={opt.key}
+                          onClick={() => toggleMultiSelect(opt.key)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                            multiSelected.includes(opt.key) || (opt.key === "__other__" && ((currentStep === "cuisine" && showCustomCuisineInput) || (currentStep === "allergies" && showCustomAllergyInput)))
+                              ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                              : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
+                          }`}
+                        >
+                          {multiSelected.includes(opt.key) && <Check className="inline h-3 w-3 mr-1" />}
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                    {currentStep === "cuisine" && showCustomCuisineInput && (
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          value={customCuisine}
+                          onChange={(e) => setCustomCuisine(e.target.value.slice(0, 30))}
+                          placeholder={t("mealPlanCreator.cuisine.customCountryPlaceholder") || "Type your cuisine..."}
+                          className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                          maxLength={30}
+                        />
+                      </div>
+                    )}
+                    {currentStep === "allergies" && showCustomAllergyInput && (
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          value={customAllergy}
+                          onChange={(e) => setCustomAllergy(e.target.value.slice(0, 30))}
+                          placeholder={t("mealPlanCreator.allergy.otherPlaceholder") || "Type your allergy..."}
+                          className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                          maxLength={30}
+                        />
+                      </div>
+                    )}
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        onClick={handleMultiSelectConfirm}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4"
+                      >
+                        {(multiSelected.filter(k => k !== "__other__").length > 0 || (currentStep === "cuisine" && customCuisine.trim()) || (currentStep === "allergies" && customAllergy.trim()))
+                          ? `${t("mealPlanCreator.chat.confirm") || "Confirm"} (${multiSelected.filter(k => k !== "__other__").length + ((currentStep === "cuisine" && customCuisine.trim()) || (currentStep === "allergies" && customAllergy.trim()) ? 1 : 0)})`
+                          : t("mealPlanCreator.chat.skip") || "Skip →"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-      {/* Navigation Buttons */}
-      {currentStep < 5 && (
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-            disabled={currentStep === 1}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("mealPlanner.previous") || "Previous"}
-          </Button>
-          <Button
-            onClick={handleNext}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            {t("mealPlanner.next") || "Next"}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+            {/* Single-select options */}
+            {isSingleSelectStep && (
+              <div className="flex justify-start">
+                <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
+                  <div className="shrink-0 w-7 h-7" />
+                  <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md w-full">
+                    <div className="flex flex-wrap gap-2">
+                      {currentSingleOptions.map((opt) => (
+                        <button
+                          key={opt.key}
+                          onClick={() => handleOptionSelect(opt.key, opt.label)}
+                          className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border border-emerald-200"
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Stepper input */}
+            {isStepperStep && stepperConfig && (
+              <div className="flex justify-start">
+                <div className="flex gap-2 max-w-[85%] md:max-w-[70%]">
+                  <div className="shrink-0 w-7 h-7" />
+                  <div className="bg-white/95 rounded-2xl rounded-tl-sm px-4 py-3 shadow-md w-full">
+                    <label className="text-xs font-medium text-gray-500 mb-2 block">{stepperConfig.label}</label>
+                    <div className="flex items-center justify-center gap-4 mb-3">
+                      <button
+                        onClick={() => handleStepperChange(-1)}
+                        disabled={stepperConfig.value <= stepperConfig.min}
+                        className="w-10 h-10 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <span className="text-2xl font-bold text-gray-800 min-w-[60px] text-center">
+                        {stepperConfig.value}
+                      </span>
+                      <button
+                        onClick={() => handleStepperChange(1)}
+                        disabled={stepperConfig.value >= stepperConfig.max}
+                        className="w-10 h-10 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={handleStepperSubmit}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4 w-full"
+                    >
+                      {t("mealPlanCreator.chat.continue") || "Continue"} →
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Summary generate button */}
+            {isSummaryStep && (
+              <div className="flex justify-center pt-2">
+                <Button
+                  onClick={handleGenerate}
+                  size="lg"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-full px-8 shadow-lg shadow-emerald-500/30"
+                >
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  {t("mealPlanCreator.generate.btn") || "Generate My Meal Plan"}
+                </Button>
+              </div>
+            )}
+
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Text Input Area */}
+          {isTextStep && (
+            <div className="shrink-0 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
+              <div className="flex gap-2 bg-white/95 rounded-full px-4 py-2 shadow-lg items-center">
+                <input
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleTextSubmit()}
+                  placeholder={
+                    currentStep === "planName"
+                      ? (t("mealPlanCreator.planNamePlaceholder") || "e.g., Weekly Healthy Meals")
+                      : currentStep === "planDescription"
+                      ? (t("mealPlanCreator.planDescriptionPlaceholder") || "Describe your plan goals...")
+                      : (t("mealPlanCreator.chat.extrasPlaceholder") || "Type here or skip...")
+                  }
+                  className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder:text-gray-400"
+                  maxLength={currentStep === "planName" ? 50 : 100}
+                />
+                <Button
+                  size="sm"
+                  onClick={handleTextSubmit}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full h-8 w-8 p-0"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              {(currentStep === "planDescription" || currentStep === "extras") && (
+                <button
+                  onClick={() => { setTextInput(""); handleTextSubmit(); }}
+                  className="text-xs text-white/60 hover:text-white/90 mt-1.5 ml-4 transition-colors"
+                >
+                  {t("mealPlanCreator.chat.skip") || "Skip →"}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Date Input Area */}
+          {isDateStep && (
+            <div className="shrink-0 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
+              <div className="flex gap-2 bg-white/95 rounded-full px-4 py-2 shadow-lg items-center">
+                <Calendar className="h-4 w-4 text-gray-400" />
+                <input
+                  type="date"
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleDateSubmit()}
+                  className="flex-1 bg-transparent outline-none text-base text-gray-800"
+                />
+                <Button
+                  size="sm"
+                  onClick={handleDateSubmit}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full h-8 w-8 p-0"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
 
       <MealPlanSuccessModal
         isOpen={showSuccessModal}
         onClose={handleSuccessModalClose}
-        mealPlan={createdPlan}
+        onViewPlan={handleViewSuccessPlan}
+        mealPlan={createdPlan ? {
+          name: createdPlan.name || planData.planName,
+          numberOfDays: planData.numberOfDays,
+          numberOfPersons: planData.numberOfPersons,
+          mealsPerDay: planData.mealsPerDay,
+        } : undefined}
       />
 
       <MealPlanTimeoutModal
@@ -1355,7 +970,6 @@ const MealPlanCreatorStepper = ({
       <SubscriptionUpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        featureType="plans"
       />
     </div>
   );

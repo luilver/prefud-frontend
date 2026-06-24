@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,7 +22,6 @@ import {
   Check,
   X,
   User,
-  Mail,
   CreditCard,
   Eye,
   EyeOff,
@@ -29,22 +29,23 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "@/hooks/use-toast";
 import UserProfileForm from "./UserProfileForm";
-import OTPVerification from "./OTPVerification";
+
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import PaymentForm from "./PaymentForm";
-import WelcomeModal from "./WelcomeModal";
 import axios from "axios";
 import { getAllSubscriptionTypes } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
+import { trackEvent } from "@/services/analytics";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
-    "pk_test_51R1tN0QtxIPdrkdTWoyJxB3qmuoh8FVEpRSQFEfCkGQFScfq8TRzCZz4ZJbXxkvhjwTw3vEuyrCizyg1APYcQcrJ00YgxWKyQ5"
+    "pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0"
 );
 
 interface SignupData {
@@ -68,19 +69,25 @@ interface SignupData {
   };
 }
 const BasicURL =
-  import.meta.env.VITE_BASE_URL || "https://pantry-auth-1.onrender.com";
+  import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
 
 const SignupSteps = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const location = useLocation();
+  const incompleteState = location.state as { accountIncomplete?: boolean; email?: string; userId?: string } | null;
+  const isAccountIncomplete = incompleteState?.accountIncomplete === true;
+
+  const [currentStep, setCurrentStep] = useState(isAccountIncomplete ? 1 : 1);
   const [signupData, setSignupData] = useState<SignupData>({
-    email: "",
+    email: incompleteState?.email || "",
     password: "",
+    userId: incompleteState?.userId || undefined,
     wantsSubscription: false,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const [customerId, setCustomerId] = useState<string>("");
@@ -106,6 +113,12 @@ const SignupSteps = () => {
     setIsLoading(true);
 
     try {
+      if (isAccountIncomplete) {
+        console.log("Incomplete account flow: moving to profile");
+        setCurrentStep(2);
+        return;
+      }
+
       console.log("Sending signup request to API:", signupData.email);
 
       const requestData = {
@@ -125,20 +138,16 @@ const SignupSteps = () => {
       const response = await axios.request(config);
       console.log("Signup API response:", response.data);
 
-      // Check if response indicates success with the correct structure
       if (
-        response.data.message &&
-        response.data.message.includes("OTP code has been sent") &&
         response.data.response?.userId
       ) {
         console.log("Showing success toast");
         toast({
           title: "✅ Account Created Successfully!",
-          description: "An OTP code has been sent to your email address.",
+          description: "Your account has been created. Let's complete your profile.",
           duration: 5000,
         });
 
-        // Store userId for OTP verification
         setSignupData((prev) => ({
           ...prev,
           userId: response.data.response.userId,
@@ -151,14 +160,12 @@ const SignupSteps = () => {
     } catch (error: any) {
       console.error("Signup failed:", error);
 
-      // Handle API error responses
       if (error.response?.data?.message) {
         const errorMessage =
           typeof error.response.data.message === "string"
             ? error.response.data.message
             : error.response.data.message.message || "Signup failed";
 
-        console.log("Showing error toast with message:", errorMessage);
         toast({
           title: "❌ Signup Failed",
           description: errorMessage,
@@ -166,7 +173,6 @@ const SignupSteps = () => {
           duration: 5000,
         });
       } else {
-        console.log("Showing generic error toast");
         toast({
           title: "❌ Signup Failed",
           description: "Unable to create account. Please try again.",
@@ -179,16 +185,11 @@ const SignupSteps = () => {
     }
   };
 
-  const handleOTPVerified = () => {
-    console.log("OTP verified successfully");
-    setCurrentStep(3);
-  };
-
   const handleProfileComplete = (profileData: any) => {
     console.log("Profile data saved:", profileData);
 
     setSignupData((prev) => ({ ...prev, profile: profileData }));
-    setCurrentStep(4);
+    setCurrentStep(3);
   };
 
   const handleSubscriptionChoice = async (planId: string) => {
@@ -204,7 +205,7 @@ const SignupSteps = () => {
       // Handle Free subscription - register directly without payment
       await handleFreeSubscription(planId);
     } else {
-      setCurrentStep(5);
+      setCurrentStep(4);
     }
   };
 
@@ -296,42 +297,46 @@ const SignupSteps = () => {
 
       await signup(userData);
 
-      console.log("Mock: Signup completed, showing welcome modal");
+      console.log("Signup completed, flagging welcome modal for dashboard");
+      try {
+        localStorage.setItem("pantry_show_welcome", "1");
+      } catch (e) {
+        console.warn("Could not set welcome flag", e);
+      }
 
-      setTimeout(() => {
-        setShowWelcome(true);
-      }, 100);
+      // Real authentication so AuthContext.user is set and routes unlock
+      if (signupData.email && signupData.password) {
+        try {
+          await login(signupData.email, signupData.password);
+          navigate("/", { replace: true });
+        } catch (loginErr) {
+          console.error("Auto-login after signup failed:", loginErr);
+          toast({
+            title: "Account created",
+            description: "Please sign in to continue.",
+            duration: 5000,
+          });
+          navigate("/signin", { replace: true });
+        }
+      } else {
+        navigate("/signin", { replace: true });
+      }
     } catch (error) {
-      console.error("Mock: Signup failed:", error);
+      console.error("Signup completion failed:", error);
     }
-  };
-
-  const handleWelcomeClose = () => {
-    console.log("Mock: Welcome modal closed, user should now see dashboard");
-    setShowWelcome(false);
   };
 
   const stepItems = [
     { step: 1, title: t("signup.account") || "Account", icon: User, color: "from-primary to-accent" },
+    { step: 2, title: t("signup.profile") || "Profile", icon: User, color: "from-accent to-primary" },
+    { step: 3, title: t("signup.plan") || "Plan", icon: Crown, color: "from-primary to-accent" },
     {
-      step: 2,
-      title: t("signup.verify") || "Verify",
-      icon: Mail,
-      color: "from-primary to-secondary",
-    },
-    { step: 3, title: t("signup.profile") || "Profile", icon: User, color: "from-accent to-primary" },
-    { step: 4, title: t("signup.plan") || "Plan", icon: Crown, color: "from-primary to-accent" },
-    {
-      step: 5,
+      step: 4,
       title: t("signup.payment") || "Payment",
       icon: CreditCard,
       color: "from-secondary to-primary",
     },
   ];
-
-  if (showWelcome) {
-    return <WelcomeModal onClose={handleWelcomeClose} />;
-  }
 
   return (
     <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
@@ -451,7 +456,8 @@ const SignupSteps = () => {
                         }))
                       }
                       required
-                      className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background"
+                      disabled={isAccountIncomplete}
+                      className="h-11 sm:h-12 text-sm border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl transition-all duration-200 bg-background/50 focus:bg-background disabled:opacity-70 disabled:cursor-not-allowed"
                       placeholder={t("signup.emailPlaceholder") || "Enter your email address"}
                     />
                   </div>
@@ -499,6 +505,14 @@ const SignupSteps = () => {
                   type="submit"
                   className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
                   disabled={isLoading}
+                  onClick={async () => {
+                    console.log('step 1 signup');
+                    trackEvent('button_click', {
+                              button_name: `step${currentStep}_submit`,
+                              screen: 'signup_page',
+                            })
+
+                  }}
                 >
                   {isLoading ? (
                     <div className="flex items-center space-x-2">
@@ -519,25 +533,16 @@ const SignupSteps = () => {
       )}
 
       {currentStep === 2 && (
-        <OTPVerification
-          email={signupData.email}
-          userId={signupData.userId || ""}
-          onVerified={handleOTPVerified}
-          onBack={() => setCurrentStep(1)}
-        />
-      )}
-
-      {currentStep === 3 && (
         <UserProfileForm
           onComplete={handleProfileComplete}
-          onBack={() => setCurrentStep(2)}
+          onBack={() => setCurrentStep(1)}
           userId={signupData.userId}
           setCustomer={setCustomerId}
           setUserId={setUserId}
         />
       )}
 
-      {currentStep === 4 && (
+      {currentStep === 3 && (
         <div className="space-y-6 sm:space-y-8">
           <div className="text-center space-y-3 px-2 sm:px-0">
             <div className="flex justify-center mb-4">
@@ -655,6 +660,13 @@ const SignupSteps = () => {
                           ? "bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground"
                           : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
                       }`}
+                      onClick={async () => {
+                        console.log('step 4 plan selection');
+                        trackEvent('button_click', {
+                                  button_name: `step${currentStep}_signup_plan${plan.name}_submit`,
+                                  screen: 'signup_page',
+                                })
+                      }}
                     >
                       <div className="flex items-center space-x-2">
                         <span>{t("signup.plan.choose") || "Choose"} {plan.name}</span>
@@ -669,11 +681,11 @@ const SignupSteps = () => {
         </div>
       )}
 
-      {currentStep === 5 && (
+      {currentStep === 4 && (
         <Elements stripe={stripePromise}>
           <PaymentForm
             onSuccess={handlePaymentSuccess}
-            onBack={() => setCurrentStep(4)}
+            onBack={() => setCurrentStep(3)}
             userInfo={{
               email: signupData.email,
               phone: signupData.profile?.phone || "",

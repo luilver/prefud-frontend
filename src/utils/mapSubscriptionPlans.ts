@@ -6,6 +6,7 @@ export interface ApiSubscriptionType {
   healthyDrinks: number;
   specialMeals: number;
   generatedMeals: number;
+  processImages?: number;
   updatedAt?: string;
   description:string;
 }
@@ -32,7 +33,7 @@ export const mapApiToPlan = (apiPlan: ApiSubscriptionType[]): Plan[] => {
       price: received.price,
       interval: "month",
       description: received.description || "Subscription Plan",
-      features: [ `Meal plans: ${received.mealPlans} `,`Healthy drinks: ${received.healthyDrinks} `,`Special Meals: ${received.specialMeals}`, `Generated meals: ${received.generatedMeals}`],
+      features: [ `Meal plans: ${received.mealPlans} `,`Healthy drinks: ${received.healthyDrinks} `,`Special Meals: ${received.specialMeals}`, `Generated meals: ${received.generatedMeals}`, `Process Images: ${received.processImages ?? 0}`],
       popular: received.name === "Professional", // por ejemplo
       gradient:
         received.name === "Professional"

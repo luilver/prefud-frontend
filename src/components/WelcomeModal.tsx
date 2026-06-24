@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PartyPopper, Sparkles, ChefHat, Calendar, TrendingUp, Camera } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface WelcomeModalProps {
@@ -13,13 +12,12 @@ interface WelcomeModalProps {
 
 const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
 
   const slides = [
     {
       icon: PartyPopper,
-      title: t("welcome.message") || "Welcome to Pantry!",
+      title: t("welcome.message") || "Welcome to Prefud!",
       description: t("welcome.subtitle") || "Your smart kitchen companion is ready to transform your cooking experience.",
       color: "text-purple-600",
       image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=250&fit=crop"
@@ -70,7 +68,6 @@ const WelcomeModal = ({ onClose }: WelcomeModalProps) => {
 
   const handleComplete = () => {
     onClose();
-    navigate('/');
   };
 
   const IconComponent = slides[currentSlide].icon;

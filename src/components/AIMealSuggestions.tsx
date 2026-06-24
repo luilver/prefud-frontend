@@ -1,589 +1,642 @@
-
-import { useState, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Sparkles, Clock, Users, AlertTriangle, Plus, Calendar } from "lucide-react";
+import {
+  Sparkles,
+  Clock,
+  Users,
+  Heart,
+  ChefHat,
+  Leaf,
+  Check,
+  AlertTriangle,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  generateMealsFromPantryJob,
+  PantryMealsNoIngredientsError,
+  PantryMealsSubscriptionLimitError,
+} from "@/services/pantryService";
+import { usePantryMealsJob } from "@/contexts/PantryMealsJobContext";
+import { Slider } from "@/components/ui/slider";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCookingLoader } from "@/hooks/useCookingLoader";
+import { trackEvent } from "@/services/analytics";
 
 interface AIMealSuggestionsProps {
   ingredients: any[];
   onAddMeal: (meal: any, selectedDate?: Date) => void;
 }
 
-const AIMealSuggestions = ({ ingredients, onAddMeal }: AIMealSuggestionsProps) => {
+// Recipe suggestions mapped to ingredient categories
+const RECIPE_SUGGESTIONS: Record<string, { name: string; emoji: string }[]> = {
+  Meat: [{ name: "Garlic Herb Steak", emoji: "🥩" }, { name: "Chicken Stir Fry", emoji: "🍗" }],
+  Dairy: [{ name: "Creamy Pasta Alfredo", emoji: "🧀" }, { name: "Cheese Omelette", emoji: "🥚" }],
+  Vegetables: [{ name: "Garden Veggie Bowl", emoji: "🥗" }, { name: "Roasted Veggie Medley", emoji: "🥕" }],
+  Fruits: [{ name: "Fresh Fruit Smoothie", emoji: "🍹" }, { name: "Fruit Salad", emoji: "🍎" }],
+  Grains: [{ name: "Fried Rice", emoji: "🍚" }, { name: "Grain Bowl", emoji: "🌾" }],
+  Pantry: [{ name: "Pasta al Ajillo", emoji: "🍝" }, { name: "Quick Bean Soup", emoji: "🍲" }],
+};
+
+const AIMealSuggestions = ({
+  ingredients,
+  onAddMeal,
+}: AIMealSuggestionsProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [selectedDay, setSelectedDay] = useState<string>("");
-  const [selectedMealPlan, setSelectedMealPlan] = useState<string>("");
-  const [showDaySelector, setShowDaySelector] = useState<any>(null);
-  const [showMealConflictDialog, setShowMealConflictDialog] = useState<any>(null);
-  const [conflictResolution, setConflictResolution] = useState<'snack' | 'substitute'>('snack');
-  const [mealToSubstitute, setMealToSubstitute] = useState<string>("");
+  const [showServingsModal, setShowServingsModal] = useState(false);
+  const [servings, setServings] = useState(4);
+  const [selectedMealForDetails, setSelectedMealForDetails] = useState<any>(null);
   const { toast } = useToast();
-  const { mealPlans, updateMealPlan, updatePantryFromIngredients } = useUser();
+  const {
+    updatePantryFromIngredients,
+    user,
+    addFavoriteMeal,
+    removeFavoriteMeal,
+    isMealFavorite,
+  } = useUser();
+  const { language, t } = useLanguage();
+  const { showLoader, hideLoader, LoaderComponent } = useCookingLoader();
+  const { startJob } = usePantryMealsJob();
 
-  const getDaysUntilExpiry = (expiryDate: Date) => {
-    const today = new Date();
-    const diffTime = expiryDate.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
-
-  const getAvailableDaysForPlan = (planId: string) => {
-    const plan = mealPlans.find(p => p.id === planId);
-    if (!plan) return [];
-
-    const startDate = new Date(plan.startDate);
-    const endDate = new Date(plan.endDate);
-    const days = [];
-    
-    const currentDate = new Date(startDate);
-    while (currentDate <= endDate) {
-      days.push({
-        value: currentDate.toISOString().split('T')[0],
-        label: currentDate.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'short', 
-          day: 'numeric',
-          year: 'numeric'
-        }),
-        date: new Date(currentDate)
-      });
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    
-    return days;
-  };
-
-  // Reset day when meal plan changes
+  // Render suggestions inline when the global ready modal dispatches the event
   useEffect(() => {
-    if (selectedMealPlan) {
-      setSelectedDay("");
-    }
-  }, [selectedMealPlan]);
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.meals && Array.isArray(detail.meals)) {
+        setSuggestions(detail.meals);
+      }
+    };
+    window.addEventListener("open-pantry-meals", handler);
+    return () => window.removeEventListener("open-pantry-meals", handler);
+  }, []);
+
+  // Find expiring ingredients (<=3 days)
+  const expiringItems = useMemo(() => {
+    return ingredients.filter((ing) => {
+      if (!ing.expiryDate) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const expiry = new Date(ing.expiryDate);
+      expiry.setHours(0, 0, 0, 0);
+      const diff = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      return diff <= 3;
+    });
+  }, [ingredients]);
+
+  // Build a smart suggestion based on expiring items
+  const insightData = useMemo(() => {
+    if (expiringItems.length === 0) return null;
+    const names = expiringItems.slice(0, 2).map((i) => i.name);
+    // Pick a recipe suggestion based on the first expiring item's category
+    const cat = expiringItems[0]?.category || "Pantry";
+    const recipes = RECIPE_SUGGESTIONS[cat] || RECIPE_SUGGESTIONS["Pantry"];
+    const recipe = recipes[Math.floor(Math.random() * recipes.length)];
+    return { names, recipe };
+  }, [expiringItems]);
 
   const generateSuggestions = async () => {
-    setIsGenerating(true);
-    
-    try {
-      // Get ingredients expiring soon (prioritize within 7 days)
-      const expiringSoon = ingredients
-        .filter(ing => getDaysUntilExpiry(ing.expiryDate) <= 7)
-        .sort((a, b) => getDaysUntilExpiry(a.expiryDate) - getDaysUntilExpiry(b.expiryDate));
-
-      console.log('Generating AI suggestions with ingredients:', expiringSoon);
-      
-      // Mock AI suggestions with proper ingredient quantities
-      const mockSuggestions = [
-        {
-          id: Date.now().toString(),
-          name: "Quick Chicken Stir Fry",
-          description: "Use your expiring chicken breast and vegetables",
-          prepTime: 15,
-          difficulty: "easy",
-          calories: 420,
-          type: "dinner",
-          usesExpiringIngredients: expiringSoon.slice(0, 3),
-          ingredients: [
-            { name: "Chicken Breast", quantity: 2, unit: "lbs" },
-            { name: "Mixed Vegetables", quantity: 1, unit: "cup" },
-            { name: "Soy Sauce", quantity: 2, unit: "tbsp" },
-            { name: "Oil", quantity: 1, unit: "tbsp" }
-          ],
-          steps: [
-            "Cut chicken into bite-sized pieces",
-            "Heat oil in a large pan",
-            "Add chicken and cook for 5-7 minutes",
-            "Add vegetables and stir fry for 3-4 minutes",
-            "Add soy sauce and serve"
-          ]
-        },
-        {
-          id: (Date.now() + 1).toString(),
-          name: "Fresh Fruit Smoothie",
-          description: "Perfect way to use bananas before they expire",
-          prepTime: 5,
-          difficulty: "easy",
-          calories: 180,
-          type: "breakfast",
-          usesExpiringIngredients: expiringSoon.slice(1, 2),
-          ingredients: [
-            { name: "Bananas", quantity: 6, unit: "pieces" },
-            { name: "Greek Yogurt", quantity: 1, unit: "container" },
-            { name: "Milk", quantity: 1, unit: "cup" },
-            { name: "Honey", quantity: 1, unit: "tbsp" }
-          ],
-          steps: [
-            "Add all ingredients to blender",
-            "Blend until smooth",
-            "Serve immediately"
-          ]
-        },
-        {
-          id: (Date.now() + 2).toString(),
-          name: "Veggie Pasta Bowl",
-          description: "Fresh pasta with your seasonal vegetables",
-          prepTime: 20,
-          difficulty: "easy",
-          calories: 350,
-          type: "lunch",
-          usesExpiringIngredients: expiringSoon.slice(0, 2),
-          ingredients: [
-            { name: "Pasta", quantity: 8, unit: "oz" },
-            { name: "Mixed Vegetables", quantity: 2, unit: "cups" },
-            { name: "Olive Oil", quantity: 2, unit: "tbsp" },
-            { name: "Garlic", quantity: 1, unit: "clove" }
-          ],
-          steps: [
-            "Cook pasta according to package directions",
-            "Sauté vegetables with garlic in olive oil",
-            "Combine pasta and vegetables",
-            "Season with herbs and serve"
-          ]
-        }
-      ];
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setSuggestions(mockSuggestions);
+    trackEvent("button_click", {
+      button_name: "pre_generate_meals_expired_submit",
+      screen: "pantry_page",
+    });
+    if (!user?.id) {
       toast({
-        title: "AI suggestions ready!",
-        description: `Generated ${mockSuggestions.length} meal suggestions using your expiring ingredients.`,
+        title: t("aiSuggestions.error"),
+        description: t("aiSuggestions.userNotFound"),
+        variant: "destructive",
       });
-    } catch (error) {
+      return;
+    }
+
+    setIsGenerating(true);
+    setShowServingsModal(false);
+    showLoader(t("aiSuggestions.loaderMessage"));
+
+    try {
+      const today = new Date();
+      const startDate = today.toISOString().split("T")[0];
+
+      const languageMap: Record<string, string> = {
+        en: "english",
+        es: "spanish",
+        pt: "portuguese",
+      };
+      const apiLanguage = languageMap[language] || "english";
+
+      const { jobId } = await generateMealsFromPantryJob(
+        user.id,
+        startDate,
+        servings,
+        apiLanguage
+      );
+
+      startJob(jobId, {
+        userId: user.id,
+        startDate,
+        servings,
+        language: apiLanguage,
+      });
+
       toast({
-        title: "Error",
-        description: "Failed to generate suggestions. Please try again.",
+        title: t("pantryMealsStarted.title") || "Meal Generation Started",
+        description:
+          t("pantryMealsStarted.description") ||
+          "We'll notify you when your pantry meal ideas are ready.",
+        duration: 5000,
+      });
+    } catch (error: any) {
+      if (error instanceof PantryMealsSubscriptionLimitError) {
+        toast({
+          title: t("aiSuggestions.subscriptionLimit"),
+          description: error.apiMessage || t("aiSuggestions.subscriptionLimit"),
+          variant: "destructive",
+        });
+        return;
+      }
+      if (error instanceof PantryMealsNoIngredientsError) {
+        toast({
+          title: t("aiSuggestions.noIngredients"),
+          description: error.apiMessage || t("aiSuggestions.noIngredients"),
+          variant: "destructive",
+        });
+        return;
+      }
+      console.error("Error generating suggestions:", error);
+      toast({
+        title: t("aiSuggestions.error"),
+        description:
+          error.response?.data?.message ||
+          t("aiSuggestions.failedToGenerate"),
         variant: "destructive",
       });
     } finally {
       setIsGenerating(false);
+      hideLoader();
     }
   };
 
-  const getMealsForDate = (planId: string, date: string) => {
-    const plan = mealPlans.find(p => p.id === planId);
-    if (!plan) return [];
-    
-    return plan.meals.filter((meal: any) => meal.date === date) || [];
-  };
-
-  const handleAddMealWithDay = async (meal: any) => {
-    if (!selectedDay || !selectedMealPlan) {
+  const handleAddToFavorites = (meal: any) => {
+    if (isMealFavorite(meal.id)) {
+      removeFavoriteMeal(meal.id);
       toast({
-        title: "Please select a day and meal plan",
-        description: "Choose which meal plan and day to add this meal to.",
-        variant: "destructive",
+        title: t("aiSuggestions.removedFromFavorites"),
+        description: `${meal.name} ${t("aiSuggestions.removedFromFavoritesDesc")}`,
       });
-      return;
-    }
-
-    const selectedDate = new Date(selectedDay);
-    const existingMeals = getMealsForDate(selectedMealPlan, selectedDay);
-    
-    // Check if there are already 3 meals for this day
-    if (existingMeals.length >= 3) {
-      setShowMealConflictDialog(meal);
-      return;
-    }
-
-    // Add meal directly if less than 3 meals
-    await handleAddMealToPlan(meal, selectedMealPlan, selectedDate, 'meal');
-  };
-
-  const handleConflictResolution = async () => {
-    if (!showMealConflictDialog || !selectedDay || !selectedMealPlan) return;
-
-    const selectedDate = new Date(selectedDay);
-    
-    if (conflictResolution === 'snack') {
-      await handleAddMealToPlan(showMealConflictDialog, selectedMealPlan, selectedDate, 'snack');
-    } else if (conflictResolution === 'substitute' && mealToSubstitute) {
-      await handleSubstituteMeal(showMealConflictDialog, selectedMealPlan, selectedDate, mealToSubstitute);
-    }
-
-    setShowMealConflictDialog(null);
-    setConflictResolution('snack');
-    setMealToSubstitute("");
-  };
-
-  const handleAddMealToPlan = async (meal: any, planId: string, date: Date, mealType: 'meal' | 'snack') => {
-    console.log('Adding meal to plan:', { meal, planId, date, mealType });
-    
-    try {
-      const dateString = date.toISOString().split('T')[0];
-      const newMeal = {
-        ...meal,
-        id: `meal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        date: dateString,
-        planId: planId,
-        mealType: mealType,
-        completed: false,
-        description: `${meal.description} - Planned for ${date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric',
-          year: 'numeric'
-        })}`
-      };
-
-      // Find the current plan and update it
-      const currentPlan = mealPlans.find(p => p.id === planId);
-      if (!currentPlan) {
-        throw new Error('Meal plan not found');
-      }
-
-      const updatedMeals = [...(currentPlan.meals || []), newMeal];
-      
-      // Update the meal plan in context
-      updateMealPlan(planId, { meals: updatedMeals });
-      
-      // Update pantry by removing used ingredients
-      if (meal.ingredients && Array.isArray(meal.ingredients)) {
-        const ingredientNames = meal.ingredients.map((ing: any) => 
-          typeof ing === 'string' ? ing : ing.name
-        );
-        updatePantryFromIngredients(ingredientNames);
-      }
-      
-      // Also call the original callback
-      onAddMeal(newMeal, date);
-      
-      const formattedDate = date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'short', 
-        day: 'numeric' 
-      });
-      
+    } else {
+      addFavoriteMeal(meal);
       toast({
-        title: `${mealType === 'snack' ? 'Snack' : 'Meal'} added successfully!`,
-        description: `${meal.name} has been added to your meal plan for ${formattedDate}. Pantry ingredients have been updated.`,
-      });
-      
-      setShowDaySelector(null);
-      setSelectedDay("");
-      setSelectedMealPlan("");
-    } catch (error) {
-      console.error('Error adding meal:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add meal to plan. Please try again.",
-        variant: "destructive",
+        title: t("aiSuggestions.addedToFavorites"),
+        description: `${meal.name} ${t("aiSuggestions.addedToFavoritesDesc")}`,
       });
     }
   };
 
-  const handleSubstituteMeal = async (newMeal: any, planId: string, date: Date, mealIdToReplace: string) => {
-    console.log('Substituting meal:', { newMeal, planId, date, mealIdToReplace });
-    
-    try {
-      const dateString = date.toISOString().split('T')[0];
-      const substituteMeal = {
-        ...newMeal,
-        id: mealIdToReplace,
-        date: dateString,
-        planId: planId,
-        mealType: 'meal',
-        completed: false,
-        description: `${newMeal.description} - Planned for ${date.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric',
-          year: 'numeric'
-        })}`
-      };
-
-      // Find the current plan and update it
-      const currentPlan = mealPlans.find(p => p.id === planId);
-      if (!currentPlan) {
-        throw new Error('Meal plan not found');
-      }
-
-      const updatedMeals = (currentPlan.meals || []).map((meal: any) => 
-        meal.id === mealIdToReplace ? substituteMeal : meal
-      );
-      
-      // Update the meal plan in context
-      updateMealPlan(planId, { meals: updatedMeals });
-      
-      // Update pantry by removing used ingredients
-      if (newMeal.ingredients && Array.isArray(newMeal.ingredients)) {
-        const ingredientNames = newMeal.ingredients.map((ing: any) => 
-          typeof ing === 'string' ? ing : ing.name
-        );
-        updatePantryFromIngredients(ingredientNames);
-      }
-      
-      // Also call the original callback
-      onAddMeal(substituteMeal, date);
-      
-      const formattedDate = date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'short', 
-        day: 'numeric' 
-      });
-      
-      toast({
-        title: "Meal substituted successfully!",
-        description: `${newMeal.name} has replaced the selected meal for ${formattedDate}. Pantry ingredients have been updated.`,
-      });
-      
-      setShowDaySelector(null);
-      setSelectedDay("");
-      setSelectedMealPlan("");
-    } catch (error) {
-      console.error('Error substituting meal:', error);
-      toast({
-        title: "Error",
-        description: "Failed to substitute meal. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleQuickAdd = (meal: any) => {
-    // Update pantry by removing used ingredients
-    if (meal.ingredients && Array.isArray(meal.ingredients)) {
-      const ingredientNames = meal.ingredients.map((ing: any) => 
-        typeof ing === 'string' ? ing : ing.name
-      );
-      updatePantryFromIngredients(ingredientNames);
-    }
-    
-    onAddMeal(meal);
+  const handleMarkAsConsumed = (meal: any) => {
     toast({
-      title: "Meal added!",
-      description: `${meal.name} has been added to your meal plan. Pantry ingredients have been updated.`,
+      title: t("aiSuggestions.markedAsConsumed"),
+      description: `${meal.name} ${t("aiSuggestions.markedAsConsumedDesc")}`,
     });
+    setSelectedMealForDetails(null);
   };
 
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-green-200">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2 text-green-700">
-          <Sparkles className="h-5 w-5" />
-          <span>AI Meal Suggestions</span>
-        </CardTitle>
-        <CardDescription>
-          Get personalized meal suggestions based on your expiring ingredients
-        </CardDescription>
+    <>
+      <LoaderComponent />
+      <Card className="bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden">
+        {/* AI Insight Card */}
         {!suggestions.length && (
-          <Button 
-            onClick={generateSuggestions}
-            disabled={isGenerating}
-            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+          <div
+            className="cursor-pointer"
+            onClick={() => setShowServingsModal(true)}
           >
-            <Sparkles className="h-4 w-4 mr-2" />
-            {isGenerating ? 'Generating...' : 'Generate AI Suggestions'}
-          </Button>
+            {insightData ? (
+              <div className="relative bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-amber-200/50 p-4 sm:p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500 to-orange-500" />
+                <div className="flex items-start gap-3 ml-2">
+                  <div className="p-2 rounded-lg bg-amber-500/15 shrink-0">
+                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-amber-800 mb-1 flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      AI Insight
+                    </p>
+                    <p className="text-sm text-amber-700 leading-relaxed">
+                      You have {insightData.names.map((name, i) => (
+                        <span key={i}>{i > 0 && " and "}<span className="font-bold">{name}</span></span>
+                      ))} expiring soon.
+                      How about a <span className="font-semibold">{insightData.recipe.emoji} {insightData.recipe.name}</span>?
+                    </p>
+                    <p className="text-xs text-amber-600/80 mt-1.5">Tap to generate meals →</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-emerald-200/50 p-4 sm:p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500" />
+                <div className="flex items-start gap-3 ml-2">
+                  <div className="p-2 rounded-lg bg-emerald-500/15 shrink-0">
+                    <Sparkles className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-emerald-800 mb-0.5">Your pantry is looking fresh! 🌿</p>
+                    <p className="text-xs text-emerald-600/80">Generate AI meals anytime. Tap to get started →</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         )}
-      </CardHeader>
-      
-      {suggestions.length > 0 && (
-        <CardContent>
-          <div className="space-y-4">
-            {suggestions.map((meal) => (
-              <Card key={meal.id} className="border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50">
-                <CardHeader className="pb-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <CardTitle className="text-base sm:text-lg text-orange-700 break-words">{meal.name}</CardTitle>
-                      <CardDescription className="text-orange-600 text-sm break-words">
-                        {meal.description}
-                      </CardDescription>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 shrink-0">
-                      <Button 
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleQuickAdd(meal)}
-                        className="border-orange-300 text-orange-700 hover:bg-orange-50 text-xs sm:text-sm w-full sm:w-auto"
-                      >
-                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                        Quick Add
-                      </Button>
-                      <Dialog open={showDaySelector === meal.id} onOpenChange={(open) => setShowDaySelector(open ? meal.id : null)}>
-                        <DialogTrigger asChild>
-                          <Button 
-                            size="sm"
-                            className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-xs sm:text-sm w-full sm:w-auto"
-                          >
-                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            Add to Day
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="w-[95vw] max-w-md mx-auto">
-                          <DialogHeader>
-                            <DialogTitle className="text-base sm:text-lg">Choose Day for {meal.name}</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <Label htmlFor="meal-plan-select" className="text-sm">Select Meal Plan</Label>
-                              <Select value={selectedMealPlan} onValueChange={setSelectedMealPlan}>
-                                <SelectTrigger className="mt-1">
-                                  <SelectValue placeholder="Choose a meal plan..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {mealPlans.map((plan) => (
-                                    <SelectItem key={plan.id} value={plan.id}>
-                                      {plan.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            {selectedMealPlan && (
-                              <div>
-                                <Label htmlFor="day-select" className="text-sm">Select Day</Label>
-                                <Select value={selectedDay} onValueChange={setSelectedDay}>
-                                  <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Choose a day..." />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {getAvailableDaysForPlan(selectedMealPlan).map((day) => (
-                                      <SelectItem key={day.value} value={day.value}>
-                                        {day.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            )}
-                            <div className="flex flex-col sm:flex-row justify-end gap-2">
-                              <Button 
-                                variant="outline" 
-                                onClick={() => {
-                                  setShowDaySelector(null);
-                                  setSelectedDay("");
-                                  setSelectedMealPlan("");
-                                }}
-                                className="text-sm w-full sm:w-auto"
-                              >
-                                Cancel
-                              </Button>
-                              <Button 
-                                onClick={() => handleAddMealWithDay(meal)}
-                                disabled={!selectedDay || !selectedMealPlan}
-                                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-sm w-full sm:w-auto"
-                              >
-                                Add Meal
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="h-3 w-3" />
-                      <span>{meal.prepTime}min</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Users className="h-3 w-3" />
-                      <span className="capitalize">{meal.difficulty}</span>
-                    </div>
-                    <span>{meal.calories} cal</span>
-                  </div>
 
-                  {meal.usesExpiringIngredients?.length > 0 && (
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <div className="flex items-center space-x-2 shrink-0">
-                        <AlertTriangle className="h-4 w-4 text-orange-500" />
-                        <span className="text-sm text-orange-600">Uses expiring:</span>
+        {/* Servings modal - triggered from insight card */}
+        {!suggestions.length && (
+          <Dialog
+            open={showServingsModal}
+            onOpenChange={setShowServingsModal}
+          >
+            <DialogContent className="w-[95vw] max-w-md mx-auto">
+              <DialogHeader>
+                <DialogTitle className="text-base sm:text-lg">
+                  {t("aiSuggestions.selectServings")}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6 py-4">
+                <div className="space-y-3">
+                  <Label htmlFor="servings-slider" className="text-sm">
+                    {t("aiSuggestions.servings")}:{" "}
+                    <span className="font-bold text-primary">
+                      {servings}
+                    </span>
+                  </Label>
+                  <Slider
+                    id="servings-slider"
+                    min={1}
+                    max={20}
+                    step={1}
+                    value={[servings]}
+                    onValueChange={(value) => setServings(value[0])}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>1</span>
+                    <span>20</span>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowServingsModal(false)}
+                >
+                  {t("aiSuggestions.cancel")}
+                </Button>
+                <Button
+                  onClick={generateSuggestions}
+                  className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                >
+                  {t("aiSuggestions.generateMeals")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {suggestions.length > 0 && (
+          <CardContent>
+            <div className="space-y-4">
+              {suggestions.map((meal) => (
+                <Card
+                  key={meal.id}
+                  className="border-accent/30 bg-gradient-to-r from-accent/10 to-accent/5"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-base sm:text-lg text-accent-foreground break-words">
+                          {meal.name}
+                        </CardTitle>
+                        <CardDescription className="text-muted-foreground text-sm break-words">
+                          {meal.description}
+                        </CardDescription>
                       </div>
-                      <div className="flex flex-wrap gap-1">
-                        {meal.usesExpiringIngredients.map((ing: any, index: number) => (
-                          <Badge key={index} variant="outline" className="text-xs border-orange-300 text-orange-700 break-all">
-                            {ing.name}
-                          </Badge>
-                        ))}
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedMealForDetails(meal)}
+                          className="border-accent/40 text-accent-foreground hover:bg-accent/10 text-xs sm:text-sm w-full sm:w-auto"
+                        >
+                          <ChefHat className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          {t("aiSuggestions.viewDetails")}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={
+                            isMealFavorite(meal.id) ? "default" : "outline"
+                          }
+                          onClick={() => handleAddToFavorites(meal)}
+                          className={
+                            isMealFavorite(meal.id)
+                              ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs sm:text-sm w-full sm:w-auto"
+                              : "border-destructive/40 text-destructive hover:bg-destructive/10 text-xs sm:text-sm w-full sm:w-auto"
+                          }
+                        >
+                          <Heart
+                            className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${
+                              isMealFavorite(meal.id) ? "fill-current" : ""
+                            }`}
+                          />
+                          {isMealFavorite(meal.id)
+                            ? t("aiSuggestions.favorited")
+                            : t("aiSuggestions.addToFavorites")}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-3 w-3" />
+                        <span>{meal.prepTime}{t("aiSuggestions.min")}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-3 w-3" />
+                        <span className="capitalize">{meal.difficulty}</span>
+                      </div>
+                      <span>{meal.calories} {t("aiSuggestions.cal")}</span>
+                      {meal.carbonFootprint && (
+                        <div className="flex items-center space-x-1">
+                          <Leaf className="h-3 w-3 text-primary" />
+                          <span>{meal.carbonFootprint}kg CO₂</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+
+              <Button
+                onClick={generateSuggestions}
+                variant="outline"
+                disabled={isGenerating}
+                className="w-full border-primary/30 text-primary hover:bg-primary/10 text-sm sm:text-base"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                {isGenerating ? t("aiSuggestions.generating") : t("aiSuggestions.generateMore")}
+              </Button>
+            </div>
+          </CardContent>
+        )}
+
+        {/* Meal Details Dialog */}
+        <Dialog
+          open={!!selectedMealForDetails}
+          onOpenChange={(open) => !open && setSelectedMealForDetails(null)}
+        >
+          <DialogContent className="w-[95vw] max-w-4xl mx-auto max-h-[95vh] overflow-hidden flex flex-col">
+            <DialogHeader className="shrink-0 pb-4">
+              <DialogTitle className="text-lg sm:text-xl md:text-2xl pr-8">
+                {selectedMealForDetails?.name}
+              </DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="flex-1 pr-2 sm:pr-4 -mr-2 sm:-mr-4">
+              <div className="space-y-6">
+                <div>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    {selectedMealForDetails?.description}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span>
+                      {t("aiSuggestions.prepTime")}: {selectedMealForDetails?.prepTime} {t("aiSuggestions.min")}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <ChefHat className="h-4 w-4 text-primary" />
+                    <span>
+                      {t("aiSuggestions.difficulty")}: {selectedMealForDetails?.difficulty}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span>{t("aiSuggestions.servingsLabel")}: {servings}</span>
+                  </div>
+                  {selectedMealForDetails?.carbonFootprint && (
+                    <div className="flex items-center space-x-2">
+                      <Leaf className="h-4 w-4 text-primary" />
+                      <span>
+                        {selectedMealForDetails.carbonFootprint}kg CO₂
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {selectedMealForDetails?.benefits && (
+                  <div>
+                    <h3 className="font-semibold mb-2 text-sm sm:text-base">
+                      {t("aiSuggestions.healthBenefits")}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      {selectedMealForDetails.benefits}
+                    </p>
+                  </div>
+                )}
+
+                {selectedMealForDetails?.prepTip && (
+                  <div className="bg-primary/10 p-3 sm:p-4 rounded-lg">
+                    <h3 className="font-semibold mb-1 text-xs sm:text-sm text-primary">
+                      💡 {t("aiSuggestions.proTip")}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed">
+                      {selectedMealForDetails.prepTip}
+                    </p>
+                  </div>
+                )}
+
+                {selectedMealForDetails?.ingredients &&
+                  selectedMealForDetails.ingredients.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-sm sm:text-base">
+                        {t("aiSuggestions.ingredients")}
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                        {selectedMealForDetails.ingredients.map(
+                          (ing: any, index: number) => (
+                            <div
+                              key={index}
+                              className="flex items-center space-x-2 text-xs sm:text-sm"
+                            >
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 text-xs"
+                              >
+                                {ing.quantity} {ing.unit}
+                              </Badge>
+                              <span className="capitalize truncate">
+                                {ing.name}
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
-                </CardHeader>
-              </Card>
-            ))}
-            
-            <Button 
-              onClick={generateSuggestions}
-              variant="outline"
-              disabled={isGenerating}
-              className="w-full border-green-200 text-green-700 hover:bg-green-50 text-sm sm:text-base"
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              {isGenerating ? 'Generating...' : 'Generate More Suggestions'}
-            </Button>
-          </div>
-        </CardContent>
-      )}
 
-      {/* Meal Conflict Resolution Dialog */}
-      <Dialog open={!!showMealConflictDialog} onOpenChange={(open) => !open && setShowMealConflictDialog(null)}>
-        <DialogContent className="w-[95vw] max-w-md mx-auto">
-          <DialogHeader>
-            <DialogTitle>Day Already Has 3 Meals</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              This day already has 3 meals planned. How would you like to add "{showMealConflictDialog?.name}"?
-            </p>
-            
-            <RadioGroup value={conflictResolution} onValueChange={(value: 'snack' | 'substitute') => setConflictResolution(value)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="snack" id="snack" />
-                <Label htmlFor="snack">Add as a snack</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="substitute" id="substitute" />
-                <Label htmlFor="substitute">Substitute an existing meal</Label>
-              </div>
-            </RadioGroup>
+                {selectedMealForDetails?.nutritionalInfo && (
+                  <div>
+                    <h3 className="font-semibold mb-3 text-sm sm:text-base">
+                      {t("aiSuggestions.nutritionalInfo")}
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                      <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
+                        <p className="text-xs text-muted-foreground">
+                          {t("aiSuggestions.calories")}
+                        </p>
+                        <p className="text-base sm:text-lg font-bold">
+                          {selectedMealForDetails.calories}
+                        </p>
+                      </div>
+                      <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
+                        <p className="text-xs text-muted-foreground">{t("aiSuggestions.protein")}</p>
+                        <p className="text-base sm:text-lg font-bold">
+                          {selectedMealForDetails.nutritionalInfo.protein}g
+                        </p>
+                      </div>
+                      <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
+                        <p className="text-xs text-muted-foreground">{t("aiSuggestions.carbs")}</p>
+                        <p className="text-base sm:text-lg font-bold">
+                          {selectedMealForDetails.nutritionalInfo.carbohydrates}
+                          g
+                        </p>
+                      </div>
+                      <div className="bg-muted p-2 sm:p-3 rounded-lg text-center">
+                        <p className="text-xs text-muted-foreground">{t("aiSuggestions.fat")}</p>
+                        <p className="text-base sm:text-lg font-bold">
+                          {selectedMealForDetails.nutritionalInfo.fat}g
+                        </p>
+                      </div>
+                    </div>
+                    {selectedMealForDetails.nutritionalInfo.vitamins &&
+                      selectedMealForDetails.nutritionalInfo.vitamins.length >
+                        0 && (
+                        <div className="mt-3">
+                          <p className="text-xs text-muted-foreground mb-2">
+                            {t("aiSuggestions.richInVitamins")}:
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedMealForDetails.nutritionalInfo.vitamins.map(
+                              (vitamin: string, index: number) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  Vitamin {vitamin}
+                                </Badge>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                )}
 
-            {conflictResolution === 'substitute' && (
-              <div>
-                <Label htmlFor="meal-to-substitute" className="text-sm">Select meal to substitute</Label>
-                <Select value={mealToSubstitute} onValueChange={setMealToSubstitute}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Choose a meal to replace..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getMealsForDate(selectedMealPlan, selectedDay).map((meal: any, index: number) => (
-                      <SelectItem key={meal.id || index} value={meal.id || `meal-${index}`}>
-                        {meal.name || `Meal ${index + 1}`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {selectedMealForDetails?.steps &&
+                  selectedMealForDetails.steps.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-sm sm:text-base">
+                        {t("aiSuggestions.cookingInstructions")}
+                      </h3>
+                      <ol className="space-y-3 sm:space-y-4">
+                        {selectedMealForDetails.steps.map(
+                          (step: string, index: number) => (
+                            <li key={index} className="flex gap-3">
+                              <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs sm:text-sm font-bold">
+                                {index + 1}
+                              </span>
+                              <span className="text-xs sm:text-sm pt-0.5 sm:pt-1 leading-relaxed">
+                                {step}
+                              </span>
+                            </li>
+                          )
+                        )}
+                      </ol>
+                    </div>
+                  )}
               </div>
-            )}
-            
-            <div className="flex justify-end gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowMealConflictDialog(null)}
+            </ScrollArea>
+            <DialogFooter className="shrink-0 pt-4 gap-2 flex-col sm:flex-row">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedMealForDetails(null)}
+                className="w-full sm:w-auto order-3 sm:order-1"
               >
-                Cancel
+                {t("aiSuggestions.close")}
               </Button>
-              <Button 
-                onClick={handleConflictResolution}
-                disabled={conflictResolution === 'substitute' && !mealToSubstitute}
-                className="bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+              <Button
+                variant={
+                  isMealFavorite(selectedMealForDetails?.id)
+                    ? "default"
+                    : "outline"
+                }
+                onClick={() => {
+                  if (selectedMealForDetails) {
+                    handleAddToFavorites(selectedMealForDetails);
+                  }
+                }}
+                className={`w-full sm:w-auto order-2 ${
+                  isMealFavorite(selectedMealForDetails?.id)
+                    ? "bg-destructive hover:bg-destructive/90"
+                    : "border-destructive/40 text-destructive hover:bg-destructive/10"
+                }`}
               >
-                Confirm
+                <Heart
+                  className={`h-4 w-4 mr-2 ${
+                    isMealFavorite(selectedMealForDetails?.id)
+                      ? "fill-current"
+                      : ""
+                  }`}
+                />
+                {isMealFavorite(selectedMealForDetails?.id)
+                  ? t("aiSuggestions.favorited")
+                  : t("aiSuggestions.addToFavorites")}
               </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </Card>
+              <Button
+                onClick={() => {
+                  if (selectedMealForDetails) {
+                    handleMarkAsConsumed(selectedMealForDetails);
+                  }
+                }}
+                className="bg-primary hover:bg-primary/90 w-full sm:w-auto order-1 sm:order-3"
+              >
+                <Check className="h-4 w-4 mr-2" />
+                {t("aiSuggestions.markAsConsumed")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </Card>
+    </>
   );
 };
 

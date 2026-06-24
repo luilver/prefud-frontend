@@ -3,12 +3,15 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Utensils, ChefHat, Sparkles, Plus } from "lucide-react";
+import { Utensils, ChefHat, Sparkles, Plus, ShoppingCart } from "lucide-react";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
+import { useNavigate } from "react-router-dom";
 import Navigation from "./Navigation";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
@@ -16,19 +19,44 @@ import IngredientTracker from "./IngredientTracker";
 import ShoppingList from "./ShoppingList";
 import UserProfile from "./UserProfile";
 import SubscriptionManager from "./SubscriptionManager";
+import { isNativePlatform } from "@/services/revenueCatService";
+import WelcomeModal from "./WelcomeModal";
 import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
 import AIDrinkCreator from "./AIDrinkCreator";
-import Reels from "./Reels";
+
 import LanguageSelector from "./LanguageSelector";
 
 const DashboardContent = () => {
   const [activeTab, setActiveTab] = useState("planner");
   const { user, logout } = useUser();
   const { t } = useLanguage();
+  const { getTotalItems } = useCart();
   const isMobile = useIsMobile();
   const { isCollapsed } = useSidebar();
+  const navigate = useNavigate();
+  const isNative = isNativePlatform();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("pantry_show_welcome") === "1") {
+        setShowWelcome(true);
+      }
+    } catch (e) {
+      console.warn("Could not read welcome flag", e);
+    }
+  }, []);
+
+  const handleWelcomeClose = () => {
+    try {
+      localStorage.removeItem("pantry_show_welcome");
+    } catch (e) {
+      console.warn("Could not clear welcome flag", e);
+    }
+    setShowWelcome(false);
+  };
 
   // Handle hash navigation to switch tabs
   useEffect(() => {
@@ -50,6 +78,41 @@ const DashboardContent = () => {
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
+  }, []);
+
+  // Scroll to top when active tab changes on mobile
+  useEffect(() => {
+    if (isMobile) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeTab, isMobile]);
+
+  // Switch to the planner tab when a global open-meal-plan event fires
+  useEffect(() => {
+    const handler = () => setActiveTab("planner");
+    window.addEventListener("open-meal-plan", handler);
+    return () => window.removeEventListener("open-meal-plan", handler);
+  }, []);
+
+  // Switch to the AI drinks tab when a global open-drink event fires
+  useEffect(() => {
+    const handler = () => setActiveTab("ai-drinks");
+    window.addEventListener("open-drink", handler);
+    return () => window.removeEventListener("open-drink", handler);
+  }, []);
+
+  // Switch to the AI meals tab when a global open-ai-meal event fires
+  useEffect(() => {
+    const handler = () => setActiveTab("ai-meals");
+    window.addEventListener("open-ai-meal", handler);
+    return () => window.removeEventListener("open-ai-meal", handler);
+  }, []);
+
+  // Switch to the pantry tab when a global open-pantry-meals event fires
+  useEffect(() => {
+    const handler = () => setActiveTab("ingredients");
+    window.addEventListener("open-pantry-meals", handler);
+    return () => window.removeEventListener("open-pantry-meals", handler);
   }, []);
 
   // Calculate dynamic margin based on sidebar state
@@ -77,8 +140,12 @@ const DashboardContent = () => {
     }
   };
 
+  const handleCartClick = () => {
+    navigate('/cart');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50/80 via-orange-25/60 to-green-75/40 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden" style={isMobile ? { backgroundColor: '#000000' } : { backgroundImage: `url(${dashboardBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
       {/* Kitchen Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* Subtle kitchen pattern overlay */}
@@ -90,10 +157,10 @@ const DashboardContent = () => {
           }}
         />
         
-        <div className="absolute top-20 left-[10%] w-6 h-6 bg-green-200/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-[15%] w-4 h-4 bg-orange-200/25 rounded-full animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-[20%] w-5 h-5 bg-green-300/15 rounded-full animate-pulse delay-2000"></div>
-        <div className="absolute bottom-20 right-[25%] w-3 h-3 bg-orange-300/20 rounded-full animate-pulse delay-3000"></div>
+        <div className="absolute top-20 left-[10%] w-6 h-6 bg-emerald-200/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-[15%] w-4 h-4 bg-teal-200/25 rounded-full animate-pulse delay-1000"></div>
+        <div className="absolute bottom-32 left-[20%] w-5 h-5 bg-emerald-300/15 rounded-full animate-pulse delay-2000"></div>
+        <div className="absolute bottom-20 right-[25%] w-3 h-3 bg-teal-300/20 rounded-full animate-pulse delay-3000"></div>
       </div>
 
       {/* Navigation */}
@@ -101,17 +168,17 @@ const DashboardContent = () => {
 
       {/* Header for Desktop (with dynamic positioning) */}
       {!isMobile && (
-        <header className="fixed top-0 right-0 bg-white/90 backdrop-blur-md border-b border-green-200/60 z-30 transition-all duration-300"
+        <header className="fixed top-0 right-0 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-b border-emerald-500/30 z-30 transition-all duration-300 shadow-xl"
           style={{ left: `${getSidebarWidth()}px` }}>
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setActiveTab("profile")}
-                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-green-50 to-orange-50 rounded-lg border border-green-200/50 hover:bg-gradient-to-r hover:from-green-100 hover:to-orange-100 transition-colors cursor-pointer"
+                  className="flex items-center space-x-2 px-3 py-2 bg-emerald-700/40 rounded-lg border border-emerald-500/30 hover:bg-emerald-600/50 transition-colors cursor-pointer"
                 >
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-green-700 font-medium">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-white font-medium">
                     {t('dashboard.header.welcome')} {user?.name?.split(' ')[0] || 'Chef'}!
                   </span>
                 </button>
@@ -119,10 +186,27 @@ const DashboardContent = () => {
               
               <div className="flex items-center space-x-4">
                 <LanguageSelector variant="button" />
+                
+                {/* Cart Icon with Badge - Hidden on native */}
+                {!isNative && (
+                  <Button
+                    variant="ghost"
+                    onClick={handleCartClick}
+                    className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white"
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    {getTotalItems() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                        {getTotalItems()}
+                      </span>
+                    )}
+                  </Button>
+                )}
+                
                 <Button 
                   variant="ghost" 
                   onClick={logout} 
-                  className="text-green-700 hover:bg-green-100/60"
+                  className="text-emerald-200 hover:bg-emerald-700/40 hover:text-white"
                 >
                   {t('dashboard.header.logout')}
                 </Button>
@@ -134,35 +218,51 @@ const DashboardContent = () => {
 
       {/* Header for Mobile */}
       {isMobile && (
-        <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-green-200/60 z-50 shadow-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-orange-400/5 to-green-600/5"></div>
+        <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-b border-emerald-500/30 z-50 shadow-xl pt-[env(safe-area-inset-top)]">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-teal-400/5 to-emerald-600/5"></div>
           <div className="relative container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 {/* Enhanced Logo with Kitchen Feel */}
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-orange-500 rounded-xl blur-sm opacity-20"></div>
-                  <div className="relative p-2.5 sm:p-3 bg-gradient-to-r from-green-500 to-orange-500 rounded-xl shadow-lg">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl blur-sm opacity-40"></div>
+                  <div className="relative p-2.5 sm:p-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl shadow-lg shadow-emerald-500/30">
                     <Utensils className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-white" />
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-green-700 via-green-600 to-orange-600 bg-clip-text text-transparent">
-                    Pantry
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+                    Prefud
                   </h1>
-                  <p className="text-xs sm:text-sm text-green-600/80 font-medium hidden sm:block">Smart Kitchen Assistant</p>
+                  <p className="text-xs sm:text-sm text-emerald-300/80 font-medium hidden sm:block">Smart Kitchen Assistant</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <LanguageSelector variant="button" className="mr-1 sm:mr-2" />
                 
+                {/* Cart Icon with Badge for Mobile - Hidden on native */}
+                {!isNative && (
+                  <Button
+                    variant="ghost"
+                    onClick={handleCartClick}
+                    className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white w-8 h-8 p-0"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    {getTotalItems() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
+                        {getTotalItems() > 9 ? '9+' : getTotalItems()}
+                      </span>
+                    )}
+                  </Button>
+                )}
+                
                 {/* Mobile Welcome - Now clickable to navigate to profile */}
                 <button
                   onClick={handleUserNameClick}
-                  className="flex items-center justify-center w-8 h-8 bg-green-50 rounded-full hover:bg-green-100 transition-colors"
+                  className="flex items-center justify-center w-8 h-8 bg-emerald-700/40 rounded-full hover:bg-emerald-600/50 transition-colors border border-emerald-500/30"
                 >
-                  <span className="text-xs text-green-700 font-medium">
+                  <span className="text-xs text-white font-medium">
                     {user?.name ? user.name.charAt(0).toUpperCase() : 'C'}
                   </span>
                 </button>
@@ -170,7 +270,7 @@ const DashboardContent = () => {
                 <Button 
                   variant="ghost" 
                   onClick={logout} 
-                  className="text-green-700 hover:bg-green-100/60 text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hidden md:block"
+                  className="text-emerald-200 hover:bg-emerald-700/40 hover:text-white text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hidden md:block"
                 >
                   {t('dashboard.header.logout')}
                 </Button>
@@ -189,16 +289,22 @@ const DashboardContent = () => {
           {/* Kitchen-inspired content wrapper */}
           <div className="relative">
             {/* Subtle content background */}
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl"></div>
+            <div className={`absolute inset-0 overflow-hidden ${isMobile ? 'bg-transparent' : 'bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl'}`}>
+              {!isMobile && (
+                <div 
+                  className="absolute inset-0 opacity-[0.06] pointer-events-none"
+                  style={{ 
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2310b981' stroke-width='0.5'%3E%3Cpath d='M0 20h40M20 0v40M0 0l40 40M40 0L0 40'/%3E%3C/g%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%230d9488' fill-opacity='0.4'/%3E%3Ccircle cx='0' cy='0' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='40' cy='0' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='0' cy='40' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3Ccircle cx='40' cy='40' r='1' fill='%2310b981' fill-opacity='0.3'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: '40px 40px'
+                  }}
+                />
+              )}
+            </div>
             
             {/* Tab Content */}
             <div className="relative p-4 sm:p-6 lg:p-8">
               <Tabs value={activeTab} className="w-full">
-                <TabsContent value="reels" className="mt-0">
-                  <div className="space-y-6">
-                    <Reels />
-                  </div>
-                </TabsContent>
 
                 <TabsContent value="planner" className="mt-0">
                   <div id="meal-planner-section" className="space-y-6">
@@ -259,6 +365,7 @@ const DashboardContent = () => {
           </div>
         </div>
       </div>
+      {showWelcome && <WelcomeModal onClose={handleWelcomeClose} />}
     </div>
   );
 };

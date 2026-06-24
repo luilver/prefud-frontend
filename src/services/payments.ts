@@ -3,7 +3,7 @@ import axios from "axios";
 const API_PAYMENTS =
   import.meta.env.VITE_PAYMENTS || "https://zora-ms-stripe-1.onrender.com";
 const BASE_URL =
-  import.meta.env.VITE_BASE_URL || "https://pantry-auth-1.onrender.com";
+  import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
 
 interface PaymentMethodResponse {
   id: string;
@@ -330,6 +330,7 @@ export interface ApiSubscriptionType {
   healthyDrinks: number;
   specialMeals: number;
   generatedMeals: number;
+  processImages?: number;
   updatedAt?: string;
   description: string;
 }

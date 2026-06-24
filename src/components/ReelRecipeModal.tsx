@@ -13,13 +13,22 @@ import {
   ShoppingCart, 
   X,
   Flame,
-  Timer
+  CheckSquare
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
+import { useAddToCart } from "@/hooks/useAddToCart";
 import MealShoppingModal from "./MealShoppingModal";
-import OrderOnlineModal from "./OrderOnlineModal";
+
+interface RecipeIngredient {
+  name: string;
+  quantity: number;
+  unit: string;
+  classification?: string;
+  carbonFootPrintToWaste?: number;
+  daysToExpire?: number;
+}
 
 interface Recipe {
   id: string;
@@ -33,6 +42,20 @@ interface Recipe {
   isLiked: boolean;
   isSaved: boolean;
   description: string;
+  steps?: string[];
+  ingredients?: RecipeIngredient[];
+  calories?: number;
+  nutritionalInfo?: {
+    protein: number;
+    fat: number;
+    carbohydrates: number;
+    fiber: number;
+    vitamins?: string[];
+  };
+  prepTip?: string;
+  benefits?: string[];
+  mealType?: string;
+  servings?: number;
 }
 
 interface ReelRecipeModalProps {
@@ -44,36 +67,27 @@ interface ReelRecipeModalProps {
 const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [showShoppingModal, setShowShoppingModal] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
   const { user, pantryItems, setPantryItems } = useUser();
+  const { toast } = useToast();
+
+  // Use actual recipe data from API
+  const recipeIngredients = recipe?.ingredients || [];
+  const recipeSteps = recipe?.steps || [];
+  const recipeNutrition = recipe?.nutritionalInfo || { protein: 0, fat: 0, carbohydrates: 0, fiber: 0 };
+
+  // Use the cart hook
+  const { handleAddToCart } = useAddToCart({
+    ingredients: recipeIngredients.map(ing => ({
+      name: ing.name,
+      quantity: ing.quantity,
+      unit: ing.unit,
+      category: ing.classification
+    })),
+    selectedIngredients,
+    onSuccess: () => setSelectedIngredients([])
+  });
 
   if (!recipe) return null;
-
-  // Mock recipe data based on the recipe
-  const mockRecipeData = {
-    ingredients: [
-      { name: "Olive Oil", quantity: 2, unit: "tbsp", classification: "oil", carbonFootPrintToWaste: 0.1, daysToExpire: 90 },
-      { name: "Garlic", quantity: 3, unit: "cloves", classification: "vegetable", carbonFootPrintToWaste: 0.05, daysToExpire: 14 },
-      { name: "Onion", quantity: 1, unit: "medium", classification: "vegetable", carbonFootPrintToWaste: 0.08, daysToExpire: 21 },
-      { name: "Salt", quantity: 1, unit: "tsp", classification: "seasoning", carbonFootPrintToWaste: 0.01, daysToExpire: 365 },
-      { name: "Black Pepper", quantity: 0.5, unit: "tsp", classification: "seasoning", carbonFootPrintToWaste: 0.02, daysToExpire: 180 },
-    ],
-    instructions: [
-      "Heat olive oil in a large pan over medium heat",
-      "Add minced garlic and diced onion, cook until fragrant",
-      "Season with salt and pepper to taste",
-      "Continue cooking until ingredients are well combined",
-      "Serve hot and enjoy your delicious meal"
-    ],
-    nutrition: {
-      calories: 250,
-      protein: 8,
-      carbs: 15,
-      fat: 12,
-      fiber: 3,
-      sodium: 450
-    }
-  };
 
   const handleIngredientToggle = (ingredientName: string) => {
     setSelectedIngredients(prev => 
@@ -83,40 +97,53 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
     );
   };
 
+  const handleSelectAll = () => {
+    if (selectedIngredients.length === recipeIngredients.length) {
+      setSelectedIngredients([]);
+    } else {
+      setSelectedIngredients(recipeIngredients.map(ing => ing.name));
+    }
+  };
+
   const handleAddToPantry = async () => {
     try {
       console.log('Selected ingredients:', selectedIngredients);
-      console.log('All available ingredients:', mockRecipeData.ingredients);
+      console.log('All available ingredients:', recipeIngredients);
 
       // Filter ingredients based on selection
-      const ingredientsToAdd = mockRecipeData.ingredients.filter(
+      const ingredientsToAdd = recipeIngredients.filter(
         ingredient => selectedIngredients.includes(ingredient.name)
       );
 
       console.log('Ingredients to add:', ingredientsToAdd);
 
       if (ingredientsToAdd.length === 0) {
-        toast.error("No ingredients selected to add to pantry.");
+        toast({
+          title: "Error",
+          description: "No ingredients selected to add to pantry.",
+          variant: "destructive"
+        });
         return;
       }
 
       // Create new pantry items with the EXACT structure for the new endpoint
       const currentTime = new Date().toISOString();
       const newPantryItems: PantryIngredient[] = ingredientsToAdd.map(ingredient => {
-        const expiryDate = new Date(Date.now() + ingredient.daysToExpire * 24 * 60 * 60 * 1000).toISOString();
+        const daysToExpire = ingredient.daysToExpire || 30;
+        const expiryDate = new Date(Date.now() + daysToExpire * 24 * 60 * 60 * 1000).toISOString();
         
         return {
           id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           name: ingredient.name,
           quantity: ingredient.quantity,
           unit: ingredient.unit,
-          category: ingredient.classification,
+          category: ingredient.classification || 'other',
           purchased: true,
           purchaseDate: currentTime,
-          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste,
-          daysToExpire: ingredient.daysToExpire,
+          carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste || 0.1,
+          daysToExpire: daysToExpire,
           expiryDate: expiryDate,
-          notes: `Carbon footprint:: ${ingredient.carbonFootPrintToWaste}`
+          notes: `Carbon footprint: ${ingredient.carbonFootPrintToWaste || 0.1}`
         };
       });
 
@@ -140,30 +167,31 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
       // Update local state (context) with the combined pantry items
       setPantryItems([...(pantryItems || []), ...newPantryItemsForState]);
       
-      toast.success(`Successfully added ${ingredientsToAdd.length} ingredients to pantry!`);
+      toast({
+        title: "Added to Pantry",
+        description: `Successfully added ${ingredientsToAdd.length} ingredient${ingredientsToAdd.length > 1 ? 's' : ''} to pantry!`,
+      });
       setSelectedIngredients([]);
     } catch (error) {
       console.error("Error adding to pantry:", error);
-      toast.error("Failed to add ingredients to pantry. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to add ingredients to pantry. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
-  const handleOrderOnline = () => {
-    setShowOrderModal(true);
-  };
-
-  const getSelectedIngredientsForOrder = () => {
-    return mockRecipeData.ingredients
-      .filter(ingredient => selectedIngredients.includes(ingredient.name))
-      .map(ingredient => ({
-        id: `ingredient-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: ingredient.name,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        category: ingredient.classification || "ingredient",
-        estimatedPrice: Math.floor(Math.random() * 10) + 2,
-        mealName: recipe.title,
-      }));
+  const handleAddToCartClick = () => {
+    if (selectedIngredients.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select ingredients to add to cart.",
+        variant: "destructive"
+      });
+      return;
+    }
+    handleAddToCart();
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -178,109 +206,122 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span className="text-xl font-bold">{recipe.title}</span>
-              <Button variant="ghost" size="sm" onClick={onClose}>
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] overflow-y-auto p-4 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center justify-between gap-2">
+              <span className="text-base sm:text-xl font-bold line-clamp-2 pr-2">{recipe.title}</span>
+              <Button variant="ghost" size="sm" onClick={onClose} className="flex-shrink-0">
                 <X className="h-4 w-4" />
               </Button>
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Recipe Header */}
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1">
-                <p className="text-muted-foreground mb-4">{recipe.description}</p>
-                
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-purple-600" />
-                    <span className="font-medium">{recipe.duration}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium">2 servings</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <ChefHat className="h-4 w-4 text-orange-600" />
-                    <Badge className={getDifficultyColor(recipe.difficulty)}>
-                      {recipe.difficulty}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
+            <div className="flex flex-col gap-3">
+              <p className="text-sm sm:text-base text-muted-foreground line-clamp-3">{recipe.description}</p>
               
-              <div className="w-full lg:w-48 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
-                <img 
-                  src={recipe.thumbnail} 
-                  alt={recipe.title}
-                  className="w-full h-full object-cover rounded-lg"
-                />
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
+                  <span className="font-medium">{recipe.duration}</span>
+                </div>
+                <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                  <span className="font-medium">{recipe.servings || 2} servings</span>
+                </div>
+                <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                  <ChefHat className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+                  <Badge className={`text-xs ${getDifficultyColor(recipe.difficulty)}`}>
+                    {recipe.difficulty}
+                  </Badge>
+                </div>
+                {recipe.calories && (
+                  <div className="flex items-center space-x-1 sm:space-x-2 text-sm">
+                    <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
+                    <span className="font-medium">{recipe.calories} cal</span>
+                  </div>
+                )}
               </div>
             </div>
 
             <Tabs defaultValue="ingredients" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="ingredients">Ingredients</TabsTrigger>
-                <TabsTrigger value="instructions">Instructions</TabsTrigger>
-                <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 h-auto">
+                <TabsTrigger value="ingredients" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Ingredients</TabsTrigger>
+                <TabsTrigger value="instructions" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Instructions</TabsTrigger>
+                <TabsTrigger value="nutrition" className="text-xs sm:text-sm py-2 px-1 sm:px-3">Nutrition</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="ingredients" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
+              <TabsContent value="ingredients" className="space-y-3 mt-3">
+                <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+                  <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-4">
+                    <CardTitle className="flex items-center justify-between text-sm sm:text-base">
                       <div className="flex items-center space-x-2">
-                        <Package className="h-5 w-5 text-blue-600" />
+                        <Package className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                         <span>Recipe Ingredients</span>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {selectedIngredients.length} selected
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs sm:text-sm text-muted-foreground">
+                          {selectedIngredients.length}/{recipeIngredients.length}
+                        </span>
+                        {recipeIngredients.length > 0 && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleSelectAll}
+                            className="h-7 text-xs px-2"
+                          >
+                            <CheckSquare className="h-3 w-3 mr-1" />
+                            {selectedIngredients.length === recipeIngredients.length ? 'Deselect' : 'Select All'}
+                          </Button>
+                        )}
+                      </div>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-3">
-                      {mockRecipeData.ingredients.map((ingredient, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <Checkbox
-                            id={`ingredient-${index}`}
-                            checked={selectedIngredients.includes(ingredient.name)}
-                            onCheckedChange={() => handleIngredientToggle(ingredient.name)}
-                          />
-                          <label
-                            htmlFor={`ingredient-${index}`}
-                            className="flex-1 cursor-pointer"
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0 space-y-3">
+                    <div className="grid gap-2 max-h-[30vh] overflow-y-auto">
+                      {recipeIngredients.length > 0 ? (
+                        recipeIngredients.map((ingredient, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                           >
-                            <div className="font-medium">{ingredient.name}</div>
-                            <div className="text-sm text-gray-600">
-                              {ingredient.quantity} {ingredient.unit}
-                            </div>
-                          </label>
-                        </div>
-                      ))}
+                            <Checkbox
+                              id={`ingredient-${index}`}
+                              checked={selectedIngredients.includes(ingredient.name)}
+                              onCheckedChange={() => handleIngredientToggle(ingredient.name)}
+                            />
+                            <label
+                              htmlFor={`ingredient-${index}`}
+                              className="flex-1 cursor-pointer min-w-0"
+                            >
+                              <div className="font-medium text-sm truncate">{ingredient.name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {ingredient.quantity} {ingredient.unit}
+                              </div>
+                            </label>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-4 text-sm">No ingredients available</p>
+                      )}
                     </div>
 
                     {selectedIngredients.length > 0 && (
-                      <div className="flex gap-3 pt-4 border-t">
+                      <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t">
                         <Button
                           onClick={handleAddToPantry}
-                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-xs sm:text-sm h-9 sm:h-10"
                         >
-                          <Package className="h-4 w-4 mr-2" />
+                          <Package className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           Add to Pantry ({selectedIngredients.length})
                         </Button>
                         <Button
-                          onClick={handleOrderOnline}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          onClick={handleAddToCartClick}
+                          className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-9 sm:h-10"
                         >
-                          <ShoppingCart className="h-4 w-4 mr-2" />
-                          Order Online ({selectedIngredients.length})
+                          <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                          Add to Cart ({selectedIngredients.length})
                         </Button>
                       </div>
                     )}
@@ -288,71 +329,71 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="instructions">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Flame className="h-5 w-5 text-orange-600" />
+              <TabsContent value="instructions" className="mt-3">
+                <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+                  <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-4">
+                    <CardTitle className="flex items-center space-x-2 text-sm sm:text-base">
+                      <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                       <span>Cooking Instructions</span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {mockRecipeData.instructions.map((instruction, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                            {index + 1}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-800">{instruction}</p>
-                            <div className="mt-2 flex items-center gap-3 text-xs">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">
-                                <Timer className="h-3 w-3 mr-1" />
-                                ~{2 + (index % 5)} min
-                              </span>
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                    <div className="space-y-2 sm:space-y-3 max-h-[40vh] overflow-y-auto">
+                      {recipeSteps.length > 0 ? (
+                        recipeSteps.map((instruction, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
+                              {index + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-foreground text-xs sm:text-sm">{instruction}</p>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-4 text-sm">No instructions available</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="nutrition">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Nutrition Facts</CardTitle>
+              <TabsContent value="nutrition" className="mt-3">
+                <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+                  <CardHeader className="p-3 sm:p-6 pb-2 sm:pb-4">
+                    <CardTitle className="text-sm sm:text-base">Nutrition Facts</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex justify-between">
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span className="font-medium">Calories</span>
-                        <span>{mockRecipeData.nutrition.calories}</span>
+                        <span className="text-primary font-bold">{recipe.calories || 0}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Protein</span>
-                        <span>{mockRecipeData.nutrition.protein}g</span>
+                        <span className="font-medium">{recipeNutrition.protein}g</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Carbs</span>
-                        <span>{mockRecipeData.nutrition.carbs}g</span>
+                        <span className="font-medium">{recipeNutrition.carbohydrates}g</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Fat</span>
-                        <span>{mockRecipeData.nutrition.fat}g</span>
+                        <span className="font-medium">{recipeNutrition.fat}g</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                         <span>Fiber</span>
-                        <span>{mockRecipeData.nutrition.fiber}g</span>
+                        <span className="font-medium">{recipeNutrition.fiber}g</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Sodium</span>
-                        <span>{mockRecipeData.nutrition.sodium}mg</span>
-                      </div>
+                      {recipeNutrition.vitamins && recipeNutrition.vitamins.length > 0 && (
+                        <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg col-span-2 text-xs sm:text-sm">
+                          <span>Vitamins</span>
+                          <span className="font-medium">{recipeNutrition.vitamins.join(', ')}</span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -365,17 +406,15 @@ const ReelRecipeModal = ({ recipe, isOpen, onClose }: ReelRecipeModalProps) => {
       <MealShoppingModal
         meal={{ 
           name: recipe.title, 
-          ingredientsList: mockRecipeData.ingredients 
+          ingredientsList: recipeIngredients.map(ing => ({
+            ...ing,
+            classification: ing.classification || 'other',
+            carbonFootPrintToWaste: ing.carbonFootPrintToWaste || 0.1,
+            daysToExpire: ing.daysToExpire || 30
+          }))
         }}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
-      />
-
-      <OrderOnlineModal
-        isOpen={showOrderModal}
-        onClose={() => setShowOrderModal(false)}
-        items={getSelectedIngredientsForOrder()}
-        mealPlanName={recipe.title}
       />
     </>
   );
