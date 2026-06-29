@@ -167,7 +167,7 @@ const SignIn = () => {
                 src={prefudIsotipo}
                 alt=""
                 aria-hidden="true"
-                className="h-8 w-8 object-contain drop-shadow-sm brightness-0 invert"
+                className="h-10 w-10 object-contain drop-shadow-sm brightness-0 invert"
               />
               <span className="font-logo text-2xl text-white/90">
                 prefud
@@ -201,7 +201,7 @@ const SignIn = () => {
                     src={prefudIsotipo}
                     alt=""
                     aria-hidden="true"
-                    className="h-7 w-7 object-contain brightness-0 invert"
+                    className="h-10 w-10 object-contain brightness-0 invert"
                   />
                 </div>
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
