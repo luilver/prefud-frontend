@@ -21,6 +21,7 @@ import Dashboard from "@/components/Dashboard";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
+import prefudIsotipo from "@/assets/prefud-isotipo.png";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
