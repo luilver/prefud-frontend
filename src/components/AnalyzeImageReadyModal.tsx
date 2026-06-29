@@ -141,6 +141,7 @@ const AnalyzeImageReadyModal = () => {
                       value={ing.name}
                       onChange={(e) => updateItem(ing.id, { name: e.target.value })}
                       placeholder="Name"
+                      aria-label={`Ingredient ${ing.name || 'unnamed'} — name`}
                       className="h-9 text-sm capitalize"
                       disabled={!checked}
                     />
@@ -153,6 +154,7 @@ const AnalyzeImageReadyModal = () => {
                         onChange={(e) =>
                           updateItem(ing.id, { quantity: parseFloat(e.target.value) || 0 })
                         }
+                        aria-label={`Quantity for ${ing.name || 'ingredient'}`}
                         className="h-9 text-sm w-24"
                         disabled={!checked}
                       />
@@ -160,6 +162,7 @@ const AnalyzeImageReadyModal = () => {
                         value={ing.unit}
                         onChange={(e) => updateItem(ing.id, { unit: e.target.value })}
                         placeholder="unit"
+                        aria-label={`Unit for ${ing.name || 'ingredient'}`}
                         className="h-9 text-sm w-24"
                         disabled={!checked}
                       />
@@ -189,6 +192,7 @@ const AnalyzeImageReadyModal = () => {
                               daysToExpire,
                             });
                           }}
+                          aria-label={`Expiration date for ${ing.name || 'ingredient'}`}
                           className="h-9 text-sm"
                           disabled={!checked}
                         />
