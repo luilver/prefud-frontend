@@ -62,7 +62,7 @@ const Index = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <img
-                src={prefudLogo.url}
+                src={logoUrl}
                 alt="prefud"
                 className="h-10 sm:h-12 lg:h-14 w-auto object-contain"
               />
@@ -505,7 +505,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <img src={prefudLogo.url} alt="prefud" className="h-12 w-auto" />
+              <img src={logoUrl} alt="prefud" className="h-12 w-auto" />
             </div>
             <div className="flex items-center justify-center space-x-6 mb-4 text-sm text-muted-foreground">
               <Link

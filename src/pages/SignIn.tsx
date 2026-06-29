@@ -10,8 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
-import prefudIsotipo from "@/assets/prefud-isotipo.png";
-import prefudFullLogo from "@/assets/prefud-full-logo.png.asset.json";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +21,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/services/analytics";
 import { isNativePlatform } from "@/services/revenueCatService";
+import { useThemeLogo } from "@/contexts/ThemeContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
