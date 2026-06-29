@@ -367,7 +367,7 @@ const AIMealCreator = () => {
                         <CardTitle className="text-sm sm:text-lg text-foreground truncate">{meal.specialMeal.specialMeal.name}</CardTitle>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="px-2 py-0.5 bg-accent/10 text-teal-400 text-[10px] rounded-full">{t("aiMealCreator.savedLabel") || "Saved"}</span>
+                        <span className="px-2 py-0.5 bg-accent/10 text-accent-foreground text-[10px] rounded-full">{t("aiMealCreator.savedLabel") || "Saved"}</span>
                         <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
@@ -384,7 +384,7 @@ const AIMealCreator = () => {
                     <div className="flex flex-wrap gap-1 mb-2">
                       <span className="px-2 py-0.5 bg-primary/10 text-primary-foreground/80 text-[10px] rounded-full">{meal.mealType}</span>
                       {meal.dietaryRestrictions?.slice(0, 2).map((restriction: string, tagIndex: number) => (
-                        <span key={tagIndex} className="px-2 py-0.5 bg-accent/10 text-teal-400 text-[10px] rounded-full">{restriction}</span>
+                        <span key={tagIndex} className="px-2 py-0.5 bg-accent/10 text-accent-foreground text-[10px] rounded-full">{restriction}</span>
                       ))}
                     </div>
                     <div className="text-[10px] sm:text-xs text-muted-foreground mb-2">
