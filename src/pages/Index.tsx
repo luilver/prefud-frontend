@@ -22,7 +22,6 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
 import prefudIsotipo from "@/assets/prefud-isotipo.png";
-import prefudWordmark from "@/assets/prefud-wordmark.png";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
