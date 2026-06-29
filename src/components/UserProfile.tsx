@@ -43,11 +43,13 @@ import {
   Activity,
   Heart,
   Camera,
+  Palette,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme, THEMES, ThemeId } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PasswordUpdate from "./PasswordUpdate";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
