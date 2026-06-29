@@ -10,6 +10,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 const SignUp = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const logoUrl = useThemeLogo();
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col">
