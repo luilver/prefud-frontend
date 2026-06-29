@@ -1,7 +1,7 @@
-
+import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Utensils, ArrowLeft, Leaf, Clock, DollarSign, Users, TrendingDown, Recycle, ShoppingCart, Calendar, BarChart3, Heart } from "lucide-react";
+import { ArrowLeft, Leaf, Clock, DollarSign, Users, TrendingDown, Recycle, ShoppingCart, Calendar, BarChart3, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -15,13 +15,12 @@ const WhyPantry = () => {
       {/* Header */}
       <header className="bg-card/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-primary rounded-lg">
-              <Utensils className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <h1 className="font-logo text-3xl text-primary">
-              prefud
-            </h1>
+          <div className="flex items-center">
+            <img
+              src={prefudLogo.url}
+              alt="prefud"
+              className="h-10 w-auto"
+            />
           </div>
           <div className="flex items-center space-x-4">
             <LanguageSelector variant="button" />
