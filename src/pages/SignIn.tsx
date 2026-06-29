@@ -162,17 +162,13 @@ const SignIn = () => {
           <div className="container mx-auto flex items-center justify-between">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2.5 group"
+              className="group"
             >
               <img
-                src={prefudIsotipo}
-                alt=""
-                aria-hidden="true"
-                className="h-10 w-10 object-contain drop-shadow-sm brightness-0 invert"
+                src={prefudFullLogo.url}
+                alt="Prefud"
+                className="h-10 w-auto object-contain brightness-0 invert"
               />
-              <span className="font-logo text-2xl text-white/90">
-                prefud
-              </span>
             </button>
 
             <div className="flex items-center gap-2">
