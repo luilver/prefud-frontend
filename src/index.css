@@ -34,8 +34,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 200 15% 20%;
 
-    --primary: 122 39% 49%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 122 39% 36%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 120 30% 85%;
     --secondary-foreground: 122 39% 25%;
@@ -67,14 +67,14 @@
 
   /* Theme: Citrus Bloom — #FF7F50 / #32CD32 */
   [data-theme="citrus"] {
-    --primary: 16 100% 65%;
+    --primary: 16 80% 42%;
     --primary-foreground: 0 0% 100%;
     --secondary: 120 61% 75%;
     --secondary-foreground: 120 61% 20%;
-    --accent: 120 61% 50%;
+    --accent: 120 61% 30%;
     --accent-foreground: 0 0% 100%;
     --ring: 16 100% 65%;
-    --sidebar-primary: 16 100% 65%;
+    --sidebar-primary: 16 80% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 16 100% 92%;
     --sidebar-accent-foreground: 16 80% 30%;
@@ -196,4 +196,34 @@
   .safe-area-right {
     padding-right: env(safe-area-inset-right);
   }
+}
+
+/* Respect prefers-reduced-motion (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip-to-content link */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+.skip-to-content:focus {
+  left: 0;
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
 }

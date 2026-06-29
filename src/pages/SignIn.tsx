@@ -247,13 +247,15 @@ const SignIn = () => {
                         type="button"
                         variant="ghost"
                         size="sm"
+                        aria-label={showPassword ? (t("signin.hidePassword") || "Hide password") : (t("signin.showPassword") || "Show password")}
+                        aria-pressed={showPassword}
                         className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 p-0 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4.5 w-4.5 text-neutral-400" />
+                          <EyeOff className="h-4.5 w-4.5 text-neutral-400" aria-hidden="true" />
                         ) : (
-                          <Eye className="h-4.5 w-4.5 text-neutral-400" />
+                          <Eye className="h-4.5 w-4.5 text-neutral-400" aria-hidden="true" />
                         )}
                       </Button>
                     </div>

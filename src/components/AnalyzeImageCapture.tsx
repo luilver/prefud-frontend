@@ -147,6 +147,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
           type="file"
           accept={ACCEPT_ATTR}
           capture="environment"
+          aria-label="Take ingredient photo with camera"
           className="hidden"
           onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
         />
@@ -154,6 +155,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
           ref={uploadInputRef}
           type="file"
           accept={ACCEPT_ATTR}
+          aria-label="Upload ingredient photo from device"
           className="hidden"
           onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
         />
