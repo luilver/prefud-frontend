@@ -65,11 +65,9 @@ const Index = () => {
                 aria-hidden="true"
                 className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 object-contain"
               />
-              <img
-                src={prefudWordmark}
-                alt="prefud"
-                className="h-8 sm:h-10 lg:h-12 w-auto object-contain"
-              />
+              <span className="font-logo text-2xl sm:text-3xl lg:text-4xl text-foreground">
+                prefud
+              </span>
             </div>
 
             {/* Desktop Navigation */}
