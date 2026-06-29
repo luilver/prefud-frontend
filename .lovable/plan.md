@@ -1,67 +1,64 @@
-## Goal
 
-Make the Planner, Plan Details, AI Meals, AI Drinks, Pantry, and Profile screens follow the active theme (Default / Citrus / Aqua / Dusk) on both desktop and mobile. Today these screens render with hardcoded `emerald` and `teal` Tailwind classes, so they stay green even after switching theme.
+# Accessibility Audit Plan (Audit-Only)
 
-## Approach
+Goal: produce `ACCESSIBILITY_AUDIT.md` at the repo root with a complete WCAG 2.2 AA findings report. **No code changes in this pass.** You decide what to fix next from the backlog.
 
-Replace hardcoded color utilities with the semantic design tokens already defined in `index.css` and overridden per theme in `[data-theme="..."]`:
+## Scope
 
-- Solid backgrounds / buttons / icons → `bg-primary`, `text-primary`, `text-primary-foreground`, `bg-accent`, `text-accent`, `border-primary`, `ring-primary`
-- Gradients (headers, CTAs, tab actives) → `bg-gradient-to-r from-primary to-accent`
-- Soft/tinted surfaces (cards, chips, hover) → `bg-primary/10`, `bg-accent/10`, `border-primary/20`, `text-primary` (token-driven, opacity-tinted)
-- Dark hero panels (e.g. Profile / Pantry top banner) → `from-primary/80 via-primary/70 to-accent/80` over the dark backdrop instead of `from-emerald-900/80 ...`
-- Status colors that are semantically non-brand stay as-is: `destructive` red for errors, `orange/red` for "expiring soon", green check for "fresh" status.
+Every page, primary component, modal, and form in the app — not a sampled subset. The four priority lenses guide *severity weighting*, not coverage:
 
-## Files to update
+1. Color contrast across all themes (Default, Citrus, Aqua, Dusk) + dark mode
+2. Keyboard & focus (tab order, focus-visible, modal trapping, skip link)
+3. Screen reader labels (icon buttons, form labels, landmarks, live regions for async jobs)
+4. Mobile / native UX (44×44 tap targets, safe areas, iOS zoom, `prefers-reduced-motion`)
 
-Sweep these components and replace every `emerald-*` / `teal-*` brand color with the semantic tokens above. Keep typography, spacing, sizes, and structure exactly as they are.
+## Surfaces audited
 
-1. **Planner**
-   - `src/components/MealPlanner.tsx`
-   - `src/components/MealPlanCreator.tsx`
-   - `src/components/MealPlanCreatorStepper.tsx`
-   - `src/components/MealPlanCalendarView.tsx`
-2. **Plan details**
-   - `src/components/MealPlanView.tsx`
-   - `src/components/MealPlanReadyModal.tsx`
-3. **AI Meals**
-   - `src/components/AIMealCreator.tsx`
-   - `src/components/AIMealCreatorStepper.tsx`
-   - `src/components/AIMealSuggestions.tsx`
-   - `src/components/AIMealGeneration.tsx`
-   - `src/components/AIMealReadyModal.tsx`
-   - `src/components/AIMealJobIndicator.tsx`
-4. **AI Drinks**
-   - `src/components/AIDrinkCreator.tsx`
-   - `src/components/AIDrinkCreatorStepper.tsx`
-   - `src/components/AIDrinkGoals.tsx`
-   - `src/components/DrinkReadyModal.tsx`
-   - `src/components/DrinkJobIndicator.tsx`
-5. **Pantry**
-   - `src/components/IngredientTracker.tsx`
-   - `src/components/AddIngredientForm.tsx`
-   - `src/components/AnalyzeImageCapture.tsx`
-   - `src/components/AnalyzeImageReadyModal.tsx`
-   - `src/components/AnalyzeImageJobIndicator.tsx`
-   - `src/components/PantryMealsJobIndicator.tsx`
-   - `src/components/PantryMealsReadyModal.tsx`
-6. **Profile**
-   - `src/components/UserProfile.tsx` (including the 5 subscription usage cards — replace the per-card `emerald/teal/blue/purple/orange` palette map with `primary`, `accent`, and neutral chips so all cards adapt to the theme; keep the orange "Calories" and emerald "Environment" semantic accents only where they represent meaning, not branding)
-7. **Shared job indicator** (used inside these flows)
-   - `src/components/MealPlanJobIndicator.tsx`
+- **Auth**: `SignIn`, `SignUp` (`SignupSteps`, OTP, password recovery/update), `DeleteAccountModal`
+- **Marketing**: `Index`, `Landing`, `WhyPantry`, `Pricing`, `TermsAndConditions`, `PrivacyPolicy`, `NotFound`
+- **Shell**: `Navigation` (desktop sidebar + mobile bottom nav), `Dashboard` headers, `WelcomeModal`, `LanguageSelector`, `ui/Header`
+- **Planner**: `MealPlanner`, `MealPlanCreator(Stepper)`, `MealPlanView`, `MealPlanCalendarView`, `MealPlanSuccessModal`, `MealPlanTimeoutModal`, `MealShoppingModal`
+- **Meals**: `AIMealCreator(Stepper)`, `AIMealIngredients/Preferences/Generation/Suggestions/View`, `RecipeView`, `ReelRecipeModal`, `CookingMode`, `UltraFocusCooking`, `Reels`
+- **Drinks**: `AIDrinkCreator(Stepper)`, `AIDrink*` family, `DrinkDetailView`, `DrinkShoppingModal`, `CocktailAnimation`
+- **Pantry**: `IngredientTracker`, `AddIngredientForm`, `AnalyzeImageCapture`, `CameraProductScanner`, `ShoppingList`
+- **Profile / Subscription**: `UserProfile` (incl. Settings/theme picker), `UserProfileForm`, `BillingManagement`, `SubscriptionManager`, `SubscriptionPurchase`, `SubscriptionUpgradeModal`, `SubscriptionCancelModal`, `SubscriptionSuccessModal`, `FreeSubscriptionConfirmModal`, `PaymentForm`/`PaymentForm2`, `PaymentMethodModal`
+- **Cart / Checkout**: `Cart`, `CheckoutFlow` + every step, `AddToCartButton`, `OrderOnlineModal`
+- **Tracking & misc**: `CalorieTracker`, `CarbonSavingsTracker`, `Environment`, `Highlights`, `Favorites`, `PageSizeSelector`
+- **Async job UX**: 5 job indicators + 5 ready modals (MealPlan, Drink, AIMeal, PantryMeals, AnalyzeImage) — checked specifically for live-region announcements
+- **Global**: `index.css` tokens for all 5 theme variants, `index.html` `lang`, viewport, `<main>` landmark count
 
-## Mobile parity
+## Method
 
-- These pages are the same components on desktop and mobile, so the same token substitutions fix both viewports.
-- Audit each file's mobile-only branches (`isMobile && ...`, `sm:` toggles, sticky bottom CTA bars) to ensure they also use `bg-primary` / gradient-to-accent, not `emerald`.
+Static code analysis only (audit-only — no Playwright runs, no edits):
 
-## Out of scope
+- **Contrast**: compute WCAG ratios for each `--foreground/--background`, `--primary/--primary-foreground`, `--accent/--accent-foreground`, `--muted-foreground/--background`, destructive, sidebar tokens — across `:root`, `[data-theme="citrus"]`, `[data-theme="aqua"]`, `[data-theme="dusk"]`, `.dark`. Flag every pair below 4.5:1 (text) / 3:1 (large text, UI components, focus rings). Also flag hard-coded `text-white`, `text-gray-*`, `bg-emerald-*`, `bg-white/15` overlays where they bypass tokens.
+- **Keyboard / focus**: grep for `onClick` on `div`/`span` without `role`+`onKeyDown`, missing `focus-visible` styles, `tabIndex` > 0, `autoFocus` outside dialogs, custom dropdowns/menus that don't use Radix/shadcn primitives, missing skip link, `aria-hidden` wrapping focusables.
+- **Screen reader**: every `<Button size="icon">` / bare `<button>` with only an icon child must have `aria-label`; every `<Input>` needs an associated `<Label htmlFor>` or `aria-label`; check `<main>` count per route, landmark usage, `aria-live` on job indicators and toast announcements, alt text on `<img>` (logos, recipe images, isotipo).
+- **Mobile/native**: tap target ≥ 44×44 (flag `size="icon"` defaults of 36×36 used as primary actions, bottom-nav items), `h-screen` vs `h-dvh`, inputs with `font-size` < 16px, safe-area utilities on fixed bars, `prefers-reduced-motion` respect in `CocktailAnimation`, reels auto-play, loading spinners.
+- **Semantic HTML & ARIA**: heading hierarchy per page (single H1, no skipped levels), correct landmarks, redundant/invalid ARIA.
+- **Forms**: required indicators, error association via `aria-describedby`, error announcements, autocomplete attributes on auth/payment forms.
+- **Motion/error prevention**: destructive actions (delete account, cancel subscription, remove cart item) confirmed; flashing/auto-advancing carousels.
 
-- `Landing.tsx`, `SignIn.tsx`, `SignUp.tsx`, pricing cards, marketing pages — not in the user's list.
-- Logic, data, endpoints, translations — untouched.
-- Semantic non-brand colors (destructive red, expiring-soon orange, fresh green check, info blue) — kept as-is.
+## Report structure (`ACCESSIBILITY_AUDIT.md`)
 
-## Verification
+1. Executive summary + per-surface scores (0–100) for Accessibility, Contrast, Keyboard, Screen Reader, Mobile, WCAG compliance.
+2. Theme contrast matrix — one table per theme listing every token pair, computed ratio, AA pass/fail.
+3. Findings grouped by severity: **Critical → Major → Minor**. Each finding includes:
+   - Title, location (`file.tsx:line` where identifiable), affected component
+   - WCAG 2.2 criterion (e.g., 1.4.3, 2.1.1, 2.4.7, 4.1.2)
+   - Severity + priority (Critical/High/Medium/Low)
+   - Why it matters (which users break)
+   - Recommended fix (code-level guidance, not applied)
+4. Cross-cutting recommendations (focus-ring token, icon-button wrapper enforcing `aria-label`, live-region helper for job indicators, theme-token cleanup of hardcoded Tailwind colors).
+5. Summary table: Issue | Location | WCAG | Severity | Fix.
+6. Suggested fix order (what I'd tackle first if you approve a follow-up build pass).
 
-- Build passes.
-- Manually switch each theme in Settings, reload, and confirm Planner, Plan details, Meals, Drinks, Pantry, and Profile recolor primary surfaces, buttons, active tabs, gradients, and chips. Check the mobile viewport for the same screens.
+## Out of scope (this pass)
+
+- No file edits, no dependency changes, no Playwright/automated tool runs.
+- Backend, copy/translations correctness, and SEO are not part of this audit.
+- Lighthouse/axe scores are *equivalent checks performed manually from code*; not actual tool runs.
+
+## Deliverable
+
+Single new file: `ACCESSIBILITY_AUDIT.md` at repo root. After you review it, you can ask me to implement fixes in priority order.
