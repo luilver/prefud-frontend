@@ -1,14 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Utensils, ArrowLeft, Sparkles, Shield, Lock } from "lucide-react";
+import { ArrowLeft, Sparkles, Shield, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useThemeLogo } from "@/contexts/ThemeContext";
 import SignupSteps from "@/components/SignupSteps";
 import LanguageSelector from "@/components/LanguageSelector";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const logoUrl = useThemeLogo();
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col">
@@ -35,12 +37,11 @@ const SignUp = () => {
               onClick={() => navigate("/")}
               className="flex items-center gap-2.5 group"
             >
-              <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
-                <Utensils className="h-5 w-5 text-emerald-400" />
-              </div>
-              <span className="font-logo text-2xl text-white/90">
-                prefud
-              </span>
+              <img
+                src={logoUrl}
+                alt="prefud"
+                className="h-10 sm:h-12 brightness-0 invert"
+              />
             </button>
             
             <div className="flex items-center gap-2">
