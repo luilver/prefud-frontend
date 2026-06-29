@@ -196,12 +196,12 @@ const SignIn = () => {
           <div className="w-full max-w-[420px]">
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
               <CardHeader className="text-center space-y-3 pt-8 pb-2 px-6 md:px-8">
-                <div className="mx-auto p-6 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl w-fit shadow-lg shadow-emerald-500/30">
+                <div className="mx-auto p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl w-fit shadow-lg shadow-emerald-500/30">
                   <img
                     src={prefudIsotipo}
                     alt=""
                     aria-hidden="true"
-                    className="h-28 w-28 object-contain brightness-0 invert"
+                    className="h-10 w-10 object-contain brightness-0 invert"
                   />
                 </div>
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">

@@ -58,14 +58,14 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo - isotipo + wordmark image */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <img
                 src={prefudIsotipo}
                 alt=""
                 aria-hidden="true"
-                className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 object-contain"
+                className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 object-contain"
               />
-              <span className="font-logo text-4xl sm:text-5xl lg:text-6xl text-foreground">
+              <span className="font-logo text-2xl sm:text-3xl lg:text-4xl text-foreground">
                 prefud
               </span>
             </div>
@@ -506,13 +506,10 @@ const Index = () => {
       <footer className="bg-card/90 backdrop-blur-sm border-t border-border/50 py-12">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              <img
-                src={prefudIsotipo}
-                alt=""
-                aria-hidden="true"
-                className="h-12 w-12 object-contain"
-              />
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className="p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
+                <Utensils className="h-5 w-5 text-primary-foreground" />
+              </div>
               <span className="font-logo text-2xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 prefud
               </span>
