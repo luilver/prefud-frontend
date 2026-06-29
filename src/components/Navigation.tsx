@@ -18,8 +18,8 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { useThemeLogo } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
-import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 
 interface NavigationProps {
   activeTab: string;
@@ -30,6 +30,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const { isCollapsed, setIsCollapsed } = useSidebar();
+  const logoUrl = useThemeLogo();
 
   const navItems = [
     { id: "planner", label: t("dashboard.nav.planner"), icon: Calendar },
@@ -100,7 +101,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center">
               <img
-                src={prefudLogo.url}
+                src={logoUrl}
                 alt="prefud"
                 className="h-12 w-auto brightness-0 invert"
               />
