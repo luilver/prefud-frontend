@@ -19,7 +19,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { cn } from "@/lib/utils";
-import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 
 interface NavigationProps {
   activeTab: string;
