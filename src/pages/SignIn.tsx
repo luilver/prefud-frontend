@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
-import prefudIsotipo from "@/assets/prefud-isotipo.png";
+import prefudWhiteLogo from "@/assets/prefud-white.png.asset.json";
 import prefudFullLogo from "@/assets/prefud-full-logo.png.asset.json";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
@@ -165,9 +165,9 @@ const SignIn = () => {
               className="group"
             >
               <img
-                src={prefudFullLogo.url}
+                src={prefudWhiteLogo.url}
                 alt="Prefud"
-                className="h-10 w-auto object-contain brightness-0 invert"
+                className="h-10 w-auto object-contain"
               />
             </button>
 
