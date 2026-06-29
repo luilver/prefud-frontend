@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import logoDefault from "@/assets/logo-default.png.asset.json";
-import logoCitrus from "@/assets/logo-citrus.png.asset.json";
-import logoAqua from "@/assets/logo-aqua.png.asset.json";
-import logoDusk from "@/assets/logo-dusk.png.asset.json";
+import logoDefault from "@/assets/logo-default.png";
+import logoCitrus from "@/assets/logo-citrus.png";
+import logoAqua from "@/assets/logo-aqua.png";
+import logoDusk from "@/assets/logo-dusk.png";
 
 export type ThemeId = "default" | "citrus" | "aqua" | "dusk";
 
@@ -18,25 +18,25 @@ export const THEMES: Record<ThemeId, ThemeMeta> = {
     id: "default",
     labelKey: "settings.theme.default",
     swatches: ["#186047", "#A4B237"],
-    logoUrl: logoDefault.url,
+    logoUrl: logoDefault,
   },
   citrus: {
     id: "citrus",
     labelKey: "settings.theme.citrus",
     swatches: ["#FF7F50", "#32CD32"],
-    logoUrl: logoCitrus.url,
+    logoUrl: logoCitrus,
   },
   aqua: {
     id: "aqua",
     labelKey: "settings.theme.aqua",
     swatches: ["#008080", "#87CEEB"],
-    logoUrl: logoAqua.url,
+    logoUrl: logoAqua,
   },
   dusk: {
     id: "dusk",
     labelKey: "settings.theme.dusk",
     swatches: ["#800080", "#B87333"],
-    logoUrl: logoDusk.url,
+    logoUrl: logoDusk,
   },
 };
 
