@@ -19,6 +19,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { cn } from "@/lib/utils";
+import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 
 interface NavigationProps {
   activeTab: string;
@@ -97,16 +98,12 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
           </div>
         ) : (
           <div className="flex items-center justify-between w-full">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg shadow-lg shadow-emerald-500/30">
-                <CookingPot className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h2 className="font-logo text-2xl text-white">
-                  prefud
-                </h2>
-                <p className="text-sm text-emerald-300/80">Smart Kitchen</p>
-              </div>
+            <div className="flex items-center">
+              <img
+                src={prefudLogo.url}
+                alt="prefud"
+                className="h-12 w-auto brightness-0 invert"
+              />
             </div>
           </div>
         )}

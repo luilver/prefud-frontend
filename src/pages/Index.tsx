@@ -22,6 +22,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
 import prefudIsotipo from "@/assets/prefud-isotipo.png";
+import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
@@ -507,12 +508,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
-                <Utensils className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-logo text-2xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                prefud
-              </span>
+              <img src={prefudLogo.url} alt="prefud" className="h-12 w-auto" />
             </div>
             <div className="flex items-center justify-center space-x-6 mb-4 text-sm text-muted-foreground">
               <Link
