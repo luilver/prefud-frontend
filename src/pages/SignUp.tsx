@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Utensils, ArrowLeft, Sparkles, Shield, Lock } from "lucide-react";
+import { ArrowLeft, Sparkles, Shield, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useThemeLogo } from "@/contexts/ThemeContext";
 import SignupSteps from "@/components/SignupSteps";
 import LanguageSelector from "@/components/LanguageSelector";
 
