@@ -164,7 +164,7 @@ const SignIn = () => {
               className="group"
             >
               <img
-                src={prefudFullLogo.url}
+                src={logoUrl}
                 alt="Prefud"
                 className="h-10 w-auto object-contain brightness-0 invert"
               />
@@ -193,7 +193,7 @@ const SignIn = () => {
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
               <CardHeader className="text-center space-y-3 pt-8 pb-2 px-6 md:px-8">
               <img
-                src={prefudFullLogo.url}
+                src={logoUrl}
                 alt="Prefud"
                 className="h-32 w-auto mx-auto object-contain"
               />
