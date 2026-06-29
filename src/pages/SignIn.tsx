@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Utensils, ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
+import prefudIsotipo from "@/assets/prefud-isotipo.png";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -162,9 +163,12 @@ const SignIn = () => {
               onClick={() => navigate("/")}
               className="flex items-center gap-2.5 group"
             >
-              <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
-                <Utensils className="h-5 w-5 text-emerald-400" />
-              </div>
+              <img
+                src={prefudIsotipo}
+                alt=""
+                aria-hidden="true"
+                className="h-8 w-8 object-contain drop-shadow-sm"
+              />
               <span className="font-logo text-2xl text-white/90">
                 prefud
               </span>
@@ -192,8 +196,13 @@ const SignIn = () => {
           <div className="w-full max-w-[420px]">
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
               <CardHeader className="text-center space-y-3 pt-8 pb-2 px-6 md:px-8">
-                <div className="mx-auto p-3.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl w-fit shadow-lg shadow-emerald-500/30">
-                  <Utensils className="h-7 w-7 text-white" />
+                <div className="mx-auto p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl w-fit shadow-lg shadow-emerald-500/30">
+                  <img
+                    src={prefudIsotipo}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-7 w-7 object-contain brightness-0 invert"
+                  />
                 </div>
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
                   {t("signin.title")}
