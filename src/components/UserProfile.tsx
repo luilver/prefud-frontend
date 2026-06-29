@@ -899,3 +899,80 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
+
+const SettingsSection = () => {
+  const { t } = useLanguage();
+  const { theme, setTheme } = useTheme();
+  return (
+    <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+      <CardContent className="p-0">
+        <Accordion type="single" collapsible defaultValue="settings">
+          <AccordionItem value="settings" className="border-none">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center space-x-2">
+                <Palette className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <span className="text-lg sm:text-xl font-semibold">
+                  {t("settings.title") || "Settings"}
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-base font-medium">
+                    {t("settings.theme.title") || "App Theme"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t("settings.theme.description") ||
+                      "Choose a color palette and matching logo for the app"}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {(Object.values(THEMES) as Array<typeof THEMES[ThemeId]>).map((tm) => {
+                    const active = theme === tm.id;
+                    return (
+                      <button
+                        key={tm.id}
+                        type="button"
+                        onClick={() => setTheme(tm.id)}
+                        className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all bg-white ${
+                          active
+                            ? "border-primary shadow-lg scale-[1.02]"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        aria-pressed={active}
+                      >
+                        <img
+                          src={tm.logoUrl}
+                          alt={tm.id}
+                          className="h-16 w-auto object-contain"
+                        />
+                        <div className="flex items-center gap-1.5">
+                          {tm.swatches.map((c) => (
+                            <span
+                              key={c}
+                              className="h-4 w-4 rounded-full border border-black/10"
+                              style={{ backgroundColor: c }}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs font-medium text-center text-gray-700">
+                          {t(tm.labelKey) || tm.id}
+                        </span>
+                        {active && (
+                          <span className="absolute top-2 right-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </CardContent>
+    </Card>
+  );
+};
