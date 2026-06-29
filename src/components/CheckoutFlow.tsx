@@ -137,7 +137,7 @@ export const CheckoutFlow: React.FC<CheckoutFlowProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-md h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-md h-[90dvh] flex flex-col p-0">
         <DialogHeader className="flex-shrink-0 px-6 py-4 border-b">
           <DialogTitle className="text-lg font-semibold">
             {steps[currentStep - 1]?.title}

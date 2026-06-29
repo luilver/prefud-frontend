@@ -448,6 +448,7 @@ const SignupSteps = () => {
                     <Input
                       id="email"
                       type="email"
+                      autoComplete="email"
                       value={signupData.email}
                       onChange={(e) =>
                         setSignupData((prev) => ({
@@ -474,6 +475,7 @@ const SignupSteps = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
                       value={signupData.password}
                       onChange={(e) =>
                         setSignupData((prev) => ({
@@ -489,13 +491,15 @@ const SignupSteps = () => {
                       type="button"
                       variant="ghost"
                       size="sm"
+                      aria-label={showPassword ? (t("signin.hidePassword") || "Hide password") : (t("signin.showPassword") || "Show password")}
+                      aria-pressed={showPassword}
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0 hover:bg-muted rounded-lg"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       )}
                     </Button>
                   </div>

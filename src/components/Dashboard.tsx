@@ -149,7 +149,7 @@ const DashboardContent = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={isMobile ? { backgroundColor: '#000000' } : { backgroundImage: `url(${dashboardBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+    <div className="min-h-dvh relative overflow-hidden" style={isMobile ? { backgroundColor: '#000000' } : { backgroundImage: `url(${dashboardBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
       <a href="#main-content" className="skip-to-content">Skip to main content</a>
       {/* Kitchen Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -201,7 +201,7 @@ const DashboardContent = () => {
                     variant="ghost"
                     onClick={handleCartClick}
                     aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
-                    className="relative text-white/80 hover:bg-white/15 hover:text-white"
+                    className="relative text-white/90 hover:bg-white/15 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
                   >
                     <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                     {getTotalItems() > 0 && (
@@ -250,9 +250,9 @@ const DashboardContent = () => {
                     variant="ghost"
                     onClick={handleCartClick}
                     aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
-                    className="relative text-white/85 hover:bg-white/15 hover:text-white w-8 h-8 p-0"
+                    className="relative text-white/90 hover:bg-white/15 hover:text-white w-11 h-11 p-0 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
                   >
-                    <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+                    <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                     {getTotalItems() > 0 && (
                       <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
                         {getTotalItems() > 9 ? '9+' : getTotalItems()}
@@ -265,7 +265,7 @@ const DashboardContent = () => {
                 <button
                   onClick={handleUserNameClick}
                   aria-label="Open your profile"
-                  className="flex items-center justify-center w-8 h-8 bg-white/15 rounded-full hover:bg-white/25 transition-colors border border-white/20"
+                  className="flex items-center justify-center w-11 h-11 bg-white/15 rounded-full hover:bg-white/25 transition-colors border border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
                 >
                   <span className="text-xs text-white font-medium">
                     {user?.name ? user.name.charAt(0).toUpperCase() : 'C'}
@@ -288,7 +288,7 @@ const DashboardContent = () => {
       {/* Main Content with dynamic positioning */}
       <main
         id="main-content"
-        className={`relative min-h-screen transition-all duration-300 ${isMobile ? 'pt-20 mb-20' : 'mt-16'}`}
+        className={`relative min-h-dvh transition-all duration-300 ${isMobile ? 'pt-20 mb-20' : 'mt-16'}`}
         style={!isMobile ? { marginLeft: `${getSidebarWidth()}px` } : {}}
       >
         <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
