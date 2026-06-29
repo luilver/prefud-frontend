@@ -103,7 +103,7 @@ const AnalyzeImageReadyModal = () => {
 
   return (
     <Dialog open={!!readyIngredients} onOpenChange={(open) => { if (!open && !isSaving) dismissReadyIngredients(); }}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <div className="relative">

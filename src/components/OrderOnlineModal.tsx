@@ -180,7 +180,7 @@ const OrderOnlineModal = ({ isOpen, onClose, items, mealPlanName }: OrderOnlineM
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-4xl max-h-[90dvh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />

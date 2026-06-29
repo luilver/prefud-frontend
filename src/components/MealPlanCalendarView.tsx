@@ -172,7 +172,7 @@ const MealPlanCalendarView = ({
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">{t("mealPlanView.shoppingList") || "Shopping List"}</h1>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">{t("mealPlanView.shoppingList") || "Shopping List"}</h2>
               <p className="text-sm text-white/80">{plan.name}</p>
             </div>
           </div>
@@ -303,9 +303,9 @@ const MealPlanCalendarView = ({
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
                 {dayDate?.dayOfWeek}, {dayDate?.dateLabel}
-              </h1>
+              </h2>
               <p className="text-sm text-white/80">{dayMeals.length} {t("mealPlanView.meal") || "meal"}{dayMeals.length !== 1 ? "s" : ""}</p>
             </div>
           </div>

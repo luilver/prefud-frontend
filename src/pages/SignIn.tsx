@@ -221,8 +221,9 @@ const SignIn = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base transition-all placeholder:text-neutral-400"
+                      className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base transition-all placeholder:text-muted-foreground"
                       placeholder={t("signin.email.placeholder")}
+                      autoComplete="email"
                     />
                   </div>
 
@@ -240,8 +241,9 @@ const SignIn = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base pr-12 transition-all placeholder:text-neutral-400"
+                        className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base pr-12 transition-all placeholder:text-muted-foreground"
                         placeholder={t("signin.password.placeholder")}
+                        autoComplete="current-password"
                       />
                       <Button
                         type="button"
@@ -253,9 +255,9 @@ const SignIn = () => {
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4.5 w-4.5 text-neutral-400" aria-hidden="true" />
+                          <EyeOff className="h-4.5 w-4.5 text-muted-foreground" aria-hidden="true" />
                         ) : (
-                          <Eye className="h-4.5 w-4.5 text-neutral-400" aria-hidden="true" />
+                          <Eye className="h-4.5 w-4.5 text-muted-foreground" aria-hidden="true" />
                         )}
                       </Button>
                     </div>
@@ -274,7 +276,7 @@ const SignIn = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 rounded-xl"
+                    className="w-full h-12 text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-all duration-300 rounded-xl"
                     disabled={isLoading}
                   >
                     {isLoading ? t("signin.signing-in") : t("signin.button")}
@@ -317,12 +319,12 @@ const SignIn = () => {
 
             {/* Trust Indicators */}
             <div className="flex justify-center items-center gap-5 mt-6">
-              <div className="flex items-center gap-1.5 text-white/60">
+              <div className="flex items-center gap-1.5 text-white/85">
                 <Shield className="h-3.5 w-3.5" />
                 <span className="text-xs font-medium">Secure</span>
               </div>
               <div className="w-1 h-1 bg-white/30 rounded-full" />
-              <div className="flex items-center gap-1.5 text-white/60">
+              <div className="flex items-center gap-1.5 text-white/85">
                 <Lock className="h-3.5 w-3.5" />
                 <span className="text-xs font-medium">256-bit SSL</span>
               </div>

@@ -23,7 +23,10 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
   if (variant === "button") {
     return (
       <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'es' | 'pt')}>
-        <SelectTrigger className={`w-auto bg-emerald-700/40 border border-emerald-500/30 shadow-none focus:ring-0 hover:bg-emerald-600/50 focus:bg-emerald-600/50 data-[state=open]:bg-emerald-600/50 rounded-lg px-2 py-1.5 h-8 transition-colors ${className}`}>
+        <SelectTrigger
+          aria-label={`${t('language.english')} / ${t('language.spanish')} / ${t('language.portuguese')}`}
+          className={`w-auto bg-emerald-700/40 border border-emerald-500/30 shadow-none focus:ring-0 hover:bg-emerald-600/50 focus:bg-emerald-600/50 data-[state=open]:bg-emerald-600/50 rounded-lg px-2 py-1.5 h-8 transition-colors ${className}`}
+        >
           <div className="flex items-center gap-1">
             <span className="text-sm">{currentLanguage?.flag}</span>
           </div>
@@ -44,7 +47,10 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
 
   return (
     <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'es' | 'pt')}>
-      <SelectTrigger className={`border-green-200 focus:border-green-400 ${className}`}>
+      <SelectTrigger
+        aria-label={t('signup.language.select')}
+        className={`border-green-200 focus:border-green-400 ${className}`}
+      >
         <SelectValue placeholder={t('signup.language.select')} />
       </SelectTrigger>
       <SelectContent className="bg-white">
