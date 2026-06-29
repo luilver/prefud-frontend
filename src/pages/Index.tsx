@@ -22,12 +22,13 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
 
-import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
+import { useThemeLogo } from "@/contexts/ThemeContext";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
   const { isLoading: isAuthLoading } = useAuth();
   const { t } = useLanguage();
+  const logoUrl = useThemeLogo();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
