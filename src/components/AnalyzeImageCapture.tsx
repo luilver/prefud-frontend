@@ -163,7 +163,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
             <img
               src={preview}
               alt="Selected ingredient photo"
-              className="w-full max-h-64 object-contain rounded-lg border border-emerald-100 bg-gray-50"
+              className="w-full max-h-64 object-contain rounded-lg border border-primary/20 bg-gray-50"
             />
             <div className="flex gap-2">
               <Button
@@ -177,7 +177,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
               <Button
                 onClick={handleAnalyze}
                 disabled={isSubmitting}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white"
               >
                 {isSubmitting ? (
                   <>
@@ -197,7 +197,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               onClick={handleTakePhoto}
-              className="h-24 flex-col gap-2 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white"
+              className="h-24 flex-col gap-2 bg-gradient-to-br from-primary to-accent hover:from-primary hover:to-accent text-white"
             >
               <Camera className="h-7 w-7" />
               <span>{t("addIngredient.takePhoto") || "Take Photo"}</span>
@@ -205,7 +205,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
             <Button
               onClick={() => uploadInputRef.current?.click()}
               variant="outline"
-              className="h-24 flex-col gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+              className="h-24 flex-col gap-2 border-primary/20 text-primary hover:bg-primary/5"
             >
               <Upload className="h-7 w-7" />
               <span>{t("addIngredient.uploadPhoto") || "Upload Photo"}</span>

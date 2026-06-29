@@ -573,7 +573,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
           {t("aiDrinkChat.back") || "Back"}
         </Button>
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full">
+          <div className="p-1.5 bg-gradient-to-r from-primary to-accent rounded-full">
             <Wine className="h-4 w-4 text-white" />
           </div>
           <h1 className="text-lg font-semibold text-white">
@@ -592,7 +592,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
             <div className={`flex gap-2 max-w-[85%] md:max-w-[70%] ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
               <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 ${
                 msg.role === "bot"
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                  ? "bg-gradient-to-r from-primary to-accent"
                   : "bg-white/20"
               }`}>
                 {msg.role === "bot" ? <Bot className="h-4 w-4 text-white" /> : <User className="h-4 w-4 text-white" />}
@@ -601,7 +601,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
               <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
                 msg.role === "bot"
                   ? "bg-white/95 text-gray-800 rounded-tl-sm shadow-md"
-                  : "bg-emerald-500 text-white rounded-tr-sm shadow-md"
+                  : "bg-primary text-white rounded-tr-sm shadow-md"
               }`}>
                 {msg.text}
 
@@ -611,7 +611,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                       <button
                         key={opt.key}
                         onClick={() => handleOptionSelect(opt.key, opt.label)}
-                        className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border border-emerald-200"
+                        className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
                       >
                         {opt.label}
                       </button>
@@ -642,7 +642,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                         onClick={() => toggleMultiSelect(opt.key)}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                           isSelected
-                            ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                            ? "bg-primary text-white border-primary shadow-sm"
                             : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
                         }`}
                       >
@@ -659,7 +659,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                       value={otherValue}
                       onChange={(e) => onOtherChange(e.target.value)}
                       placeholder={otherPlaceholder}
-                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-primary/40"
                       maxLength={30}
                     />
                   </div>
@@ -668,7 +668,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                   <Button
                     size="sm"
                     onClick={handleMultiSelectConfirm}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4"
+                    className="bg-primary hover:bg-primary text-white text-xs rounded-full px-4"
                   >
                     {getConfirmCount() > 0
                       ? `${t("aiDrinkChat.confirm") || "Confirm"} (${getConfirmCount()})`
@@ -691,7 +691,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                     <button
                       key={opt.key}
                       onClick={() => handleOptionSelect(opt.key, opt.label)}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border border-emerald-200"
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
                     >
                       {opt.label}
                     </button>
@@ -729,7 +729,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
                 <Button
                   size="sm"
                   onClick={handleStepperSubmit}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4 w-full"
+                  className="bg-primary hover:bg-primary text-white text-xs rounded-full px-4 w-full"
                 >
                   {t("aiDrinkChat.continue") || "Continue"} →
                 </Button>
@@ -744,7 +744,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
             <Button
               onClick={handleGenerate}
               size="lg"
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-full px-8 shadow-lg shadow-emerald-500/30"
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white rounded-full px-8 shadow-lg shadow-primary/30"
             >
               <Sparkles className="h-5 w-5 mr-2" />
               {t("aiDrinkChat.generate") || "Generate My Drink"}
@@ -774,7 +774,7 @@ const AIDrinkCreatorStepper = ({ onBack, onDrinkCreated }: AIDrinkCreatorStepper
             <Button
               size="sm"
               onClick={handleTextSubmit}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full h-8 w-8 p-0"
+              className="bg-primary hover:bg-primary text-white rounded-full h-8 w-8 p-0"
             >
               <Send className="h-4 w-4" />
             </Button>

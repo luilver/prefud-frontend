@@ -185,7 +185,7 @@ const IngredientTracker = () => {
     const daysLeft = getDaysUntilExpiry(ingredient.expiryDate);
     const totalDays = ingredient.daysToExpire || 14;
     const pct = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
-    let barColor = "bg-emerald-500";
+    let barColor = "bg-primary";
     if (daysLeft <= 3) barColor = "bg-red-500";
     else if (daysLeft <= 7) barColor = "bg-amber-400";
     return { pct, barColor };
@@ -299,19 +299,19 @@ const IngredientTracker = () => {
           backgroundImage: `url('https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?q=80&w=2070&auto=format&fit=crop')`
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/85 via-emerald-800/75 to-teal-900/85" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/85 via-primary/75 to-accent/85" />
       </div>
 
       <div className="relative z-10 space-y-6">
         {/* Header - Add Ingredient button removed on mobile */}
-        <div className="flex items-center justify-between bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+        <div className="flex items-center justify-between bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
               <Package className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg sm:text-2xl font-bold text-white">{t('ingredientTracker.title') || 'Pantry Tracker'}</h1>
-              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+              <p className="text-xs sm:text-sm text-primary-foreground/80 mt-0.5">
                 {t('ingredientTracker.description') || 'Keep track of your ingredients and their expiration dates'}
               </p>
             </div>
@@ -320,7 +320,7 @@ const IngredientTracker = () => {
             <div className="flex items-center space-x-2">
               <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/30">
+                  <Button className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent shadow-lg shadow-primary/30">
                     <Plus className="h-4 w-4 mr-2" />
                     {t('ingredientTracker.addIngredient') || 'Add Ingredient'}
                   </Button>
@@ -342,7 +342,7 @@ const IngredientTracker = () => {
             <TabsList className="w-full bg-black/30 backdrop-blur-sm border-0 p-1 rounded-xl">
               <TabsTrigger
                 value="pantry"
-                className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-lg text-white/70 rounded-lg py-2.5 gap-2"
+                className="flex-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-white data-[state=active]:shadow-lg text-white/70 rounded-lg py-2.5 gap-2"
               >
                 <Package className="h-4 w-4" />
                 {t('ingredientTracker.pantryTab') || 'Pantry'}
@@ -369,7 +369,7 @@ const IngredientTracker = () => {
               {/* Add Ingredient Button */}
               <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
                 <DialogTrigger asChild>
-                  <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/30 py-3">
+                  <Button className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent shadow-lg shadow-primary/30 py-3">
                     <Plus className="h-4 w-4 mr-2" />
                     {t('ingredientTracker.addIngredient') || 'Add Ingredient'}
                   </Button>
@@ -389,13 +389,13 @@ const IngredientTracker = () => {
                   placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-emerald-200 focus:border-emerald-400 bg-white/95"
+                  className="pl-10 border-primary/20 focus:border-primary/40 bg-white/95"
                 />
               </div>
 
               {/* Ingredient List */}
               <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
                 <CardContent className="p-4">
                   {Object.keys(categorizedIngredients).length > 0 ? (
                     <Accordion type="multiple" defaultValue={[]} className="space-y-3">
@@ -404,13 +404,13 @@ const IngredientTracker = () => {
                           <AccordionItem
                             key={category}
                             value={category}
-                            className="border border-emerald-200 rounded-xl overflow-hidden bg-gradient-to-r from-emerald-50/50 to-teal-50/50"
+                            className="border border-primary/20 rounded-xl overflow-hidden bg-gradient-to-r from-primary/10/50 to-accent/10/50"
                           >
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
+                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5/50 transition-colors">
                               <div className="flex items-center space-x-3">
                                 <span className="text-2xl">{getCategoryIcon(category)}</span>
                                 <span className="font-semibold text-gray-800">{category}</span>
-                                <span className="text-sm text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-medium">
+                                <span className="text-sm text-primary bg-primary/10 px-2.5 py-0.5 rounded-full font-medium">
                                   {categoryIngredients.length}
                                 </span>
                               </div>
@@ -464,7 +464,7 @@ const IngredientTracker = () => {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className="inline-flex items-center gap-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full px-2.5 py-0.5">
+                              <span className="inline-flex items-center gap-1 text-xs font-medium bg-primary/10 text-primary rounded-full px-2.5 py-0.5">
                                 <Leaf className="h-3 w-3" />
                                 Save {co2Savings.toFixed(1)} kg CO₂
                               </span>
@@ -519,8 +519,8 @@ const IngredientTracker = () => {
               ) : (
                 <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
                   <CardContent className="text-center py-12 text-gray-500">
-                    <Leaf className="h-16 w-16 mx-auto mb-4 text-emerald-400 opacity-50" />
-                    <p className="text-lg font-medium text-emerald-700">All fresh!</p>
+                    <Leaf className="h-16 w-16 mx-auto mb-4 text-primary-foreground/80 opacity-50" />
+                    <p className="text-lg font-medium text-primary">All fresh!</p>
                     <p className="text-sm">No items expiring soon</p>
                   </CardContent>
                 </Card>
@@ -537,9 +537,9 @@ const IngredientTracker = () => {
 
             <div className="flex md:grid md:grid-cols-4 gap-3 md:gap-6 overflow-x-auto pb-2 md:pb-0 snap-x snap-mandatory">
               {[
-                { key: 'all' as ActiveFilter, label: t('ingredientTracker.totalItems') || 'Total Items', value: ingredients.length, gradient: 'from-emerald-500 to-teal-500', textColor: 'text-emerald-700', icon: <Package className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+                { key: 'all' as ActiveFilter, label: t('ingredientTracker.totalItems') || 'Total Items', value: ingredients.length, gradient: 'from-primary to-accent', textColor: 'text-primary', icon: <Package className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
                 { key: 'expiring' as ActiveFilter, label: t('ingredientTracker.expiringSoon') || 'Expiring Soon', value: expiringIngredients.length, gradient: 'from-orange-500 to-red-500', textColor: 'text-orange-700', icon: <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
-                { key: 'categories' as ActiveFilter, label: t('ingredientTracker.categories') || 'Categories', value: Object.keys(categorizedIngredients).length, gradient: 'from-teal-500 to-cyan-500', textColor: 'text-teal-700', icon: <Calendar className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
+                { key: 'categories' as ActiveFilter, label: t('ingredientTracker.categories') || 'Categories', value: Object.keys(categorizedIngredients).length, gradient: 'from-accent to-cyan-500', textColor: 'text-primary', icon: <Calendar className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
                 { key: 'lowStock' as ActiveFilter, label: t('ingredientTracker.lowStock') || 'Low Stock', value: ingredients.filter((i) => i.quantity <= 1).length, gradient: 'from-red-500 to-pink-500', textColor: 'text-red-700', icon: <Bell className="h-5 w-5 md:h-6 md:w-6 text-white" /> },
               ].map((stat) => (
                 <Card
@@ -547,7 +547,7 @@ const IngredientTracker = () => {
                   onClick={() => handleStatClick(stat.key)}
                   className={`bg-white/95 backdrop-blur-sm border-0 shadow-xl min-w-[120px] md:min-w-0 snap-start flex-shrink-0 overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
                     activeFilter === stat.key && stat.key !== 'all' && stat.key !== 'categories'
-                      ? 'ring-2 ring-emerald-500 shadow-emerald-500/20'
+                      ? 'ring-2 ring-primary shadow-primary/20'
                       : ''
                   }`}
                 >
@@ -601,7 +601,7 @@ const IngredientTracker = () => {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <span className="inline-flex items-center gap-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full px-2.5 py-0.5">
+                                  <span className="inline-flex items-center gap-1 text-xs font-medium bg-primary/10 text-primary rounded-full px-2.5 py-0.5">
                                     <Leaf className="h-3 w-3" />
                                     Save {co2Savings.toFixed(1)} kg CO₂
                                   </span>
@@ -630,10 +630,10 @@ const IngredientTracker = () => {
               )}
 
               <Card className={`${pantryColSpan} bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden`}>
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-accent">
                       <Package className="h-5 w-5 text-white" />
                     </div>
                     <span className="text-gray-800">{t('ingredientTracker.yourPantry') || 'Your Pantry'}</span>
@@ -647,7 +647,7 @@ const IngredientTracker = () => {
                       placeholder={t('ingredientTracker.searchPlaceholder') || 'Search ingredients...'}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 border-emerald-200 focus:border-emerald-400"
+                      className="pl-10 border-primary/20 focus:border-primary/40"
                     />
                   </div>
                 </CardHeader>
@@ -659,13 +659,13 @@ const IngredientTracker = () => {
                           <AccordionItem
                             key={category}
                             value={category}
-                            className="border border-emerald-200 rounded-xl overflow-hidden bg-gradient-to-r from-emerald-50/50 to-teal-50/50"
+                            className="border border-primary/20 rounded-xl overflow-hidden bg-gradient-to-r from-primary/10/50 to-accent/10/50"
                           >
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
+                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5/50 transition-colors">
                               <div className="flex items-center space-x-3">
                                 <span className="text-2xl">{getCategoryIcon(category)}</span>
                                 <span className="font-semibold text-gray-800">{category}</span>
-                                <span className="text-sm text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-medium">
+                                <span className="text-sm text-primary bg-primary/10 px-2.5 py-0.5 rounded-full font-medium">
                                   {categoryIngredients.length} {categoryIngredients.length === 1 ? 'item' : 'items'}
                                 </span>
                               </div>

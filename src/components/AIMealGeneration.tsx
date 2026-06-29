@@ -893,7 +893,7 @@ const AIMealGeneration = ({ mealData, onMealCreated }: AIMealGenerationProps) =>
           {/* Action Button */}
           <Button 
             onClick={handleSaveMeal}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+            className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white"
             size="lg"
           >
             {t("mealSidebar.saveMeal") || "Save This Meal"}

@@ -233,21 +233,21 @@ const AIDrinkCreator = () => {
           backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/70 to-accent/80" />
       </div>
 
       <div className="relative z-10 space-y-6">
         {/* Header Card */}
-        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+        <div className="bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
               <Wine className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg sm:text-2xl font-bold text-white">
                 {t("aiDrinkCreator.title") || "Create Your Perfect Healthy Drink"}
               </h1>
-              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+              <p className="text-xs sm:text-sm text-primary-foreground/80 mt-0.5">
                 {t("aiDrinkCreator.desc") || "Let AI help you create delicious and nutritious drinks tailored to your health goals and preferences"}
               </p>
             </div>
@@ -255,7 +255,7 @@ const AIDrinkCreator = () => {
           <div className="mt-3 sm:mt-4">
             <Button 
               onClick={handleStartCreation}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-2 shadow-lg shadow-emerald-500/30 w-full sm:w-auto"
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white px-6 py-2 shadow-lg shadow-primary/30 w-full sm:w-auto"
             >
               {t("aiDrinkCreator.start") || "Start Creating"}
             </Button>
@@ -267,8 +267,8 @@ const AIDrinkCreator = () => {
           <Card className="bg-white/10 backdrop-blur-sm border-0">
             <CardContent className="py-8 text-center">
               <div className="flex items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin mr-2 text-emerald-400" />
-                <p className="text-emerald-100">{t("aiDrinkCreator.loading") || "Loading your drinks..."}</p>
+                <Loader2 className="h-6 w-6 animate-spin mr-2 text-primary-foreground/80" />
+                <p className="text-primary-foreground">{t("aiDrinkCreator.loading") || "Loading your drinks..."}</p>
               </div>
             </CardContent>
           </Card>
@@ -293,11 +293,11 @@ const AIDrinkCreator = () => {
             <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
               {(isMobile ? allApiDrinks : apiDrinks).map((drink) => (
                 <Card key={drink._id} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
-                  <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                  <div className="h-1.5 bg-gradient-to-r from-primary to-accent" />
                   <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shrink-0">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-primary to-accent shrink-0">
                           <Droplets className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <CardTitle className="text-sm sm:text-lg text-foreground truncate">{drink.drink_name}</CardTitle>
@@ -306,7 +306,7 @@ const AIDrinkCreator = () => {
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3 text-emerald-500" />{drink.drinkPlan.healthyDrink.cookingTime}m
+                        <Clock className="w-3 h-3 text-primary" />{drink.drinkPlan.healthyDrink.cookingTime}m
                       </span>
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
                         {drink.drinkPlan.healthyDrink.drinkType}
@@ -315,10 +315,10 @@ const AIDrinkCreator = () => {
                         {drink.drinkPlan.healthyDrink.calories} cal
                       </span>
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
-                        <Users className="w-3 h-3 text-emerald-500" />{drink.numberPeople}
+                        <Users className="w-3 h-3 text-primary" />{drink.numberPeople}
                       </span>
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
-                        <Leaf className="w-3 h-3 text-emerald-500" />{drink.drinkPlan.totalCarbonFootprint}kg
+                        <Leaf className="w-3 h-3 text-primary" />{drink.drinkPlan.totalCarbonFootprint}kg
                       </span>
                     </div>
                   </CardHeader>
@@ -326,16 +326,16 @@ const AIDrinkCreator = () => {
                     <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-2">{drink.drinkPlan.healthyDrink.description}</p>
                     <div className="flex flex-wrap gap-1 mb-2">
                       {drink.drinkPlan.healthyDrink.nutritionalInfo.vitamins?.slice(0, 3).map((vitamin, index) => (
-                        <span key={index} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full">
+                        <span key={index} className="px-2 py-0.5 bg-primary/10 text-primary-foreground/80 text-[10px] rounded-full">
                           {t("aiDrinkCreator.vitamin") || "Vit"} {vitamin}
                         </span>
                       ))}
                     </div>
                     <div className="flex gap-2 pt-2 border-t border-border/50">
-                      <Button variant="outline" size="sm" className="flex-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleViewApiDrink(drink)}>
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary-foreground/80 hover:bg-primary/10" onClick={() => handleViewApiDrink(drink)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiDrinkCreator.viewRecipe") || "View Recipe"}
                       </Button>
-                      <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white" onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}>
+                      <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}>
                         <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -350,8 +350,8 @@ const AIDrinkCreator = () => {
                 <div ref={loadMoreRef} className="h-4" />
                 {isLoadingMore && (
                   <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
-                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                    <Loader2 className="h-6 w-6 animate-spin text-primary-foreground/80" />
+                    <span className="ml-2 text-primary-foreground text-sm">Loading more...</span>
                   </div>
                 )}
                 {currentPage >= totalPages && allApiDrinks.length > 0 && (
@@ -371,7 +371,7 @@ const AIDrinkCreator = () => {
                       <PaginationItem>
                         <PaginationPrevious 
                           onClick={() => handlePageChange(currentPage - 1)}
-                          className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                          className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/5"}
                         />
                       </PaginationItem>
                       
@@ -386,7 +386,7 @@ const AIDrinkCreator = () => {
                               <PaginationLink
                                 onClick={() => handlePageChange(page)}
                                 isActive={page === currentPage}
-                                className={`cursor-pointer ${page === currentPage ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'hover:bg-emerald-50'}`}
+                                className={`cursor-pointer ${page === currentPage ? 'bg-primary text-white hover:bg-primary' : 'hover:bg-primary/5'}`}
                               >
                                 {page}
                               </PaginationLink>
@@ -408,7 +408,7 @@ const AIDrinkCreator = () => {
                       <PaginationItem>
                         <PaginationNext 
                           onClick={() => handlePageChange(currentPage + 1)}
-                          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/5"}
                         />
                       </PaginationItem>
                     </PaginationContent>
@@ -430,10 +430,10 @@ const AIDrinkCreator = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {aiDrinks.map((drink, index) => (
                 <Card key={index} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-primary" />
                   <CardHeader>
                     <div className="flex items-center space-x-2">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-accent to-primary">
                         <Droplets className="h-5 w-5 text-white" />
                       </div>
                       <CardTitle className="text-lg text-gray-800">{drink.name}</CardTitle>
@@ -448,7 +448,7 @@ const AIDrinkCreator = () => {
                       {drink.nutritionHighlights?.slice(0, 2).map((highlight: string, highlightIndex: number) => (
                         <span 
                           key={highlightIndex}
-                          className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"
+                          className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
                         >
                           {highlight.split(' ').slice(0, 2).join(' ')}
                         </span>
@@ -458,7 +458,7 @@ const AIDrinkCreator = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        className="flex-1 border-primary/20 text-primary hover:bg-primary/5"
                         onClick={() => handleViewDrink(drink)}
                       >
                         <Eye className="h-4 w-4 mr-1" />
@@ -466,7 +466,7 @@ const AIDrinkCreator = () => {
                       </Button>
                       <Button 
                         size="sm" 
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                        className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white"
                         onClick={() => handleMarkAsDone(drink.id || index.toString(), drink.name)}
                       >
                         <CheckCircle2 className="h-4 w-4" />
@@ -483,7 +483,7 @@ const AIDrinkCreator = () => {
         {totalDrinks === 0 && !loading && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
               <CardHeader>
                 <CardTitle className="text-gray-800">🥤 {t("aiDrinkCreator.smoothies") || "Smoothies"}</CardTitle>
               </CardHeader>
@@ -493,7 +493,7 @@ const AIDrinkCreator = () => {
             </Card>
 
             <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-primary" />
               <CardHeader>
                 <CardTitle className="text-gray-800">🧃 {t("aiDrinkCreator.juices") || "Fresh Juices"}</CardTitle>
               </CardHeader>
@@ -503,7 +503,7 @@ const AIDrinkCreator = () => {
             </Card>
 
             <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
               <CardHeader>
                 <CardTitle className="text-gray-800">🍵 {t("aiDrinkCreator.teas") || "Wellness Teas"}</CardTitle>
               </CardHeader>
