@@ -21,7 +21,7 @@ import Dashboard from "@/components/Dashboard";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
-import prefudIsotipo from "@/assets/prefud-isotipo.png";
+
 import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 
 const Index = () => {
