@@ -167,7 +167,7 @@ const SignIn = () => {
                 src={prefudIsotipo}
                 alt=""
                 aria-hidden="true"
-                className="h-8 w-8 object-contain drop-shadow-sm"
+                className="h-8 w-8 object-contain drop-shadow-sm brightness-0 invert"
               />
               <span className="font-logo text-2xl text-white/90">
                 prefud
