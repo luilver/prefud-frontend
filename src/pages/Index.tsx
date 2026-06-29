@@ -22,6 +22,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
 import prefudIsotipo from "@/assets/prefud-isotipo.png";
+import prefudWordmark from "@/assets/prefud-wordmark.png";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
@@ -57,16 +58,19 @@ const Index = () => {
       <nav className="bg-card/95 backdrop-blur-md border-b border-border/50 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - isotipo + wordmark */}
+            {/* Logo - isotipo + wordmark image */}
             <div className="flex items-center space-x-2">
               <img
                 src={prefudIsotipo}
-                alt="prefud"
+                alt=""
+                aria-hidden="true"
                 className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 object-contain"
               />
-              <h1 className="font-logo text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                prefud
-              </h1>
+              <img
+                src={prefudWordmark}
+                alt="prefud"
+                className="h-8 sm:h-10 lg:h-12 w-auto object-contain"
+              />
             </div>
 
             {/* Desktop Navigation */}
