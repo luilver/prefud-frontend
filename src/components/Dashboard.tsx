@@ -150,6 +150,7 @@ const DashboardContent = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={isMobile ? { backgroundColor: '#000000' } : { backgroundImage: `url(${dashboardBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+      <a href="#main-content" className="skip-to-content">Skip to main content</a>
       {/* Kitchen Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* Subtle kitchen pattern overlay */}
@@ -161,10 +162,10 @@ const DashboardContent = () => {
           }}
         />
         
-        <div className="absolute top-20 left-[10%] w-6 h-6 bg-emerald-200/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-[15%] w-4 h-4 bg-teal-200/25 rounded-full animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-[20%] w-5 h-5 bg-emerald-300/15 rounded-full animate-pulse delay-2000"></div>
-        <div className="absolute bottom-20 right-[25%] w-3 h-3 bg-teal-300/20 rounded-full animate-pulse delay-3000"></div>
+        <div aria-hidden="true" className="absolute top-20 left-[10%] w-6 h-6 bg-emerald-200/20 rounded-full motion-safe:animate-pulse"></div>
+        <div aria-hidden="true" className="absolute top-40 right-[15%] w-4 h-4 bg-teal-200/25 rounded-full motion-safe:animate-pulse delay-1000"></div>
+        <div aria-hidden="true" className="absolute bottom-32 left-[20%] w-5 h-5 bg-emerald-300/15 rounded-full motion-safe:animate-pulse delay-2000"></div>
+        <div aria-hidden="true" className="absolute bottom-20 right-[25%] w-3 h-3 bg-teal-300/20 rounded-full motion-safe:animate-pulse delay-3000"></div>
       </div>
 
       {/* Navigation */}
@@ -181,9 +182,10 @@ const DashboardContent = () => {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setActiveTab("profile")}
+                  aria-label={`${t('dashboard.header.welcome')} ${user?.name?.split(' ')[0] || 'Chef'}. Open profile`}
                   className="flex items-center space-x-2 px-3 py-2 bg-white/15 rounded-lg border border-white/20 hover:bg-white/25 transition-colors cursor-pointer"
                 >
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  <div aria-hidden="true" className="w-2 h-2 bg-white rounded-full motion-safe:animate-pulse"></div>
                   <span className="text-sm text-white font-medium">
                     {t('dashboard.header.welcome')} {user?.name?.split(' ')[0] || 'Chef'}!
                   </span>
@@ -198,9 +200,10 @@ const DashboardContent = () => {
                   <Button
                     variant="ghost"
                     onClick={handleCartClick}
+                    aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
                     className="relative text-white/80 hover:bg-white/15 hover:text-white"
                   >
-                    <ShoppingCart className="h-5 w-5" />
+                    <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                     {getTotalItems() > 0 && (
                       <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
                         {getTotalItems()}
@@ -246,9 +249,10 @@ const DashboardContent = () => {
                   <Button
                     variant="ghost"
                     onClick={handleCartClick}
+                    aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
                     className="relative text-white/85 hover:bg-white/15 hover:text-white w-8 h-8 p-0"
                   >
-                    <ShoppingCart className="h-4 w-4" />
+                    <ShoppingCart className="h-4 w-4" aria-hidden="true" />
                     {getTotalItems() > 0 && (
                       <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
                         {getTotalItems() > 9 ? '9+' : getTotalItems()}
@@ -260,6 +264,7 @@ const DashboardContent = () => {
                 {/* Mobile Welcome - Now clickable to navigate to profile */}
                 <button
                   onClick={handleUserNameClick}
+                  aria-label="Open your profile"
                   className="flex items-center justify-center w-8 h-8 bg-white/15 rounded-full hover:bg-white/25 transition-colors border border-white/20"
                 >
                   <span className="text-xs text-white font-medium">
@@ -281,7 +286,8 @@ const DashboardContent = () => {
       )}
 
       {/* Main Content with dynamic positioning */}
-      <div 
+      <main
+        id="main-content"
         className={`relative min-h-screen transition-all duration-300 ${isMobile ? 'pt-20 mb-20' : 'mt-16'}`}
         style={!isMobile ? { marginLeft: `${getSidebarWidth()}px` } : {}}
       >
@@ -364,7 +370,7 @@ const DashboardContent = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
       {showWelcome && <WelcomeModal onClose={handleWelcomeClose} />}
     </div>
   );
