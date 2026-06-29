@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
 import prefudIsotipo from "@/assets/prefud-isotipo.png";
+import prefudFullLogo from "@/assets/prefud-full-logo.png.asset.json";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -196,14 +197,11 @@ const SignIn = () => {
           <div className="w-full max-w-[420px]">
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
               <CardHeader className="text-center space-y-3 pt-8 pb-2 px-6 md:px-8">
-                <div className="mx-auto p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl w-fit shadow-lg shadow-emerald-500/30">
-                  <img
-                    src={prefudIsotipo}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-10 w-10 object-contain brightness-0 invert"
-                  />
-                </div>
+              <img
+                src={prefudFullLogo.url}
+                alt="Prefud"
+                className="h-32 w-auto mx-auto object-contain"
+              />
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
                   {t("signin.title")}
                 </CardTitle>
