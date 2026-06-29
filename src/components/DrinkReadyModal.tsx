@@ -24,8 +24,8 @@ const DrinkReadyModal = () => {
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <div className="relative">
-              <CheckCircle className="h-16 w-16 text-emerald-500" />
-              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-1">
+              <CheckCircle className="h-16 w-16 text-primary" />
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-primary to-accent rounded-full p-1">
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
             </div>
@@ -41,15 +41,15 @@ const DrinkReadyModal = () => {
               "Your personalized healthy drink has been mixed and is ready to enjoy."}
           </p>
           {readyDrink?.name && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-              <p className="font-semibold text-emerald-800 truncate">{readyDrink.name}</p>
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
+              <p className="font-semibold text-primary truncate">{readyDrink.name}</p>
             </div>
           )}
 
           <div className="pt-2 space-y-2">
             <Button
               onClick={handleView}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+              className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white"
             >
               <Eye className="h-4 w-4 mr-2" />
               {t("drinkReady.viewDrink") || "View Drink"}

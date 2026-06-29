@@ -311,7 +311,7 @@ const MealPlanner = () => {
           backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/70 to-accent/80" />
       </div>
 
       <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
@@ -326,17 +326,17 @@ const MealPlanner = () => {
         )}
 
         {/* Header */}
-        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+        <div className="bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold text-white">
                   {t("mealPlanner.title") || "Meal Planner"}
                 </h1>
-                <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+                <p className="text-xs sm:text-sm text-primary-foreground/80 mt-0.5">
                   {t("mealPlanner.description") || "Create and manage your weekly meal plans"}
                 </p>
               </div>
@@ -349,7 +349,7 @@ const MealPlanner = () => {
                 setIsEditing(false);
                 isNavigatingBack.current = false;
               }}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white w-full sm:w-auto shadow-lg"
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white w-full sm:w-auto shadow-lg"
             >
               <Plus className="h-4 w-4 mr-2" />
               {t("mealPlanner.aiMeal") || "Create AI Meal Plan"}
@@ -373,8 +373,8 @@ const MealPlanner = () => {
         {isLoadingPlans && (
           <div className="flex items-center justify-center py-12">
             <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-emerald-400" />
-              <p className="text-emerald-100">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary-foreground/80" />
+              <p className="text-primary-foreground">
                 {t("mealPlanner.loadingPlans") || "Loading your meal plans..."}
               </p>
             </div>
@@ -408,8 +408,8 @@ const MealPlanner = () => {
                 const co2Max = 50;
                 const co2Percent = Math.min((co2Value / co2Max) * 100, 100);
                 const co2Level = co2Percent <= 33 ? 'low' : co2Percent <= 66 ? 'medium' : 'high';
-                const co2Color = co2Level === 'low' ? 'text-emerald-600' : co2Level === 'medium' ? 'text-amber-600' : 'text-red-500';
-                const co2BarColor = co2Level === 'low' ? 'bg-emerald-500' : co2Level === 'medium' ? 'bg-amber-500' : 'bg-red-500';
+                const co2Color = co2Level === 'low' ? 'text-primary' : co2Level === 'medium' ? 'text-amber-600' : 'text-red-500';
+                const co2BarColor = co2Level === 'low' ? 'bg-primary' : co2Level === 'medium' ? 'bg-amber-500' : 'bg-red-500';
                 const co2Label = co2Level === 'low' ? (t("mealPlanner.co2Low") || 'Low impact') : co2Level === 'medium' ? (t("mealPlanner.co2Medium") || 'Medium impact') : (t("mealPlanner.co2High") || 'High impact');
 
                 return (
@@ -581,8 +581,8 @@ const MealPlanner = () => {
                 <div ref={loadMoreRef} className="h-4" />
                 {isLoadingMore && (
                   <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
-                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                    <Loader2 className="h-6 w-6 animate-spin text-primary-foreground/80" />
+                    <span className="ml-2 text-primary-foreground text-sm">Loading more...</span>
                   </div>
                 )}
                 {currentPage >= totalPages && allPlans.length > 0 && (
@@ -605,7 +605,7 @@ const MealPlanner = () => {
                           className={
                             currentPage <= 1
                               ? "pointer-events-none opacity-50"
-                              : "cursor-pointer hover:bg-emerald-50"
+                              : "cursor-pointer hover:bg-primary/5"
                           }
                         />
                       </PaginationItem>
@@ -622,7 +622,7 @@ const MealPlanner = () => {
                                 <PaginationLink
                                   onClick={() => handlePageChange(page)}
                                   isActive={page === currentPage}
-                                  className={`cursor-pointer ${page === currentPage ? "bg-emerald-500 text-white hover:bg-emerald-600" : "hover:bg-emerald-50"}`}
+                                  className={`cursor-pointer ${page === currentPage ? "bg-primary text-white hover:bg-primary" : "hover:bg-primary/5"}`}
                                 >
                                   {page}
                                 </PaginationLink>
@@ -649,7 +649,7 @@ const MealPlanner = () => {
                           className={
                             currentPage >= totalPages
                               ? "pointer-events-none opacity-50"
-                              : "cursor-pointer hover:bg-emerald-50"
+                              : "cursor-pointer hover:bg-primary/5"
                           }
                         />
                       </PaginationItem>

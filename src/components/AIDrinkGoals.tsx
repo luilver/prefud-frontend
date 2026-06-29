@@ -76,7 +76,7 @@ const AIDrinkGoals = ({ data, onUpdate, onNext }: AIDrinkGoalsProps) => {
     { id: 'gluten-free', label: t("aiDrinkGoals.diet.glutenFree") || 'Gluten Free', color: 'bg-yellow-500' },
     { id: 'dairy-free', label: t("aiDrinkGoals.diet.dairyFree") || 'Dairy Free', color: 'bg-blue-500' },
     { id: 'low-carb', label: t("aiDrinkGoals.diet.lowCarb") || 'Low Carb', color: 'bg-red-500' },
-    { id: 'diabetic-friendly', label: t("aiDrinkGoals.diet.diabeticFriendly") || 'Diabetic Friendly', color: 'bg-teal-500' }
+    { id: 'diabetic-friendly', label: t("aiDrinkGoals.diet.diabeticFriendly") || 'Diabetic Friendly', color: 'bg-accent' }
   ];
 
   const cuisinePreferences = [
