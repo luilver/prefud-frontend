@@ -165,9 +165,9 @@ const SignIn = () => {
               className="group"
             >
               <img
-                src={prefudFullLogo.url}
+                src={prefudWhiteLogo.url}
                 alt="Prefud"
-                className="h-10 w-auto object-contain brightness-0 invert"
+                className="h-10 w-auto object-contain"
               />
             </button>
 
