@@ -21,7 +21,7 @@ import Dashboard from "@/components/Dashboard";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
-import prefudIsotipo from "@/assets/prefud-isotipo.png";
+
 import prefudLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 
 const Index = () => {
@@ -58,18 +58,14 @@ const Index = () => {
       <nav className="bg-card/95 backdrop-blur-md border-b border-border/50 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - isotipo + wordmark image */}
-            <div className="flex items-center space-x-2">
+            {/* Logo */}
+            <Link to="/" className="flex items-center">
               <img
-                src={prefudIsotipo}
-                alt=""
-                aria-hidden="true"
-                className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 object-contain"
+                src={prefudLogo.url}
+                alt="prefud"
+                className="h-10 sm:h-12 lg:h-14 w-auto object-contain"
               />
-              <span className="font-logo text-2xl sm:text-3xl lg:text-4xl text-foreground">
-                prefud
-              </span>
-            </div>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
