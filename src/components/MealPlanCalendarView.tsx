@@ -184,7 +184,7 @@ const MealPlanCalendarView = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <CardTitle className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5 text-blue-500" />
+                        <ShoppingCart className="h-5 w-5 text-primary" />
                         {t("mealPlanView.shoppingSummary") || "Shopping Summary"}
                       </CardTitle>
                       <CardDescription>
