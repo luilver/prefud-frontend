@@ -10,6 +10,9 @@ const AnalyzeImageJobIndicator = () => {
 
   return (
     <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
       className="fixed left-1/2 -translate-x-1/2 z-50 max-w-sm w-[calc(100%-2rem)] animate-in slide-in-from-top-4"
       style={{ top: "calc(env(safe-area-inset-top, 0px) + 5rem)" }}
     >
