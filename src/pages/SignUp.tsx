@@ -38,8 +38,8 @@ const SignUp = () => {
               <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
                 <Utensils className="h-5 w-5 text-emerald-400" />
               </div>
-              <span className="text-xl font-semibold text-white/90 tracking-tight">
-                Prefud
+              <span className="font-logo text-2xl text-white/90">
+                prefud
               </span>
             </button>
             

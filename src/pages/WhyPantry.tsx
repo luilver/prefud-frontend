@@ -19,8 +19,8 @@ const WhyPantry = () => {
             <div className="p-2 bg-primary rounded-lg">
               <Utensils className="h-6 w-6 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-primary">
-              Prefud
+            <h1 className="font-logo text-3xl text-primary">
+              prefud
             </h1>
           </div>
           <div className="flex items-center space-x-4">

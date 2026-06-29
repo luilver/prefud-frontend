@@ -65,8 +65,8 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex flex-col">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Prefud
+                <h1 className="font-logo text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  prefud
                 </h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">
                   Smart Meal Planning
@@ -514,8 +514,8 @@ const Index = () => {
               <div className="p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
                 <Utensils className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Prefud
+              <span className="font-logo text-2xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                prefud
               </span>
             </div>
             <div className="flex items-center justify-center space-x-6 mb-4 text-sm text-muted-foreground">
