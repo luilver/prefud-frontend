@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Utensils, ChefHat, Sparkles, Plus, ShoppingCart } from "lucide-react";
+import { ChefHat, Sparkles, Plus, ShoppingCart } from "lucide-react";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -13,6 +13,7 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { useNavigate } from "react-router-dom";
 import Navigation from "./Navigation";
+import { useThemeLogo } from "@/contexts/ThemeContext";
 import MealPlanner from "./MealPlanner";
 import CalorieTracker from "./CalorieTracker";
 import IngredientTracker from "./IngredientTracker";
@@ -38,6 +39,9 @@ const DashboardContent = () => {
   const navigate = useNavigate();
   const isNative = isNativePlatform();
   const [showWelcome, setShowWelcome] = useState(false);
+  const logoUrl = useThemeLogo();
+  const themeGradient =
+    "linear-gradient(to right, hsl(var(--primary) / 0.95), hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.95))";
 
   useEffect(() => {
     try {
@@ -168,16 +172,18 @@ const DashboardContent = () => {
 
       {/* Header for Desktop (with dynamic positioning) */}
       {!isMobile && (
-        <header className="fixed top-0 right-0 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-b border-emerald-500/30 z-30 transition-all duration-300 shadow-xl"
-          style={{ left: `${getSidebarWidth()}px` }}>
+        <header
+          className="fixed top-0 right-0 backdrop-blur-md border-b border-white/10 z-30 transition-all duration-300 shadow-xl"
+          style={{ left: `${getSidebarWidth()}px`, background: themeGradient }}
+        >
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setActiveTab("profile")}
-                  className="flex items-center space-x-2 px-3 py-2 bg-emerald-700/40 rounded-lg border border-emerald-500/30 hover:bg-emerald-600/50 transition-colors cursor-pointer"
+                  className="flex items-center space-x-2 px-3 py-2 bg-white/15 rounded-lg border border-white/20 hover:bg-white/25 transition-colors cursor-pointer"
                 >
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                   <span className="text-sm text-white font-medium">
                     {t('dashboard.header.welcome')} {user?.name?.split(' ')[0] || 'Chef'}!
                   </span>
@@ -192,11 +198,11 @@ const DashboardContent = () => {
                   <Button
                     variant="ghost"
                     onClick={handleCartClick}
-                    className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white"
+                    className="relative text-white/80 hover:bg-white/15 hover:text-white"
                   >
                     <ShoppingCart className="h-5 w-5" />
                     {getTotalItems() > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                      <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
                         {getTotalItems()}
                       </span>
                     )}
@@ -206,7 +212,7 @@ const DashboardContent = () => {
                 <Button 
                   variant="ghost" 
                   onClick={logout} 
-                  className="text-emerald-200 hover:bg-emerald-700/40 hover:text-white"
+                  className="text-white/80 hover:bg-white/15 hover:text-white"
                 >
                   {t('dashboard.header.logout')}
                 </Button>
@@ -218,24 +224,18 @@ const DashboardContent = () => {
 
       {/* Header for Mobile */}
       {isMobile && (
-        <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-b border-emerald-500/30 z-50 shadow-xl pt-[env(safe-area-inset-top)]">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-teal-400/5 to-emerald-600/5"></div>
+        <header
+          className="fixed top-0 left-0 right-0 backdrop-blur-md border-b border-white/10 z-50 shadow-xl pt-[env(safe-area-inset-top)]"
+          style={{ background: themeGradient }}
+        >
           <div className="relative container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                {/* Enhanced Logo with Kitchen Feel */}
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl blur-sm opacity-40"></div>
-                  <div className="relative p-2.5 sm:p-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl shadow-lg shadow-emerald-500/30">
-                    <Utensils className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h1 className="font-logo text-2xl sm:text-3xl lg:text-4xl text-white">
-                    prefud
-                  </h1>
-                  <p className="text-xs sm:text-sm text-emerald-300/80 font-medium hidden sm:block">Smart Kitchen Assistant</p>
-                </div>
+              <div className="flex items-center">
+                <img
+                  src={logoUrl}
+                  alt="prefud"
+                  className="h-9 sm:h-10 w-auto brightness-0 invert"
+                />
               </div>
               
               <div className="flex items-center space-x-3 sm:space-x-4">
@@ -246,11 +246,11 @@ const DashboardContent = () => {
                   <Button
                     variant="ghost"
                     onClick={handleCartClick}
-                    className="relative text-emerald-200 hover:bg-emerald-700/40 hover:text-white w-8 h-8 p-0"
+                    className="relative text-white/85 hover:bg-white/15 hover:text-white w-8 h-8 p-0"
                   >
                     <ShoppingCart className="h-4 w-4" />
                     {getTotalItems() > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
+                      <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
                         {getTotalItems() > 9 ? '9+' : getTotalItems()}
                       </span>
                     )}
@@ -260,7 +260,7 @@ const DashboardContent = () => {
                 {/* Mobile Welcome - Now clickable to navigate to profile */}
                 <button
                   onClick={handleUserNameClick}
-                  className="flex items-center justify-center w-8 h-8 bg-emerald-700/40 rounded-full hover:bg-emerald-600/50 transition-colors border border-emerald-500/30"
+                  className="flex items-center justify-center w-8 h-8 bg-white/15 rounded-full hover:bg-white/25 transition-colors border border-white/20"
                 >
                   <span className="text-xs text-white font-medium">
                     {user?.name ? user.name.charAt(0).toUpperCase() : 'C'}
@@ -270,7 +270,7 @@ const DashboardContent = () => {
                 <Button 
                   variant="ghost" 
                   onClick={logout} 
-                  className="text-emerald-200 hover:bg-emerald-700/40 hover:text-white text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hidden md:block"
+                  className="text-white/85 hover:bg-white/15 hover:text-white text-xs sm:text-sm lg:text-base px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 hidden md:block"
                 >
                   {t('dashboard.header.logout')}
                 </Button>
