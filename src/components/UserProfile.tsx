@@ -934,7 +934,10 @@ const SettingsSection = () => {
                       <button
                         key={tm.id}
                         type="button"
-                        onClick={() => setTheme(tm.id)}
+                        onClick={() => {
+                          setTheme(tm.id);
+                          setTimeout(() => window.location.reload(), 150);
+                        }}
                         className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all bg-white ${
                           active
                             ? "border-primary shadow-lg scale-[1.02]"
