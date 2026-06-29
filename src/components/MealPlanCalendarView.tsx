@@ -184,7 +184,7 @@ const MealPlanCalendarView = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <CardTitle className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5 text-blue-500" />
+                        <ShoppingCart className="h-5 w-5 text-primary" />
                         {t("mealPlanView.shoppingSummary") || "Shopping Summary"}
                       </CardTitle>
                       <CardDescription>
@@ -397,7 +397,10 @@ const MealPlanCalendarView = ({
               <p className="text-sm text-white/80">{plan.name}</p>
             </div>
           </div>
-          <Button onClick={() => setShowShoppingList(true)} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
+          <Button
+            onClick={() => setShowShoppingList(true)}
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
+          >
             <ShoppingBasket className="h-4 w-4 mr-2" />
             {t("mealPlanView.shoppingList") || "Shopping List"} ({totalItems})
           </Button>
