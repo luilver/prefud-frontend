@@ -552,7 +552,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           <div className="flex gap-2">
             <Button
               onClick={() => setShowCalendarView(true)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white"
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
             >
               <CalendarDays className="h-4 w-4 mr-2" />
               {t("mealPlanView.calendarView") || "Calendar View"}
