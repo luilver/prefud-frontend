@@ -20,9 +20,11 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'poppins': ['Poppins', 'sans-serif'],
-				'inter': ['Inter', 'sans-serif'],
-				'sans': ['Inter', 'sans-serif'], // Set Inter as default sans font
+				'montserrat': ['Montserrat', 'sans-serif'],
+				'logo': ['Pacifico', 'cursive'],
+				'poppins': ['Montserrat', 'sans-serif'], // legacy alias -> Montserrat
+				'inter': ['Montserrat', 'sans-serif'], // legacy alias -> Montserrat
+				'sans': ['Montserrat', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

@@ -6,6 +6,24 @@
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
+  html, body {
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+  }
+  h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+  h4, h5, h6 { font-family: 'Montserrat', sans-serif; font-weight: 500; }
+}
+
+@layer utilities {
+  .font-logo {
+    font-family: 'Pacifico', cursive;
+    font-weight: 400;
+    text-transform: lowercase;
+    letter-spacing: 0.01em;
+  }
+}
+
+@layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 200 15% 20%;
