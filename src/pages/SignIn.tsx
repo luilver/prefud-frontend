@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
-import prefudIsotipo from "@/assets/prefud-isotipo.png";
+import prefudWhiteLogo from "@/assets/prefud-white.png.asset.json";
 import prefudFullLogo from "@/assets/prefud-full-logo.png.asset.json";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
