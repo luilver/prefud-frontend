@@ -136,6 +136,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               key={item.id}
               variant="ghost"
               onClick={() => onTabChange(item.id)}
+              aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "transition-all duration-300 rounded-xl",
                 isCollapsed 
@@ -147,7 +149,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
               )}
               title={isCollapsed ? item.label : undefined}
             >
-              <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+              <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} aria-hidden="true" />
               {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
             </Button>
           );
@@ -158,9 +160,9 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
       {!isCollapsed && (
         <div className="p-4">
           <div className="flex items-center justify-center space-x-2">
-            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse delay-500"></div>
-            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse delay-1000"></div>
+            <div aria-hidden="true" className="w-2 h-2 bg-white/60 rounded-full motion-safe:animate-pulse"></div>
+            <div aria-hidden="true" className="w-2 h-2 bg-white/40 rounded-full motion-safe:animate-pulse delay-500"></div>
+            <div aria-hidden="true" className="w-2 h-2 bg-white/60 rounded-full motion-safe:animate-pulse delay-1000"></div>
           </div>
         </div>
       )}
@@ -173,6 +175,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         <Button
           variant="ghost"
           onClick={() => setIsCollapsed(!isCollapsed)}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!isCollapsed}
           className={cn(
             "text-white/75 hover:bg-white/10 hover:text-white transition-all duration-300 rounded-xl",
             isCollapsed ? "w-full h-10 px-2" : "w-full justify-start h-10 px-3"
