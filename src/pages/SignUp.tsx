@@ -6,8 +6,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useThemeLogo } from "@/contexts/ThemeContext";
 import SignupSteps from "@/components/SignupSteps";
 import LanguageSelector from "@/components/LanguageSelector";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const SignUp = () => {
+  useDocumentTitle("Create account");
   const navigate = useNavigate();
   const { t } = useLanguage();
   const logoUrl = useThemeLogo();

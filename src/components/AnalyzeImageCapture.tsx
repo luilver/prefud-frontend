@@ -46,6 +46,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
               title: t("addIngredient.error") || "Camera permission denied",
               description: "Please allow camera access to take a photo.",
               variant: "destructive",
+              // role="alert" is set by shadcn Toast for destructive variants
             });
             return;
           }

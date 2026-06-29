@@ -22,8 +22,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/services/analytics";
 import { isNativePlatform } from "@/services/revenueCatService";
 import { useThemeLogo } from "@/contexts/ThemeContext";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const SignIn = () => {
+  useDocumentTitle("Sign in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);

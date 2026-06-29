@@ -5,14 +5,16 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useThemeLogo } from "@/contexts/ThemeContext";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const WhyPantry = () => {
+  useDocumentTitle("Why Prefud");
   const navigate = useNavigate();
   const { t } = useLanguage();
   const logoUrl = useThemeLogo();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       {/* Header */}
       <header className="bg-card/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
