@@ -21,6 +21,7 @@ import Dashboard from "@/components/Dashboard";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
+import prefudIsotipo from "@/assets/prefud-isotipo.png";
 
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
@@ -56,22 +57,16 @@ const Index = () => {
       <nav className="bg-card/95 backdrop-blur-md border-b border-border/50 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - enhanced design */}
+            {/* Logo - isotipo + wordmark */}
             <div className="flex items-center space-x-2">
-              <div className="relative p-1.5 sm:p-2">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-xl blur-sm opacity-75"></div>
-                <div className="relative p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg shadow-lg">
-                  <Utensils className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-primary-foreground" />
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <h1 className="font-logo text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  prefud
-                </h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">
-                  Smart Meal Planning
-                </p>
-              </div>
+              <img
+                src={prefudIsotipo}
+                alt="prefud"
+                className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 object-contain"
+              />
+              <h1 className="font-logo text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                prefud
+              </h1>
             </div>
 
             {/* Desktop Navigation */}
