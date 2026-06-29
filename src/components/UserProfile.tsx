@@ -831,6 +831,9 @@ const UserProfile = () => {
           </CardContent>
         </Card>
 
+        {/* Settings (Theme) Section */}
+        <SettingsSection />
+
         {/* Mobile Logout Button */}
         {isMobile && (
           <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
