@@ -102,8 +102,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 <CookingPot className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">
-                  Prefud
+                <h2 className="font-logo text-2xl text-white">
+                  prefud
                 </h2>
                 <p className="text-sm text-emerald-300/80">Smart Kitchen</p>
               </div>

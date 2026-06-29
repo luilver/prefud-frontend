@@ -231,8 +231,8 @@ const DashboardContent = () => {
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                    Prefud
+                  <h1 className="font-logo text-2xl sm:text-3xl lg:text-4xl text-white">
+                    prefud
                   </h1>
                   <p className="text-xs sm:text-sm text-emerald-300/80 font-medium hidden sm:block">Smart Kitchen Assistant</p>
                 </div>
