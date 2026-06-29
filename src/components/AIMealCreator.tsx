@@ -343,7 +343,7 @@ const AIMealCreator = () => {
                       ))}
                     </div>
                     <div className="flex gap-2 pt-2 border-t border-border/50">
-                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary-foreground/80 hover:bg-primary/10" onClick={() => handleViewMeal(meal)}>
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => handleViewMeal(meal)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                       </Button>
                       <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(meal.id || index.toString(), meal.name, false)}>
@@ -391,7 +391,7 @@ const AIMealCreator = () => {
                       {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} {t("aiMealCreator.peopleLabel") || "people"}
                     </div>
                     <div className="flex gap-2 pt-2 border-t border-border/50">
-                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary-foreground/80 hover:bg-primary/10" onClick={() => handleViewApiMeal(meal)}>
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => handleViewApiMeal(meal)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                       </Button>
                       <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(meal._id, meal.specialMeal.specialMeal.name, true)}>

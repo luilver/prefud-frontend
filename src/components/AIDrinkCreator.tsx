@@ -332,7 +332,7 @@ const AIDrinkCreator = () => {
                       ))}
                     </div>
                     <div className="flex gap-2 pt-2 border-t border-border/50">
-                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary-foreground/80 hover:bg-primary/10" onClick={() => handleViewApiDrink(drink)}>
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => handleViewApiDrink(drink)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiDrinkCreator.viewRecipe") || "View Recipe"}
                       </Button>
                       <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}>
