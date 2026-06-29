@@ -37,12 +37,11 @@ const SignUp = () => {
               onClick={() => navigate("/")}
               className="flex items-center gap-2.5 group"
             >
-              <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
-                <Utensils className="h-5 w-5 text-emerald-400" />
-              </div>
-              <span className="font-logo text-2xl text-white/90">
-                prefud
-              </span>
+              <img
+                src={logoUrl}
+                alt="prefud"
+                className="h-10 sm:h-12 brightness-0 invert"
+              />
             </button>
             
             <div className="flex items-center gap-2">
