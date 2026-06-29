@@ -607,11 +607,13 @@ const UserProfile = () => {
                 return (
                   <div
                     key={idx}
+                    role="group"
+                    aria-label={`${card.label}: ${remaining}${currentSubscriptionType ? ` of ${limit}` : ""} remaining`}
                     className={`group bg-gradient-to-br ${c.bg} to-white rounded-xl p-4 border ${c.ring} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between ${idx === 4 ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""}`}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className={`h-9 w-9 rounded-full ${c.badgeBg} flex items-center justify-center`}>
-                        <Icon className={`h-4 w-4 ${c.text}`} />
+                        <Icon className={`h-4 w-4 ${c.text}`} aria-hidden="true" />
                       </div>
                       <div className="text-right leading-none">
                         <span className={`text-2xl font-bold ${c.text}`}>{remaining}</span>
@@ -623,7 +625,14 @@ const UserProfile = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-800 leading-tight">{card.label}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{card.desc}</p>
-                      <div className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                      <div
+                        className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden"
+                        role="progressbar"
+                        aria-valuenow={pct}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={`${card.label} usage`}
+                      >
                         <div className={`h-full ${c.bar} transition-all duration-500`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>

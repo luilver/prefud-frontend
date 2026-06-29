@@ -10,8 +10,10 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useThemeLogo } from "@/contexts/ThemeContext";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const Landing = () => {
+  useDocumentTitle("Prefud - Your Smart Kitchen Companion");
   const navigate = useNavigate();
   const { t } = useLanguage();
   const logoUrl = useThemeLogo();

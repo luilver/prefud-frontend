@@ -33,9 +33,14 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
         </SelectTrigger>
         <SelectContent className="bg-white border border-emerald-200 shadow-xl">
           {languageOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value} className="hover:bg-emerald-50 focus:bg-emerald-50">
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              aria-label={option.label}
+              className="hover:bg-emerald-50 focus:bg-emerald-50"
+            >
               <div className="flex items-center space-x-2">
-                <span className="text-lg">{option.flag}</span>
+                <span className="text-lg" aria-hidden="true">{option.flag}</span>
                 <span className="text-gray-700">{option.label}</span>
               </div>
             </SelectItem>
@@ -55,9 +60,9 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
       </SelectTrigger>
       <SelectContent className="bg-white">
         {languageOptions.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
+          <SelectItem key={option.value} value={option.value} aria-label={option.label}>
             <div className="flex items-center space-x-2">
-              <span className="text-lg">{option.flag}</span>
+              <span className="text-lg" aria-hidden="true">{option.flag}</span>
               <span>{option.label}</span>
             </div>
           </SelectItem>

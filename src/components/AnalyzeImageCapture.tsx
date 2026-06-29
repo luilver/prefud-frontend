@@ -46,6 +46,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
               title: t("addIngredient.error") || "Camera permission denied",
               description: "Please allow camera access to take a photo.",
               variant: "destructive",
+              // role="alert" is set by shadcn Toast for destructive variants
             });
             return;
           }
@@ -108,7 +109,7 @@ const AnalyzeImageCapture = ({ onBack, onJobStarted }: AnalyzeImageCaptureProps)
       toast({
         title: t("analyzeImageStarted.title") || "Image Analysis Started",
         description: t("analyzeImageStarted.description") || "We'll notify you when ingredients are detected",
-        duration: 5000,
+        duration: 8000,
       });
       onJobStarted();
     } catch (err: any) {
