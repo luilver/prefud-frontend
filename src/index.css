@@ -65,6 +65,54 @@
     --sidebar-ring: 195 100% 50%;
   }
 
+  /* Theme: Citrus Bloom — #FF7F50 / #32CD32 */
+  [data-theme="citrus"] {
+    --primary: 16 100% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 120 61% 75%;
+    --secondary-foreground: 120 61% 20%;
+    --accent: 120 61% 50%;
+    --accent-foreground: 0 0% 100%;
+    --ring: 16 100% 65%;
+    --sidebar-primary: 16 100% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 16 100% 92%;
+    --sidebar-accent-foreground: 16 80% 30%;
+    --sidebar-ring: 16 100% 65%;
+  }
+
+  /* Theme: Aquatic Flow — #008080 / #87CEEB */
+  [data-theme="aqua"] {
+    --primary: 180 100% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 197 71% 73%;
+    --secondary-foreground: 180 100% 18%;
+    --accent: 197 71% 60%;
+    --accent-foreground: 180 100% 15%;
+    --ring: 180 100% 25%;
+    --sidebar-primary: 180 100% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 197 71% 90%;
+    --sidebar-accent-foreground: 180 100% 20%;
+    --sidebar-ring: 180 100% 25%;
+  }
+
+  /* Theme: Evening Flavors — #800080 / #B87333 */
+  [data-theme="dusk"] {
+    --primary: 300 100% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 56% 46%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 30 56% 60%;
+    --accent-foreground: 30 60% 15%;
+    --ring: 300 100% 25%;
+    --sidebar-primary: 300 100% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 300 30% 92%;
+    --sidebar-accent-foreground: 300 100% 20%;
+    --sidebar-ring: 300 100% 25%;
+  }
+
   .dark {
     --background: 200 25% 8%;
     --foreground: 120 15% 95%;
