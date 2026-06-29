@@ -53,7 +53,13 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   if (isMobile) {
     // Mobile Bottom Tab Navigation
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-teal-900/95 backdrop-blur-md border-t border-emerald-500/30 shadow-2xl">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t border-white/10 shadow-2xl"
+        style={{
+          background:
+            "linear-gradient(to right, hsl(var(--primary) / 0.95), hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.95))",
+        }}
+      >
         <div className="flex justify-around items-center py-2 px-2">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -66,9 +72,9 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 onClick={() => onTabChange(item.id)}
                 className={cn(
                   "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1 rounded-xl transition-all duration-300",
-                  isActive 
-                    ? "bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30" 
-                    : "text-emerald-200/80 hover:bg-emerald-700/40 hover:text-white"
+                  isActive
+                    ? "bg-white/20 text-white shadow-lg"
+                    : "text-white/70 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <Icon className="h-6 w-6" />
@@ -82,18 +88,24 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
 
   // Desktop Sidebar Navigation with collapse functionality
   return (
-    <nav className={cn(
-      "fixed left-0 top-0 h-full bg-gradient-to-b from-emerald-900 via-emerald-800 to-teal-900 backdrop-blur-md border-r border-emerald-500/30 shadow-2xl z-40 flex flex-col transition-all duration-300",
-      isCollapsed ? "w-16" : "w-64"
-    )}>
+    <nav
+      className={cn(
+        "fixed left-0 top-0 h-full backdrop-blur-md border-r border-white/10 shadow-2xl z-40 flex flex-col transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64"
+      )}
+      style={{
+        background:
+          "linear-gradient(to bottom, hsl(var(--primary)), hsl(var(--primary) / 0.9), hsl(var(--accent)))",
+      }}
+    >
       {/* Sidebar Header - aligned with dashboard header height */}
       <div className={cn(
-        "border-b border-emerald-500/30 transition-all duration-300 h-20 flex items-center",
+        "border-b border-white/10 transition-all duration-300 h-20 flex items-center",
         isCollapsed ? "px-3 justify-center" : "px-6 justify-between"
       )}>
         {isCollapsed ? (
           <div className="flex justify-center">
-            <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg shadow-lg shadow-emerald-500/30">
+            <div className="p-2 bg-white/15 rounded-lg shadow-lg">
               <CookingPot className="h-6 w-6 text-white" />
             </div>
           </div>
@@ -126,9 +138,9 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 isCollapsed 
                   ? "w-full h-12 px-0 justify-center" 
                   : "w-full justify-start h-12 px-4",
-                isActive 
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30" 
-                  : "text-emerald-200/80 hover:bg-emerald-700/40 hover:text-white"
+                isActive
+                  ? "bg-white/20 text-white shadow-lg"
+                  : "text-white/75 hover:bg-white/10 hover:text-white"
               )}
               title={isCollapsed ? item.label : undefined}
             >
@@ -143,23 +155,23 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
       {!isCollapsed && (
         <div className="p-4">
           <div className="flex items-center justify-center space-x-2">
-            <div className="w-2 h-2 bg-emerald-400/60 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-teal-400/60 rounded-full animate-pulse delay-500"></div>
-            <div className="w-2 h-2 bg-emerald-400/60 rounded-full animate-pulse delay-1000"></div>
+            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse delay-500"></div>
+            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse delay-1000"></div>
           </div>
         </div>
       )}
 
       {/* Collapse/Expand Toggle - moved to bottom */}
       <div className={cn(
-        "border-t border-emerald-500/30",
+        "border-t border-white/10",
         isCollapsed ? "p-2" : "p-4"
       )}>
         <Button
           variant="ghost"
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            "text-emerald-200 hover:bg-emerald-700/40 hover:text-white transition-all duration-300 rounded-xl",
+            "text-white/75 hover:bg-white/10 hover:text-white transition-all duration-300 rounded-xl",
             isCollapsed ? "w-full h-10 px-2" : "w-full justify-start h-10 px-3"
           )}
         >
