@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 export type Language = "en" | "es" | "pt";
 
@@ -6215,6 +6215,13 @@ export const LanguageProvider = ({
   children: React.ReactNode;
 }) => {
   const [language, setLanguage] = useState<Language>("en");
+
+  // Keep <html lang> in sync for screen readers (WCAG 3.1.1).
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
 
   const t = (key: string): string => {
     return (
