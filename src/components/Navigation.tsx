@@ -70,6 +70,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 key={item.id}
                 variant="ghost"
                 onClick={() => onTabChange(item.id)}
+                aria-label={item.label}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1 rounded-xl transition-all duration-300",
                   isActive
@@ -77,7 +79,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                     : "text-white/70 hover:bg-white/10 hover:text-white"
                 )}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="h-6 w-6" aria-hidden="true" />
+                <span className="text-[10px] mt-0.5 leading-tight truncate max-w-full">{item.label}</span>
               </Button>
             );
           })}
