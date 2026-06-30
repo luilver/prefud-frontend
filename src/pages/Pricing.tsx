@@ -7,6 +7,7 @@ import PricingHeader from "@/components/pricing/PricingHeader";
 import ImpactStats from "@/components/pricing/ImpactStats";
 import PricingCard from "@/components/pricing/PricingCard";
 import PricingFAQ from "@/components/pricing/PricingFAQ";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 interface PricingPlan {
   id: string;
@@ -30,6 +31,7 @@ interface PricingPlan {
 }
 
 const Pricing = () => {
+  useDocumentTitle("Pricing");
   const navigate = useNavigate();
   const { user, acceptSubscription } = useUser();
   const { t } = useLanguage();

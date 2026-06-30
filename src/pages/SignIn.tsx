@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Utensils, ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Shield, Lock } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -21,8 +21,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/contexts/AuthContext";
 import { trackEvent } from "@/services/analytics";
 import { isNativePlatform } from "@/services/revenueCatService";
+import { useThemeLogo } from "@/contexts/ThemeContext";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const SignIn = () => {
+  useDocumentTitle("Sign in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +36,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t, setLanguage } = useLanguage();
+  const logoUrl = useThemeLogo();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,14 +164,13 @@ const SignIn = () => {
           <div className="container mx-auto flex items-center justify-between">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2.5 group"
+              className="group"
             >
-              <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 group-hover:bg-white/20 transition-all duration-300">
-                <Utensils className="h-5 w-5 text-emerald-400" />
-              </div>
-              <span className="text-xl font-semibold text-white/90 tracking-tight">
-                Prefud
-              </span>
+              <img
+                src={logoUrl}
+                alt="Prefud"
+                className="h-10 w-auto object-contain brightness-0 invert"
+              />
             </button>
 
             <div className="flex items-center gap-2">
@@ -192,9 +195,11 @@ const SignIn = () => {
           <div className="w-full max-w-[420px]">
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
               <CardHeader className="text-center space-y-3 pt-8 pb-2 px-6 md:px-8">
-                <div className="mx-auto p-3.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl w-fit shadow-lg shadow-emerald-500/30">
-                  <Utensils className="h-7 w-7 text-white" />
-                </div>
+              <img
+                src={logoUrl}
+                alt="Prefud"
+                className="h-32 w-auto mx-auto object-contain"
+              />
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
                   {t("signin.title")}
                 </CardTitle>
@@ -218,8 +223,9 @@ const SignIn = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base transition-all placeholder:text-neutral-400"
+                      className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base transition-all placeholder:text-muted-foreground"
                       placeholder={t("signin.email.placeholder")}
+                      autoComplete="email"
                     />
                   </div>
 
@@ -237,20 +243,23 @@ const SignIn = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base pr-12 transition-all placeholder:text-neutral-400"
+                        className="h-12 rounded-xl border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:border-emerald-500 focus:ring-emerald-500/20 text-base pr-12 transition-all placeholder:text-muted-foreground"
                         placeholder={t("signin.password.placeholder")}
+                        autoComplete="current-password"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
+                        aria-label={showPassword ? (t("signin.hidePassword") || "Hide password") : (t("signin.showPassword") || "Show password")}
+                        aria-pressed={showPassword}
                         className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 p-0 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4.5 w-4.5 text-neutral-400" />
+                          <EyeOff className="h-4.5 w-4.5 text-muted-foreground" aria-hidden="true" />
                         ) : (
-                          <Eye className="h-4.5 w-4.5 text-neutral-400" />
+                          <Eye className="h-4.5 w-4.5 text-muted-foreground" aria-hidden="true" />
                         )}
                       </Button>
                     </div>
@@ -269,7 +278,7 @@ const SignIn = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 rounded-xl"
+                    className="w-full h-12 text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg transition-all duration-300 rounded-xl"
                     disabled={isLoading}
                   >
                     {isLoading ? t("signin.signing-in") : t("signin.button")}
@@ -312,12 +321,12 @@ const SignIn = () => {
 
             {/* Trust Indicators */}
             <div className="flex justify-center items-center gap-5 mt-6">
-              <div className="flex items-center gap-1.5 text-white/60">
+              <div className="flex items-center gap-1.5 text-white/85">
                 <Shield className="h-3.5 w-3.5" />
                 <span className="text-xs font-medium">Secure</span>
               </div>
               <div className="w-1 h-1 bg-white/30 rounded-full" />
-              <div className="flex items-center gap-1.5 text-white/60">
+              <div className="flex items-center gap-1.5 text-white/85">
                 <Lock className="h-3.5 w-3.5" />
                 <span className="text-xs font-medium">256-bit SSL</span>
               </div>

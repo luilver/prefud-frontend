@@ -1,54 +1,64 @@
-## Goal
-Rename app display brand to **Prefud** AND change iOS/Android bundle identifiers from `com.bessel.mypantryapp` to **`com.bessel.prefud`**. Leave route paths, code identifiers, backend URLs, and the kitchen "pantry" feature concept untouched.
 
-> If you want a different bundle id (e.g. `com.prefud.app`), tell me before approving and I'll swap the value.
+# Accessibility Audit Plan (Audit-Only)
 
-## Scope: what changes
+Goal: produce `ACCESSIBILITY_AUDIT.md` at the repo root with a complete WCAG 2.2 AA findings report. **No code changes in this pass.** You decide what to fix next from the backlog.
 
-### 1. Bundle identifiers → `com.bessel.prefud`
-- `capacitor.config.ts` → `appId: "com.bessel.prefud"`, `appName: "Prefud"`
-- iOS `ios/App/App.xcodeproj/project.pbxproj` → both `PRODUCT_BUNDLE_IDENTIFIER = com.bessel.prefud;` entries (Debug + Release)
-- Android `android/app/build.gradle` → `namespace = "com.bessel.prefud"` and `applicationId "com.bessel.prefud"`
-- Android `android/app/src/main/res/values/strings.xml` → `package_name` and `custom_url_scheme` = `com.bessel.prefud`
-- Android Java package rename: move `android/app/src/main/java/com/bessel/pantryapp/MainActivity.java` → `android/app/src/main/java/com/bessel/prefud/MainActivity.java` and update its `package com.bessel.prefud;` declaration
+## Scope
 
-### 2. Native app display name (iOS & Android)
-- `ios/App/App/Info.plist` → `CFBundleDisplayName` = `Prefud`
-- `android/app/src/main/res/values/strings.xml` → `app_name` = `Prefud`, `title_activity_main` = `Prefud`
+Every page, primary component, modal, and form in the app — not a sampled subset. The four priority lenses guide *severity weighting*, not coverage:
 
-### 3. Web metadata
-- `index.html` → `<title>Prefud - Your Smart Kitchen Companion</title>`
+1. Color contrast across all themes (Default, Citrus, Aqua, Dusk) + dark mode
+2. Keyboard & focus (tab order, focus-visible, modal trapping, skip link)
+3. Screen reader labels (icon buttons, form labels, landmarks, live regions for async jobs)
+4. Mobile / native UX (44×44 tap targets, safe areas, iOS zoom, `prefers-reduced-motion`)
 
-### 4. UI components (visible brand text)
-- `src/components/Navigation.tsx` sidebar "Pantry" → "Prefud"
-- `src/components/Dashboard.tsx` (~line 235) "Pantry" → "Prefud"
-- `src/components/ui/Header.tsx` "MealGenius" → "Prefud"
-- `src/pages/Landing.tsx` brand mentions → "Prefud"
+## Surfaces audited
 
-### 5. Translations — brand mentions only (EN/ES/PT)
-Replace brand "Pantry" with "Prefud" in `src/translations/en.ts`, `es.ts`, `pt.ts`: hero titles, testimonials, footer, `whyPantry` body copy, terms intro, `freePlanDescription`, landing strings ("How Pantry Works" → "How Prefud Works", "Pantry uses AI…" → "Prefud uses AI…", etc.).
-**Not touched:** feature keys/copy `addToPantry`, `addedToPantry`, "Add to Pantry", "Agregar a la Despensa", "Adicionar à Despensa" — these refer to the kitchen pantry feature.
+- **Auth**: `SignIn`, `SignUp` (`SignupSteps`, OTP, password recovery/update), `DeleteAccountModal`
+- **Marketing**: `Index`, `Landing`, `WhyPantry`, `Pricing`, `TermsAndConditions`, `PrivacyPolicy`, `NotFound`
+- **Shell**: `Navigation` (desktop sidebar + mobile bottom nav), `Dashboard` headers, `WelcomeModal`, `LanguageSelector`, `ui/Header`
+- **Planner**: `MealPlanner`, `MealPlanCreator(Stepper)`, `MealPlanView`, `MealPlanCalendarView`, `MealPlanSuccessModal`, `MealPlanTimeoutModal`, `MealShoppingModal`
+- **Meals**: `AIMealCreator(Stepper)`, `AIMealIngredients/Preferences/Generation/Suggestions/View`, `RecipeView`, `ReelRecipeModal`, `CookingMode`, `UltraFocusCooking`, `Reels`
+- **Drinks**: `AIDrinkCreator(Stepper)`, `AIDrink*` family, `DrinkDetailView`, `DrinkShoppingModal`, `CocktailAnimation`
+- **Pantry**: `IngredientTracker`, `AddIngredientForm`, `AnalyzeImageCapture`, `CameraProductScanner`, `ShoppingList`
+- **Profile / Subscription**: `UserProfile` (incl. Settings/theme picker), `UserProfileForm`, `BillingManagement`, `SubscriptionManager`, `SubscriptionPurchase`, `SubscriptionUpgradeModal`, `SubscriptionCancelModal`, `SubscriptionSuccessModal`, `FreeSubscriptionConfirmModal`, `PaymentForm`/`PaymentForm2`, `PaymentMethodModal`
+- **Cart / Checkout**: `Cart`, `CheckoutFlow` + every step, `AddToCartButton`, `OrderOnlineModal`
+- **Tracking & misc**: `CalorieTracker`, `CarbonSavingsTracker`, `Environment`, `Highlights`, `Favorites`, `PageSizeSelector`
+- **Async job UX**: 5 job indicators + 5 ready modals (MealPlan, Drink, AIMeal, PantryMeals, AnalyzeImage) — checked specifically for live-region announcements
+- **Global**: `index.css` tokens for all 5 theme variants, `index.html` `lang`, viewport, `<main>` landmark count
 
-## Out of scope
-- Route paths (`/why-pantry`), component/file names (`WhyPantry`, `PantryMealsJobContext`, `pantryService`, `pantryItems`)
-- Backend service URLs, env vars, API endpoints
-- Feature-level "pantry" language
+## Method
 
-## Required user actions after merge
-Changing the bundle id has real consequences — please be aware:
+Static code analysis only (audit-only — no Playwright runs, no edits):
 
-1. Run locally:
-   ```
-   npx cap sync ios && npx cap sync android
-   ```
-2. **App Store / Play Store:** a new `applicationId` / bundle id is treated as a **new app**. The existing listing (if any) cannot be updated with this build; you'll need a new listing or to revert to the old id.
-3. **Signing & Firebase / GoogleService-Info.plist / google-services.json:** these are tied to the old bundle id. You must regenerate/replace them for `com.bessel.prefud` or the app will fail at runtime (Firebase, push, OAuth callbacks). I'm not touching `ios/App/App/GoogleService-Info.plist` — you'll need to download a new one.
-4. **RevenueCat / IAP product configuration:** subscriptions are scoped to the bundle id. You'll need to recreate or remap them under the new id.
-5. **Deep-link / OAuth redirect schemes** that reference `com.bessel.mypantryapp` outside this repo (e.g. provider dashboards) must be updated to `com.bessel.prefud`.
-6. iOS users on the old app won't auto-upgrade — the new bundle id installs as a separate app.
+- **Contrast**: compute WCAG ratios for each `--foreground/--background`, `--primary/--primary-foreground`, `--accent/--accent-foreground`, `--muted-foreground/--background`, destructive, sidebar tokens — across `:root`, `[data-theme="citrus"]`, `[data-theme="aqua"]`, `[data-theme="dusk"]`, `.dark`. Flag every pair below 4.5:1 (text) / 3:1 (large text, UI components, focus rings). Also flag hard-coded `text-white`, `text-gray-*`, `bg-emerald-*`, `bg-white/15` overlays where they bypass tokens.
+- **Keyboard / focus**: grep for `onClick` on `div`/`span` without `role`+`onKeyDown`, missing `focus-visible` styles, `tabIndex` > 0, `autoFocus` outside dialogs, custom dropdowns/menus that don't use Radix/shadcn primitives, missing skip link, `aria-hidden` wrapping focusables.
+- **Screen reader**: every `<Button size="icon">` / bare `<button>` with only an icon child must have `aria-label`; every `<Input>` needs an associated `<Label htmlFor>` or `aria-label`; check `<main>` count per route, landmark usage, `aria-live` on job indicators and toast announcements, alt text on `<img>` (logos, recipe images, isotipo).
+- **Mobile/native**: tap target ≥ 44×44 (flag `size="icon"` defaults of 36×36 used as primary actions, bottom-nav items), `h-screen` vs `h-dvh`, inputs with `font-size` < 16px, safe-area utilities on fixed bars, `prefers-reduced-motion` respect in `CocktailAnimation`, reels auto-play, loading spinners.
+- **Semantic HTML & ARIA**: heading hierarchy per page (single H1, no skipped levels), correct landmarks, redundant/invalid ARIA.
+- **Forms**: required indicators, error association via `aria-describedby`, error announcements, autocomplete attributes on auth/payment forms.
+- **Motion/error prevention**: destructive actions (delete account, cancel subscription, remove cart item) confirmed; flashing/auto-advancing carousels.
 
-## Verification
-- Build succeeds; TypeScript clean.
-- Grep shows no remaining `com.bessel.mypantryapp` and no brand "Pantry"/"MealGenius" strings in UI/translations.
-- `strings.xml`, `Info.plist`, `build.gradle`, and `project.pbxproj` show `Prefud` / `com.bessel.prefud`.
-- Android `MainActivity.java` lives at `…/java/com/bessel/prefud/MainActivity.java` with matching `package` declaration.
+## Report structure (`ACCESSIBILITY_AUDIT.md`)
+
+1. Executive summary + per-surface scores (0–100) for Accessibility, Contrast, Keyboard, Screen Reader, Mobile, WCAG compliance.
+2. Theme contrast matrix — one table per theme listing every token pair, computed ratio, AA pass/fail.
+3. Findings grouped by severity: **Critical → Major → Minor**. Each finding includes:
+   - Title, location (`file.tsx:line` where identifiable), affected component
+   - WCAG 2.2 criterion (e.g., 1.4.3, 2.1.1, 2.4.7, 4.1.2)
+   - Severity + priority (Critical/High/Medium/Low)
+   - Why it matters (which users break)
+   - Recommended fix (code-level guidance, not applied)
+4. Cross-cutting recommendations (focus-ring token, icon-button wrapper enforcing `aria-label`, live-region helper for job indicators, theme-token cleanup of hardcoded Tailwind colors).
+5. Summary table: Issue | Location | WCAG | Severity | Fix.
+6. Suggested fix order (what I'd tackle first if you approve a follow-up build pass).
+
+## Out of scope (this pass)
+
+- No file edits, no dependency changes, no Playwright/automated tool runs.
+- Backend, copy/translations correctness, and SEO are not part of this audit.
+- Lighthouse/axe scores are *equivalent checks performed manually from code*; not actual tool runs.
+
+## Deliverable
+
+Single new file: `ACCESSIBILITY_AUDIT.md` at repo root. After you review it, you can ask me to implement fixes in priority order.

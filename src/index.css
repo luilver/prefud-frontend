@@ -6,6 +6,24 @@
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
+  html, body {
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+  }
+  h1, h2, h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+  h4, h5, h6 { font-family: 'Montserrat', sans-serif; font-weight: 500; }
+}
+
+@layer utilities {
+  .font-logo {
+    font-family: 'Pacifico', cursive;
+    font-weight: 400;
+    text-transform: lowercase;
+    letter-spacing: 0.01em;
+  }
+}
+
+@layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 200 15% 20%;
@@ -16,8 +34,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 200 15% 20%;
 
-    --primary: 122 39% 49%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 122 39% 36%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 120 30% 85%;
     --secondary-foreground: 122 39% 25%;
@@ -45,6 +63,54 @@
     --sidebar-accent-foreground: 122 39% 25%;
     --sidebar-border: 120 15% 85%;
     --sidebar-ring: 195 100% 50%;
+  }
+
+  /* Theme: Citrus Bloom — #FF7F50 / #32CD32 */
+  [data-theme="citrus"] {
+    --primary: 16 80% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 120 61% 75%;
+    --secondary-foreground: 120 61% 20%;
+    --accent: 120 61% 30%;
+    --accent-foreground: 0 0% 100%;
+    --ring: 16 100% 65%;
+    --sidebar-primary: 16 80% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 16 100% 92%;
+    --sidebar-accent-foreground: 16 80% 30%;
+    --sidebar-ring: 16 100% 65%;
+  }
+
+  /* Theme: Aquatic Flow — #008080 / #87CEEB */
+  [data-theme="aqua"] {
+    --primary: 180 100% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 197 71% 73%;
+    --secondary-foreground: 180 100% 18%;
+    --accent: 197 71% 60%;
+    --accent-foreground: 180 100% 15%;
+    --ring: 180 100% 25%;
+    --sidebar-primary: 180 100% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 197 71% 90%;
+    --sidebar-accent-foreground: 180 100% 20%;
+    --sidebar-ring: 180 100% 25%;
+  }
+
+  /* Theme: Evening Flavors — #800080 / #B87333 */
+  [data-theme="dusk"] {
+    --primary: 300 100% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 56% 46%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 30 56% 60%;
+    --accent-foreground: 30 60% 15%;
+    --ring: 300 100% 25%;
+    --sidebar-primary: 300 100% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 300 30% 92%;
+    --sidebar-accent-foreground: 300 100% 20%;
+    --sidebar-ring: 300 100% 25%;
   }
 
   .dark {
@@ -130,4 +196,34 @@
   .safe-area-right {
     padding-right: env(safe-area-inset-right);
   }
+}
+
+/* Respect prefers-reduced-motion (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip-to-content link */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+.skip-to-content:focus {
+  left: 0;
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
 }

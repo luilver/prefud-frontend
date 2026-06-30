@@ -164,15 +164,15 @@ const MealPlanCalendarView = ({
       <div className="min-h-screen relative">
         <div className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
           style={{ backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')` }}>
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/70 to-accent/80" />
         </div>
         <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
-          <div className="flex items-center gap-4 bg-emerald-900/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+          <div className="flex items-center gap-4 bg-primary/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
             <Button variant="ghost" onClick={() => setShowShoppingList(false)} className="p-2 text-white hover:bg-white/20 border border-white/20">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">{t("mealPlanView.shoppingList") || "Shopping List"}</h1>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">{t("mealPlanView.shoppingList") || "Shopping List"}</h2>
               <p className="text-sm text-white/80">{plan.name}</p>
             </div>
           </div>
@@ -184,7 +184,7 @@ const MealPlanCalendarView = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <CardTitle className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5 text-blue-500" />
+                        <ShoppingCart className="h-5 w-5 text-primary" />
                         {t("mealPlanView.shoppingSummary") || "Shopping Summary"}
                       </CardTitle>
                       <CardDescription>
@@ -229,11 +229,11 @@ const MealPlanCalendarView = ({
                 return (
                   <Accordion type="multiple" defaultValue={[firstCategory]} className="space-y-3">
                     {categorizedItems.map(([category, items]: [string, any]) => (
-                      <AccordionItem key={category} value={category} className="border border-emerald-200 rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm shadow-sm">
-                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50">
+                      <AccordionItem key={category} value={category} className="border border-primary/20 rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm shadow-sm">
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5/50">
                           <div className="flex items-center justify-between w-full pr-2">
                             <span className="text-lg font-semibold capitalize text-gray-800">{category}</span>
-                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary">
                               {items.length} {t("mealPlanView.items") || "items"}
                             </Badge>
                           </div>
@@ -243,7 +243,7 @@ const MealPlanCalendarView = ({
                             {items.map((item: any, index: number) => {
                               const itemId = item.id || item.name || `${category}-${index}`;
                               return (
-                                <div key={itemId} className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${checkedItems.has(itemId) ? "bg-emerald-50 border-emerald-200" : "bg-gray-50 border-gray-200 hover:bg-gray-100"}`}>
+                                <div key={itemId} className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${checkedItems.has(itemId) ? "bg-primary/5 border-primary/20" : "bg-gray-50 border-gray-200 hover:bg-gray-100"}`}>
                                   <div className="flex items-center gap-3">
                                     <Checkbox id={`cal-item-${itemId}`} checked={checkedItems.has(itemId)} onCheckedChange={() => handleItemCheck(itemId)} />
                                     <div className="flex-1">
@@ -295,17 +295,17 @@ const MealPlanCalendarView = ({
       <div className="min-h-screen relative">
         <div className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
           style={{ backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')` }}>
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/70 to-accent/80" />
         </div>
         <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
-          <div className="flex items-center gap-4 bg-emerald-900/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+          <div className="flex items-center gap-4 bg-primary/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
             <Button variant="ghost" onClick={() => setSelectedDay(null)} className="p-2 text-white hover:bg-white/20 border border-white/20">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
                 {dayDate?.dayOfWeek}, {dayDate?.dateLabel}
-              </h1>
+              </h2>
               <p className="text-sm text-white/80">{dayMeals.length} {t("mealPlanView.meal") || "meal"}{dayMeals.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
@@ -383,11 +383,11 @@ const MealPlanCalendarView = ({
     <div className="min-h-screen relative">
       <div className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
         style={{ backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')` }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/70 to-accent/80" />
       </div>
       <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-emerald-900/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-primary/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack} className="p-2 text-white hover:bg-white/20 border border-white/20">
               <ArrowLeft className="h-5 w-5" />
@@ -397,7 +397,10 @@ const MealPlanCalendarView = ({
               <p className="text-sm text-white/80">{plan.name}</p>
             </div>
           </div>
-          <Button onClick={() => setShowShoppingList(true)} className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
+          <Button
+            onClick={() => setShowShoppingList(true)}
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
+          >
             <ShoppingBasket className="h-4 w-4 mr-2" />
             {t("mealPlanView.shoppingList") || "Shopping List"} ({totalItems})
           </Button>
@@ -415,7 +418,7 @@ const MealPlanCalendarView = ({
                 key={day.dayKey}
                 className={`cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-200 ${
                   allCompleted ? "bg-green-50 border-green-300" :
-                  day.hasMeals ? "bg-white/95 border-emerald-200" : "bg-white/70 border-gray-200"
+                  day.hasMeals ? "bg-white/95 border-primary/20" : "bg-white/70 border-gray-200"
                 }`}
                 onClick={() => setSelectedDay(day.dayKey)}
               >
@@ -425,7 +428,7 @@ const MealPlanCalendarView = ({
                   <p className="text-xs text-muted-foreground">{day.date.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" })}</p>
                   {day.hasMeals ? (
                     <div className="mt-2">
-                      <Badge variant="secondary" className={`text-xs ${allCompleted ? "bg-green-100 text-green-800" : "bg-emerald-100 text-emerald-800"}`}>
+                      <Badge variant="secondary" className={`text-xs ${allCompleted ? "bg-green-100 text-green-800" : "bg-primary/10 text-primary"}`}>
                         {allCompleted ? <CheckCircle className="h-3 w-3 mr-1" /> : null}
                         {day.mealCount} {t("mealPlanView.meal") || "meal"}{day.mealCount !== 1 ? "s" : ""}
                       </Badge>

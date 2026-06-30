@@ -579,7 +579,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
           {t("aiMealCreatorStepper.backToMeals") || "Back"}
         </Button>
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full">
+          <div className="p-1.5 bg-gradient-to-r from-primary to-accent rounded-full">
             <ChefHat className="h-4 w-4 text-white" />
           </div>
           <h1 className="text-lg font-semibold text-white">
@@ -599,7 +599,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
               {/* Avatar */}
               <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-1 ${
                 msg.role === "bot"
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                  ? "bg-gradient-to-r from-primary to-accent"
                   : "bg-white/20"
               }`}>
                 {msg.role === "bot" ? (
@@ -613,7 +613,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
               <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
                 msg.role === "bot"
                   ? "bg-white/95 text-gray-800 rounded-tl-sm shadow-md"
-                  : "bg-emerald-500 text-white rounded-tr-sm shadow-md"
+                  : "bg-primary text-white rounded-tr-sm shadow-md"
               }`}>
                 {msg.text}
 
@@ -624,7 +624,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                       <button
                         key={opt.key}
                         onClick={() => handleOptionSelect(opt.key, opt.label)}
-                        className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border border-emerald-200"
+                        className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
                       >
                         {opt.label}
                       </button>
@@ -649,7 +649,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                       onClick={() => toggleMultiSelect(opt.key)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                         multiSelected.includes(opt.key) || (opt.key === "__other__" && ((currentStep === "cuisine" && showCustomCuisineInput) || (currentStep === "allergies" && showCustomAllergyInput)))
-                          ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                          ? "bg-primary text-white border-primary shadow-sm"
                           : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
                       }`}
                     >
@@ -665,7 +665,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                       value={customCuisine}
                       onChange={(e) => setCustomCuisine(e.target.value.slice(0, 30))}
                       placeholder={t("aiMealCreatorStepper.cuisine.otherPlaceholder") || "Type your cuisine..."}
-                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-primary/40"
                       maxLength={30}
                     />
                   </div>
@@ -677,7 +677,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                       value={customAllergy}
                       onChange={(e) => setCustomAllergy(e.target.value.slice(0, 30))}
                       placeholder={t("aiMealCreatorStepper.allergy.otherPlaceholder") || "Type your allergy..."}
-                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-emerald-400"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-xs text-gray-800 outline-none focus:border-primary/40"
                       maxLength={30}
                     />
                   </div>
@@ -686,7 +686,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                   <Button
                     size="sm"
                     onClick={handleMultiSelectConfirm}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4"
+                    className="bg-primary hover:bg-primary text-white text-xs rounded-full px-4"
                   >
                     {(multiSelected.filter(k => k !== "__other__").length > 0 || (currentStep === "cuisine" && customCuisine.trim()) || (currentStep === "allergies" && customAllergy.trim()))
                       ? `${t("aiMealCreatorStepper.chat.confirm") || "Confirm"} (${multiSelected.filter(k => k !== "__other__").length + ((currentStep === "cuisine" && customCuisine.trim()) || (currentStep === "allergies" && customAllergy.trim()) ? 1 : 0)})`
@@ -709,7 +709,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                     <button
                       key={opt.key}
                       onClick={() => handleOptionSelect(opt.key, opt.label)}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border border-emerald-200"
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
                     >
                       {opt.label}
                     </button>
@@ -749,7 +749,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
                 <Button
                   size="sm"
                   onClick={handleStepperSubmit}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full px-4 w-full"
+                  className="bg-primary hover:bg-primary text-white text-xs rounded-full px-4 w-full"
                 >
                   {t("aiMealCreatorStepper.chat.continue") || "Continue"} →
                 </Button>
@@ -764,7 +764,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
             <Button
               onClick={handleGenerate}
               size="lg"
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-full px-8 shadow-lg shadow-emerald-500/30"
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white rounded-full px-8 shadow-lg shadow-primary/30"
             >
               <Sparkles className="h-5 w-5 mr-2" />
               {t("aiMealCreatorStepper.chat.generate") || "Generate My Meal"}
@@ -805,7 +805,7 @@ const AIMealCreatorStepper = ({ onBack, onMealCreated }: AIMealCreatorStepperPro
             <Button
               size="sm"
               onClick={handleTextSubmit}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full h-8 w-8 p-0"
+              className="bg-primary hover:bg-primary text-white rounded-full h-8 w-8 p-0"
             >
               <Send className="h-4 w-4" />
             </Button>

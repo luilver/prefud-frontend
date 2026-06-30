@@ -250,15 +250,15 @@ const AIMealSuggestions = ({
                 </div>
               </div>
             ) : (
-              <div className="relative bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-emerald-200/50 p-4 sm:p-5">
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500" />
+              <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 border-b border-primary/20/50 p-4 sm:p-5">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-accent" />
                 <div className="flex items-start gap-3 ml-2">
-                  <div className="p-2 rounded-lg bg-emerald-500/15 shrink-0">
-                    <Sparkles className="h-5 w-5 text-emerald-600" />
+                  <div className="p-2 rounded-lg bg-primary/15 shrink-0">
+                    <Sparkles className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-emerald-800 mb-0.5">Your pantry is looking fresh! 🌿</p>
-                    <p className="text-xs text-emerald-600/80">Generate AI meals anytime. Tap to get started →</p>
+                    <p className="text-sm font-semibold text-primary mb-0.5">Your pantry is looking fresh! 🌿</p>
+                    <p className="text-xs text-primary/80">Generate AI meals anytime. Tap to get started →</p>
                   </div>
                 </div>
               </div>

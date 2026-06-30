@@ -22,10 +22,13 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/services/analytics";
 
+import { useThemeLogo } from "@/contexts/ThemeContext";
+
 const Index = () => {
   const { isAuthenticated, user, checkSubscription } = useUser();
   const { isLoading: isAuthLoading } = useAuth();
   const { t } = useLanguage();
+  const logoUrl = useThemeLogo();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -56,23 +59,14 @@ const Index = () => {
       <nav className="bg-card/95 backdrop-blur-md border-b border-border/50 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - enhanced design */}
-            <div className="flex items-center space-x-2">
-              <div className="relative p-1.5 sm:p-2">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-xl blur-sm opacity-75"></div>
-                <div className="relative p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg shadow-lg">
-                  <Utensils className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-primary-foreground" />
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Prefud
-                </h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">
-                  Smart Meal Planning
-                </p>
-              </div>
-            </div>
+            {/* Logo */}
+            <Link to="/" className="flex items-center">
+              <img
+                src={logoUrl}
+                alt="prefud"
+                className="h-10 sm:h-12 lg:h-14 w-auto object-contain"
+              />
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
@@ -511,12 +505,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
-                <Utensils className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Prefud
-              </span>
+              <img src={logoUrl} alt="prefud" className="h-12 w-auto" />
             </div>
             <div className="flex items-center justify-center space-x-6 mb-4 text-sm text-muted-foreground">
               <Link

@@ -9,10 +9,14 @@ import { trackEvent } from "@/services/analytics";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
+import { useThemeLogo } from "@/contexts/ThemeContext";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const Landing = () => {
+  useDocumentTitle("Prefud - Your Smart Kitchen Companion");
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const logoUrl = useThemeLogo();
 
   const handleCTA = (source: string) => {
     trackEvent("landing_cta_click", { source });
@@ -274,7 +278,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-border">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-         <span className="font-poppins font-semibold text-foreground">Prefud</span>
+         <img src={logoUrl} alt="prefud" className="h-8 w-auto" />
           <div className="flex gap-6">
             <a href="/terms" className="hover:text-foreground transition-colors">{t("landing.terms")}</a>
             <a href="/privacy" className="hover:text-foreground transition-colors">{t("landing.privacy")}</a>

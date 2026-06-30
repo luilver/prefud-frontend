@@ -103,12 +103,12 @@ const AnalyzeImageReadyModal = () => {
 
   return (
     <Dialog open={!!readyIngredients} onOpenChange={(open) => { if (!open && !isSaving) dismissReadyIngredients(); }}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <div className="relative">
-              <CheckCircle className="h-14 w-14 text-emerald-500" />
-              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-1">
+              <CheckCircle className="h-14 w-14 text-primary" />
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-primary to-accent rounded-full p-1">
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
             </div>
@@ -123,13 +123,13 @@ const AnalyzeImageReadyModal = () => {
             {items.length} {t("analyzeImageReady.description") || "ingredients detected. Edit and select which to add to your pantry."}
           </p>
 
-          <div className="space-y-2 max-h-72 overflow-y-auto rounded-lg border border-emerald-100 p-2">
+          <div className="space-y-2 max-h-72 overflow-y-auto rounded-lg border border-primary/20 p-2">
             {items.map((ing) => {
               const checked = selected.has(ing.id);
               return (
                 <div
                   key={ing.id}
-                  className="flex items-start gap-3 rounded-md p-2 hover:bg-emerald-50"
+                  className="flex items-start gap-3 rounded-md p-2 hover:bg-primary/5"
                 >
                   <Checkbox
                     checked={checked}
@@ -141,6 +141,7 @@ const AnalyzeImageReadyModal = () => {
                       value={ing.name}
                       onChange={(e) => updateItem(ing.id, { name: e.target.value })}
                       placeholder="Name"
+                      aria-label={`Ingredient ${ing.name || 'unnamed'} — name`}
                       className="h-9 text-sm capitalize"
                       disabled={!checked}
                     />
@@ -153,6 +154,7 @@ const AnalyzeImageReadyModal = () => {
                         onChange={(e) =>
                           updateItem(ing.id, { quantity: parseFloat(e.target.value) || 0 })
                         }
+                        aria-label={`Quantity for ${ing.name || 'ingredient'}`}
                         className="h-9 text-sm w-24"
                         disabled={!checked}
                       />
@@ -160,6 +162,7 @@ const AnalyzeImageReadyModal = () => {
                         value={ing.unit}
                         onChange={(e) => updateItem(ing.id, { unit: e.target.value })}
                         placeholder="unit"
+                        aria-label={`Unit for ${ing.name || 'ingredient'}`}
                         className="h-9 text-sm w-24"
                         disabled={!checked}
                       />
@@ -189,6 +192,7 @@ const AnalyzeImageReadyModal = () => {
                               daysToExpire,
                             });
                           }}
+                          aria-label={`Expiration date for ${ing.name || 'ingredient'}`}
                           className="h-9 text-sm"
                           disabled={!checked}
                         />
@@ -208,7 +212,7 @@ const AnalyzeImageReadyModal = () => {
             <Button
               onClick={handleAdd}
               disabled={isSaving || selected.size === 0}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+              className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white"
             >
               {isSaving ? (
                 <>

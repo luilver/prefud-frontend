@@ -257,21 +257,21 @@ const AIMealCreator = () => {
           backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/90 via-emerald-800/85 to-teal-900/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/85 to-accent/90" />
       </div>
 
       <div className="relative z-10 space-y-6">
         {/* Header */}
-        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+        <div className="bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
               <Salad className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg sm:text-2xl font-bold text-white">
                 {t("aiMealCreator.createMealTitle") || "Create a Meal"}
               </h1>
-              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+              <p className="text-xs sm:text-sm text-primary-foreground/80 mt-0.5">
                 {t("aiMealCreator.createMealDesc") || "Create unique, personalized meals with AI based on your preferences, dietary needs, and available ingredients."}
               </p>
             </div>
@@ -282,7 +282,7 @@ const AIMealCreator = () => {
           <Button 
             onClick={handleStartCreation}
             size="lg"
-            className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-8 py-3 shadow-lg shadow-emerald-500/30"
+            className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white px-8 py-3 shadow-lg shadow-primary/30"
           >
             <Wand2 className="mr-2 h-5 w-5" />
             {t("aiMealCreator.createAIMealBtn") || "Create AI Meal"}
@@ -303,8 +303,8 @@ const AIMealCreator = () => {
         {isLoadingMeals && (
           <div className="flex items-center justify-center py-8">
             <div className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-emerald-400" />
-              <p className="text-emerald-100">{t("aiMealCreator.loadingMeals") || "Loading your meals..."}</p>
+              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-primary-foreground/80" />
+              <p className="text-primary-foreground">{t("aiMealCreator.loadingMeals") || "Loading your meals..."}</p>
             </div>
           </div>
         )}
@@ -316,11 +316,11 @@ const AIMealCreator = () => {
               {/* Local AI Meals */}
               {currentPageLocalMeals.map((meal, index) => (
                 <Card key={`local-${index}`} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
-                  <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                  <div className="h-1.5 bg-gradient-to-r from-primary to-accent" />
                   <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 shrink-0">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-primary to-accent shrink-0">
                           <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <CardTitle className="text-sm sm:text-lg text-foreground truncate">{meal.name}</CardTitle>
@@ -329,7 +329,7 @@ const AIMealCreator = () => {
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3 text-emerald-500" />{meal.cookingTime}m
+                        <Clock className="w-3 h-3 text-primary" />{meal.cookingTime}m
                       </span>
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.cuisine}</span>
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.difficulty}</span>
@@ -339,14 +339,14 @@ const AIMealCreator = () => {
                     <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-2">{meal.description}</p>
                     <div className="flex flex-wrap gap-1 mb-2">
                       {meal.tags?.slice(0, 3).map((tag: string, tagIndex: number) => (
-                        <span key={tagIndex} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full">{tag}</span>
+                        <span key={tagIndex} className="px-2 py-0.5 bg-primary/10 text-primary-foreground/80 text-[10px] rounded-full">{tag}</span>
                       ))}
                     </div>
                     <div className="flex gap-2 pt-2 border-t border-border/50">
-                      <Button variant="outline" size="sm" className="flex-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleViewMeal(meal)}>
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => handleViewMeal(meal)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                       </Button>
-                      <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white" onClick={() => handleMarkAsDone(meal.id || index.toString(), meal.name, false)}>
+                      <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(meal.id || index.toString(), meal.name, false)}>
                         <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -357,23 +357,23 @@ const AIMealCreator = () => {
               {/* API Meals */}
               {(isMobile ? allApiMeals : apiMeals).map((meal, index) => (
                 <Card key={`api-${meal._id || index}`} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
-                  <div className="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-500" />
+                  <div className="h-1.5 bg-gradient-to-r from-accent to-primary" />
                   <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 shrink-0">
+                        <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-accent to-primary shrink-0">
                           <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <CardTitle className="text-sm sm:text-lg text-foreground truncate">{meal.specialMeal.specialMeal.name}</CardTitle>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="px-2 py-0.5 bg-teal-500/10 text-teal-400 text-[10px] rounded-full">{t("aiMealCreator.savedLabel") || "Saved"}</span>
+                        <span className="px-2 py-0.5 bg-accent/10 text-accent-foreground text-[10px] rounded-full">{t("aiMealCreator.savedLabel") || "Saved"}</span>
                         <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3 text-emerald-500" />{meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime}m
+                        <Clock className="w-3 h-3 text-primary" />{meal.specialMeal.specialMeal.cookingTime || meal.maxCookingTime}m
                       </span>
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.cuisinePreferences?.[0] || 'Various'}</span>
                       <span className="inline-flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5 text-[10px] sm:text-xs text-muted-foreground">{meal.cookingSkillLevel}</span>
@@ -382,19 +382,19 @@ const AIMealCreator = () => {
                   <CardContent className="pt-2 pb-3 sm:pb-4 px-3 sm:px-6">
                     <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-2">{meal.specialMeal.specialMeal.description}</p>
                     <div className="flex flex-wrap gap-1 mb-2">
-                      <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full">{meal.mealType}</span>
+                      <span className="px-2 py-0.5 bg-primary/10 text-primary-foreground/80 text-[10px] rounded-full">{meal.mealType}</span>
                       {meal.dietaryRestrictions?.slice(0, 2).map((restriction: string, tagIndex: number) => (
-                        <span key={tagIndex} className="px-2 py-0.5 bg-teal-500/10 text-teal-400 text-[10px] rounded-full">{restriction}</span>
+                        <span key={tagIndex} className="px-2 py-0.5 bg-accent/10 text-accent-foreground text-[10px] rounded-full">{restriction}</span>
                       ))}
                     </div>
                     <div className="text-[10px] sm:text-xs text-muted-foreground mb-2">
                       {meal.specialMeal.specialMeal.calories} cal • {meal.numberPeople} {t("aiMealCreator.peopleLabel") || "people"}
                     </div>
                     <div className="flex gap-2 pt-2 border-t border-border/50">
-                      <Button variant="outline" size="sm" className="flex-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleViewApiMeal(meal)}>
+                      <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => handleViewApiMeal(meal)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                       </Button>
-                      <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white" onClick={() => handleMarkAsDone(meal._id, meal.specialMeal.specialMeal.name, true)}>
+                      <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(meal._id, meal.specialMeal.specialMeal.name, true)}>
                         <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -409,8 +409,8 @@ const AIMealCreator = () => {
                 <div ref={loadMoreRef} className="h-4" />
                 {isLoadingMore && (
                   <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
-                    <span className="ml-2 text-emerald-100 text-sm">Loading more...</span>
+                    <Loader2 className="h-6 w-6 animate-spin text-primary-foreground/80" />
+                    <span className="ml-2 text-primary-foreground text-sm">Loading more...</span>
                   </div>
                 )}
                 {currentPage >= totalPages && allApiMeals.length > 0 && (
@@ -430,7 +430,7 @@ const AIMealCreator = () => {
                       <PaginationItem>
                         <PaginationPrevious 
                           onClick={() => handlePageChange(currentPage - 1)}
-                          className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                          className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/5"}
                         />
                       </PaginationItem>
                       
@@ -445,7 +445,7 @@ const AIMealCreator = () => {
                               <PaginationLink
                                 onClick={() => handlePageChange(page)}
                                 isActive={page === currentPage}
-                                className={`cursor-pointer ${page === currentPage ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'hover:bg-emerald-50'}`}
+                                className={`cursor-pointer ${page === currentPage ? 'bg-primary text-white hover:bg-primary' : 'hover:bg-primary/5'}`}
                               >
                                 {page}
                               </PaginationLink>
@@ -467,7 +467,7 @@ const AIMealCreator = () => {
                       <PaginationItem>
                         <PaginationNext 
                           onClick={() => handlePageChange(currentPage + 1)}
-                          className={currentPage >= maxTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-emerald-50"}
+                          className={currentPage >= maxTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/5"}
                         />
                       </PaginationItem>
                     </PaginationContent>
@@ -482,7 +482,7 @@ const AIMealCreator = () => {
           <Card className="text-center py-12 bg-white/95 backdrop-blur-sm border-0 shadow-xl">
             <CardContent>
               <div className="space-y-4">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                <div className="mx-auto w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
                   <Salad className="h-8 w-8 text-white" />
                 </div>
                 <div>

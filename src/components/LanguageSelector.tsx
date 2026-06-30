@@ -23,16 +23,24 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
   if (variant === "button") {
     return (
       <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'es' | 'pt')}>
-        <SelectTrigger className={`w-auto bg-emerald-700/40 border border-emerald-500/30 shadow-none focus:ring-0 hover:bg-emerald-600/50 focus:bg-emerald-600/50 data-[state=open]:bg-emerald-600/50 rounded-lg px-2 py-1.5 h-8 transition-colors ${className}`}>
+        <SelectTrigger
+          aria-label={`${t('language.english')} / ${t('language.spanish')} / ${t('language.portuguese')}`}
+          className={`w-auto bg-emerald-700/40 border border-emerald-500/30 shadow-none focus:ring-0 hover:bg-emerald-600/50 focus:bg-emerald-600/50 data-[state=open]:bg-emerald-600/50 rounded-lg px-2 py-1.5 h-8 transition-colors ${className}`}
+        >
           <div className="flex items-center gap-1">
             <span className="text-sm">{currentLanguage?.flag}</span>
           </div>
         </SelectTrigger>
         <SelectContent className="bg-white border border-emerald-200 shadow-xl">
           {languageOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value} className="hover:bg-emerald-50 focus:bg-emerald-50">
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              aria-label={option.label}
+              className="hover:bg-emerald-50 focus:bg-emerald-50"
+            >
               <div className="flex items-center space-x-2">
-                <span className="text-lg">{option.flag}</span>
+                <span className="text-lg" aria-hidden="true">{option.flag}</span>
                 <span className="text-gray-700">{option.label}</span>
               </div>
             </SelectItem>
@@ -44,14 +52,17 @@ const LanguageSelector = ({ variant = "select", className = "" }: LanguageSelect
 
   return (
     <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'es' | 'pt')}>
-      <SelectTrigger className={`border-green-200 focus:border-green-400 ${className}`}>
+      <SelectTrigger
+        aria-label={t('signup.language.select')}
+        className={`border-green-200 focus:border-green-400 ${className}`}
+      >
         <SelectValue placeholder={t('signup.language.select')} />
       </SelectTrigger>
       <SelectContent className="bg-white">
         {languageOptions.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
+          <SelectItem key={option.value} value={option.value} aria-label={option.label}>
             <div className="flex items-center space-x-2">
-              <span className="text-lg">{option.flag}</span>
+              <span className="text-lg" aria-hidden="true">{option.flag}</span>
               <span>{option.label}</span>
             </div>
           </SelectItem>

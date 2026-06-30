@@ -262,7 +262,7 @@ const AddIngredientForm = ({ onClose, onAdd }: AddIngredientFormProps) => {
           <Button
             type="button"
             onClick={() => setShowAnalyzeImage(true)}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/30"
+            className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white shadow-lg shadow-primary/30"
           >
             <Camera className="h-4 w-4 mr-2" />
             {t("addIngredient.scanWithCamera") || "Scan ingredients with camera"}

@@ -526,12 +526,12 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           backgroundImage: `url('https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?q=80&w=2070&auto=format&fit=crop')`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/70 to-accent/80" />
       </div>
 
       <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-emerald-900/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-primary/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -552,7 +552,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
           <div className="flex gap-2">
             <Button
               onClick={() => setShowCalendarView(true)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white"
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
             >
               <CalendarDays className="h-4 w-4 mr-2" />
               {t("mealPlanView.calendarView") || "Calendar View"}
@@ -566,7 +566,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
             <CollapsibleTrigger className="w-full">
               <CardContent className="flex items-center justify-between p-4 cursor-pointer hover:bg-black/5 transition-colors rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-accent">
                     <Info className="h-5 w-5 text-white" />
                   </div>
                   <div className="text-left">
@@ -590,8 +590,8 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                     <span className="text-lg font-bold text-gray-800">{totalDays}</span>
                     <span className="text-[10px] text-gray-500 uppercase tracking-wider">{t("mealPlanView.days") || "Days"}</span>
                   </div>
-                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-emerald-50">
-                    <Users className="h-5 w-5 text-emerald-600" />
+                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-primary/5">
+                    <Users className="h-5 w-5 text-primary" />
                     <span className="text-lg font-bold text-gray-800">{peopleCount}</span>
                     <span className="text-[10px] text-gray-500 uppercase tracking-wider">{t("mealPlanView.persons") || "People"}</span>
                   </div>
@@ -662,7 +662,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {cuisinePreferences.map((c: string, i: number) => (
-                        <Badge key={i} className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-0">{c}</Badge>
+                        <Badge key={i} className="bg-primary/10 text-primary hover:bg-primary/20 border-0">{c}</Badge>
                       ))}
                     </div>
                   </div>
@@ -1031,16 +1031,16 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                           <AccordionItem
                             key={category}
                             value={category}
-                            className="border border-emerald-200 rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm shadow-sm"
+                            className="border border-primary/20 rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm shadow-sm"
                           >
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-emerald-50/50 transition-colors">
+                            <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/5/50 transition-colors">
                               <div className="flex items-center justify-between w-full pr-2">
                                 <span className="text-lg font-semibold capitalize text-gray-800">
                                   {category}
                                 </span>
                                 <Badge
                                   variant="secondary"
-                                  className="bg-emerald-100 text-emerald-800"
+                                  className="bg-primary/10 text-primary"
                                 >
                                   {items.length}{" "}
                                   {t("mealPlanView.items") || "items"}
@@ -1059,7 +1059,7 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
                                       key={itemId}
                                       className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
                                         checkedItems.has(itemId)
-                                          ? "bg-emerald-50 border-emerald-200"
+                                          ? "bg-primary/5 border-primary/20"
                                           : "bg-gray-50 border-gray-200 hover:bg-gray-100"
                                       }`}
                                     >

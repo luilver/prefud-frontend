@@ -7,6 +7,7 @@ import { UserProvider } from "@/contexts/UserContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { MealPlanJobProvider } from "@/contexts/MealPlanJobContext";
 import MealPlanJobIndicator from "@/components/MealPlanJobIndicator";
@@ -44,7 +45,7 @@ const AppContent = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-dvh">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -72,6 +73,7 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
+      <ThemeProvider>
       <AuthProvider>
         <SubscriptionProvider>
           <UserProvider>
@@ -104,6 +106,7 @@ const App = () => (
           </UserProvider>
         </SubscriptionProvider>
       </AuthProvider>
+      </ThemeProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );

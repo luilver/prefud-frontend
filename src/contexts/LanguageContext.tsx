@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 export type Language = "en" | "es" | "pt";
 
@@ -14,6 +14,15 @@ const translations = {
     "language.english": "English",
     "language.spanish": "Spanish",
     "language.portuguese": "Portuguese",
+
+    // Settings
+    "settings.title": "Settings",
+    "settings.theme.title": "App Theme",
+    "settings.theme.description": "Choose a color palette and matching logo for the app",
+    "settings.theme.default": "Classic Green",
+    "settings.theme.citrus": "Citrus Bloom",
+    "settings.theme.aqua": "Aquatic Flow",
+    "settings.theme.dusk": "Evening Flavors",
 
     // Common
     "common.continue": "Continue",
@@ -2020,6 +2029,15 @@ const translations = {
     "language.english": "Inglés",
     "language.spanish": "Español",
     "language.portuguese": "Portugués",
+
+    // Settings
+    "settings.title": "Configuración",
+    "settings.theme.title": "Tema de la aplicación",
+    "settings.theme.description": "Elige una paleta de colores y el logo correspondiente",
+    "settings.theme.default": "Verde Clásico",
+    "settings.theme.citrus": "Floración Cítrica",
+    "settings.theme.aqua": "Flujo Acuático",
+    "settings.theme.dusk": "Sabores del Anochecer",
 
     // Common
     "common.continue": "Continuar",
@@ -4099,6 +4117,15 @@ const translations = {
     "language.english": "Inglês",
     "language.spanish": "Espanhol",
     "language.portuguese": "Português",
+
+    // Settings
+    "settings.title": "Configurações",
+    "settings.theme.title": "Tema do aplicativo",
+    "settings.theme.description": "Escolha uma paleta de cores e o logotipo correspondente",
+    "settings.theme.default": "Verde Clássico",
+    "settings.theme.citrus": "Floração Cítrica",
+    "settings.theme.aqua": "Fluxo Aquático",
+    "settings.theme.dusk": "Sabores do Anoitecer",
 
     // Common
     "common.continue": "Continuar",
@@ -6188,6 +6215,13 @@ export const LanguageProvider = ({
   children: React.ReactNode;
 }) => {
   const [language, setLanguage] = useState<Language>("en");
+
+  // Keep <html lang> in sync for screen readers (WCAG 3.1.1).
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
 
   const t = (key: string): string => {
     return (

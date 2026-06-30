@@ -9,8 +9,8 @@ export const Header = () => {
         <div className="flex justify-between h-16 items-center">
           {/* Left side - Logo/Brand */}
           <div className="flex-shrink-0">
-            <Link to="/" className="text-xl font-bold text-gray-900">
-              Prefud
+            <Link to="/" className="font-logo text-2xl text-gray-900">
+              prefud
             </Link>
           </div>
 

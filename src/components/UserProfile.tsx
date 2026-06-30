@@ -43,11 +43,13 @@ import {
   Activity,
   Heart,
   Camera,
+  Palette,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme, THEMES, ThemeId } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PasswordUpdate from "./PasswordUpdate";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
@@ -289,21 +291,21 @@ const UserProfile = () => {
           backgroundImage: `url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2070&auto=format&fit=crop')`
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/80 via-emerald-800/70 to-teal-900/80" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/70 to-accent/80" />
       </div>
 
       <div className="relative z-10 space-y-4 sm:space-y-6 max-w-4xl mx-auto p-4">
         {/* Header */}
-        <div className="bg-emerald-900/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-emerald-500/20">
+        <div className="bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg sm:text-2xl font-bold text-white">
                 {t("profile.title") || "My Profile"}
               </h1>
-              <p className="text-xs sm:text-sm text-emerald-200/80 mt-0.5">
+              <p className="text-xs sm:text-sm text-primary-foreground/80 mt-0.5">
                 {t("profile.description") || "Manage your personal information and preferences"}
               </p>
             </div>
@@ -317,7 +319,7 @@ const UserProfile = () => {
               <AccordionItem value="profile-info" className="border-none">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline">
                   <div className="flex items-center space-x-2">
-                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     <span className="text-lg sm:text-xl font-semibold">
                       {t("profile.personalInfo") || "Profile Information"}
                     </span>
@@ -330,7 +332,7 @@ const UserProfile = () => {
                       e.stopPropagation();
                       setIsEditing(true);
                     }}
-                    className="border-emerald-500 text-emerald-600 hover:bg-emerald-50 ml-4"
+                    className="border-primary text-primary hover:bg-primary/5 ml-4"
                   >
                     <Edit2 className="h-4 w-4 mr-2" />
                     {t("profile.edit") || "Edit"}
@@ -353,7 +355,7 @@ const UserProfile = () => {
                       <Button
                         size="sm"
                         onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto"
+                        className="bg-primary hover:bg-primary w-full sm:w-auto"
                       >
                         <Save className="h-4 w-4 mr-2" />
                         {t("common.save")}
@@ -383,7 +385,7 @@ const UserProfile = () => {
                             onChange={(e) =>
                               setEditData((prev) => ({ ...prev, name: e.target.value }))
                             }
-                            className="border-emerald-200 focus:border-emerald-400 text-sm"
+                            className="border-primary/20 focus:border-primary/40 text-sm"
                           />
                         ) : (
                           <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
@@ -408,7 +410,7 @@ const UserProfile = () => {
                                 email: e.target.value,
                               }))
                             }
-                            className="border-emerald-200 focus:border-emerald-400 text-sm"
+                            className="border-primary/20 focus:border-primary/40 text-sm"
                           />
                         ) : (
                           <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
@@ -429,7 +431,7 @@ const UserProfile = () => {
                               setEditData((prev) => ({ ...prev, country: value }))
                             }
                             placeholder={t("profile.selectCountry") || "Select country"}
-                            className="border-emerald-200 focus:border-emerald-400 text-sm"
+                            className="border-primary/20 focus:border-primary/40 text-sm"
                           />
                         ) : (
                           <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
@@ -459,7 +461,7 @@ const UserProfile = () => {
                               <Input
                                 value={countryDisplay?.prefix || ""}
                                 disabled
-                                className="border-emerald-200 bg-gray-50 text-center text-sm"
+                                className="border-primary/20 bg-gray-50 text-center text-sm"
                               />
                             </div>
                             <Input
@@ -477,7 +479,7 @@ const UserProfile = () => {
                                   }`,
                                 }))
                               }
-                              className="border-emerald-200 focus:border-emerald-400 flex-1 text-sm"
+                              className="border-primary/20 focus:border-primary/40 flex-1 text-sm"
                               />
                           </div>
                         ) : (
@@ -534,11 +536,11 @@ const UserProfile = () => {
               <AccordionItem value="subscription-info" className="border-none">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline">
                   <div className="flex items-center space-x-2">
-                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     <span className="text-lg sm:text-xl font-semibold">
                       {t("profile.subscription") || "My Subscription"}
                     </span>
-                    <div className="ml-2 px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-full">
+                    <div className="ml-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
                       {currentSubscriptionName} Plan
                     </div>
                   </div>
@@ -595,8 +597,8 @@ const UserProfile = () => {
                 const limit = card.limit ?? 0;
                 const pct = limit > 0 ? Math.min(100, Math.round((remaining / limit) * 100)) : 0;
                 const palette: Record<string, { ring: string; bg: string; badgeBg: string; text: string; bar: string; from: string }> = {
-                  emerald: { ring: "border-emerald-100", bg: "from-emerald-50", badgeBg: "bg-emerald-100", text: "text-emerald-600", bar: "bg-emerald-500", from: "" },
-                  teal:    { ring: "border-teal-100",    bg: "from-teal-50",    badgeBg: "bg-teal-100",    text: "text-teal-600",    bar: "bg-teal-500",    from: "" },
+                  emerald: { ring: "border-primary/20", bg: "from-primary/10", badgeBg: "bg-primary/10", text: "text-primary", bar: "bg-primary", from: "" },
+                  teal:    { ring: "border-accent/30",    bg: "from-accent/10",    badgeBg: "bg-accent/20",    text: "text-primary",    bar: "bg-accent",    from: "" },
                   cyan:    { ring: "border-cyan-100",    bg: "from-cyan-50",    badgeBg: "bg-cyan-100",    text: "text-cyan-600",    bar: "bg-cyan-500",    from: "" },
                   orange:  { ring: "border-orange-100",  bg: "from-orange-50",  badgeBg: "bg-orange-100",  text: "text-orange-600",  bar: "bg-orange-500",  from: "" },
                   violet:  { ring: "border-violet-100",  bg: "from-violet-50",  badgeBg: "bg-violet-100",  text: "text-violet-600",  bar: "bg-violet-500",  from: "" },
@@ -605,11 +607,13 @@ const UserProfile = () => {
                 return (
                   <div
                     key={idx}
+                    role="group"
+                    aria-label={`${card.label}: ${remaining}${currentSubscriptionType ? ` of ${limit}` : ""} remaining`}
                     className={`group bg-gradient-to-br ${c.bg} to-white rounded-xl p-4 border ${c.ring} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between ${idx === 4 ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""}`}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className={`h-9 w-9 rounded-full ${c.badgeBg} flex items-center justify-center`}>
-                        <Icon className={`h-4 w-4 ${c.text}`} />
+                        <Icon className={`h-4 w-4 ${c.text}`} aria-hidden="true" />
                       </div>
                       <div className="text-right leading-none">
                         <span className={`text-2xl font-bold ${c.text}`}>{remaining}</span>
@@ -621,7 +625,14 @@ const UserProfile = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-800 leading-tight">{card.label}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{card.desc}</p>
-                      <div className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                      <div
+                        className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden"
+                        role="progressbar"
+                        aria-valuenow={pct}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={`${card.label} usage`}
+                      >
                         <div className={`h-full ${c.bar} transition-all duration-500`} style={{ width: `${pct}%` }} />
                       </div>
                     </div>
@@ -634,12 +645,12 @@ const UserProfile = () => {
             <div className="mt-6 p-4 bg-white rounded-lg border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Target className="h-4 w-4 text-emerald-600" />
+                  <Target className="h-4 w-4 text-primary" />
                   <span className="font-medium">Plan Status</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${currentSubscriptionInfo?.status ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                  <span className={`text-sm font-medium ${currentSubscriptionInfo?.status ? 'text-emerald-600' : 'text-red-600'}`}>
+                  <div className={`w-2 h-2 rounded-full ${currentSubscriptionInfo?.status ? 'bg-primary' : 'bg-red-500'}`}></div>
+                  <span className={`text-sm font-medium ${currentSubscriptionInfo?.status ? 'text-primary' : 'text-red-600'}`}>
                     {currentSubscriptionInfo?.status ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -720,10 +731,10 @@ const UserProfile = () => {
                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <span className="text-sm font-medium">{goal}</span>
                           <div className="flex items-center space-x-2">
-                            <div className="w-4 h-4 bg-emerald-100 rounded-full flex items-center justify-center">
-                              <div className="w-2 h-2 bg-emerald-600 rounded-full" />
+                            <div className="w-4 h-4 bg-primary/10 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-primary rounded-full" />
                             </div>
-                            <span className="text-xs text-emerald-600">Active</span>
+                            <span className="text-xs text-primary">Active</span>
                           </div>
                         </div>
                       ))
@@ -747,7 +758,7 @@ const UserProfile = () => {
               <AccordionItem value="environmental-impact" className="border-none">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline">
                   <div className="flex items-center space-x-2">
-                    <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                    <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     <span className="text-lg sm:text-xl font-semibold">
                       {t("profile.environmental.title") || "Environmental Impact"}
                     </span>
@@ -760,11 +771,11 @@ const UserProfile = () => {
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                   {/* Consumed Meals Impact */}
-                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
+                  <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
                     <div className="flex items-center justify-between mb-2">
-                      <Utensils className="h-5 w-5 text-emerald-600" />
+                      <Utensils className="h-5 w-5 text-primary" />
                       <div className="text-right">
-                        <span className="text-2xl font-bold text-emerald-600">{carbonConsumed.toLocaleString()}</span>
+                        <span className="text-2xl font-bold text-primary">{carbonConsumed.toLocaleString()}</span>
                         <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
                       </div>
                     </div>
@@ -790,15 +801,15 @@ const UserProfile = () => {
                 <div className="space-y-3">
                   <h4 className="text-base font-medium">💡 {t("profile.environmental.sustainabilityTips") || "Sustainability Tips"}</h4>
                     <div className="grid grid-cols-1 gap-3">
-                      <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                        <p className="text-sm font-medium text-emerald-800">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
-                        <p className="text-xs text-emerald-600">
+                      <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                        <p className="text-sm font-medium text-primary">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
+                        <p className="text-xs text-primary">
                           {t("profile.environmental.preventedWaste") || "You've prevented 2.1 kg CO₂ by using ingredients before expiration"}
                         </p>
                       </div>
-                      <div className="p-3 bg-teal-50 rounded-lg border border-teal-100">
-                        <p className="text-sm font-medium text-teal-800">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
-                        <p className="text-xs text-teal-600">
+                      <div className="p-3 bg-accent/10 rounded-lg border border-accent/30">
+                        <p className="text-sm font-medium text-primary">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
+                        <p className="text-xs text-primary">
                           {t("profile.environmental.wasteReduction") || "Your meal planning has reduced food waste by 78% this month"}
                         </p>
                       </div>
@@ -821,13 +832,16 @@ const UserProfile = () => {
           <CardContent className="p-4">
             <Button
               onClick={() => navigate("/favorites")}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+              className="w-full bg-gradient-to-r from-primary to-accent text-white hover:from-primary hover:to-accent transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
             >
               <Heart className="h-4 w-4" />
               <span>{t("profile.checkFavorites")}</span>
             </Button>
           </CardContent>
         </Card>
+
+        {/* Settings (Theme) Section */}
+        <SettingsSection />
 
         {/* Mobile Logout Button */}
         {isMobile && (
@@ -894,3 +908,83 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
+
+const SettingsSection = () => {
+  const { t } = useLanguage();
+  const { theme, setTheme } = useTheme();
+  return (
+    <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+      <CardContent className="p-0">
+        <Accordion type="single" collapsible defaultValue="settings">
+          <AccordionItem value="settings" className="border-none">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center space-x-2">
+                <Palette className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <span className="text-lg sm:text-xl font-semibold">
+                  {t("settings.title") || "Settings"}
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-base font-medium">
+                    {t("settings.theme.title") || "App Theme"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t("settings.theme.description") ||
+                      "Choose a color palette and matching logo for the app"}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {(Object.values(THEMES) as Array<typeof THEMES[ThemeId]>).map((tm) => {
+                    const active = theme === tm.id;
+                    return (
+                      <button
+                        key={tm.id}
+                        type="button"
+                        onClick={() => {
+                          setTheme(tm.id);
+                          setTimeout(() => window.location.reload(), 150);
+                        }}
+                        className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all bg-white ${
+                          active
+                            ? "border-primary shadow-lg scale-[1.02]"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        aria-pressed={active}
+                      >
+                        <img
+                          src={tm.logoUrl}
+                          alt={tm.id}
+                          className="h-16 w-auto object-contain"
+                        />
+                        <div className="flex items-center gap-1.5">
+                          {tm.swatches.map((c) => (
+                            <span
+                              key={c}
+                              className="h-4 w-4 rounded-full border border-black/10"
+                              style={{ backgroundColor: c }}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs font-medium text-center text-gray-700">
+                          {t(tm.labelKey) || tm.id}
+                        </span>
+                        {active && (
+                          <span className="absolute top-2 right-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </CardContent>
+    </Card>
+  );
+};
