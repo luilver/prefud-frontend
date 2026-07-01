@@ -1,52 +1,60 @@
 ## New Page: `/brand` — Prefud Brand Manual
 
-A public, design-forward brand manual page documenting Prefud's visual identity with downloadable logo assets.
+A public brand manual page documenting Prefud's visual identity with downloadable logo assets. The 4 uploaded reference images become the source-of-truth "isotype/logomark" downloads.
+
+### Uploaded assets → CDN
+Upload the 4 user-provided images to Lovable Assets (`.asset.json` pointers) as the canonical isotypes/logomarks per palette:
+- `logomark-default.jpeg` — official logo (green bowl + gradient wordmark) — from image 1
+- `logomark-citrus.jpeg` — Variación 4: Floración Cítrica Digital — from image 2
+- `logomark-aqua.jpeg` — Variación 5: Flujo Acuático de Bytes — from image 4
+- `logomark-dusk.jpeg` — Variación 6: Sabores del Anochecer — from image 3
+
+The existing `prefud-full-logo-v2.png` remains the primary/full logo, and the existing `logo-default/citrus/aqua/dusk.png` remain the horizontal-lockup logos already used in the nav.
 
 ### Route
-- Add `/brand` to `src/App.tsx` routing (public, no auth required).
-- Create `src/pages/Brand.tsx` with `useDocumentTitle("Brand Manual")`.
+- Add `/brand` route to `src/App.tsx` (public, no auth).
+- Create `src/pages/Brand.tsx`, set `useDocumentTitle("Brand Manual")`.
 
 ### Page Sections
 
 **1. Hero**
-- Large "Prefud Brand Manual" title (Pacifico + Montserrat mix).
-- Tagline: short description of the brand's visual language.
+- Wordmark "prefud" in Pacifico + subtitle "Brand Manual" in Montserrat.
+- One-line tagline about the visual system.
 
-**2. Logo System**
-- **Primary Logo** (`prefud-full-logo-v2.png`) — large preview on a checkered transparency background + Download PNG button.
-- **Horizontal Logo** — the theme-aware horizontal logos already used in nav. Show all 4 variants (default, citrus, aqua, dusk) each with its own Download button.
-- **Isotype (icon-only)** — extract/prepare 4 isotype PNGs (one per theme). Each shown with transparent bg + Download.
-  - Technical note: The current `logo-{theme}.png` assets are full horizontal lockups. To provide true isotypes, I'll generate 4 new transparent PNG isotypes via imagegen (mark-only, matching each palette) and upload them via lovable-assets.
+**2. Logo System** (3 subsections, each with preview on a checkered transparency background + Download button)
+- **Primary Logo** — `prefud-full-logo-v2.png`, one big preview, Download PNG.
+- **Horizontal Logos** — 4 cards (default / citrus / aqua / dusk) using the existing `logo-{theme}.png` assets, each with Download.
+- **Logomark / Isotype** — 4 cards for the newly uploaded reference images, each with Download.
+
+Downloads use `<a href={asset.url} download>`.
 
 **3. Typography**
-- **Pacifico** — used for the logo wordmark. Live sample at large size + usage rules ("logo only, never body copy").
-- **Montserrat** — UI font. Show weight ladder: 400 body, 500 h4-h6, 700 h1-h3. Sample paragraph + heading scale.
-- Note the legacy aliases (`font-inter`, `font-poppins`) both resolve to Montserrat.
+- **Pacifico** — logo wordmark. Live sample at 96px, plus rule "reserved for the logo, never body copy".
+- **Montserrat** — UI font. Weight ladder: 700 (h1–h3), 500 (h4–h6), 400 (body). Show heading scale + body sample.
+- Note: `font-inter` and `font-poppins` aliases both resolve to Montserrat.
 
-**4. Color System**
-Four palettes, each as a card with swatches (hex + HSL + token name):
-- **Default (Classic Green)** — `#186047`, `#A4B237`, plus secondary/accent/background tokens.
-- **Citrus Bloom** — `#FF7F50`, `#32CD32`.
-- **Aquatic Flow** — `#008080`, `#87CEEB`.
-- **Evening Flavors** — `#800080`, `#B87333`.
-Each card renders using its actual `[data-theme="..."]` scope so tokens (primary, secondary, accent, ring) render live.
-Include a "Copy hex" click for each swatch.
+**4. Color System — 4 Palettes**
+Grid of 4 palette cards. Each card is wrapped in a `<div data-theme="...">` so its tokens render live (primary/secondary/accent/ring/background). Within each card:
+- Palette name + Spanish variation name.
+- Signature hex swatches (with hex code, HSL, and token label) — click-to-copy.
+- A mini "tokens in action" strip: button, badge, ring, card surface.
 
-**5. Download Section (summary)**
-Grid recap of all downloadable assets with a single-click download each. Downloads use an anchor with `download` attribute pointing at the `.asset.json` `url` field.
+Palettes:
+- **Default — Verde Corporativo**: `#186047` Verde Teal Primario, `#A4B237` Verde Oliva Secundario, `#F7F6F1` Fondo de Papel.
+- **Citrus — Floración Cítrica Digital**: `#FF7F50`, `#32CD32`.
+- **Aqua — Flujo Acuático de Bytes**: `#008080`, `#87CEEB`.
+- **Dusk — Sabores del Anochecer**: `#800080`, `#B87333`.
+
+**5. Download Summary**
+Compact grid recap of every downloadable asset (primary + 4 horizontal + 4 logomarks = 9 downloads), single click each.
 
 ### Visual Style
-- Uses existing design tokens only (no hardcoded colors) so the page itself adapts to the currently selected theme, while the palette cards force their own `data-theme` scope to preview all four.
-- Clean, editorial layout: generous whitespace, section dividers, monospace for hex codes.
-- Responsive: 1-col mobile, 2-col tablet, 3-col desktop for swatch grids.
-
-### Assets to create
-- 4 new isotype PNGs via `imagegen--generate_image` (transparent bg, mark-only, one per palette), uploaded through `lovable-assets` CLI → `src/assets/isotype-{theme}.png.asset.json`.
+- Editorial layout, generous whitespace, monospace for hex codes, section dividers.
+- Uses semantic tokens (`bg-card`, `text-primary`, `border-border`) — no hardcoded colors on the page chrome, so it also adapts to the currently selected theme. Palette cards force their own `data-theme` scope so all four palettes preview simultaneously.
+- Responsive: 1-col mobile, 2-col tablet, up to 4-col desktop for logo/palette grids.
 
 ### Files
-- Create: `src/pages/Brand.tsx`, 4 new isotype asset pointers.
-- Edit: `src/App.tsx` (add route).
-- No changes to translations, contexts, or business logic.
-
-### Out of scope
-- No link added to navigation (page is standalone/shareable via URL). If you want it linked from the footer or profile, say so and I'll add it.
+- Create: `src/pages/Brand.tsx`.
+- Create: 4 `.asset.json` pointers under `src/assets/` for the uploaded reference images.
+- Edit: `src/App.tsx` (add `/brand` route + import).
+- No changes to contexts, translations, business logic, or navigation. Page is standalone/shareable via URL (say the word if you want it linked from the footer/profile).

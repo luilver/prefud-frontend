@@ -36,6 +36,7 @@ import Favorites from "@/pages/Favorites";
 import Cart from "@/pages/Cart";
 import NotFound from "@/pages/NotFound";
 import Landing from "@/pages/Landing";
+import Brand from "@/pages/Brand";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const AppContent = () => {
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/landing" element={<Landing />} />
+        <Route path="/brand" element={<Brand />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
