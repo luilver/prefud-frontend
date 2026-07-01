@@ -8,6 +8,9 @@ import useDocumentTitle from "@/hooks/useDocumentTitle";
 import primaryLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 import horizontalWhite from "@/assets/prefud-horizontal-white.png.asset.json";
 import horizontalBlack from "@/assets/prefud-horizontal-black.png.asset.json";
+import horizontalCitrus from "@/assets/prefud-horizontal-citrus.png.asset.json";
+import horizontalAqua from "@/assets/prefud-horizontal-aqua.png.asset.json";
+import horizontalDusk from "@/assets/prefud-horizontal-dusk.png.asset.json";
 import logoDefault from "@/assets/logo-default.png.asset.json";
 import logoCitrus from "@/assets/logo-citrus.png.asset.json";
 import logoAqua from "@/assets/logo-aqua.png.asset.json";
@@ -90,6 +93,12 @@ const LOGOMARKS: Array<{ theme: ThemeKey; label: string; asset: typeof markDefau
   { theme: "citrus", label: "Citrus Bloom", asset: markCitrus },
   { theme: "aqua", label: "Aquatic Flow", asset: markAqua },
   { theme: "dusk", label: "Evening Flavors", asset: markDusk },
+];
+
+const THEMED_HORIZONTAL: Array<{ theme: Exclude<ThemeKey, "default">; label: string; asset: typeof horizontalCitrus }> = [
+  { theme: "citrus", label: "Citrus Bloom", asset: horizontalCitrus },
+  { theme: "aqua", label: "Aquatic Flow", asset: horizontalAqua },
+  { theme: "dusk", label: "Evening Flavors", asset: horizontalDusk },
 ];
 
 const CheckerBg: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
@@ -304,6 +313,37 @@ const Brand: React.FC = () => {
               </div>
             </Card>
           </div>
+
+          <div className="mt-10">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+              Themed variants — isotype left, wordmark right
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              {THEMED_HORIZONTAL.map((item) => (
+                <Card key={item.theme} className="p-5">
+                  <CheckerBg className="h-40 p-4">
+                    <img
+                      src={item.asset.url}
+                      alt={`Prefud horizontal logo — ${item.label}`}
+                      className="max-h-full w-auto object-contain"
+                      loading="lazy"
+                    />
+                  </CheckerBg>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold">{item.label}</div>
+                      <div className="text-xs text-muted-foreground font-mono">{item.theme}</div>
+                    </div>
+                    <DownloadButton
+                      url={item.asset.url}
+                      filename={`prefud-horizontal-${item.theme}.png`}
+                      label="Download"
+                    />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Vertical Logos */}
@@ -493,6 +533,21 @@ const Brand: React.FC = () => {
                 </div>
                 <DownloadButton url={horizontalBlack.url} filename="prefud-horizontal-black.png" label="Download" />
               </li>
+              {THEMED_HORIZONTAL.map((item) => (
+                <li key={`h-themed-${item.theme}`} className="flex items-center justify-between py-3 gap-3">
+                  <div>
+                    <div className="font-medium">Horizontal — {item.label}</div>
+                    <div className="text-xs text-muted-foreground font-mono">
+                      prefud-horizontal-{item.theme}.png
+                    </div>
+                  </div>
+                  <DownloadButton
+                    url={item.asset.url}
+                    filename={`prefud-horizontal-${item.theme}.png`}
+                    label="Download"
+                  />
+                </li>
+              ))}
               {HORIZONTAL_LOGOS.map((item) => (
                 <li key={`h-${item.theme}`} className="flex items-center justify-between py-3 gap-3">
                   <div>
