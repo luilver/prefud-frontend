@@ -1,21 +1,30 @@
-## Fixes to `/brand` page
+## Changes to `src/pages/Brand.tsx`
 
-**1. Rename section**
-In `src/pages/Brand.tsx`, rename the "Horizontal Logos" section heading (and any related copy/anchor) to "Vertical Logos". Keep the same assets and download buttons.
+### 1. Upload the two new logo variants to Lovable Assets
+Upload the user-provided images as CDN assets:
+- `user-uploads://prefud-white-2.png` → `src/assets/prefud-horizontal-white.png.asset.json`
+- `user-uploads://prefud-black.png` → `src/assets/prefud-horizontal-black.png.asset.json`
 
-**2. Fix Isotypes section — crop just the bowl**
-Currently the Isotypes section reuses the full uploaded images (bowl + "prefud" wordmark + palette caption). The isotype should be only the bowl illustration.
+The existing `prefud-full-logo-v2.png` (color/green horizontal lockup) remains the third variant.
 
-Approach: generate 4 new transparent-PNG isotype assets (one per theme), cropped/derived from each uploaded reference so only the bowl mark remains — no wordmark, no caption, no background.
+### 2. Replace the "prefud" text in the top nav
+Currently the nav shows `<span className="font-logo text-2xl">prefud</span>` on the right. Replace it with an `<img>` of the color horizontal logo (`primaryLogo.url`), height ~32px, alt "Prefud".
 
-- Default (Classic Green) — teal/olive bowl, from `WhatsApp_Image_2026-06-28_at_22.39.12-7.jpeg`
-- Citrus Bloom — coral/green bowl, from `...22.39.29-4.jpeg`
-- Aquatic Flow — blue/teal bowl, from `...22.39.30-4.jpeg`
-- Evening Flavors — purple/bronze bowl, from `...22.39.30_1-4.jpeg`
+### 3. Replace the "prefud" text in the hero
+Currently the hero shows a giant Pacifico `prefud` above "Brand Manual". Replace that H1 text with the color horizontal logo image (max-h-24 sm:max-h-32, centered), keeping the "Visual Identity · v1" eyebrow and "Brand Manual" subtitle unchanged. The H1 becomes the visually-hidden "Prefud Brand Manual" for SEO/a11y (or move the H1 to the "Brand Manual" line).
 
-Each output: transparent PNG, square, tight crop around the bowl mark. Upload via `lovable-assets` and store pointers under `src/assets/isotype-<theme>.png.asset.json`.
+### 4. New "Horizontal Logo Variants" section
+Insert a new section (numbered 02, shifting the others) between "Primary Logo" and "Vertical Logos":
 
-**3. Wire new isotypes into Brand page**
-Replace the 4 image sources used in the Isotypes grid with the new cropped assets. Keep the checkerboard preview background, individual Download buttons, and the consolidated downloads list (update those entries to point at the new isotype files). Horizontal/Vertical logo assets are unchanged.
+- **Title**: "Horizontal Logo — Color / White / Black"
+- **Layout**: 3-card grid (grid-cols-1 sm:grid-cols-3)
+  - Card 1: Color version (`primaryLogo`), preview on the checker transparency background, download as `prefud-horizontal-color.png`.
+  - Card 2: White version on a dark preview background (`bg-neutral-900`), download as `prefud-horizontal-white.png`.
+  - Card 3: Black version on a light preview background (`bg-neutral-100`), download as `prefud-horizontal-black.png`.
+- Each card reuses the existing `DownloadButton` component and states "Transparent PNG".
 
-No other pages or theme logic are touched.
+### 5. Renumber and extend the "All Downloads" list
+- Renumber the following sections (Vertical → 03, Isotypes → 04, Typography → 05, Colors → 06, Downloads → 07).
+- Add three entries at the top of the downloads list: Horizontal Color, Horizontal White, Horizontal Black — each with its own download link.
+
+No other files touched. No changes to routing, business logic, or theming.
