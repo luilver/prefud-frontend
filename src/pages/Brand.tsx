@@ -533,6 +533,21 @@ const Brand: React.FC = () => {
                 </div>
                 <DownloadButton url={horizontalBlack.url} filename="prefud-horizontal-black.png" label="Download" />
               </li>
+              {THEMED_HORIZONTAL.map((item) => (
+                <li key={`h-themed-${item.theme}`} className="flex items-center justify-between py-3 gap-3">
+                  <div>
+                    <div className="font-medium">Horizontal — {item.label}</div>
+                    <div className="text-xs text-muted-foreground font-mono">
+                      prefud-horizontal-{item.theme}.png
+                    </div>
+                  </div>
+                  <DownloadButton
+                    url={item.asset.url}
+                    filename={`prefud-horizontal-${item.theme}.png`}
+                    label="Download"
+                  />
+                </li>
+              ))}
               {HORIZONTAL_LOGOS.map((item) => (
                 <li key={`h-${item.theme}`} className="flex items-center justify-between py-3 gap-3">
                   <div>
