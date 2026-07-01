@@ -10,10 +10,10 @@ import logoDefault from "@/assets/logo-default.png.asset.json";
 import logoCitrus from "@/assets/logo-citrus.png.asset.json";
 import logoAqua from "@/assets/logo-aqua.png.asset.json";
 import logoDusk from "@/assets/logo-dusk.png.asset.json";
-import markDefault from "@/assets/logomark-default.jpeg.asset.json";
-import markCitrus from "@/assets/logomark-citrus.jpeg.asset.json";
-import markAqua from "@/assets/logomark-aqua.jpeg.asset.json";
-import markDusk from "@/assets/logomark-dusk.jpeg.asset.json";
+import markDefault from "@/assets/isotype-default.png.asset.json";
+import markCitrus from "@/assets/isotype-citrus.png.asset.json";
+import markAqua from "@/assets/isotype-aqua.png.asset.json";
+import markDusk from "@/assets/isotype-dusk.png.asset.json";
 
 type ThemeKey = "default" | "citrus" | "aqua" | "dusk";
 
@@ -247,13 +247,13 @@ const Brand: React.FC = () => {
           </Card>
         </section>
 
-        {/* Horizontal Logos */}
-        <section aria-labelledby="horizontal-logo-heading">
+        {/* Vertical Logos */}
+        <section aria-labelledby="vertical-logo-heading">
           <div className="mb-6">
             <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">02</div>
-            <h2 id="horizontal-logo-heading" className="text-3xl font-bold">Horizontal Logos</h2>
+            <h2 id="vertical-logo-heading" className="text-3xl font-bold">Vertical Logos</h2>
             <p className="text-muted-foreground mt-1">
-              Compact horizontal lockups used in navigation bars. One per palette theme.
+              Vertical lockups — bowl mark stacked above the Pacifico wordmark. One per palette theme.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -262,7 +262,7 @@ const Brand: React.FC = () => {
                 <CheckerBg className="h-32 p-4">
                   <img
                     src={item.asset.url}
-                    alt={`Prefud horizontal logo — ${item.label}`}
+                    alt={`Prefud vertical logo — ${item.label}`}
                     className="max-h-20 w-auto object-contain"
                     loading="lazy"
                   />
@@ -274,7 +274,7 @@ const Brand: React.FC = () => {
                   </div>
                   <DownloadButton
                     url={item.asset.url}
-                    filename={`prefud-horizontal-${item.theme}.png`}
+                    filename={`prefud-vertical-${item.theme}.png`}
                   />
                 </div>
               </Card>
@@ -416,12 +416,12 @@ const Brand: React.FC = () => {
               {HORIZONTAL_LOGOS.map((item) => (
                 <li key={`h-${item.theme}`} className="flex items-center justify-between py-3 gap-3">
                   <div>
-                    <div className="font-medium">Horizontal — {item.label}</div>
+                    <div className="font-medium">Vertical — {item.label}</div>
                     <div className="text-xs text-muted-foreground font-mono">
-                      prefud-horizontal-{item.theme}.png
+                      prefud-vertical-{item.theme}.png
                     </div>
                   </div>
-                  <DownloadButton url={item.asset.url} filename={`prefud-horizontal-${item.theme}.png`} label="Download" />
+                  <DownloadButton url={item.asset.url} filename={`prefud-vertical-${item.theme}.png`} label="Download" />
                 </li>
               ))}
               {LOGOMARKS.map((item) => (
@@ -429,10 +429,10 @@ const Brand: React.FC = () => {
                   <div>
                     <div className="font-medium">Isotype — {item.label}</div>
                     <div className="text-xs text-muted-foreground font-mono">
-                      prefud-isotype-{item.theme}.jpg
+                      prefud-isotype-{item.theme}.png
                     </div>
                   </div>
-                  <DownloadButton url={item.asset.url} filename={`prefud-isotype-${item.theme}.jpg`} label="Download" />
+                  <DownloadButton url={item.asset.url} filename={`prefud-isotype-${item.theme}.png`} label="Download" />
                 </li>
               ))}
             </ul>
