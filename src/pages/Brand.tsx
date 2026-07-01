@@ -313,6 +313,37 @@ const Brand: React.FC = () => {
               </div>
             </Card>
           </div>
+
+          <div className="mt-10">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+              Themed variants — isotype left, wordmark right
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              {THEMED_HORIZONTAL.map((item) => (
+                <Card key={item.theme} className="p-5">
+                  <CheckerBg className="h-40 p-4">
+                    <img
+                      src={item.asset.url}
+                      alt={`Prefud horizontal logo — ${item.label}`}
+                      className="max-h-full w-auto object-contain"
+                      loading="lazy"
+                    />
+                  </CheckerBg>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold">{item.label}</div>
+                      <div className="text-xs text-muted-foreground font-mono">{item.theme}</div>
+                    </div>
+                    <DownloadButton
+                      url={item.asset.url}
+                      filename={`prefud-horizontal-${item.theme}.png`}
+                      label="Download"
+                    />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Vertical Logos */}
