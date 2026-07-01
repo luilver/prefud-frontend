@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 import primaryLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
+import horizontalWhite from "@/assets/prefud-horizontal-white.png.asset.json";
+import horizontalBlack from "@/assets/prefud-horizontal-black.png.asset.json";
 import logoDefault from "@/assets/logo-default.png.asset.json";
 import logoCitrus from "@/assets/logo-citrus.png.asset.json";
 import logoAqua from "@/assets/logo-aqua.png.asset.json";
@@ -202,7 +204,11 @@ const Brand: React.FC = () => {
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back to app
           </Link>
-          <span className="font-logo text-2xl text-primary">prefud</span>
+          <img
+            src={primaryLogo.url}
+            alt="Prefud"
+            className="h-8 w-auto object-contain"
+          />
         </div>
       </div>
 
@@ -211,8 +217,12 @@ const Brand: React.FC = () => {
         <div className="text-xs font-mono uppercase tracking-[0.3em] text-muted-foreground mb-4">
           Visual Identity · v1
         </div>
-        <h1 className="font-logo text-6xl sm:text-8xl text-primary leading-none">prefud</h1>
-        <p className="mt-6 text-2xl sm:text-3xl font-semibold text-foreground">Brand Manual</p>
+        <img
+          src={primaryLogo.url}
+          alt="Prefud"
+          className="mx-auto max-h-24 sm:max-h-32 w-auto object-contain"
+        />
+        <h1 className="mt-6 text-2xl sm:text-3xl font-semibold text-foreground">Brand Manual</h1>
         <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
           A living reference for the Prefud visual system — logo variants, typography, and the four
           color palettes that adapt across every surface of the app.
@@ -247,10 +257,59 @@ const Brand: React.FC = () => {
           </Card>
         </section>
 
+        {/* Horizontal Logo Variants */}
+        <section aria-labelledby="horizontal-variants-heading">
+          <div className="mb-6">
+            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">02</div>
+            <h2 id="horizontal-variants-heading" className="text-3xl font-bold">Horizontal Logo — Color / White / Black</h2>
+            <p className="text-muted-foreground mt-1">
+              Three flavors of the same lockup for every background. All transparent PNGs.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <Card className="p-5">
+              <CheckerBg className="h-40 p-4">
+                <img src={primaryLogo.url} alt="Prefud horizontal color" className="max-h-full w-auto object-contain" loading="lazy" />
+              </CheckerBg>
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold">Color</div>
+                  <div className="text-xs text-muted-foreground font-mono">on any light surface</div>
+                </div>
+                <DownloadButton url={primaryLogo.url} filename="prefud-horizontal-color.png" label="Download" />
+              </div>
+            </Card>
+            <Card className="p-5">
+              <div className="rounded-lg overflow-hidden flex items-center justify-center h-40 p-4 bg-neutral-900">
+                <img src={horizontalWhite.url} alt="Prefud horizontal white" className="max-h-full w-auto object-contain" loading="lazy" />
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold">White</div>
+                  <div className="text-xs text-muted-foreground font-mono">for dark backgrounds</div>
+                </div>
+                <DownloadButton url={horizontalWhite.url} filename="prefud-horizontal-white.png" label="Download" />
+              </div>
+            </Card>
+            <Card className="p-5">
+              <div className="rounded-lg overflow-hidden flex items-center justify-center h-40 p-4 bg-neutral-100">
+                <img src={horizontalBlack.url} alt="Prefud horizontal black" className="max-h-full w-auto object-contain" loading="lazy" />
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold">Black</div>
+                  <div className="text-xs text-muted-foreground font-mono">for light backgrounds</div>
+                </div>
+                <DownloadButton url={horizontalBlack.url} filename="prefud-horizontal-black.png" label="Download" />
+              </div>
+            </Card>
+          </div>
+        </section>
+
         {/* Vertical Logos */}
         <section aria-labelledby="vertical-logo-heading">
           <div className="mb-6">
-            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">02</div>
+            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">03</div>
             <h2 id="vertical-logo-heading" className="text-3xl font-bold">Vertical Logos</h2>
             <p className="text-muted-foreground mt-1">
               Vertical lockups — bowl mark stacked above the Pacifico wordmark. One per palette theme.
@@ -285,7 +344,7 @@ const Brand: React.FC = () => {
         {/* Logomarks / Isotypes */}
         <section aria-labelledby="isotype-heading">
           <div className="mb-6">
-            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">03</div>
+            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">04</div>
             <h2 id="isotype-heading" className="text-3xl font-bold">Isotypes</h2>
             <p className="text-muted-foreground mt-1">
               The signature bowl mark on its own — no wordmark. One version per palette theme.
@@ -319,7 +378,7 @@ const Brand: React.FC = () => {
         {/* Typography */}
         <section aria-labelledby="typography-heading">
           <div className="mb-6">
-            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">04</div>
+            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">05</div>
             <h2 id="typography-heading" className="text-3xl font-bold">Typography</h2>
             <p className="text-muted-foreground mt-1">
               Two typefaces carry the entire system. One sings, the other speaks clearly.
@@ -382,7 +441,7 @@ const Brand: React.FC = () => {
         {/* Colors */}
         <section aria-labelledby="color-heading">
           <div className="mb-6">
-            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">05</div>
+            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">06</div>
             <h2 id="color-heading" className="text-3xl font-bold">Color System</h2>
             <p className="text-muted-foreground mt-1">
               Four palettes. Users pick their theme; every surface adapts through semantic tokens.
@@ -398,7 +457,7 @@ const Brand: React.FC = () => {
         {/* Download summary */}
         <section aria-labelledby="downloads-heading">
           <div className="mb-6">
-            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">06</div>
+            <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">07</div>
             <h2 id="downloads-heading" className="text-3xl font-bold">All Downloads</h2>
             <p className="text-muted-foreground mt-1">
               Every logo asset in one place.
@@ -412,6 +471,27 @@ const Brand: React.FC = () => {
                   <div className="text-xs text-muted-foreground font-mono">prefud-primary-logo.png</div>
                 </div>
                 <DownloadButton url={primaryLogo.url} filename="prefud-primary-logo.png" />
+              </li>
+              <li className="flex items-center justify-between py-3 gap-3">
+                <div>
+                  <div className="font-medium">Horizontal — Color</div>
+                  <div className="text-xs text-muted-foreground font-mono">prefud-horizontal-color.png</div>
+                </div>
+                <DownloadButton url={primaryLogo.url} filename="prefud-horizontal-color.png" label="Download" />
+              </li>
+              <li className="flex items-center justify-between py-3 gap-3">
+                <div>
+                  <div className="font-medium">Horizontal — White</div>
+                  <div className="text-xs text-muted-foreground font-mono">prefud-horizontal-white.png</div>
+                </div>
+                <DownloadButton url={horizontalWhite.url} filename="prefud-horizontal-white.png" label="Download" />
+              </li>
+              <li className="flex items-center justify-between py-3 gap-3">
+                <div>
+                  <div className="font-medium">Horizontal — Black</div>
+                  <div className="text-xs text-muted-foreground font-mono">prefud-horizontal-black.png</div>
+                </div>
+                <DownloadButton url={horizontalBlack.url} filename="prefud-horizontal-black.png" label="Download" />
               </li>
               {HORIZONTAL_LOGOS.map((item) => (
                 <li key={`h-${item.theme}`} className="flex items-center justify-between py-3 gap-3">
