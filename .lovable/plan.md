@@ -1,60 +1,21 @@
-## New Page: `/brand` — Prefud Brand Manual
+## Fixes to `/brand` page
 
-A public brand manual page documenting Prefud's visual identity with downloadable logo assets. The 4 uploaded reference images become the source-of-truth "isotype/logomark" downloads.
+**1. Rename section**
+In `src/pages/Brand.tsx`, rename the "Horizontal Logos" section heading (and any related copy/anchor) to "Vertical Logos". Keep the same assets and download buttons.
 
-### Uploaded assets → CDN
-Upload the 4 user-provided images to Lovable Assets (`.asset.json` pointers) as the canonical isotypes/logomarks per palette:
-- `logomark-default.jpeg` — official logo (green bowl + gradient wordmark) — from image 1
-- `logomark-citrus.jpeg` — Variación 4: Floración Cítrica Digital — from image 2
-- `logomark-aqua.jpeg` — Variación 5: Flujo Acuático de Bytes — from image 4
-- `logomark-dusk.jpeg` — Variación 6: Sabores del Anochecer — from image 3
+**2. Fix Isotypes section — crop just the bowl**
+Currently the Isotypes section reuses the full uploaded images (bowl + "prefud" wordmark + palette caption). The isotype should be only the bowl illustration.
 
-The existing `prefud-full-logo-v2.png` remains the primary/full logo, and the existing `logo-default/citrus/aqua/dusk.png` remain the horizontal-lockup logos already used in the nav.
+Approach: generate 4 new transparent-PNG isotype assets (one per theme), cropped/derived from each uploaded reference so only the bowl mark remains — no wordmark, no caption, no background.
 
-### Route
-- Add `/brand` route to `src/App.tsx` (public, no auth).
-- Create `src/pages/Brand.tsx`, set `useDocumentTitle("Brand Manual")`.
+- Default (Classic Green) — teal/olive bowl, from `WhatsApp_Image_2026-06-28_at_22.39.12-7.jpeg`
+- Citrus Bloom — coral/green bowl, from `...22.39.29-4.jpeg`
+- Aquatic Flow — blue/teal bowl, from `...22.39.30-4.jpeg`
+- Evening Flavors — purple/bronze bowl, from `...22.39.30_1-4.jpeg`
 
-### Page Sections
+Each output: transparent PNG, square, tight crop around the bowl mark. Upload via `lovable-assets` and store pointers under `src/assets/isotype-<theme>.png.asset.json`.
 
-**1. Hero**
-- Wordmark "prefud" in Pacifico + subtitle "Brand Manual" in Montserrat.
-- One-line tagline about the visual system.
+**3. Wire new isotypes into Brand page**
+Replace the 4 image sources used in the Isotypes grid with the new cropped assets. Keep the checkerboard preview background, individual Download buttons, and the consolidated downloads list (update those entries to point at the new isotype files). Horizontal/Vertical logo assets are unchanged.
 
-**2. Logo System** (3 subsections, each with preview on a checkered transparency background + Download button)
-- **Primary Logo** — `prefud-full-logo-v2.png`, one big preview, Download PNG.
-- **Horizontal Logos** — 4 cards (default / citrus / aqua / dusk) using the existing `logo-{theme}.png` assets, each with Download.
-- **Logomark / Isotype** — 4 cards for the newly uploaded reference images, each with Download.
-
-Downloads use `<a href={asset.url} download>`.
-
-**3. Typography**
-- **Pacifico** — logo wordmark. Live sample at 96px, plus rule "reserved for the logo, never body copy".
-- **Montserrat** — UI font. Weight ladder: 700 (h1–h3), 500 (h4–h6), 400 (body). Show heading scale + body sample.
-- Note: `font-inter` and `font-poppins` aliases both resolve to Montserrat.
-
-**4. Color System — 4 Palettes**
-Grid of 4 palette cards. Each card is wrapped in a `<div data-theme="...">` so its tokens render live (primary/secondary/accent/ring/background). Within each card:
-- Palette name + Spanish variation name.
-- Signature hex swatches (with hex code, HSL, and token label) — click-to-copy.
-- A mini "tokens in action" strip: button, badge, ring, card surface.
-
-Palettes:
-- **Default — Verde Corporativo**: `#186047` Verde Teal Primario, `#A4B237` Verde Oliva Secundario, `#F7F6F1` Fondo de Papel.
-- **Citrus — Floración Cítrica Digital**: `#FF7F50`, `#32CD32`.
-- **Aqua — Flujo Acuático de Bytes**: `#008080`, `#87CEEB`.
-- **Dusk — Sabores del Anochecer**: `#800080`, `#B87333`.
-
-**5. Download Summary**
-Compact grid recap of every downloadable asset (primary + 4 horizontal + 4 logomarks = 9 downloads), single click each.
-
-### Visual Style
-- Editorial layout, generous whitespace, monospace for hex codes, section dividers.
-- Uses semantic tokens (`bg-card`, `text-primary`, `border-border`) — no hardcoded colors on the page chrome, so it also adapts to the currently selected theme. Palette cards force their own `data-theme` scope so all four palettes preview simultaneously.
-- Responsive: 1-col mobile, 2-col tablet, up to 4-col desktop for logo/palette grids.
-
-### Files
-- Create: `src/pages/Brand.tsx`.
-- Create: 4 `.asset.json` pointers under `src/assets/` for the uploaded reference images.
-- Edit: `src/App.tsx` (add `/brand` route + import).
-- No changes to contexts, translations, business logic, or navigation. Page is standalone/shareable via URL (say the word if you want it linked from the footer/profile).
+No other pages or theme logic are touched.
