@@ -288,7 +288,7 @@ const Brand: React.FC = () => {
             <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-1">03</div>
             <h2 id="isotype-heading" className="text-3xl font-bold">Isotypes</h2>
             <p className="text-muted-foreground mt-1">
-              The signature bowl mark with the Pacifico wordmark — one canonical version per palette.
+              The signature bowl mark on its own — no wordmark. One version per palette theme.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -307,7 +307,7 @@ const Brand: React.FC = () => {
                   <div className="text-xs text-muted-foreground font-mono mb-3">{item.theme}</div>
                   <DownloadButton
                     url={item.asset.url}
-                    filename={`prefud-isotype-${item.theme}.jpg`}
+                    filename={`prefud-isotype-${item.theme}.png`}
                     label="Download"
                   />
                 </div>
