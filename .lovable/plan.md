@@ -1,30 +1,27 @@
-## Changes to `src/pages/Brand.tsx`
+## Add themed horizontal logos to the Brand page
 
-### 1. Upload the two new logo variants to Lovable Assets
-Upload the user-provided images as CDN assets:
-- `user-uploads://prefud-white-2.png` → `src/assets/prefud-horizontal-white.png.asset.json`
-- `user-uploads://prefud-black.png` → `src/assets/prefud-horizontal-black.png.asset.json`
+Extend the "Horizontal Logo" section on `/brand` with three additional themed horizontal lockups — Citrus Bloom, Aquatic Flow, and Evening Flavors — where the isotype (bowl mark) sits on the left and the "prefud" wordmark on the right.
 
-The existing `prefud-full-logo-v2.png` (color/green horizontal lockup) remains the third variant.
+### 1. Build the horizontal artwork per theme
+The existing `logo-citrus.png`, `logo-aqua.png`, and `logo-dusk.png` are vertical stacks (isotype on top, Pacifico wordmark below) on a cream paper background. Using Python + PIL in the sandbox:
+- Load each themed vertical PNG.
+- Remove the cream background to obtain a transparent-background version.
+- Compute the tight bounding box of non-transparent pixels, then split it horizontally into the top half (isotype) and bottom half (wordmark) using the natural vertical gap between the two elements.
+- Compose a new canvas (wide, e.g. 1600×600) with the isotype anchored on the left and the wordmark anchored on the right, vertically centered, with consistent padding and a small gutter between them.
+- Save as `prefud-horizontal-citrus.png`, `prefud-horizontal-aqua.png`, `prefud-horizontal-dusk.png` (transparent PNGs).
 
-### 2. Replace the "prefud" text in the top nav
-Currently the nav shows `<span className="font-logo text-2xl">prefud</span>` on the right. Replace it with an `<img>` of the color horizontal logo (`primaryLogo.url`), height ~32px, alt "Prefud".
+### 2. Upload as CDN assets
+Run `lovable-assets create --file …` for each generated PNG and write the resulting pointer to `src/assets/prefud-horizontal-{theme}.png.asset.json`. Delete the temporary PNGs from `/tmp`.
 
-### 3. Replace the "prefud" text in the hero
-Currently the hero shows a giant Pacifico `prefud` above "Brand Manual". Replace that H1 text with the color horizontal logo image (max-h-24 sm:max-h-32, centered), keeping the "Visual Identity · v1" eyebrow and "Brand Manual" subtitle unchanged. The H1 becomes the visually-hidden "Prefud Brand Manual" for SEO/a11y (or move the H1 to the "Brand Manual" line).
+### 3. Update `src/pages/Brand.tsx`
+- Import the three new `.asset.json` files.
+- In the "Horizontal Logo — Color / White / Black" section (section 02), rename the heading to **"Horizontal Logo Variants"** and split the section into two grouped subsections while keeping the same section number:
+  - **Neutral variants** — the existing 3 cards: Color (green primary), White (on dark), Black (on light).
+  - **Themed variants** — a new grid of 3 cards: Citrus Bloom, Aquatic Flow, Evening Flavors, each shown on the transparent checker background with a `Download PNG` button (`prefud-horizontal-{theme}.png`).
+- Each themed card matches the existing card styling (Card + CheckerBg + label + download).
+- Add the three new filenames to the "All Downloads" list at the bottom of the page.
 
-### 4. New "Horizontal Logo Variants" section
-Insert a new section (numbered 02, shifting the others) between "Primary Logo" and "Vertical Logos":
-
-- **Title**: "Horizontal Logo — Color / White / Black"
-- **Layout**: 3-card grid (grid-cols-1 sm:grid-cols-3)
-  - Card 1: Color version (`primaryLogo`), preview on the checker transparency background, download as `prefud-horizontal-color.png`.
-  - Card 2: White version on a dark preview background (`bg-neutral-900`), download as `prefud-horizontal-white.png`.
-  - Card 3: Black version on a light preview background (`bg-neutral-100`), download as `prefud-horizontal-black.png`.
-- Each card reuses the existing `DownloadButton` component and states "Transparent PNG".
-
-### 5. Renumber and extend the "All Downloads" list
-- Renumber the following sections (Vertical → 03, Isotypes → 04, Typography → 05, Colors → 06, Downloads → 07).
-- Add three entries at the top of the downloads list: Horizontal Color, Horizontal White, Horizontal Black — each with its own download link.
-
-No other files touched. No changes to routing, business logic, or theming.
+### Technical notes
+- Only `src/pages/Brand.tsx` is edited; three new asset pointers are added under `src/assets/`.
+- No routing, business logic, or theme system changes.
+- The horizontal compositions are new bitmap files — they are not generated at runtime.
