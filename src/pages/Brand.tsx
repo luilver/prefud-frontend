@@ -8,6 +8,9 @@ import useDocumentTitle from "@/hooks/useDocumentTitle";
 import primaryLogo from "@/assets/prefud-full-logo-v2.png.asset.json";
 import horizontalWhite from "@/assets/prefud-horizontal-white.png.asset.json";
 import horizontalBlack from "@/assets/prefud-horizontal-black.png.asset.json";
+import horizontalCitrus from "@/assets/prefud-horizontal-citrus.png.asset.json";
+import horizontalAqua from "@/assets/prefud-horizontal-aqua.png.asset.json";
+import horizontalDusk from "@/assets/prefud-horizontal-dusk.png.asset.json";
 import logoDefault from "@/assets/logo-default.png.asset.json";
 import logoCitrus from "@/assets/logo-citrus.png.asset.json";
 import logoAqua from "@/assets/logo-aqua.png.asset.json";
@@ -90,6 +93,12 @@ const LOGOMARKS: Array<{ theme: ThemeKey; label: string; asset: typeof markDefau
   { theme: "citrus", label: "Citrus Bloom", asset: markCitrus },
   { theme: "aqua", label: "Aquatic Flow", asset: markAqua },
   { theme: "dusk", label: "Evening Flavors", asset: markDusk },
+];
+
+const THEMED_HORIZONTAL: Array<{ theme: Exclude<ThemeKey, "default">; label: string; asset: typeof horizontalCitrus }> = [
+  { theme: "citrus", label: "Citrus Bloom", asset: horizontalCitrus },
+  { theme: "aqua", label: "Aquatic Flow", asset: horizontalAqua },
+  { theme: "dusk", label: "Evening Flavors", asset: horizontalDusk },
 ];
 
 const CheckerBg: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
