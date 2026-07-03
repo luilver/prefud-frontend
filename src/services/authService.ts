@@ -165,6 +165,77 @@ class AuthService {
     }
   }
 
+  async loginFirebase(token: string): Promise<CompleteLoginResponse> {
+    try {
+      const response = await fetch(`${this.baseURL}/security/loginfirebase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({})
+      });
+
+      const responseData = await response.json();
+
+      if (responseData.code === 'ACCOUNT_INCOMPLETE') {
+        const error = new Error(responseData.message || 'Account incomplete');
+        (error as any).code = 'ACCOUNT_INCOMPLETE';
+        (error as any).userId = responseData.userId;
+        throw error;
+      }
+
+      if (!response.ok) {
+        const errorMessage = Array.isArray(responseData.message?.message) 
+          ? responseData.message.message[0] 
+          : responseData.message?.message || responseData.message;
+        const err = new Error(errorMessage);
+        (err as any).statusCode = response.status;
+        (err as any).responseData = responseData;
+        throw err;
+      }
+
+      const loginData: LoginResponse = responseData;
+      const profile = await this.getProfile(loginData.userId);
+      const pantry = await this.getPantry(loginData.userId);
+      const subscription = await this.getSubscription(loginData.userId);
+      
+      return {
+        ...loginData,
+        profile,
+        pantry,
+        subscription
+      };
+    } catch (error) {
+      console.error('Firebase Login error:', error);
+      throw error;
+    }
+  }
+
+  async signupFirebase(token: string, additionalData: any = {}): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseURL}/security/signupfirebase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(additionalData)
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        const errorMessage = Array.isArray(responseData.message?.message) 
+          ? responseData.message.message[0] 
+          : responseData.message?.message || responseData.message;
+        throw new Error(errorMessage);
+      }
+      return responseData;
+    } catch (error) {
+      console.error('Firebase Signup error:', error);
+      throw error;
+    }
+  }
+
   async getProfile(userId: string): Promise<UserProfile> {
     try {
       const response = await fetch(`${this.baseURL}/user-profile/${userId}`, {

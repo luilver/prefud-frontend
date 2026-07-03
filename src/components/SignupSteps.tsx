@@ -42,16 +42,23 @@ import axios from "axios";
 import { getAllSubscriptionTypes } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
 import { trackEvent } from "@/services/analytics";
+import { authService } from "@/services/authService";
+import { auth, googleProvider, appleProvider } from "@/firebase";
+import { signInWithPopup } from "firebase/auth";
+import { Capacitor } from "@capacitor/core";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
+import { isNativePlatform } from "@/services/revenueCatService";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
-    "pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0"
+  "pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0"
 );
 
 interface SignupData {
   email: string;
   password: string;
   userId?: string;
+  firebaseToken?: string;
   wantsSubscription: boolean;
   selectedPlan?: string;
   profile?: {
@@ -73,20 +80,21 @@ const BasicURL =
 
 const SignupSteps = () => {
   const location = useLocation();
-  const incompleteState = location.state as { accountIncomplete?: boolean; email?: string; userId?: string } | null;
+  const incompleteState = location.state as { accountIncomplete?: boolean; email?: string; userId?: string; firebaseToken?: string } | null;
   const isAccountIncomplete = incompleteState?.accountIncomplete === true;
 
-  const [currentStep, setCurrentStep] = useState(isAccountIncomplete ? 1 : 1);
+  const [currentStep, setCurrentStep] = useState(isAccountIncomplete ? 2 : 1);
   const [signupData, setSignupData] = useState<SignupData>({
     email: incompleteState?.email || "",
     password: "",
     userId: incompleteState?.userId || undefined,
+    firebaseToken: incompleteState?.firebaseToken || undefined,
     wantsSubscription: false,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
-  const { login } = useAuth();
+  const { login, loginFirebase } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
@@ -180,6 +188,64 @@ const SignupSteps = () => {
           duration: 5000,
         });
       }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFirebaseSignup = async (provider: any) => {
+    setIsLoading(true);
+    let token = "";
+    let email = "";
+    try {
+      if (isNativePlatform()) {
+        console.log('it is native platform ');
+        if (provider === googleProvider) {
+          const result = await FirebaseAuthentication.signInWithGoogle();
+          console.log('google login ', result);
+          email = result.user?.email || "";
+        } else if (provider === appleProvider) {
+          const result = await FirebaseAuthentication.signInWithApple();
+          console.log('apple login ', result);
+          email = result.user?.email || "";
+        }
+
+        // Get the Firebase ID token (JWT), not the Google/Apple ID token
+        const tokenResult = await FirebaseAuthentication.getIdToken();
+        token = tokenResult.token || "";
+      } else {
+        const result = await signInWithPopup(auth, provider);
+        token = await result.user.getIdToken();
+        email = result.user.email || "";
+      }
+
+      const responseData = await authService.signupFirebase(token, { email });
+
+      if (responseData?.response?.userId) {
+        toast({
+          title: "✅ Account Created Successfully!",
+          description: "Your account has been created. Let's complete your profile.",
+          duration: 5000,
+        });
+
+        setSignupData((prev) => ({
+          ...prev,
+          userId: responseData.response.userId,
+          email: email || prev.email,
+          firebaseToken: token,
+        }));
+        setCurrentStep(2);
+      } else {
+        throw new Error("Unexpected response format");
+      }
+    } catch (error: any) {
+      console.error("Firebase Signup failed:", error);
+      toast({
+        title: "❌ Signup Failed",
+        description: error.message || "Unable to create account with provider.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -285,13 +351,13 @@ const SignupSteps = () => {
         phone: signupData.profile?.phone || "",
         preferences: signupData.profile
           ? {
-              dietaryRestrictions: [],
-              allergies: signupData.profile.allergies || [],
-              cuisinePreferences: [],
-              cookingSkillLevel: "beginner" as const,
-              mealPrepTime: 30,
-              budgetRange: "medium" as const,
-            }
+            dietaryRestrictions: [],
+            allergies: signupData.profile.allergies || [],
+            cuisinePreferences: [],
+            cookingSkillLevel: "beginner" as const,
+            mealPrepTime: 30,
+            budgetRange: "medium" as const,
+          }
           : undefined,
       };
 
@@ -305,7 +371,20 @@ const SignupSteps = () => {
       }
 
       // Real authentication so AuthContext.user is set and routes unlock
-      if (signupData.email && signupData.password) {
+      if (signupData.firebaseToken) {
+        try {
+          await loginFirebase(signupData.firebaseToken);
+          navigate("/", { replace: true });
+        } catch (loginErr) {
+          console.error("Auto-login via Firebase after signup failed:", loginErr);
+          toast({
+            title: "Account created",
+            description: "Please sign in to continue.",
+            duration: 5000,
+          });
+          navigate("/signin", { replace: true });
+        }
+      } else if (signupData.email && signupData.password) {
         try {
           await login(signupData.email, signupData.password);
           navigate("/", { replace: true });
@@ -343,35 +422,29 @@ const SignupSteps = () => {
       <div className="relative mb-6 sm:mb-8">
         <div className="flex justify-center">
           <div
-            className={`flex items-center ${
-              isMobile ? "space-x-2" : "space-x-4 sm:space-x-6"
-            } px-2 sm:px-0`}
+            className={`flex items-center ${isMobile ? "space-x-2" : "space-x-4 sm:space-x-6"
+              } px-2 sm:px-0`}
           >
             {stepItems.map(({ step, title, icon: Icon, color }, index) => (
               <div key={step} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`relative flex items-center justify-center ${
-                      isMobile ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
-                    } rounded-full transition-all duration-500 ${
-                      currentStep >= step
-                        ? `bg-gradient-to-r ${color} text-white shadow-lg border-2 border-primary/20 ${
-                            isMobile ? "scale-105" : "scale-110"
-                          }`
+                    className={`relative flex items-center justify-center ${isMobile ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
+                      } rounded-full transition-all duration-500 ${currentStep >= step
+                        ? `bg-gradient-to-r ${color} text-white shadow-lg border-2 border-primary/20 ${isMobile ? "scale-105" : "scale-110"
+                        }`
                         : "bg-background border-2 border-border text-muted-foreground shadow-md"
-                    }`}
+                      }`}
                   >
                     {currentStep > step ? (
                       <Check
-                        className={`${
-                          isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
-                        }`}
+                        className={`${isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
+                          }`}
                       />
                     ) : (
                       <Icon
-                        className={`${
-                          isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
-                        }`}
+                        className={`${isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
+                          }`}
                       />
                     )}
 
@@ -383,13 +456,11 @@ const SignupSteps = () => {
                   </div>
 
                   <span
-                    className={`mt-2 text-xs font-medium transition-all duration-300 ${
-                      isMobile ? "hidden" : ""
-                    } ${
-                      currentStep >= step
+                    className={`mt-2 text-xs font-medium transition-all duration-300 ${isMobile ? "hidden" : ""
+                      } ${currentStep >= step
                         ? "text-foreground font-semibold"
                         : "text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {title}
                   </span>
@@ -397,13 +468,11 @@ const SignupSteps = () => {
 
                 {index < stepItems.length - 1 && (
                   <div
-                    className={`${
-                      isMobile ? "w-4 h-0.5" : "w-8 sm:w-16 h-1"
-                    } mx-2 sm:mx-4 rounded-full transition-all duration-500 ${
-                      currentStep > step
+                    className={`${isMobile ? "w-4 h-0.5" : "w-8 sm:w-16 h-1"
+                      } mx-2 sm:mx-4 rounded-full transition-all duration-500 ${currentStep > step
                         ? `bg-gradient-to-r ${stepItems[index + 1].color}`
                         : "bg-border"
-                    }`}
+                      }`}
                   />
                 )}
               </div>
@@ -512,9 +581,9 @@ const SignupSteps = () => {
                   onClick={async () => {
                     console.log('step 1 signup');
                     trackEvent('button_click', {
-                              button_name: `step${currentStep}_submit`,
-                              screen: 'signup_page',
-                            })
+                      button_name: `step${currentStep}_submit`,
+                      screen: 'signup_page',
+                    })
 
                   }}
                 >
@@ -530,6 +599,63 @@ const SignupSteps = () => {
                     </div>
                   )}
                 </Button>
+
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or sign up with
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-11 sm:h-12 rounded-xl border-border hover:bg-muted transition-all"
+                    onClick={() => handleFirebaseSignup(googleProvider)}
+                    disabled={isLoading}
+                  >
+                    <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                      <path d="M1 1h22v22H1z" fill="none" />
+                    </svg>
+                    Google
+                  </Button>
+
+                  {isNativePlatform() && Capacitor.getPlatform() === 'ios' && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-11 sm:h-12 rounded-xl border-border hover:bg-muted transition-all"
+                      onClick={() => handleFirebaseSignup(appleProvider)}
+                      disabled={isLoading}
+                    >
+                      <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.43.987 3.96.948 1.567-.025 2.558-1.498 3.562-2.964 1.156-1.687 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.484-4.508 2.597-4.572-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.502 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.56-1.702z" />
+                      </svg>
+                      Apple
+                    </Button>
+                  )}
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -558,17 +684,16 @@ const SignupSteps = () => {
               {t("signup.choosePlan") || "Choose your plan"}
             </h2>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto">
-              {t("signup.selectPlanDescription") || "Select the perfect plan to start your personalized meal planning"}  
+              {t("signup.selectPlanDescription") || "Select the perfect plan to start your personalized meal planning"}
               {t("signup.journey") || "journey"}
             </p>
           </div>
 
           <div
-            className={`grid ${
-              isMobile
+            className={`grid ${isMobile
                 ? "grid-cols-1 gap-4"
                 : "grid-cols-1 lg:grid-cols-3 gap-6"
-            } px-1 sm:px-0`}
+              } px-1 sm:px-0`}
           >
             {subscriptionTypes.map((plan, index) => (
               <div key={plan.id} className="relative group">
@@ -577,11 +702,10 @@ const SignupSteps = () => {
                 ></div>
 
                 <Card
-                  className={`relative cursor-pointer transition-all duration-500 border-2 rounded-2xl overflow-hidden h-full transform group-hover:scale-[1.02] group-hover:shadow-xl ${
-                    plan.popular
+                  className={`relative cursor-pointer transition-all duration-500 border-2 rounded-2xl overflow-hidden h-full transform group-hover:scale-[1.02] group-hover:shadow-xl ${plan.popular
                       ? "border-primary shadow-xl bg-gradient-to-b from-card to-primary/5"
                       : "border-border hover:border-primary/50 bg-card shadow-lg"
-                  }`}
+                    }`}
                   onClick={() => handleSubscriptionChoice(plan.id)}
                 >
                   <div
@@ -659,17 +783,16 @@ const SignupSteps = () => {
                     </div>
 
                     <Button
-                      className={`w-full h-11 sm:h-12 text-sm font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${
-                        plan.name === "Free"
+                      className={`w-full h-11 sm:h-12 text-sm font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${plan.name === "Free"
                           ? "bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground"
                           : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
-                      }`}
+                        }`}
                       onClick={async () => {
                         console.log('step 4 plan selection');
                         trackEvent('button_click', {
-                                  button_name: `step${currentStep}_signup_plan${plan.name}_submit`,
-                                  screen: 'signup_page',
-                                })
+                          button_name: `step${currentStep}_signup_plan${plan.name}_submit`,
+                          screen: 'signup_page',
+                        })
                       }}
                     >
                       <div className="flex items-center space-x-2">
