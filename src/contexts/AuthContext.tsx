@@ -82,6 +82,7 @@ interface AuthContextType {
   setUser: React.Dispatch<React.SetStateAction<AuthUser | null>>;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void | any>;
+  loginFirebase: (token: string) => Promise<void | any>;
   logout: () => void;
   isLoading: boolean;
    updateSubscription: (subscription: AuthUser['subscription']) => void;
@@ -206,6 +207,60 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const loginFirebase = async (token: string) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.loginFirebase(token);
+      
+      const userData: AuthUser = {
+        email: response.email,
+        isActive: response.isActive,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt,
+        expirationToken: response.expirationToken,
+        token: response.token,
+        userId: response.userId,
+        profile: response.profile,
+        pantry: response.pantry.transformedItems,
+        originalPantryResponse: response.pantry.originalResponse,
+        subscription: response.subscription
+      };
+
+      // Store user data and token for session persistence
+      localStorage.setItem('authUser', JSON.stringify(userData));
+      localStorage.setItem('authToken', response.token);
+      
+      setUser(userData);
+      console.log('Firebase Login successful, session saved');
+      
+      // Trigger pantry sync event for UserContext with both formats
+      if (response.pantry.transformedItems) {
+        window.dispatchEvent(new CustomEvent('pantry-sync', { 
+          detail: { 
+            pantry: response.pantry.transformedItems,
+            originalPantryResponse: response.pantry.originalResponse
+          } 
+        }));
+      }
+
+      // Trigger subscription sync event for SubscriptionContext
+      if (response.subscription) {
+        window.dispatchEvent(new CustomEvent('subscription-sync', { 
+          detail: { subscription: response.subscription } 
+        }));
+      }
+
+      // Return the user data so it can be used immediately
+      return userData;
+    } catch (error) {
+      console.error('Firebase Login failed:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   const logout = () => {
     console.log('Logging out and clearing all session data');
     
@@ -254,6 +309,7 @@ const updateSubscription = (newSubscription: AuthUser['subscription']) => {
     setUser,
     isAuthenticated: !!user,
     login,
+    loginFirebase,
     logout,
     isLoading,
     updateSubscription
