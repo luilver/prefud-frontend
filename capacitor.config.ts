@@ -14,10 +14,14 @@ const config: CapacitorConfig = {
       style: "DARK",
     },
     CapacitorHttp: {
-    enabled: true, 
-  },
-  FirebaseAnalytics: {
+      enabled: true, 
+    },
+    FirebaseAnalytics: {
       enabled: true,
+    },
+    FirebaseAuthentication: {
+      skipNativeAuth: false,
+      providers: ["apple.com", "google.com"],
     }
   },
   server: {

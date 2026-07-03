@@ -48,6 +48,18 @@
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <true/>
     
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.507413119491-f7s1h48v4j4ebtu671h2igvg0e5odmjc</string>
+            </array>
+        </dict>
+    </array>
+    
     <!-- Privacy Purpose Strings Added Below -->
     <key>NSCameraUsageDescription</key>
     <string>Prefud needs access to the camera to take photos.</string>

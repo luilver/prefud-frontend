@@ -27,6 +27,7 @@ import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
 import { authService } from "@/services/authService";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 
 const SignIn = () => {
   useDocumentTitle("Sign in");
@@ -49,7 +50,7 @@ const SignIn = () => {
       button_name: "login_submit",
       screen: "login_page",
     });
-    
+
     setIsLoading(true);
     try {
       const userData = await login(email, password);
@@ -77,12 +78,12 @@ const SignIn = () => {
           description: t("signin.accountIncompleteDesc") || "Your account needs to be completed. Please verify your email to continue.",
           variant: "destructive",
         });
-        navigate("/signup", { 
-          state: { 
-            accountIncomplete: true, 
-            email, 
-            userId: (error as any).userId 
-          } 
+        navigate("/signup", {
+          state: {
+            accountIncomplete: true,
+            email,
+            userId: (error as any).userId
+          }
         });
         return;
       }
@@ -131,10 +132,24 @@ const SignIn = () => {
     let token = "";
     let email = "";
     try {
-      const result = await signInWithPopup(auth, provider);
-      token = await result.user.getIdToken();
-      email = result.user.email || "";
-      
+      if (isNativePlatform()) {
+        if (provider === googleProvider) {
+          const result = await FirebaseAuthentication.signInWithGoogle();
+          email = result.user?.email || "";
+        } else if (provider === appleProvider) {
+          const result = await FirebaseAuthentication.signInWithApple();
+          email = result.user?.email || "";
+        }
+
+        // Get the Firebase ID token (JWT), not the Google/Apple ID token
+        const tokenResult = await FirebaseAuthentication.getIdToken();
+        token = tokenResult.token || "";
+      } else {
+        const result = await signInWithPopup(auth, provider);
+        token = await result.user.getIdToken();
+        email = result.user.email || "";
+      }
+
       const userData = await loginFirebase(token);
       if (
         userData?.profile?.languages &&
@@ -152,24 +167,24 @@ const SignIn = () => {
       navigate("/");
     } catch (error) {
       console.log("Firebase Login error caught:", error);
-      
+
       if (error instanceof Error && (error as any).statusCode === 404) {
         // User not found, call signupFirebase
         try {
           const responseData = await authService.signupFirebase(token, { email });
-          
+
           if (responseData?.response?.userId) {
             toast({
               title: "✅ Account Created Successfully!",
               description: "Please complete your profile to continue.",
             });
-            navigate("/signup", { 
-              state: { 
-                accountIncomplete: true, 
-                email: email, 
+            navigate("/signup", {
+              state: {
+                accountIncomplete: true,
+                email: email,
                 userId: responseData.response.userId,
                 firebaseToken: token
-              } 
+              }
             });
             return;
           }
@@ -182,23 +197,23 @@ const SignIn = () => {
           return;
         }
       }
-      
+
       if (error instanceof Error && (error as any).code === 'ACCOUNT_INCOMPLETE') {
         toast({
           title: t("signin.accountIncomplete") || "Account Incomplete",
           description: t("signin.accountIncompleteDesc") || "Your account needs to be completed. Please verify your email to continue.",
           variant: "destructive",
         });
-        navigate("/signup", { 
-          state: { 
-            accountIncomplete: true, 
-            email: (error as any).email || "", 
-            userId: (error as any).userId 
-          } 
+        navigate("/signup", {
+          state: {
+            accountIncomplete: true,
+            email: (error as any).email || "",
+            userId: (error as any).userId
+          }
         });
         return;
       }
-      
+
       toast({
         title: "Sign in failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
@@ -282,11 +297,11 @@ const SignIn = () => {
           <div className="w-full max-w-[420px]">
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
               <CardHeader className="text-center space-y-3 pt-8 pb-2 px-6 md:px-8">
-              <img
-                src={logoUrl}
-                alt="Prefud"
-                className="h-32 w-auto mx-auto object-contain"
-              />
+                <img
+                  src={logoUrl}
+                  alt="Prefud"
+                  className="h-32 w-auto mx-auto object-contain"
+                />
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
                   {t("signin.title")}
                 </CardTitle>
@@ -370,7 +385,7 @@ const SignIn = () => {
                   >
                     {isLoading ? t("signin.signing-in") : t("signin.button")}
                   </Button>
-                  
+
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
                       <span className="w-full border-t border-neutral-200 dark:border-neutral-700" />
@@ -411,7 +426,7 @@ const SignIn = () => {
                       </svg>
                       Google
                     </Button>
-                    
+
                     {isNativePlatform() && Capacitor.getPlatform() === 'ios' && (
                       <Button
                         type="button"

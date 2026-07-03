@@ -46,11 +46,12 @@ import { authService } from "@/services/authService";
 import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 import { isNativePlatform } from "@/services/revenueCatService";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
-    "pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0"
+  "pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0"
 );
 
 interface SignupData {
@@ -194,12 +195,32 @@ const SignupSteps = () => {
 
   const handleFirebaseSignup = async (provider: any) => {
     setIsLoading(true);
+    let token = "";
+    let email = "";
     try {
-      const result = await signInWithPopup(auth, provider);
-      const token = await result.user.getIdToken();
-      
-      const responseData = await authService.signupFirebase(token, { email: result.user.email });
-      
+      if (isNativePlatform()) {
+        console.log('it is native platform ');
+        if (provider === googleProvider) {
+          const result = await FirebaseAuthentication.signInWithGoogle();
+          console.log('google login ', result);
+          email = result.user?.email || "";
+        } else if (provider === appleProvider) {
+          const result = await FirebaseAuthentication.signInWithApple();
+          console.log('apple login ', result);
+          email = result.user?.email || "";
+        }
+
+        // Get the Firebase ID token (JWT), not the Google/Apple ID token
+        const tokenResult = await FirebaseAuthentication.getIdToken();
+        token = tokenResult.token || "";
+      } else {
+        const result = await signInWithPopup(auth, provider);
+        token = await result.user.getIdToken();
+        email = result.user.email || "";
+      }
+
+      const responseData = await authService.signupFirebase(token, { email });
+
       if (responseData?.response?.userId) {
         toast({
           title: "✅ Account Created Successfully!",
@@ -210,7 +231,7 @@ const SignupSteps = () => {
         setSignupData((prev) => ({
           ...prev,
           userId: responseData.response.userId,
-          email: result.user.email || prev.email,
+          email: email || prev.email,
           firebaseToken: token,
         }));
         setCurrentStep(2);
@@ -330,13 +351,13 @@ const SignupSteps = () => {
         phone: signupData.profile?.phone || "",
         preferences: signupData.profile
           ? {
-              dietaryRestrictions: [],
-              allergies: signupData.profile.allergies || [],
-              cuisinePreferences: [],
-              cookingSkillLevel: "beginner" as const,
-              mealPrepTime: 30,
-              budgetRange: "medium" as const,
-            }
+            dietaryRestrictions: [],
+            allergies: signupData.profile.allergies || [],
+            cuisinePreferences: [],
+            cookingSkillLevel: "beginner" as const,
+            mealPrepTime: 30,
+            budgetRange: "medium" as const,
+          }
           : undefined,
       };
 
@@ -401,35 +422,29 @@ const SignupSteps = () => {
       <div className="relative mb-6 sm:mb-8">
         <div className="flex justify-center">
           <div
-            className={`flex items-center ${
-              isMobile ? "space-x-2" : "space-x-4 sm:space-x-6"
-            } px-2 sm:px-0`}
+            className={`flex items-center ${isMobile ? "space-x-2" : "space-x-4 sm:space-x-6"
+              } px-2 sm:px-0`}
           >
             {stepItems.map(({ step, title, icon: Icon, color }, index) => (
               <div key={step} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`relative flex items-center justify-center ${
-                      isMobile ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
-                    } rounded-full transition-all duration-500 ${
-                      currentStep >= step
-                        ? `bg-gradient-to-r ${color} text-white shadow-lg border-2 border-primary/20 ${
-                            isMobile ? "scale-105" : "scale-110"
-                          }`
+                    className={`relative flex items-center justify-center ${isMobile ? "w-10 h-10" : "w-12 h-12 sm:w-14 sm:h-14"
+                      } rounded-full transition-all duration-500 ${currentStep >= step
+                        ? `bg-gradient-to-r ${color} text-white shadow-lg border-2 border-primary/20 ${isMobile ? "scale-105" : "scale-110"
+                        }`
                         : "bg-background border-2 border-border text-muted-foreground shadow-md"
-                    }`}
+                      }`}
                   >
                     {currentStep > step ? (
                       <Check
-                        className={`${
-                          isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
-                        }`}
+                        className={`${isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
+                          }`}
                       />
                     ) : (
                       <Icon
-                        className={`${
-                          isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
-                        }`}
+                        className={`${isMobile ? "h-4 w-4" : "h-5 w-5 sm:h-6 sm:w-6"
+                          }`}
                       />
                     )}
 
@@ -441,13 +456,11 @@ const SignupSteps = () => {
                   </div>
 
                   <span
-                    className={`mt-2 text-xs font-medium transition-all duration-300 ${
-                      isMobile ? "hidden" : ""
-                    } ${
-                      currentStep >= step
+                    className={`mt-2 text-xs font-medium transition-all duration-300 ${isMobile ? "hidden" : ""
+                      } ${currentStep >= step
                         ? "text-foreground font-semibold"
                         : "text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {title}
                   </span>
@@ -455,13 +468,11 @@ const SignupSteps = () => {
 
                 {index < stepItems.length - 1 && (
                   <div
-                    className={`${
-                      isMobile ? "w-4 h-0.5" : "w-8 sm:w-16 h-1"
-                    } mx-2 sm:mx-4 rounded-full transition-all duration-500 ${
-                      currentStep > step
+                    className={`${isMobile ? "w-4 h-0.5" : "w-8 sm:w-16 h-1"
+                      } mx-2 sm:mx-4 rounded-full transition-all duration-500 ${currentStep > step
                         ? `bg-gradient-to-r ${stepItems[index + 1].color}`
                         : "bg-border"
-                    }`}
+                      }`}
                   />
                 )}
               </div>
@@ -570,9 +581,9 @@ const SignupSteps = () => {
                   onClick={async () => {
                     console.log('step 1 signup');
                     trackEvent('button_click', {
-                              button_name: `step${currentStep}_submit`,
-                              screen: 'signup_page',
-                            })
+                      button_name: `step${currentStep}_submit`,
+                      screen: 'signup_page',
+                    })
 
                   }}
                 >
@@ -588,7 +599,7 @@ const SignupSteps = () => {
                     </div>
                   )}
                 </Button>
-                
+
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-border" />
@@ -629,7 +640,7 @@ const SignupSteps = () => {
                     </svg>
                     Google
                   </Button>
-                  
+
                   {isNativePlatform() && Capacitor.getPlatform() === 'ios' && (
                     <Button
                       type="button"
@@ -673,17 +684,16 @@ const SignupSteps = () => {
               {t("signup.choosePlan") || "Choose your plan"}
             </h2>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto">
-              {t("signup.selectPlanDescription") || "Select the perfect plan to start your personalized meal planning"}  
+              {t("signup.selectPlanDescription") || "Select the perfect plan to start your personalized meal planning"}
               {t("signup.journey") || "journey"}
             </p>
           </div>
 
           <div
-            className={`grid ${
-              isMobile
+            className={`grid ${isMobile
                 ? "grid-cols-1 gap-4"
                 : "grid-cols-1 lg:grid-cols-3 gap-6"
-            } px-1 sm:px-0`}
+              } px-1 sm:px-0`}
           >
             {subscriptionTypes.map((plan, index) => (
               <div key={plan.id} className="relative group">
@@ -692,11 +702,10 @@ const SignupSteps = () => {
                 ></div>
 
                 <Card
-                  className={`relative cursor-pointer transition-all duration-500 border-2 rounded-2xl overflow-hidden h-full transform group-hover:scale-[1.02] group-hover:shadow-xl ${
-                    plan.popular
+                  className={`relative cursor-pointer transition-all duration-500 border-2 rounded-2xl overflow-hidden h-full transform group-hover:scale-[1.02] group-hover:shadow-xl ${plan.popular
                       ? "border-primary shadow-xl bg-gradient-to-b from-card to-primary/5"
                       : "border-border hover:border-primary/50 bg-card shadow-lg"
-                  }`}
+                    }`}
                   onClick={() => handleSubscriptionChoice(plan.id)}
                 >
                   <div
@@ -774,17 +783,16 @@ const SignupSteps = () => {
                     </div>
 
                     <Button
-                      className={`w-full h-11 sm:h-12 text-sm font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${
-                        plan.name === "Free"
+                      className={`w-full h-11 sm:h-12 text-sm font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${plan.name === "Free"
                           ? "bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground"
                           : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
-                      }`}
+                        }`}
                       onClick={async () => {
                         console.log('step 4 plan selection');
                         trackEvent('button_click', {
-                                  button_name: `step${currentStep}_signup_plan${plan.name}_submit`,
-                                  screen: 'signup_page',
-                                })
+                          button_name: `step${currentStep}_signup_plan${plan.name}_submit`,
+                          screen: 'signup_page',
+                        })
                       }}
                     >
                       <div className="flex items-center space-x-2">
