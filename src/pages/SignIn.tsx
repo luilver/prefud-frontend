@@ -23,6 +23,11 @@ import { trackEvent } from "@/services/analytics";
 import { isNativePlatform } from "@/services/revenueCatService";
 import { useThemeLogo } from "@/contexts/ThemeContext";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
+import { auth, googleProvider, appleProvider } from "@/firebase";
+import { signInWithPopup } from "firebase/auth";
+import { Capacitor } from "@capacitor/core";
+import { authService } from "@/services/authService";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 
 const SignIn = () => {
   useDocumentTitle("Sign in");
@@ -31,7 +36,7 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordRecovery, setShowPasswordRecovery] = useState(false);
-  const { login } = useUser();
+  const { login, loginFirebase } = useUser();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -45,7 +50,7 @@ const SignIn = () => {
       button_name: "login_submit",
       screen: "login_page",
     });
-    
+
     setIsLoading(true);
     try {
       const userData = await login(email, password);
@@ -73,12 +78,12 @@ const SignIn = () => {
           description: t("signin.accountIncompleteDesc") || "Your account needs to be completed. Please verify your email to continue.",
           variant: "destructive",
         });
-        navigate("/signup", { 
-          state: { 
-            accountIncomplete: true, 
-            email, 
-            userId: (error as any).userId 
-          } 
+        navigate("/signup", {
+          state: {
+            accountIncomplete: true,
+            email,
+            userId: (error as any).userId
+          }
         });
         return;
       }
@@ -115,6 +120,103 @@ const SignIn = () => {
       toast({
         title,
         description,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFirebaseLogin = async (provider: any) => {
+    setIsLoading(true);
+    let token = "";
+    let email = "";
+    try {
+      if (isNativePlatform()) {
+        if (provider === googleProvider) {
+          const result = await FirebaseAuthentication.signInWithGoogle();
+          email = result.user?.email || "";
+        } else if (provider === appleProvider) {
+          const result = await FirebaseAuthentication.signInWithApple();
+          email = result.user?.email || "";
+        }
+
+        // Get the Firebase ID token (JWT), not the Google/Apple ID token
+        const tokenResult = await FirebaseAuthentication.getIdToken();
+        token = tokenResult.token || "";
+      } else {
+        const result = await signInWithPopup(auth, provider);
+        token = await result.user.getIdToken();
+        email = result.user.email || "";
+      }
+
+      const userData = await loginFirebase(token);
+      if (
+        userData?.profile?.languages &&
+        (userData.profile.languages === "en" ||
+          userData.profile.languages === "es" ||
+          userData.profile.languages === "pt")
+      ) {
+        setLanguage(userData.profile.languages as Language);
+      }
+
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
+      navigate("/");
+    } catch (error) {
+      console.log("Firebase Login error caught:", error);
+
+      if (error instanceof Error && (error as any).statusCode === 404) {
+        // User not found, call signupFirebase
+        try {
+          const responseData = await authService.signupFirebase(token, { email });
+
+          if (responseData?.response?.userId) {
+            toast({
+              title: "✅ Account Created Successfully!",
+              description: "Please complete your profile to continue.",
+            });
+            navigate("/signup", {
+              state: {
+                accountIncomplete: true,
+                email: email,
+                userId: responseData.response.userId,
+                firebaseToken: token
+              }
+            });
+            return;
+          }
+        } catch (signupError: any) {
+          toast({
+            title: "Sign up failed",
+            description: signupError.message || "Could not create account.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      if (error instanceof Error && (error as any).code === 'ACCOUNT_INCOMPLETE') {
+        toast({
+          title: t("signin.accountIncomplete") || "Account Incomplete",
+          description: t("signin.accountIncompleteDesc") || "Your account needs to be completed. Please verify your email to continue.",
+          variant: "destructive",
+        });
+        navigate("/signup", {
+          state: {
+            accountIncomplete: true,
+            email: (error as any).email || "",
+            userId: (error as any).userId
+          }
+        });
+        return;
+      }
+
+      toast({
+        title: "Sign in failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -195,11 +297,11 @@ const SignIn = () => {
           <div className="w-full max-w-[420px]">
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">
               <CardHeader className="text-center space-y-3 pt-8 pb-2 px-6 md:px-8">
-              <img
-                src={logoUrl}
-                alt="Prefud"
-                className="h-32 w-auto mx-auto object-contain"
-              />
+                <img
+                  src={logoUrl}
+                  alt="Prefud"
+                  className="h-32 w-auto mx-auto object-contain"
+                />
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
                   {t("signin.title")}
                 </CardTitle>
@@ -283,39 +385,83 @@ const SignIn = () => {
                   >
                     {isLoading ? t("signin.signing-in") : t("signin.button")}
                   </Button>
-                </form>
 
-                {isNativePlatform() ? (
-                  <div className="mt-6 pt-6 border-t border-emerald-500/20">
-                    <div className="text-center space-y-2">
-                      <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                        Log in with your existing account
-                      </p>
-                      <p className="text-xs text-neutral-400 dark:text-neutral-500">
-                        Use this app with an existing account
-                      </p>
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-neutral-200 dark:border-neutral-700" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white dark:bg-neutral-900 px-2 text-neutral-500">
+                        Or continue with
+                      </span>
                     </div>
                   </div>
-                ) : (
-                  <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
-                    <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
-                      {t("signin.no-account")}{" "}
+
+                  <div className="flex flex-col gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-12 rounded-xl border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
+                      onClick={() => handleFirebaseLogin(googleProvider)}
+                      disabled={isLoading}
+                    >
+                      <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                        <path
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          fill="#4285F4"
+                        />
+                        <path
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          fill="#34A853"
+                        />
+                        <path
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          fill="#FBBC05"
+                        />
+                        <path
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          fill="#EA4335"
+                        />
+                        <path d="M1 1h22v22H1z" fill="none" />
+                      </svg>
+                      Google
+                    </Button>
+
+                    {isNativePlatform() && Capacitor.getPlatform() === 'ios' && (
                       <Button
-                        variant="link"
-                        onClick={async () => {
-                          trackEvent("button_click", {
-                            button_name: "signup_submit",
-                            screen: "login_page",
-                          });
-                          navigate("/signup");
-                        }}
-                        className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-0 h-auto font-semibold text-sm"
+                        type="button"
+                        variant="outline"
+                        className="w-full h-12 rounded-xl border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
+                        onClick={() => handleFirebaseLogin(appleProvider)}
+                        disabled={isLoading}
                       >
-                        {t("signin.create-here")}
+                        <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.43.987 3.96.948 1.567-.025 2.558-1.498 3.562-2.964 1.156-1.687 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.484-4.508 2.597-4.572-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.502 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.56-1.702z" />
+                        </svg>
+                        Apple
                       </Button>
-                    </p>
+                    )}
                   </div>
-                )}
+                </form>
+
+                <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                  <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
+                    {t("signin.no-account")}{" "}
+                    <Button
+                      variant="link"
+                      onClick={async () => {
+                        trackEvent("button_click", {
+                          button_name: "signup_submit",
+                          screen: "login_page",
+                        });
+                        navigate("/signup");
+                      }}
+                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-0 h-auto font-semibold text-sm"
+                    >
+                      {t("signin.create-here")}
+                    </Button>
+                  </p>
+                </div>
               </CardContent>
             </Card>
 

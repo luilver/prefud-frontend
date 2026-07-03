@@ -151,8 +151,10 @@ interface UserContextType {
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   login: (email: string, password: string) => Promise<any>;
+  loginFirebase: (token: string) => Promise<any>;
   logout: () => void;
   signup: (userData: any) => Promise<void>;
+  signupFirebase: (token: string, userData: any) => Promise<void>;
   updateUserProfile: (updates: Partial<User>) => void;
   addPantryItem: (item: Omit<PantryItem, "id">) => void;
   updatePantryItem: (id: string, updates: Partial<PantryItem>) => void;
@@ -232,6 +234,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const {
     user: authUser,
     login: authLogin,
+    loginFirebase: authLoginFirebase,
     logout: authLogout,
     isAuthenticated: authIsAuthenticated,
   } = useAuth();
@@ -592,6 +595,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     return userData;
   };
 
+  const loginFirebase = async (token: string) => {
+    const userData = await authLoginFirebase(token);
+    await checkSubscription();
+    return userData;
+  };
+
+
   const logout = () => {
     authLogout();
     setUser(null);
@@ -653,6 +663,43 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(newUser);
     await checkSubscription();
   };
+
+  const signupFirebase = async (token: string, userData: any) => {
+    // You could call authService.signupFirebase here if needed, 
+    // but typically after signup you automatically login.
+    // Let's just do the mock for now as the current code does.
+    const newUser: User = {
+      id: Date.now().toString(),
+      name: userData.name || userData.email.split("@")[0],
+      email: userData.email,
+      phone: userData.phone,
+      country: userData.country,
+      language: userData.language || "en",
+      preferences: userData.preferences || {
+        dietaryRestrictions: [],
+        allergies: [],
+        cuisinePreferences: [],
+        cookingSkillLevel: "beginner",
+        mealPrepTime: 30,
+        budgetRange: "medium",
+      },
+      subscription: {
+        plan: "free",
+        isSubscribed: false,
+        planLimits: {
+          plansPerMonth: 1,
+          usedPlans: 0,
+          mealCreations: 3,
+          usedMealCreations: 0,
+          deliveryCommissions: 0,
+          usedDeliveryCommissions: 0,
+        },
+      },
+    };
+    setUser(newUser);
+    await checkSubscription();
+  };
+
 
   const updateUserProfile = (updates: Partial<User>) => {
     if (user) {
@@ -1126,8 +1173,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     isAuthenticated,
     setUser,
     login,
+    loginFirebase,
     logout,
     signup,
+    signupFirebase,
     updateUserProfile,
     addPantryItem,
     updatePantryItem,

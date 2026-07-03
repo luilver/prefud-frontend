@@ -4,4 +4,5 @@
     <string name="title_activity_main">Prefud</string>
     <string name="package_name">com.bessel.prefud</string>
     <string name="custom_url_scheme">com.bessel.prefud</string>
+    <string name="default_web_client_id">PLACEHOLDER_WEB_CLIENT_ID</string>
 </resources>
