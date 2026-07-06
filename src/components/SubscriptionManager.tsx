@@ -165,8 +165,30 @@ const SubscriptionManager = () => {
     );
   };
 
+  const getDisplayPrice = (plan: SubscriptionPlan): string => {
+    if (plan.price === 0) return "Free";
+
+    const nativePackage = findNativePackageForPlan(plan);
+
+    if (nativePackage?.product?.priceString) {
+      return nativePackage.product.priceString;
+    }
+
+    return `$${plan.price}`;
+  };
+
   const handleNativePurchase = async (plan: SubscriptionPlan) => {
     const pkg = findNativePackageForPlan(plan);
+    console.log("[RevenueCat] Starting native purchase", {
+      planId: plan.id,
+      planName: plan.name,
+      packageIdentifier: pkg?.identifier,
+      productIdentifier: pkg?.product.identifier,
+      productTitle: pkg?.product.title,
+      priceString: pkg?.product.priceString,
+      defaultOptionId: pkg?.product.defaultOption?.id,
+      defaultOptionStoreProductId: pkg?.product.defaultOption?.storeProductId,
+    });
     if (!pkg) {
       toast({
         title: "Plan unavailable",
@@ -445,8 +467,12 @@ const SubscriptionManager = () => {
                 <CardTitle className="text-xl">{plan.name}</CardTitle>
                 <CardDescription>
                   <div className="text-3xl font-bold text-gray-800 mt-2">
-                    {plan.price === 0 ? 'Free' : `$${plan.price}`}
-                    {plan.price > 0 && <span className="text-sm font-normal text-gray-600">/{plan.interval}</span>}
+                    {getDisplayPrice(plan)}
+                    {plan.price > 0 && (
+                      <span className="text-sm font-normal text-gray-600">
+                        /{plan.interval}
+                      </span>
+                    )}
                   </div>
                 </CardDescription>
               </CardHeader>
