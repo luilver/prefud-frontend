@@ -43,7 +43,7 @@ export async function initRevenueCat(appUserId?: string): Promise<void> {
 
   try {
     if (!configured) {
-      await Purchases.setLogLevel({ level: LOG_LEVEL.WARN });
+      await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
       await Purchases.configure({ apiKey, appUserID: appUserId });
       configured = true;
     } else if (appUserId && configuringUserId !== appUserId) {

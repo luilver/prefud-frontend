@@ -6,11 +6,15 @@ import type { ApiSubscriptionType } from '@/services/payments';
  * backend `subscriptionType.name`. Update these strings to match the real
  * product identifiers you set up.
  */
+// export const RC_PRODUCT_TO_PLAN_NAME: Record<string, string> = {
+//   family_monthly: 'family',
+//   family_yearly: 'family',
+//   professional_monthly: 'professional',
+//   professional_yearly: 'professional',
+// };
 export const RC_PRODUCT_TO_PLAN_NAME: Record<string, string> = {
-  family_monthly: 'family',
-  family_yearly: 'family',
-  professional_monthly: 'professional',
-  professional_yearly: 'professional',
+  "family_monthly:family-monthly": "family",
+  "professional_monthly:professional-monthly": "professional",
 };
 
 /**
