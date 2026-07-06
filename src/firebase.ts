@@ -3,13 +3,13 @@ import { getAnalytics, logEvent, isSupported } from 'firebase/analytics';
 import { getAuth, GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyD8yOIxvefigdgf9i8YMUUCEn-s1xTpJRY",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "prefud.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "prefud",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "prefud.appspot.com",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "507413119491",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:507413119491:web:229e4d0d982c0d4c1ac436",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-C11WFRT11K"
 };
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
