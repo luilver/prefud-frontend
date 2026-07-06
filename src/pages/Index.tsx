@@ -41,10 +41,10 @@ const Index = () => {
   // Redirect mobile users to login if not authenticated (only after auth loading completes)
   useEffect(() => {
     if (isAuthLoading) return;
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile && !isAuthenticated) {
-      navigate("/signin");
-    }
+    // const isMobile = window.innerWidth <= 768;
+    // if (isMobile && !isAuthenticated) {
+      // navigate("/signin");
+    // }
   }, [isAuthenticated, isAuthLoading, navigate]);
 
   // If user is authenticated, show the full dashboard

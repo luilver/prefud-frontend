@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
@@ -36,12 +36,14 @@ import Favorites from "@/pages/Favorites";
 import Cart from "@/pages/Cart";
 import NotFound from "@/pages/NotFound";
 import Landing from "@/pages/Landing";
-import Brand from "@/pages/Brand";
+import { isNativePlatform } from "@/services/revenueCatService";
+import Brand from "./pages/Brand";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { isLoading, user } = useAuth();
+  const isNative = isNativePlatform();
 
 
   if (isLoading) {
@@ -55,7 +57,10 @@ const AppContent = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route
+          path="/"
+          element={isNative && !user ? <Navigate to="/signup" replace /> : <Index />}
+        />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/pricing" element={<Pricing />} />

@@ -14,7 +14,7 @@ const config: CapacitorConfig = {
       style: "DARK",
     },
     CapacitorHttp: {
-      enabled: true, 
+      enabled: true,
     },
     FirebaseAnalytics: {
       enabled: true,
