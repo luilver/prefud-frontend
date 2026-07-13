@@ -13,6 +13,11 @@ import type { ApiSubscriptionType } from '@/services/payments';
 //   professional_yearly: 'professional',
 // };
 export const RC_PRODUCT_TO_PLAN_NAME: Record<string, string> = {
+  // iOS
+  family_monthly: "family",
+  professional_monthly: "professional",
+
+  // Android
   "family_monthly:family-monthly": "family",
   "professional_monthly:professional-monthly": "professional",
 };
