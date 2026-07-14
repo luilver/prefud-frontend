@@ -201,7 +201,7 @@ const SignupSteps = () => {
       if (isNativePlatform()) {
         console.log('it is native platform ');
         if (provider === googleProvider) {
-          const result = await FirebaseAuthentication.signInWithGoogle();
+          const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
           console.log('google login ', result);
           email = result.user?.email || "";
         } else if (provider === appleProvider) {
@@ -691,8 +691,8 @@ const SignupSteps = () => {
 
           <div
             className={`grid ${isMobile
-                ? "grid-cols-1 gap-4"
-                : "grid-cols-1 lg:grid-cols-3 gap-6"
+              ? "grid-cols-1 gap-4"
+              : "grid-cols-1 lg:grid-cols-3 gap-6"
               } px-1 sm:px-0`}
           >
             {subscriptionTypes.map((plan, index) => (
@@ -703,8 +703,8 @@ const SignupSteps = () => {
 
                 <Card
                   className={`relative cursor-pointer transition-all duration-500 border-2 rounded-2xl overflow-hidden h-full transform group-hover:scale-[1.02] group-hover:shadow-xl ${plan.popular
-                      ? "border-primary shadow-xl bg-gradient-to-b from-card to-primary/5"
-                      : "border-border hover:border-primary/50 bg-card shadow-lg"
+                    ? "border-primary shadow-xl bg-gradient-to-b from-card to-primary/5"
+                    : "border-border hover:border-primary/50 bg-card shadow-lg"
                     }`}
                   onClick={() => handleSubscriptionChoice(plan.id)}
                 >
@@ -784,8 +784,8 @@ const SignupSteps = () => {
 
                     <Button
                       className={`w-full h-11 sm:h-12 text-sm font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${plan.name === "Free"
-                          ? "bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground"
-                          : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
+                        ? "bg-gradient-to-r from-muted to-muted-foreground hover:from-muted/90 hover:to-muted-foreground/90 text-muted-foreground"
+                        : `bg-gradient-to-r ${plan.gradient} hover:shadow-2xl text-primary-foreground`
                         }`}
                       onClick={async () => {
                         console.log('step 4 plan selection');
