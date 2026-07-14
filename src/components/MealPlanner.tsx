@@ -514,12 +514,12 @@ const MealPlanner = () => {
                         {(plan.preferences?.cuisinePreferences?.length > 0 || plan.preferences?.dietaryRestrictions?.length > 0 || plan.preferences?.cookingSkillLevel) && (
                           <div className="flex flex-wrap gap-1.5 mb-3">
                             {plan.preferences?.cuisinePreferences?.map((c: string) => (
-                              <span key={c} className="inline-flex items-center gap-1 text-xs font-medium bg-emerald-100 text-emerald-900 rounded-full px-2.5 py-1">
+                              <span key={c} className="inline-flex items-center gap-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full px-2.5 py-1">
                                 <Globe className="h-2.5 w-2.5" />{c}
                               </span>
                             ))}
                             {plan.preferences?.dietaryRestrictions?.map((d: string) => (
-                              <span key={d} className="inline-flex items-center gap-1 text-xs font-medium bg-amber-100 text-amber-900 rounded-full px-2.5 py-1">
+                              <span key={d} className="inline-flex items-center gap-1 text-xs font-medium bg-accent text-accent-foreground rounded-full px-2.5 py-1">
                                 <Flame className="h-2.5 w-2.5" />{d}
                               </span>
                             ))}
@@ -682,15 +682,15 @@ const MealPlanner = () => {
               <Card className="text-center py-12 bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl">
                 <CardContent>
                   <div className="flex flex-col items-center space-y-4">
-                    <div className="bg-emerald-600 p-4 rounded-full shadow-lg">
+                    <div className="bg-primary p-4 rounded-full shadow-lg">
                       <Sparkles className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-emerald-900 mb-2">
+                      <h3 className="text-xl font-semibold text-primary mb-2">
                         {t("mealPlanner.welcomeToAIMeal") || "Welcome to AI Meal Planning"}
                         , {user?.name?.split(" ")[0] || "Chef"}!
                       </h3>
-                      <p className="text-emerald-900/70 max-w-md mx-auto leading-relaxed">
+                      <p className="text-primary/70 max-w-md mx-auto leading-relaxed">
                         {t("mealPlanner.createYourPersonalized") ||
                           "Create your first personalized meal plan with our AI assistant"}
                         .
@@ -703,7 +703,7 @@ const MealPlanner = () => {
                         setIsEditing(false);
                         isNavigatingBack.current = false;
                       }}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white mt-4 shadow-lg"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4 shadow-lg"
                       size="lg"
                     >
                       <Sparkles className="h-5 w-5 mr-2" />
