@@ -16,6 +16,7 @@ let package = Package(
         .package(name: "CapacitorFirebaseAnalytics", path: "../../../node_modules/@capacitor-firebase/analytics"),
         .package(name: "CapacitorFirebaseAuthentication", path: "../../../node_modules/@capacitor-firebase/authentication"),
         .package(name: "CapacitorCamera", path: "../../../node_modules/@capacitor/camera"),
+        .package(name: "CapacitorSplashScreen", path: "../../../node_modules/@capacitor/splash-screen"),
         .package(name: "RevenuecatPurchasesCapacitor", path: "../../../node_modules/@revenuecat/purchases-capacitor")
     ],
     targets: [
@@ -28,6 +29,7 @@ let package = Package(
                 .product(name: "CapacitorFirebaseAnalytics", package: "CapacitorFirebaseAnalytics"),
                 .product(name: "CapacitorFirebaseAuthentication", package: "CapacitorFirebaseAuthentication"),
                 .product(name: "CapacitorCamera", package: "CapacitorCamera"),
+                .product(name: "CapacitorSplashScreen", package: "CapacitorSplashScreen"),
                 .product(name: "RevenuecatPurchasesCapacitor", package: "RevenuecatPurchasesCapacitor")
             ]
         )
