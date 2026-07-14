@@ -39,6 +39,8 @@ export async function initRevenueCat(appUserId?: string): Promise<void> {
     return;
   }
 
+  console.log(`[RevenueCat] Initialising for platform: ${platform} with key starting with: ${apiKey.substring(0, 8)}...`);
+
   if (configured && configuringUserId === (appUserId ?? null)) return;
 
   try {
