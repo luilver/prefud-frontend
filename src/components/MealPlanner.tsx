@@ -329,20 +329,20 @@ const MealPlanner = () => {
         <div
           className={
             isMobile
-              ? "bg-emerald-800 rounded-2xl p-5 shadow-xl"
+              ? "bg-primary rounded-2xl p-5 shadow-xl"
               : "bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/60 shadow-2xl"
           }
         >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className={isMobile ? "p-2 bg-white/15 rounded-lg" : "p-2 bg-emerald-600 rounded-lg"}>
+              <div className={isMobile ? "p-2 bg-white/15 rounded-lg" : "p-2 bg-primary rounded-lg"}>
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className={`text-lg sm:text-2xl font-bold ${isMobile ? "text-white" : "text-emerald-900"}`}>
+                <h1 className={`text-lg sm:text-2xl font-bold ${isMobile ? "text-primary-foreground" : "text-primary"}`}>
                   {t("mealPlanner.title") || "Meal Planner"}
                 </h1>
-                <p className={`text-xs sm:text-sm mt-0.5 ${isMobile ? "text-white/80" : "text-emerald-900/70"}`}>
+                <p className={`text-xs sm:text-sm mt-0.5 ${isMobile ? "text-primary-foreground/80" : "text-primary/70"}`}>
                   {t("mealPlanner.description") || "Create and manage your weekly meal plans"}
                 </p>
               </div>
@@ -356,8 +356,8 @@ const MealPlanner = () => {
               }}
               className={
                 isMobile
-                  ? "w-full bg-white text-emerald-800 hover:bg-white/90 font-semibold shadow-md"
-                  : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg w-full sm:w-auto"
+                  ? "w-full bg-white text-primary hover:bg-white/90 font-semibold shadow-md"
+                  : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg w-full sm:w-auto"
               }
             >
               <Plus className="h-4 w-4 mr-2" />

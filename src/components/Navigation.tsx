@@ -57,7 +57,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t border-white/10 shadow-2xl"
         style={{
           background:
-            "linear-gradient(to right, #065f46, #059669, #f59e0b)",
+            "linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary)), hsl(var(--accent)))",
         }}
       >
         <div className="flex justify-around items-center py-2 px-2">
@@ -75,8 +75,8 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 className={cn(
                   "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1 rounded-xl transition-all duration-300",
                   isActive
-                    ? "bg-emerald-900 text-white shadow-lg ring-1 ring-white/20"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-black/30 text-white shadow-lg ring-1 ring-white/20"
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <Icon className="h-6 w-6" aria-hidden="true" />
@@ -96,7 +96,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         "fixed left-0 top-0 h-full backdrop-blur-md border-r border-white/10 shadow-2xl z-40 flex flex-col transition-all duration-300",
         isCollapsed ? "w-16" : "w-64"
       )}
-      style={{ backgroundColor: "#064e3b" }}
+      style={{ backgroundColor: "hsl(var(--sidebar-primary))" }}
     >
       {/* Sidebar Header - aligned with dashboard header height */}
       <div className={cn(
