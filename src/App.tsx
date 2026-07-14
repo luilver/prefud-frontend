@@ -59,7 +59,7 @@ const AppContent = () => {
       <Routes>
         <Route
           path="/"
-          element={isNative && !user ? <Navigate to="/signup" replace /> : <Index />}
+          element={isNative && !user ? <Navigate to="/signin" replace /> : <Index />}
         />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
