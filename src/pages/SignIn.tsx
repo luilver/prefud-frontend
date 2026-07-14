@@ -312,7 +312,7 @@ const SignIn = () => {
                 <img
                   src={logoUrl}
                   alt="Prefud"
-                  className="h-32 w-auto mx-auto object-contain"
+                  className="h-24 w-auto mx-auto object-contain"
                 />
                 <CardTitle className="text-2xl md:text-[1.65rem] font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
                   {t("signin.title")}
