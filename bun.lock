@@ -7,11 +7,13 @@
       "dependencies": {
         "@capacitor-community/text-to-speech": "^8.0.0",
         "@capacitor-firebase/analytics": "^8.0.1",
+        "@capacitor-firebase/authentication": "^8.3.0",
         "@capacitor/android": "^8.0.2",
         "@capacitor/camera": "^8.2.0",
         "@capacitor/cli": "^8.0.2",
         "@capacitor/core": "^8.0.2",
         "@capacitor/ios": "^8.0.1",
+        "@capacitor/splash-screen": "^8.0.1",
         "@hookform/resolvers": "^3.9.0",
         "@huggingface/transformers": "^3.8.1",
         "@nestjs/mapped-types": "*",
@@ -105,6 +107,8 @@
 
     "@capacitor-firebase/analytics": ["@capacitor-firebase/analytics@8.0.1", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0", "firebase": "^12.6.0" } }, "sha512-/s8T6BhGwML6z4zGxRIfy2TE89ybric+v2yXCd1xscS4jV4ejv9l+TGZioEi0MvFDZyWdQoSCvgnFI0OKM+PRg=="],
 
+    "@capacitor-firebase/authentication": ["@capacitor-firebase/authentication@8.3.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor-firebase/authentication/-/authentication-8.3.0.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0", "firebase": "^12.6.0" }, "optionalPeers": ["firebase"] }, "sha512-ecbZxyzNVDOE6tE0iaAD9fZZh5GuoKPq//b+Zkx4k51/P6NNksst2IpbdlZHHAOF5jGWVPrgXec8ujz3CiRd9Q=="],
+
     "@capacitor/android": ["@capacitor/android@8.0.2", "", { "peerDependencies": { "@capacitor/core": "^8.0.0" } }, "sha512-0D7j0YvzjnfCMKLvFkAbx8b3Vwx+QfHFG5NzoXpI9sAl3zWiLsfa+NX4x92Fy+k4MGjLSMAfLThCqILYGDDsgw=="],
 
     "@capacitor/camera": ["@capacitor/camera@8.2.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/camera/-/camera-8.2.0.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-hYfrT6xpL936qoEkIpJzSnb0fQCaTkOux1cXzGBfH8QLOGqr6gSLiWZlZz/fqMPmMKJMNRBqlTQkj5fuMhVZog=="],
@@ -114,6 +118,8 @@
     "@capacitor/core": ["@capacitor/core@8.0.2", "", { "dependencies": { "tslib": "^2.1.0" } }, "sha512-EXZfxkL6GFJS2cb7TIBR7RiHA5iz6ufDcl1VmUpI2pga3lJ5Ck2+iqbx7N+osL3XYem9ad4XCidJEMm64DX6UQ=="],
 
     "@capacitor/ios": ["@capacitor/ios@8.0.2", "", { "peerDependencies": { "@capacitor/core": "^8.0.0" } }, "sha512-7EM7vBxXI3Ku49aYCJcS9su5Y3i6UmXpx7e0y+oQV9PzCnZ6l5B0ACJ+gXAU0bM3q7/f+kGBsOtXMid84rU6MQ=="],
+
+    "@capacitor/splash-screen": ["@capacitor/splash-screen@8.0.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/splash-screen/-/splash-screen-8.0.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-c/ew/Z3eA7z8l06WoRAtzVF16VwYYrExmHmfGq1Cg675pVzaC/yuucB8/1xG1vhEfnW4fZ1KhSf/kzR1RiVYgg=="],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.8.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg=="],
 
