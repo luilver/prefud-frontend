@@ -139,7 +139,7 @@ const SignIn = () => {
     try {
       if (isNativePlatform()) {
         if (provider === googleProvider) {
-          const result = await FirebaseAuthentication.signInWithGoogle();
+          const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
           email = result.user?.email || "";
         } else if (provider === appleProvider) {
           const result = await FirebaseAuthentication.signInWithApple();

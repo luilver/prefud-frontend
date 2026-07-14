@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "507413119491",
+    "project_id": "prefud",
+    "storage_bucket": "prefud.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507413119491:android:6cd1bca4dac15ff31ac436",
+        "android_client_info": {
+          "package_name": "com.bessel.prefud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDpU52fayDbWWP4OI9VoV3xVhip1stwv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
