@@ -325,31 +325,40 @@ const MealPlanner = () => {
           />
         )}
 
-        {/* Header */}
-        <div className="bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+        {/* Header / Summary Card */}
+        <div
+          className={
+            isMobile
+              ? "bg-emerald-800 rounded-2xl p-5 shadow-xl"
+              : "bg-white/80 backdrop-blur-xl rounded-2xl p-6 border border-white/60 shadow-2xl"
+          }
+        >
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              <div className={isMobile ? "p-2 bg-white/15 rounded-lg" : "p-2 bg-emerald-600 rounded-lg"}>
+                <Calendar className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold text-white">
+                <h1 className={`text-lg sm:text-2xl font-bold ${isMobile ? "text-white" : "text-emerald-900"}`}>
                   {t("mealPlanner.title") || "Meal Planner"}
                 </h1>
-                <p className="text-xs sm:text-sm text-primary-foreground/80 mt-0.5">
+                <p className={`text-xs sm:text-sm mt-0.5 ${isMobile ? "text-white/80" : "text-emerald-900/70"}`}>
                   {t("mealPlanner.description") || "Create and manage your weekly meal plans"}
                 </p>
               </div>
             </div>
             <Button
               onClick={() => {
-                console.log("Creating new meal plan");
                 setShowCreator(true);
                 setSelectedMealPlan(null);
                 setIsEditing(false);
                 isNavigatingBack.current = false;
               }}
-              className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white w-full sm:w-auto shadow-lg"
+              className={
+                isMobile
+                  ? "w-full bg-white text-emerald-800 hover:bg-white/90 font-semibold shadow-md"
+                  : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg w-full sm:w-auto"
+              }
             >
               <Plus className="h-4 w-4 mr-2" />
               {t("mealPlanner.aiMeal") || "Create AI Meal Plan"}
@@ -442,7 +451,10 @@ const MealPlanner = () => {
 
                       <CardContent className="pt-2 pb-4">
                         {/* Metrics row - icon-driven, compact */}
-                        <div className="flex items-center gap-1 flex-wrap mb-3">
+                        <div
+                          className="flex items-center gap-1.5 flex-wrap mb-3"
+                          aria-label={`${daysCount} days, ${peopleCount} people, ${mealsCount} meals per day`}
+                        >
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className="flex items-center gap-1.5 bg-muted/60 rounded-full px-2.5 py-1">
@@ -502,17 +514,17 @@ const MealPlanner = () => {
                         {(plan.preferences?.cuisinePreferences?.length > 0 || plan.preferences?.dietaryRestrictions?.length > 0 || plan.preferences?.cookingSkillLevel) && (
                           <div className="flex flex-wrap gap-1.5 mb-3">
                             {plan.preferences?.cuisinePreferences?.map((c: string) => (
-                              <span key={c} className="inline-flex items-center gap-1 text-[10px] font-medium bg-primary/10 text-primary rounded-full px-2 py-0.5">
+                              <span key={c} className="inline-flex items-center gap-1 text-xs font-medium bg-emerald-100 text-emerald-900 rounded-full px-2.5 py-1">
                                 <Globe className="h-2.5 w-2.5" />{c}
                               </span>
                             ))}
                             {plan.preferences?.dietaryRestrictions?.map((d: string) => (
-                              <span key={d} className="inline-flex items-center gap-1 text-[10px] font-medium bg-accent/20 text-accent-foreground rounded-full px-2 py-0.5">
+                              <span key={d} className="inline-flex items-center gap-1 text-xs font-medium bg-amber-100 text-amber-900 rounded-full px-2.5 py-1">
                                 <Flame className="h-2.5 w-2.5" />{d}
                               </span>
                             ))}
                             {plan.preferences?.cookingSkillLevel && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-secondary text-secondary-foreground rounded-full px-2 py-0.5">
+                              <span className="inline-flex items-center gap-1 text-xs font-medium bg-neutral-200 text-neutral-900 rounded-full px-2.5 py-1">
                                 <Award className="h-2.5 w-2.5" />{plan.preferences.cookingSkillLevel}
                               </span>
                             )}
@@ -662,45 +674,45 @@ const MealPlanner = () => {
         ) : (
           !isLoadingPlans &&
           hasLoadedInitialPlans && (
-            <Card className="text-center py-12 bg-card backdrop-blur-sm border border-border shadow-xl">
-              <CardContent>
-                <div className="flex flex-col items-center space-y-4">
-                  <div className="bg-gradient-to-r from-primary to-primary/80 p-4 rounded-full shadow-lg">
-                    <Sparkles className="h-8 w-8 text-primary-foreground" />
+            isMobile ? (
+              <p className="text-center text-neutral-400 text-sm py-12">
+                {t("mealPlanner.emptyState") || "No tienes más planes de comidas."}
+              </p>
+            ) : (
+              <Card className="text-center py-12 bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl">
+                <CardContent>
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="bg-emerald-600 p-4 rounded-full shadow-lg">
+                      <Sparkles className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-emerald-900 mb-2">
+                        {t("mealPlanner.welcomeToAIMeal") || "Welcome to AI Meal Planning"}
+                        , {user?.name?.split(" ")[0] || "Chef"}!
+                      </h3>
+                      <p className="text-emerald-900/70 max-w-md mx-auto leading-relaxed">
+                        {t("mealPlanner.createYourPersonalized") ||
+                          "Create your first personalized meal plan with our AI assistant"}
+                        .
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setShowCreator(true);
+                        setSelectedMealPlan(null);
+                        setIsEditing(false);
+                        isNavigatingBack.current = false;
+                      }}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white mt-4 shadow-lg"
+                      size="lg"
+                    >
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      {t("mealPlanner.createYourFirstAIMeal") || "Create Your First AI Meal Plan"}
+                    </Button>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {t("mealPlanner.welcomeToAIMeal") ||
-                        "Welcome to AI Meal Planning"}
-                      , {user?.name?.split(" ")[0] || "Chef"}!
-                    </h3>
-                    <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
-                      {t("mealPlanner.createYourPersonalized") ||
-                        "Create your first personalized meal plan with our AI assistant"}
-                      .
-                      {t("mealPlanner.getCustomizedRecipes") ||
-                        "Get customized recipes based on your preferences, dietary needs, and cooking skills"}
-                      .
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      console.log("Creating first meal plan");
-                      setShowCreator(true);
-                      setSelectedMealPlan(null);
-                      setIsEditing(false);
-                      isNavigatingBack.current = false;
-                    }}
-                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground mt-4 shadow-lg"
-                    size="lg"
-                  >
-                    <Sparkles className="h-5 w-5 mr-2" />
-                    {t("mealPlanner.createYourFirstAIMeal") ||
-                      "Create Your First AI Meal Plan"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )
           )
         )}
       </div>
