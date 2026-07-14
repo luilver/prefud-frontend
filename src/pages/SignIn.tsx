@@ -176,7 +176,9 @@ const SignIn = () => {
       if (error instanceof Error && (error as any).statusCode === 404) {
         // User not found, call signupFirebase
         try {
-          const responseData = await authService.signupFirebase(token, { email });
+          const responseData = await authService.signupFirebase(token, {
+            email,
+          });
 
           if (responseData?.response?.userId) {
             toast({
@@ -188,8 +190,8 @@ const SignIn = () => {
                 accountIncomplete: true,
                 email: email,
                 userId: responseData.response.userId,
-                firebaseToken: token
-              }
+                firebaseToken: token,
+              },
             });
             return;
           }
@@ -203,25 +205,33 @@ const SignIn = () => {
         }
       }
 
-      if (error instanceof Error && (error as any).code === 'ACCOUNT_INCOMPLETE') {
+      if (
+        error instanceof Error &&
+        (error as any).code === "ACCOUNT_INCOMPLETE"
+      ) {
         toast({
           title: t("signin.accountIncomplete") || "Account Incomplete",
-          description: t("signin.accountIncompleteDesc") || "Your account needs to be completed. Please verify your email to continue.",
+          description:
+            t("signin.accountIncompleteDesc") ||
+            "Your account needs to be completed. Please verify your email to continue.",
           variant: "destructive",
         });
         navigate("/signup", {
           state: {
             accountIncomplete: true,
             email: (error as any).email || "",
-            userId: (error as any).userId
-          }
+            userId: (error as any).userId,
+          },
         });
         return;
       }
 
       toast({
         title: "Sign in failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -269,10 +279,7 @@ const SignIn = () => {
         {/* Minimal Header */}
         <header className="py-4 px-4 md:py-6">
           <div className="container mx-auto flex items-center justify-between">
-            <button
-              onClick={() => navigate("/")}
-              className="group"
-            >
+            <button onClick={() => navigate("/")} className="group">
               <img
                 src={logoUrl}
                 alt="Prefud"
@@ -358,15 +365,25 @@ const SignIn = () => {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        aria-label={showPassword ? (t("signin.hidePassword") || "Hide password") : (t("signin.showPassword") || "Show password")}
+                        aria-label={
+                          showPassword
+                            ? t("signin.hidePassword") || "Hide password"
+                            : t("signin.showPassword") || "Show password"
+                        }
                         aria-pressed={showPassword}
                         className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 p-0 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4.5 w-4.5 text-muted-foreground" aria-hidden="true" />
+                          <EyeOff
+                            className="h-4.5 w-4.5 text-muted-foreground"
+                            aria-hidden="true"
+                          />
                         ) : (
-                          <Eye className="h-4.5 w-4.5 text-muted-foreground" aria-hidden="true" />
+                          <Eye
+                            className="h-4.5 w-4.5 text-muted-foreground"
+                            aria-hidden="true"
+                          />
                         )}
                       </Button>
                     </div>
@@ -391,24 +408,25 @@ const SignIn = () => {
                     {isLoading ? t("signin.signing-in") : t("signin.button")}
                   </Button>
 
-                <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
-                  <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
-                    {t("signin.no-account")}{" "}
-                    <Button
-                      variant="link"
-                      onClick={async () => {
-                        trackEvent("button_click", {
-                          button_name: "signup_submit",
-                          screen: "login_page",
-                        });
-                        navigate("/signup");
-                      }}
-                      className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-0 h-auto font-semibold text-sm"
-                    >
-                      {t("signin.create-here")}
-                    </Button>
-                  </p>
-                </div>
+                  <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                    <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
+                      {t("signin.no-account")}{" "}
+                      <Button
+                        variant="link"
+                        onClick={async () => {
+                          trackEvent("button_click", {
+                            button_name: "signup_submit",
+                            screen: "login_page",
+                          });
+                          navigate("/signup");
+                        }}
+                        className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 p-0 h-auto font-semibold text-sm"
+                      >
+                        {t("signin.create-here")}
+                      </Button>
+                    </p>
+                  </div>
+                </form>
               </CardContent>
             </Card>
 

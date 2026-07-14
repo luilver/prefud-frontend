@@ -1,10 +1,27 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star, XCircle, RotateCw, ExternalLink } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Check,
+  Crown,
+  Star,
+  XCircle,
+  RotateCw,
+  ExternalLink,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { getAllSubscriptionTypes, ApiSubscriptionType, subscribeUser } from "@/services/payments";
+import {
+  getAllSubscriptionTypes,
+  ApiSubscriptionType,
+  subscribeUser,
+} from "@/services/payments";
 import PaymentForm from "./PaymentForm";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import PaymentMethodModal from "./PaymentMethodModal";
@@ -19,9 +36,11 @@ import {
   getActiveEntitlement,
   openManageSubscriptions,
 } from "@/services/revenueCatService";
-import { resolveSubscriptionTypeId, RC_PRODUCT_TO_PLAN_NAME } from "@/utils/rcProductMap";
+import {
+  resolveSubscriptionTypeId,
+  RC_PRODUCT_TO_PLAN_NAME,
+} from "@/utils/rcProductMap";
 import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
-
 
 interface SubscriptionPlan {
   id: string;
@@ -39,12 +58,16 @@ interface SubscriptionPlan {
 }
 
 const SubscriptionManager = () => {
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
+    null,
+  );
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentSubscriptionId, setCurrentSubscriptionId] = useState<string>("");
-  const [currentSubscriptionName, setCurrentSubscriptionName] = useState<string>("Free");
+  const [currentSubscriptionId, setCurrentSubscriptionId] =
+    useState<string>("");
+  const [currentSubscriptionName, setCurrentSubscriptionName] =
+    useState<string>("Free");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -58,38 +81,51 @@ const SubscriptionManager = () => {
   const isNative = isNativePlatform();
 
   // Convert API subscription types to UI subscription plans
-  const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
+  const convertApiToPlans = (
+    apiPlans: ApiSubscriptionType[],
+  ): SubscriptionPlan[] => {
     return apiPlans.map((apiPlan) => {
       const priceInDollars = apiPlan.price / 100; // Convert cents to dollars
-      
+
+      const generatedMeals =
+        apiPlan.generatedMeals ??
+        (apiPlan as ApiSubscriptionType & { generateMeals?: number })
+          .generateMeals ??
+        0;
+
       // Generate features based on the plan data
       const features = [
         `${apiPlan.mealPlans} Meal Plans per month`,
-        `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
+        // `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
+        `${generatedMeals} Meal Creations with pantry ingredients`,
         `${apiPlan.healthyDrinks} Healthy Drinks per month`,
         `${apiPlan.specialMeals} Special Meals per month`,
-        `${apiPlan.processImages ?? 0} Process Images per month`
+        `${apiPlan.processImages ?? 0} Process Images per month`,
       ];
 
       // Add additional features based on plan type
-      if (apiPlan.name.toLowerCase() === 'free') {
-        features.push("Basic Recipe Collection", "Shopping List Generator", "Email Support");
-      } else if (apiPlan.name.toLowerCase() === 'family') {
+      if (apiPlan.name.toLowerCase() === "free") {
+        features.push(
+          "Basic Recipe Collection",
+          "Shopping List Generator",
+          "Email Support",
+        );
+      } else if (apiPlan.name.toLowerCase() === "family") {
         features.push(
           "AI Meal Recommendations",
-          "Advanced Recipe Collection", 
-         
+          "Advanced Recipe Collection",
+
           "Nutritional Analysis",
-          "Priority Support"
+          "Priority Support",
         );
-      } else if (apiPlan.name.toLowerCase() === 'professional') {
+      } else if (apiPlan.name.toLowerCase() === "professional") {
         features.push(
           "10 Free Delivery Commissions",
           "3 Free Home Deliveries",
-          "Advanced AI Recommendations", 
+          "Advanced AI Recommendations",
           "Custom Dietary Plans",
           "Professional Analytics",
-          "Phone Support"
+          "Phone Support",
         );
       }
 
@@ -101,12 +137,17 @@ const SubscriptionManager = () => {
         features,
         limits: {
           plansPerMonth: apiPlan.mealPlans,
-          mealCreations: apiPlan.generatedMeals,
-          deliveryCommissions: apiPlan.name.toLowerCase() === 'family' ? 3 : 
-                              apiPlan.name.toLowerCase() === 'professional' ? 10 : 0,
-          homeDeliveries: apiPlan.name.toLowerCase() === 'professional' ? 3 : undefined
+          mealCreations: generatedMeals,
+          deliveryCommissions:
+            apiPlan.name.toLowerCase() === "family"
+              ? 3
+              : apiPlan.name.toLowerCase() === "professional"
+                ? 10
+                : 0,
+          homeDeliveries:
+            apiPlan.name.toLowerCase() === "professional" ? 3 : undefined,
         },
-        popular: apiPlan.name.toLowerCase() === 'family'
+        popular: apiPlan.name.toLowerCase() === "family",
       };
     });
   };
@@ -117,24 +158,27 @@ const SubscriptionManager = () => {
       try {
         setIsLoading(true);
         const apiPlans = await getAllSubscriptionTypes();
-        console.log('this are the subscription plans ', apiPlans);
+        console.log("this are the subscription plans ", apiPlans);
         const convertedPlans = convertApiToPlans(apiPlans);
         setPlans(convertedPlans);
 
         // Set current subscription ID for comparison
-        const userSubId = (user?.subscription?.subscriptionTypeId ?? "").toString().trim();
+        const userSubId = (user?.subscription?.subscriptionTypeId ?? "")
+          .toString()
+          .trim();
         console.log("[SubscriptionManager] User subscription ID:", userSubId);
         setCurrentSubscriptionId(userSubId);
 
         // Also set the current subscription name based on the loaded plans
-        const matched = convertedPlans.find(p => p.id === userSubId);
+        const matched = convertedPlans.find((p) => p.id === userSubId);
         setCurrentSubscriptionName(matched ? matched.name : "Free");
       } catch (error) {
-        console.error('Error fetching subscription types:', error);
+        console.error("Error fetching subscription types:", error);
         toast({
           title: "Error Loading Plans",
-          description: "Failed to load subscription plans. Please try again later.",
-          variant: "destructive"
+          description:
+            "Failed to load subscription plans. Please try again later.",
+          variant: "destructive",
         });
       } finally {
         setIsLoading(false);
@@ -155,12 +199,16 @@ const SubscriptionManager = () => {
     })();
   }, [isNative, user?.userId]);
 
-  const findNativePackageForPlan = (plan: SubscriptionPlan): PurchasesPackage | null => {
+  const findNativePackageForPlan = (
+    plan: SubscriptionPlan,
+  ): PurchasesPackage | null => {
     if (!isNative || nativePackages.length === 0) return null;
     return (
       nativePackages.find((pkg) => {
         const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
-        return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+        return (
+          mappedName && mappedName.toLowerCase() === plan.name.toLowerCase()
+        );
       }) ?? null
     );
   };
@@ -174,7 +222,9 @@ const SubscriptionManager = () => {
       return nativePackage.product.priceString;
     }
 
-    return `$${plan.price}`;
+    // return `$${plan.price}`;
+    return `$${plan.price.toFixed(2)}`;
+    // return `$${29.99}`;
   };
 
   const handleNativePurchase = async (plan: SubscriptionPlan) => {
@@ -245,13 +295,14 @@ const SubscriptionManager = () => {
       if (!activeEntitlement) {
         toast({
           title: "No purchases to restore",
-          description: "We could not find any active subscription on this account.",
+          description:
+            "We could not find any active subscription on this account.",
         });
         return;
       }
       // Find which plan matches the active entitlement (entitlement id === plan name by convention)
       const matched = plans.find(
-        (p) => p.name.toLowerCase() === activeEntitlement.toLowerCase()
+        (p) => p.name.toLowerCase() === activeEntitlement.toLowerCase(),
       );
       if (matched) {
         await subscribeUser(user?.userId || "", matched.id, activeEntitlement);
@@ -275,7 +326,7 @@ const SubscriptionManager = () => {
 
   const handleSelectPlan = async (plan: SubscriptionPlan) => {
     if (plan.id === currentSubscriptionId) return;
-    console.log('selected plan during selection ', plan)
+    console.log("selected plan during selection ", plan);
     setSelectedPlan(plan);
     if (plan.price === 0) {
       // Free plan - show confirmation modal if user has an active subscription
@@ -294,10 +345,10 @@ const SubscriptionManager = () => {
   };
 
   const handleCancelSubscription = () => {
-    trackEvent('button_click', {
-          button_name: 'cancel_subscription_submit',
-          screen: 'profile_page',
-        })
+    trackEvent("button_click", {
+      button_name: "cancel_subscription_submit",
+      screen: "profile_page",
+    });
     // Simulate switching to free plan
     setCurrentSubscriptionId("");
     setCurrentSubscriptionName("Free");
@@ -331,7 +382,7 @@ const SubscriptionManager = () => {
           email: user?.email || "user@example.com",
           phone: user?.profile?.phone || "+1234567890",
           customerId: user?.profile?.ruku_client_id || "",
-          userId: user?.userId || ""
+          userId: user?.userId || "",
         }}
         selectedPlan={selectedPlan}
       />
@@ -372,8 +423,7 @@ const SubscriptionManager = () => {
     <div className="max-w-6xl mx-auto space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-800">Actual Plan</h1>
-        
-        
+
         {/* Current Subscription Display */}
         {currentSubscriptionName !== "Free" && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto">
@@ -410,7 +460,8 @@ const SubscriptionManager = () => {
         )}
         <h1 className="text-3xl font-bold text-gray-800">Update your plan</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Select the perfect plan for your meal planning needs. Upgrade or downgrade anytime.
+          Select the perfect plan for your meal planning needs. Upgrade or
+          downgrade anytime.
         </p>
         {isNative && (
           <div className="flex justify-center pt-2">
@@ -420,7 +471,9 @@ const SubscriptionManager = () => {
               onClick={handleRestore}
               disabled={isRestoring}
             >
-              <RotateCw className={`h-4 w-4 mr-1 ${isRestoring ? "animate-spin" : ""}`} />
+              <RotateCw
+                className={`h-4 w-4 mr-1 ${isRestoring ? "animate-spin" : ""}`}
+              />
               {isRestoring ? "Restoring..." : "Restore Purchases"}
             </Button>
           </div>
@@ -428,20 +481,21 @@ const SubscriptionManager = () => {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        
         {plans.map((plan) => {
           // Mark current plan ONLY when IDs match.
           // If the user has no subscription ID, mark Free (price === 0) as current.
-          const isCurrentPlan = plan.id === currentSubscriptionId || (!currentSubscriptionId && plan.price === 0);
-          
+          const isCurrentPlan =
+            plan.id === currentSubscriptionId ||
+            (!currentSubscriptionId && plan.price === 0);
+
           return (
-            <Card 
+            <Card
               key={plan.id}
               className={`relative ${
-                plan.popular 
-                  ? 'border-green-500 border-2 bg-gradient-to-b from-green-50 to-white' 
-                  : 'border-gray-200'
-              } ${isCurrentPlan ? 'ring-2 ring-blue-500' : ''}`}
+                plan.popular
+                  ? "border-green-500 border-2 bg-gradient-to-b from-green-50 to-white"
+                  : "border-gray-200"
+              } ${isCurrentPlan ? "ring-2 ring-blue-500" : ""}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -451,7 +505,7 @@ const SubscriptionManager = () => {
                   </div>
                 </div>
               )}
-              
+
               {isCurrentPlan && (
                 <div className="absolute -top-3 right-4">
                   <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
@@ -459,10 +513,12 @@ const SubscriptionManager = () => {
                   </div>
                 </div>
               )}
-              
+
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
-                  <Crown className={`h-8 w-8 ${plan.popular ? 'text-green-500' : 'text-gray-400'}`} />
+                  <Crown
+                    className={`h-8 w-8 ${plan.popular ? "text-green-500" : "text-gray-400"}`}
+                  />
                 </div>
                 <CardTitle className="text-xl">{plan.name}</CardTitle>
                 <CardDescription>
@@ -491,16 +547,16 @@ const SubscriptionManager = () => {
                   onClick={() => handleSelectPlan(plan)}
                   className={`w-full ${
                     plan.popular
-                      ? 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600'
-                      : 'bg-gray-800 hover:bg-gray-700'
+                      ? "bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
+                      : "bg-gray-800 hover:bg-gray-700"
                   }`}
                   disabled={isCurrentPlan || isPurchasing}
                 >
                   {isCurrentPlan
-                    ? 'Current Plan'
+                    ? "Current Plan"
                     : isPurchasing && selectedPlan?.id === plan.id
-                    ? 'Processing...'
-                    : `Get ${plan.name}`}
+                      ? "Processing..."
+                      : `Get ${plan.name}`}
                 </Button>
               </CardContent>
             </Card>
@@ -508,9 +564,10 @@ const SubscriptionManager = () => {
         })}
       </div>
 
-
       <div className="text-center space-y-4 pt-8 border-t">
-        <h3 className="text-lg font-semibold text-gray-800">All plans include:</h3>
+        <h3 className="text-lg font-semibold text-gray-800">
+          All plans include:
+        </h3>
         <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
           <div className="flex items-center space-x-2 text-sm text-gray-700">
             <Check className="h-4 w-4 text-emerald-500" />
@@ -547,8 +604,6 @@ const SubscriptionManager = () => {
         planName={selectedPlan?.name || ""}
         planPrice={selectedPlan?.price || 0}
       />
-
-     
     </div>
   );
 };
