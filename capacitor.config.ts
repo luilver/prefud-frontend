@@ -9,6 +9,14 @@ const config: CapacitorConfig = {
     allowMixedContent: true,
   },
   plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      launchAutoHide: true,
+      backgroundColor: "#ffffff",
+      androidSplashResourceName: "splash",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: false,
+    },
     StatusBar: {
       overlaysWebView: true,
       style: "DARK",

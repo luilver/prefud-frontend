@@ -159,7 +159,19 @@ const SubscriptionManager = () => {
         setIsLoading(true);
         const apiPlans = await getAllSubscriptionTypes();
         console.log("this are the subscription plans ", apiPlans);
-        const convertedPlans = convertApiToPlans(apiPlans);
+        let convertedPlans = convertApiToPlans(apiPlans);
+        
+        // If native, only show plans that RevenueCat actually loaded (plus the Free plan)
+        if (isNative && nativePackages.length > 0) {
+          convertedPlans = convertedPlans.filter((plan) => {
+            if (plan.price === 0) return true;
+            return nativePackages.some((pkg) => {
+              const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
+              return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+            });
+          });
+        }
+        
         setPlans(convertedPlans);
 
         // Set current subscription ID for comparison
@@ -186,7 +198,7 @@ const SubscriptionManager = () => {
     };
 
     fetchSubscriptionTypes();
-  }, [toast, user?.subscription?.subscriptionTypeId, isNative]);
+  }, [toast, user?.subscription?.subscriptionTypeId, isNative, nativePackages]);
 
   // Initialise RevenueCat + load offerings on native
   useEffect(() => {
@@ -230,14 +242,11 @@ const SubscriptionManager = () => {
   const handleNativePurchase = async (plan: SubscriptionPlan) => {
     const pkg = findNativePackageForPlan(plan);
     console.log("[RevenueCat] Starting native purchase", {
-      planId: plan.id,
-      planName: plan.name,
-      packageIdentifier: pkg?.identifier,
-      productIdentifier: pkg?.product.identifier,
-      productTitle: pkg?.product.title,
-      priceString: pkg?.product.priceString,
-      defaultOptionId: pkg?.product.defaultOption?.id,
-      defaultOptionStoreProductId: pkg?.product.defaultOption?.storeProductId,
+      intendedPlanId: plan.id,
+      intendedPlanName: plan.name,
+      matchedPackageIdentifier: pkg?.identifier || "NONE",
+      matchedProductIdentifier: pkg?.product.identifier || "NONE",
+      allAvailableProducts: nativePackages.map(p => p.product.identifier)
     });
     if (!pkg) {
       toast({
