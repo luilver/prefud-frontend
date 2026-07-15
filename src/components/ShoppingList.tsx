@@ -121,17 +121,21 @@ const ShoppingList = () => {
       .filter(Boolean);
 
     if (checkedItemNames.length > 0) {
-      checkedItemNames.forEach(itemName => {
-        addPantryItem({
-          name: itemName,
-          quantity: 1,
-          unit: 'item',
-          category: 'meal-ingredient',
-          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-          purchaseDate: new Date(),
-          notes: selectedMealPlan ? `Added from meal plan: ${selectedMealPlan.name}` : 'Added from shopping list'
+      Object.entries(checkedItems)
+        .filter(([_, isChecked]) => isChecked)
+        .forEach(([itemId]) => {
+          const item: any = currentList?.find((it: any) => it.id === itemId);
+          if (!item) return;
+          addPantryItem({
+            name: item.name,
+            quantity: item.quantity ?? 1,
+            unit: item.unit ?? 'item',
+            category: item.classification || item.category || 'ingredient',
+            expiryDate: new Date(Date.now() + ((item.daysToExpire ?? 7) * 24 * 60 * 60 * 1000)),
+            purchaseDate: new Date(),
+            notes: selectedMealPlan ? `Added from meal plan: ${selectedMealPlan.name}` : 'Added from shopping list'
+          });
         });
-      });
       // Reset checkboxes after adding to pantry
       setCheckedItems({});
       setShowAddToPantryDialog(false);

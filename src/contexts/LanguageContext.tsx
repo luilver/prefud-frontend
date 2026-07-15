@@ -1476,6 +1476,7 @@ const translations = {
     "drinkShoppingModal.selectAll": "Select All",
     "drinkShoppingModal.clearAll": "Clear All",
     "drinkShoppingModal.addToPantry": "Add to Pantry",
+    "drinkShoppingModal.addToCart": "Add to Cart",
     "drinkShoppingModal.requestDelivery": "Request Delivery",
     "drinkShoppingModal.chooseDeliveryTime": "Choose Delivery Time",
     "drinkShoppingModal.whenDelivery":
@@ -3538,6 +3539,7 @@ const translations = {
     "drinkShoppingModal.selectAll": "Seleccionar Todo",
     "drinkShoppingModal.clearAll": "Limpiar Todo",
     "drinkShoppingModal.addToPantry": "Añadir a la despensa",
+    "drinkShoppingModal.addToCart": "Añadir al carrito",
     "drinkShoppingModal.requestDelivery": "Solicitar Entrega",
     "drinkShoppingModal.chooseDeliveryTime": "Elige el tiempo de entrega",
     "drinkShoppingModal.whenDelivery":
@@ -5623,6 +5625,7 @@ const translations = {
     "drinkShoppingModal.selectAll": "Selecionar Todos",
     "drinkShoppingModal.clearAll": "Limpar Todos",
     "drinkShoppingModal.addToPantry": "Adicionar à Despensa",
+    "drinkShoppingModal.addToCart": "Adicionar ao Carrinho",
     "drinkShoppingModal.requestDelivery": "Solicitar Entrega",
     "drinkShoppingModal.chooseDeliveryTime": "Escolha o Tempo de Entrega",
     "drinkShoppingModal.whenDelivery":

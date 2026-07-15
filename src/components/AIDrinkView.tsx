@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { Checkbox } from "@/components/ui/checkbox";
+import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
 
 interface AIDrinkViewProps {
   drink: any;
@@ -19,7 +20,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
   const { t } = useLanguage();
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const { deleteAIDrink } = useUser();
+  const { deleteAIDrink, user, pantryItems, setPantryItems } = useUser();
   const { addItem } = useCart();
 
   const toggleStep = (stepIndex: number) => {
@@ -73,6 +74,67 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
     selectedIngredients,
     onSuccess: () => setSelectedIngredients([])
   });
+
+  const addSelectedToPantry = async () => {
+    if (selectedIngredients.length === 0) return;
+
+    const apiList: any[] = drink?.apiData?.ingredientsList || [];
+    const nowISO = new Date().toISOString();
+
+    const selectedData = selectedIngredients.map((name) => {
+      const apiIng = apiList.find((i) => i?.name === name);
+      const fallback = drink.ingredients.find((i: any) => i?.name === name);
+      const amount = fallback?.amount || "1 unit";
+      const match = String(amount).match(/^(\d+(?:\.\d+)?)\s*(\w+)?/);
+      const quantity = apiIng?.quantity ?? (match ? parseFloat(match[1]) : 1);
+      const unit = apiIng?.unit ?? (match && match[2] ? match[2] : "unit");
+      const classification =
+        apiIng?.classification || fallback?.category || "drink-ingredient";
+      const carbon = apiIng?.carbonFootPrintToWaste ?? 0.2;
+      const days = apiIng?.daysToExpire ?? 7;
+      return { name, quantity, unit, classification, carbon, days };
+    });
+
+    const newPantryItems: PantryIngredient[] = selectedData.map((ing) => {
+      const expiryISO = new Date(Date.now() + ing.days * 24 * 60 * 60 * 1000).toISOString();
+      return {
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: ing.name,
+        quantity: ing.quantity,
+        unit: ing.unit,
+        category: ing.classification,
+        purchased: true,
+        purchaseDate: nowISO,
+        carbonFootPrintToWaste: ing.carbon,
+        daysToExpire: ing.days,
+        expiryDate: expiryISO,
+        notes: `Carbon footprint:: ${ing.carbon}`,
+      };
+    });
+
+    try {
+      if (user?.id) {
+        await addIngredientsToPantry(user.id, newPantryItems);
+      }
+    } catch (e) {
+      console.error("Failed to add ingredients to pantry:", e);
+      toast.error("Failed to add ingredients to pantry. Please try again.");
+      return;
+    }
+
+    const newPantryItemsForState = newPantryItems.map((item) => ({
+      ...item,
+      purchaseDate: new Date(item.purchaseDate),
+      expiryDate: new Date(item.expiryDate),
+    }));
+
+    setPantryItems([...(pantryItems || []), ...newPantryItemsForState]);
+
+    toast.success(
+      `${t("drinkShoppingModal.addedToPantryTitle") || "Added to Pantry!"} (${selectedIngredients.length})`
+    );
+    setSelectedIngredients([]);
+  };
 
   const enhancedInstructions = useMemo(() => {
     const drinkTips = [
@@ -370,14 +432,23 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                       </div>
 
                       {selectedIngredients.length > 0 && (
-                        <div className="flex justify-center pt-4 border-t mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4 border-t mt-6">
                           <Button
                             onClick={() => handleAddToCart()}
-                            className="flex-1 bg-primary hover:bg-primary/90 h-12 max-w-xs"
+                            className="flex-1 bg-primary hover:bg-primary/90 h-12 sm:max-w-xs"
                             size="lg"
                           >
                             <ShoppingCart className="h-5 w-5 mr-2" />
-                            Add to Cart ({selectedIngredients.length})
+                            {t("drinkShoppingModal.addToCart") || "Add to Cart"} ({selectedIngredients.length})
+                          </Button>
+                          <Button
+                            onClick={addSelectedToPantry}
+                            variant="outline"
+                            className="flex-1 h-12 sm:max-w-xs"
+                            size="lg"
+                          >
+                            <Package className="h-5 w-5 mr-2" />
+                            {t("drinkShoppingModal.addToPantry") || "Add to Pantry"} ({selectedIngredients.length})
                           </Button>
                         </div>
                       )}

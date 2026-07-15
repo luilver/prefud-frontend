@@ -20,6 +20,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useThemeLogo } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { Bot } from "lucide-react";
 
 interface NavigationProps {
   activeTab: string;
@@ -31,6 +33,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
   const isMobile = useIsMobile();
   const { isCollapsed, setIsCollapsed } = useSidebar();
   const logoUrl = useThemeLogo();
+  const navigate = useNavigate();
 
   const navItems = [
     { id: "planner", label: t("dashboard.nav.planner"), icon: Calendar },
@@ -57,11 +60,11 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t border-white/10 shadow-2xl"
         style={{
           background:
-            "linear-gradient(to right, hsl(var(--primary) / 0.95), hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.95))",
+            "linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary)), hsl(var(--accent)))",
         }}
       >
-        <div className="flex justify-around items-center py-2 px-2">
-          {navItems.map((item) => {
+        <div className="relative flex justify-around items-center py-2 px-2">
+          {navItems.slice(0, 2).map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
 
@@ -75,8 +78,41 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
                 className={cn(
                   "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1 rounded-xl transition-all duration-300",
                   isActive
-                    ? "bg-white/20 text-white shadow-lg"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-black/30 text-white shadow-lg ring-1 ring-white/20"
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
+                )}
+              >
+                <Icon className="h-6 w-6" aria-hidden="true" />
+                <span className="text-[10px] mt-0.5 leading-tight truncate max-w-full">{item.label}</span>
+              </Button>
+            );
+          })}
+
+          {/* Central AI Assistant FAB */}
+          <button
+            type="button"
+            onClick={() => navigate("/assistant")}
+            aria-label="prefud AI Assistant"
+            className="mx-1 -mt-6 h-14 w-14 rounded-full bg-white text-primary shadow-xl ring-2 ring-white/60 flex items-center justify-center hover:scale-105 transition-transform"
+          >
+            <Bot className="h-7 w-7" />
+          </button>
+
+          {navItems.slice(2).map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <Button
+                key={item.id}
+                variant="ghost"
+                onClick={() => onTabChange(item.id)}
+                aria-label={item.label}
+                aria-current={isActive ? "page" : undefined}
+                className={cn(
+                  "flex flex-col items-center justify-center min-w-0 flex-1 h-14 px-1 rounded-xl transition-all duration-300",
+                  isActive
+                    ? "bg-black/30 text-white shadow-lg ring-1 ring-white/20"
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <Icon className="h-6 w-6" aria-hidden="true" />
@@ -96,10 +132,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         "fixed left-0 top-0 h-full backdrop-blur-md border-r border-white/10 shadow-2xl z-40 flex flex-col transition-all duration-300",
         isCollapsed ? "w-16" : "w-64"
       )}
-      style={{
-        background:
-          "linear-gradient(to bottom, hsl(var(--primary)), hsl(var(--primary) / 0.9), hsl(var(--accent)))",
-      }}
+      style={{ backgroundColor: "hsl(var(--sidebar-primary))" }}
     >
       {/* Sidebar Header - aligned with dashboard header height */}
       <div className={cn(
@@ -127,6 +160,19 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
 
       {/* Navigation Items */}
       <div className="flex-1 p-2 space-y-1">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/assistant")}
+          aria-label="prefud AI Assistant"
+          className={cn(
+            "transition-all duration-300 rounded-xl bg-white/15 text-white hover:bg-white/25",
+            isCollapsed ? "w-full h-12 px-0 justify-center" : "w-full justify-start h-12 px-4"
+          )}
+          title={isCollapsed ? "AI Assistant" : undefined}
+        >
+          <Bot className={cn("h-5 w-5", !isCollapsed && "mr-3")} aria-hidden="true" />
+          {!isCollapsed && <span className="text-sm font-medium">AI Assistant</span>}
+        </Button>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;

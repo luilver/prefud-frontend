@@ -40,8 +40,9 @@ const DashboardContent = () => {
   const isNative = isNativePlatform();
   const [showWelcome, setShowWelcome] = useState(false);
   const logoUrl = useThemeLogo();
+  // Theme-aware gradient using semantic tokens (primary → accent)
   const themeGradient =
-    "linear-gradient(to right, hsl(var(--primary) / 0.95), hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.95))";
+    "linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary)), hsl(var(--accent)))";
 
   useEffect(() => {
     try {
@@ -162,9 +163,9 @@ const DashboardContent = () => {
           }}
         />
         
-        <div aria-hidden="true" className="absolute top-20 left-[10%] w-6 h-6 bg-emerald-200/20 rounded-full motion-safe:animate-pulse"></div>
+        <div aria-hidden="true" className="absolute top-20 left-[10%] w-6 h-6 bg-primary/20 rounded-full motion-safe:animate-pulse"></div>
         <div aria-hidden="true" className="absolute top-40 right-[15%] w-4 h-4 bg-teal-200/25 rounded-full motion-safe:animate-pulse delay-1000"></div>
-        <div aria-hidden="true" className="absolute bottom-32 left-[20%] w-5 h-5 bg-emerald-300/15 rounded-full motion-safe:animate-pulse delay-2000"></div>
+        <div aria-hidden="true" className="absolute bottom-32 left-[20%] w-5 h-5 bg-primary/15 rounded-full motion-safe:animate-pulse delay-2000"></div>
         <div aria-hidden="true" className="absolute bottom-20 right-[25%] w-3 h-3 bg-teal-300/20 rounded-full motion-safe:animate-pulse delay-3000"></div>
       </div>
 
@@ -174,8 +175,8 @@ const DashboardContent = () => {
       {/* Header for Desktop (with dynamic positioning) */}
       {!isMobile && (
         <header
-          className="fixed top-0 right-0 backdrop-blur-md border-b border-white/10 z-30 transition-all duration-300 shadow-xl"
-          style={{ left: `${getSidebarWidth()}px`, background: themeGradient }}
+          className="fixed top-0 right-0 z-30 transition-all duration-300"
+          style={{ left: `${getSidebarWidth()}px`, background: "transparent" }}
         >
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
@@ -183,7 +184,7 @@ const DashboardContent = () => {
                 <button
                   onClick={() => setActiveTab("profile")}
                   aria-label={`${t('dashboard.header.welcome')} ${user?.name?.split(' ')[0] || 'Chef'}. Open profile`}
-                  className="flex items-center space-x-2 px-3 py-2 bg-white/15 rounded-lg border border-white/20 hover:bg-white/25 transition-colors cursor-pointer"
+                  className="flex items-center space-x-2 px-3 py-2 bg-white/20 backdrop-blur-md rounded-lg border border-white/30 hover:bg-white/30 transition-colors cursor-pointer [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
                 >
                   <div aria-hidden="true" className="w-2 h-2 bg-white rounded-full motion-safe:animate-pulse"></div>
                   <span className="text-sm text-white font-medium">
@@ -201,7 +202,7 @@ const DashboardContent = () => {
                     variant="ghost"
                     onClick={handleCartClick}
                     aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
-                    className="relative text-white/90 hover:bg-white/15 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+                    className="relative text-white hover:bg-white/20 hover:text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.4))] focus-visible:ring-2 focus-visible:ring-white"
                   >
                     <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                     {getTotalItems() > 0 && (
@@ -215,7 +216,7 @@ const DashboardContent = () => {
                 <Button 
                   variant="ghost" 
                   onClick={logout} 
-                  className="text-white/80 hover:bg-white/15 hover:text-white"
+                  className="text-white hover:bg-white/20 hover:text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
                 >
                   {t('dashboard.header.logout')}
                 </Button>
@@ -295,7 +296,7 @@ const DashboardContent = () => {
           {/* Kitchen-inspired content wrapper */}
           <div className="relative">
             {/* Subtle content background */}
-            <div className={`absolute inset-0 overflow-hidden ${isMobile ? 'bg-transparent' : 'bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl'}`}>
+            <div className={`absolute inset-0 overflow-hidden ${isMobile ? 'bg-transparent' : 'bg-white/75 backdrop-blur-xl rounded-3xl border border-white/60 shadow-2xl'}`}>
               {!isMobile && (
                 <div 
                   className="absolute inset-0 opacity-[0.06] pointer-events-none"

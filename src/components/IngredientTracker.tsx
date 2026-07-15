@@ -53,17 +53,98 @@ const IngredientTracker = () => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
 
-  const mapApiCategoryToUI = (category: string): string => {
+  const mapApiCategoryToUI = (category?: string): string => {
+    if (!category || !category.trim()) return "Pantry";
     const categoryMap: Record<string, string> = {
+      // Dairy
       dairy: "Dairy",
+      lacteo: "Dairy",
+      "lácteo": "Dairy",
+      lacteos: "Dairy",
+      "lácteos": "Dairy",
+      laticinio: "Dairy",
+      "laticínio": "Dairy",
+      // Meat / Protein / Fish
       protein: "Meat",
+      meat: "Meat",
+      carne: "Meat",
+      proteina: "Meat",
+      "proteína": "Meat",
+      pescado: "Fish",
+      fish: "Fish",
+      seafood: "Fish",
+      marisco: "Fish",
+      peixe: "Fish",
+      // Vegetables
       vegetable: "Vegetables",
+      vegetables: "Vegetables",
+      verdura: "Vegetables",
+      verduras: "Vegetables",
+      vegetal: "Vegetables",
+      "hortaliça": "Vegetables",
+      // Fruits
       fruit: "Fruits",
+      fruits: "Fruits",
+      fruta: "Fruits",
+      frutas: "Fruits",
+      // Grains
       grain: "Grains",
-      herb: "Pantry",
+      grains: "Grains",
+      grano: "Grains",
+      granos: "Grains",
+      cereal: "Grains",
+      cereais: "Grains",
+      "grão": "Grains",
+      // Legumes
+      legume: "Legumes",
+      legumbre: "Legumes",
+      legumbres: "Legumes",
+      leguminosa: "Legumes",
+      // Herbs & Spices
+      herb: "Herbs & Spices",
+      spice: "Herbs & Spices",
+      hierba: "Herbs & Spices",
+      especia: "Herbs & Spices",
+      especias: "Herbs & Spices",
+      erva: "Herbs & Spices",
+      condimento: "Herbs & Spices",
+      // Oils & Fats
+      oil: "Oils & Fats",
+      fat: "Oils & Fats",
+      aceite: "Oils & Fats",
+      grasa: "Oils & Fats",
+      "óleo": "Oils & Fats",
+      gordura: "Oils & Fats",
+      // Bakery
+      bakery: "Bakery",
+      bread: "Bakery",
+      pan: "Bakery",
+      "pão": "Bakery",
+      panaderia: "Bakery",
+      "panadería": "Bakery",
+      // Beverages
+      beverage: "Beverages",
+      drink: "Beverages",
+      bebida: "Beverages",
+      bebidas: "Beverages",
+      // Condiments / Sauces
+      sauce: "Condiments",
+      condiment: "Condiments",
+      salsa: "Condiments",
+      molho: "Condiments",
+      // Pantry / Other fallbacks
+      pantry: "Pantry",
       other: "Pantry",
+      ingredient: "Pantry",
+      ingrediente: "Pantry",
+      otros: "Pantry",
+      outro: "Pantry",
+      outros: "Pantry",
     };
-    return categoryMap[category.toLowerCase()] || "Pantry";
+    const key = category.toLowerCase().trim();
+    if (categoryMap[key]) return categoryMap[key];
+    // Preserve unknown classifications as their own group (title-cased)
+    return key.charAt(0).toUpperCase() + key.slice(1);
   };
 
   const fetchPantryItems = async () => {
