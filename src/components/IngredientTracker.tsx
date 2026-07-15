@@ -55,15 +55,52 @@ const IngredientTracker = () => {
 
   const mapApiCategoryToUI = (category: string): string => {
     const categoryMap: Record<string, string> = {
+      // English
       dairy: "Dairy",
       protein: "Meat",
+      meat: "Meat",
       vegetable: "Vegetables",
+      vegetables: "Vegetables",
       fruit: "Fruits",
+      fruits: "Fruits",
       grain: "Grains",
+      grains: "Grains",
       herb: "Pantry",
+      spice: "Pantry",
+      oil: "Pantry",
       other: "Pantry",
+      // Spanish
+      "lácteo": "Dairy",
+      "lacteo": "Dairy",
+      "proteína": "Meat",
+      "proteina": "Meat",
+      "carne": "Meat",
+      "vegetal": "Vegetables",
+      "verdura": "Vegetables",
+      "fruta": "Fruits",
+      "grano": "Grains",
+      "cereal": "Grains",
+      "especia": "Pantry",
+      "hierba": "Pantry",
+      "aceite": "Pantry",
+      "otro": "Pantry",
+      // Portuguese
+      "laticínio": "Dairy",
+      "laticinio": "Dairy",
+      "proteína ": "Meat",
+      "legume": "Vegetables",
+      "vegetais": "Vegetables",
+      "grão": "Grains",
+      "grao": "Grains",
+      "especiaria": "Pantry",
+      "óleo": "Pantry",
+      "oleo": "Pantry",
+      "outro": "Pantry",
+      // Fallback for generic "ingredient" label from meal adds
+      ingredient: "Pantry",
     };
-    return categoryMap[category.toLowerCase()] || "Pantry";
+    if (!category) return "Pantry";
+    return categoryMap[category.toLowerCase().trim()] || "Pantry";
   };
 
   const fetchPantryItems = async () => {
