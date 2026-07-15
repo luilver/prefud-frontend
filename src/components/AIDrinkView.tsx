@@ -9,7 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { Checkbox } from "@/components/ui/checkbox";
-import { updatePantry, type Ingredient } from "@/services/pantryService";
+import { addIngredientsToPantry, type PantryIngredient } from "@/services/pantryService";
 
 interface AIDrinkViewProps {
   drink: any;
@@ -95,7 +95,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
       return { name, quantity, unit, classification, carbon, days };
     });
 
-    const newPantryItems = selectedData.map((ing) => {
+    const newPantryItems: PantryIngredient[] = selectedData.map((ing) => {
       const expiryISO = new Date(Date.now() + ing.days * 24 * 60 * 60 * 1000).toISOString();
       return {
         id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -114,33 +114,12 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
 
     try {
       if (user?.id) {
-        const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          classification: item.category || "ingredient",
-          carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0.2,
-          daysToExpire: item.daysToExpire ?? 7,
-          dayAdded:
-            typeof item.purchaseDate === "string"
-              ? item.purchaseDate
-              : item.purchaseDate?.toISOString() || nowISO,
-        }));
-
-        const newAsIngredients: Ingredient[] = newPantryItems.map((item) => ({
-          name: item.name,
-          quantity: item.quantity,
-          unit: item.unit,
-          classification: item.category,
-          carbonFootPrintToWaste: item.carbonFootPrintToWaste,
-          daysToExpire: item.daysToExpire,
-          dayAdded: item.purchaseDate,
-        }));
-
-        await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
+        await addIngredientsToPantry(user.id, newPantryItems);
       }
     } catch (e) {
-      console.error("Failed to sync pantry to backend:", e);
+      console.error("Failed to add ingredients to pantry:", e);
+      toast.error("Failed to add ingredients to pantry. Please try again.");
+      return;
     }
 
     const newPantryItemsForState = newPantryItems.map((item) => ({
