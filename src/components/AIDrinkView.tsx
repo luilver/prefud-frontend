@@ -453,14 +453,23 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
                       </div>
 
                       {selectedIngredients.length > 0 && (
-                        <div className="flex justify-center pt-4 border-t mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4 border-t mt-6">
                           <Button
                             onClick={() => handleAddToCart()}
-                            className="flex-1 bg-primary hover:bg-primary/90 h-12 max-w-xs"
+                            className="flex-1 bg-primary hover:bg-primary/90 h-12 sm:max-w-xs"
                             size="lg"
                           >
                             <ShoppingCart className="h-5 w-5 mr-2" />
-                            Add to Cart ({selectedIngredients.length})
+                            {t("drinkShoppingModal.addToCart") || "Add to Cart"} ({selectedIngredients.length})
+                          </Button>
+                          <Button
+                            onClick={addSelectedToPantry}
+                            variant="outline"
+                            className="flex-1 h-12 sm:max-w-xs"
+                            size="lg"
+                          >
+                            <Package className="h-5 w-5 mr-2" />
+                            {t("drinkShoppingModal.addToPantry") || "Add to Pantry"} ({selectedIngredients.length})
                           </Button>
                         </div>
                       )}
