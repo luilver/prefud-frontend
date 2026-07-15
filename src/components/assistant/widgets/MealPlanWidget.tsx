@@ -1,0 +1,79 @@
+import React, { useState } from "react";
+import type { MealPlanPayload, MealBase } from "@/types/assistant";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Clock, Flame, ShoppingCart, PackagePlus, Leaf } from "lucide-react";
+
+interface Props {
+  data: MealPlanPayload;
+  onOpenMeal: (meal: MealBase) => void;
+  onAddToCart: () => void;
+  onAddToPantry: () => void;
+  compact?: boolean;
+}
+
+const MealPlanWidget: React.FC<Props> = ({ data, onOpenMeal, onAddToCart, onAddToPantry, compact }) => {
+  const days = data.mealPlan.mealPlan;
+  const [activeDay, setActiveDay] = useState(0);
+  const day = days[activeDay];
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-foreground">Plan de comidas</h3>
+        <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+          <Leaf className="h-3 w-3" /> CO2 total {data.totalCarbonFootprint}
+        </span>
+      </div>
+
+      <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
+        {days.map((d, i) => (
+          <button
+            key={d.date}
+            onClick={() => setActiveDay(i)}
+            className={
+              "shrink-0 rounded-full border px-3 py-1 text-xs transition-colors " +
+              (i === activeDay
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border bg-background text-muted-foreground hover:bg-accent")
+            }
+          >
+            {d.dayOfWeek} · Dia {d.day}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        {day.meals.map((m) => (
+          <Card key={m.id} className="p-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] uppercase tracking-wide text-primary">{m.mealType}</div>
+                <div className="font-semibold text-sm truncate">{m.name}</div>
+                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+                  <span className="inline-flex items-center gap-1"><Flame className="h-3 w-3" />{m.calories} kcal</span>
+                  <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{m.cookingTime} min</span>
+                  <span className="inline-flex items-center gap-1"><Leaf className="h-3 w-3" />CO2 {m.carbonFootprint}</span>
+                </div>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => onOpenMeal(m)}>Ver receta</Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {!compact && (
+        <div className="flex flex-col sm:flex-row gap-2 pt-1">
+          <Button onClick={onAddToCart} className="flex-1">
+            <ShoppingCart className="h-4 w-4 mr-2" /> Anadir al carrito
+          </Button>
+          <Button onClick={onAddToPantry} variant="outline" className="flex-1">
+            <PackagePlus className="h-4 w-4 mr-2" /> Anadir a despensa
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MealPlanWidget;

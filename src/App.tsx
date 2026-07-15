@@ -38,6 +38,7 @@ import NotFound from "@/pages/NotFound";
 import Landing from "@/pages/Landing";
 import { isNativePlatform } from "@/services/revenueCatService";
 import Brand from "./pages/Brand";
+import Assistant from "@/pages/Assistant";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const AppContent = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/brand" element={<Brand />} />
+        <Route path="/assistant" element={<Assistant />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
