@@ -1,31 +1,33 @@
-## Problem
+## Goal
+The drink detail screen shown after a healthy drink is generated (`AIDrinkView.tsx`, opened via the `open-drink` event) currently only offers "Add to Cart" for selected ingredients. Add a matching "Add to Pantry" action so users can send selected drink ingredients straight to the pantry, mirroring what already exists for meals and in `DrinkShoppingModal`.
 
-In `src/components/IngredientTracker.tsx`, the pantry groups items by `category`, but every ingredient ends up under a single "Pantry" accordion. The cause is `mapApiCategoryToUI` (lines 56–67): it only recognizes a few English keys (`dairy`, `protein`, `vegetable`, `fruit`, `grain`, `herb`, `other`) and returns `"Pantry"` for anything else. Since the backend stores `classification` in Spanish (e.g. `grano`, `fruta`, `verdura`, `carne`, `lácteo`, `hierba`, `ingrediente`), almost every ingredient falls through to the default and gets collapsed into one group.
+## Scope
+Frontend only. One file: `src/components/AIDrinkView.tsx`.
 
-## Fix
+## Changes
 
-Update `mapApiCategoryToUI` in `src/components/IngredientTracker.tsx` so it groups ingredients by their real classification:
+1. In the Ingredients Selector tab (around the existing "Add to Cart" button, line ~372), render an "Add to Pantry" button next to it (stacked on mobile, side-by-side on desktop). Both buttons are disabled when `selectedIngredients.length === 0`.
 
-1. Expand the map to cover Spanish and Portuguese classification values used by the pantry API, in addition to the current English ones:
-   - Dairy: `dairy`, `lacteo`, `lácteo`, `lacteos`, `laticinio`, `laticínio`
-   - Meat / Protein: `protein`, `meat`, `carne`, `proteina`, `proteína`, `pescado`, `fish`, `seafood`, `marisco`, `peixe`
-   - Vegetables: `vegetable`, `vegetables`, `verdura`, `verduras`, `vegetal`, `legume`, `hortaliça`
-   - Fruits: `fruit`, `fruits`, `fruta`, `frutas`
-   - Grains: `grain`, `grains`, `grano`, `granos`, `cereal`, `cereais`, `grão`
-   - Legumes: `legume` (EN sense), `legumbre`, `legumbres`, `leguminosa`
-   - Herbs & Spices: `herb`, `spice`, `hierba`, `especia`, `especias`, `erva`, `condimento`
-   - Oils & Fats: `oil`, `fat`, `aceite`, `grasa`, `óleo`, `gordura`
-   - Bakery: `bakery`, `bread`, `pan`, `pão`, `panaderia`, `panadería`
-   - Beverages: `beverage`, `drink`, `bebida`, `bebidas`
-   - Condiments / Sauces: `sauce`, `condiment`, `salsa`, `condimento`, `molho`
-   - Pantry / Other fallbacks: `pantry`, `other`, `ingredient`, `ingrediente`, `otros`, `outro`, `outros`
-2. When a classification isn't in the map, stop defaulting to `"Pantry"`. Title-case the incoming classification string and use it as the group name (e.g. `"embutido"` → `"Embutido"`), so any new/unknown category still gets its own accordion group instead of being merged.
-3. Guard against empty/undefined classification: if both `classification` and `category` are missing, keep the current `"Pantry"` fallback.
+2. Add an `addSelectedToPantry` handler that:
+   - Uses `drink.apiData?.ingredientsList` when available (this is where the backend classification lives — `classification`, `daysToExpire`, `carbonFootPrintToWaste`) and falls back to `drink.ingredients` otherwise.
+   - Builds pantry items with the correct fields, using `classification` as `category` (fix consistent with the earlier pantry-category fix). Fallback chain: `ingredient.classification || ingredient.category || "drink-ingredient"`.
+   - Syncs to the backend via `updatePantry(user.id, [...existing, ...new])` (same pattern used in `DrinkShoppingModal.addSelectedToPantry`).
+   - Updates local `pantryItems` state via `setPantryItems` with `Date` objects.
+   - Shows a success toast using existing i18n keys (`drinkShoppingModal.addedToPantryTitle`, etc.).
+   - Clears `selectedIngredients` on success.
 
-No other files need to change — `categorizedIngredients` already groups by `category`, and the accordion sections in the mobile and desktop pantry views (lines ~400 and ~656) will automatically render one accordion per resulting group.
+3. Wire the required imports/hooks:
+   - `useUser` (for `pantryItems`, `setPantryItems`, `user`)
+   - `updatePantry` and `Ingredient` from `@/services/pantryService`
+   - Reuse the existing `useToast` (already used indirectly via `useAddToCart`; import `useToast` directly here)
+   - `Package` icon (already imported).
+
+4. Styling uses semantic tokens (`bg-primary`, `variant="outline"`) to respect current theming — no hardcoded colors.
 
 ## Out of scope
+- No changes to `DrinkDetailView.tsx` (already has pantry support via `DrinkShoppingModal`).
+- No changes to backend, translations, or cart logic.
+- No changes to the "Add to Cart" button behavior.
 
-- Translating group names via `LanguageContext` (current UI already uses fixed English labels for these categories).
-- Changing how ingredients are added to the pantry (already fixed in prior turns).
-- Icon mapping for new categories — `getCategoryIcon` already falls back to `📦` for unknown labels.
+## Technical notes
+- The pantry payload shape and `updatePantry` call mirror `DrinkShoppingModal.tsx` exactly, so category ("classification") flows through to `/add-ingredients` correctly — same fix applied recently for meal shopping list and meal plan view.
