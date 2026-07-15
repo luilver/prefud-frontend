@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { Checkbox } from "@/components/ui/checkbox";
+import { updatePantry, type Ingredient } from "@/services/pantryService";
 
 interface AIDrinkViewProps {
   drink: any;
@@ -19,7 +20,7 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
   const { t } = useLanguage();
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const { deleteAIDrink } = useUser();
+  const { deleteAIDrink, user, pantryItems, setPantryItems } = useUser();
   const { addItem } = useCart();
 
   const toggleStep = (stepIndex: number) => {
@@ -73,6 +74,88 @@ const AIDrinkView = ({ drink, onBack }: AIDrinkViewProps) => {
     selectedIngredients,
     onSuccess: () => setSelectedIngredients([])
   });
+
+  const addSelectedToPantry = async () => {
+    if (selectedIngredients.length === 0) return;
+
+    const apiList: any[] = drink?.apiData?.ingredientsList || [];
+    const nowISO = new Date().toISOString();
+
+    const selectedData = selectedIngredients.map((name) => {
+      const apiIng = apiList.find((i) => i?.name === name);
+      const fallback = drink.ingredients.find((i: any) => i?.name === name);
+      const amount = fallback?.amount || "1 unit";
+      const match = String(amount).match(/^(\d+(?:\.\d+)?)\s*(\w+)?/);
+      const quantity = apiIng?.quantity ?? (match ? parseFloat(match[1]) : 1);
+      const unit = apiIng?.unit ?? (match && match[2] ? match[2] : "unit");
+      const classification =
+        apiIng?.classification || fallback?.category || "drink-ingredient";
+      const carbon = apiIng?.carbonFootPrintToWaste ?? 0.2;
+      const days = apiIng?.daysToExpire ?? 7;
+      return { name, quantity, unit, classification, carbon, days };
+    });
+
+    const newPantryItems = selectedData.map((ing) => {
+      const expiryISO = new Date(Date.now() + ing.days * 24 * 60 * 60 * 1000).toISOString();
+      return {
+        id: `pantry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: ing.name,
+        quantity: ing.quantity,
+        unit: ing.unit,
+        category: ing.classification,
+        purchased: true,
+        purchaseDate: nowISO,
+        carbonFootPrintToWaste: ing.carbon,
+        daysToExpire: ing.days,
+        expiryDate: expiryISO,
+        notes: `Carbon footprint:: ${ing.carbon}`,
+      };
+    });
+
+    try {
+      if (user?.id) {
+        const existingAsIngredients: Ingredient[] = (pantryItems || []).map((item: any) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          classification: item.category || "ingredient",
+          carbonFootPrintToWaste: item.carbonFootPrintToWaste ?? 0.2,
+          daysToExpire: item.daysToExpire ?? 7,
+          dayAdded:
+            typeof item.purchaseDate === "string"
+              ? item.purchaseDate
+              : item.purchaseDate?.toISOString() || nowISO,
+        }));
+
+        const newAsIngredients: Ingredient[] = newPantryItems.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          classification: item.category,
+          carbonFootPrintToWaste: item.carbonFootPrintToWaste,
+          daysToExpire: item.daysToExpire,
+          dayAdded: item.purchaseDate,
+        }));
+
+        await updatePantry(user.id, [...existingAsIngredients, ...newAsIngredients]);
+      }
+    } catch (e) {
+      console.error("Failed to sync pantry to backend:", e);
+    }
+
+    const newPantryItemsForState = newPantryItems.map((item) => ({
+      ...item,
+      purchaseDate: new Date(item.purchaseDate),
+      expiryDate: new Date(item.expiryDate),
+    }));
+
+    setPantryItems([...(pantryItems || []), ...newPantryItemsForState]);
+
+    toast.success(
+      `${t("drinkShoppingModal.addedToPantryTitle") || "Added to Pantry!"} (${selectedIngredients.length})`
+    );
+    setSelectedIngredients([]);
+  };
 
   const enhancedInstructions = useMemo(() => {
     const drinkTips = [
