@@ -301,7 +301,10 @@ const MealPlanView = ({ plan, onBack, onEdit }: MealPlanViewProps) => {
         name: ingredient.name,
         quantity: ingredient.quantity,
         unit: ingredient.unit,
-        category: ingredient.category || "ingredient aqui",
+        category:
+          ingredient.classification ||
+          ingredient.category ||
+          "ingredient",
         purchased: true,
         purchaseDate: new Date().toISOString(),
         carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste || 0,
