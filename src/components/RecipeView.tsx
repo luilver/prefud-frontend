@@ -719,6 +719,7 @@ const RecipeView = ({ meal, plan, onBack }: RecipeViewProps) => {
         meal={meal}
         isOpen={showShoppingModal}
         onClose={() => setShowShoppingModal(false)}
+        planIngredientsList={plan?.plan?.plan?.ingredientsList || plan?.plan?.ingredientsList || plan?.shoppingList}
       />
 
       {showCookingMode && (

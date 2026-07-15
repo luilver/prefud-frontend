@@ -40,8 +40,9 @@ const DashboardContent = () => {
   const isNative = isNativePlatform();
   const [showWelcome, setShowWelcome] = useState(false);
   const logoUrl = useThemeLogo();
+  // Theme-aware gradient using semantic tokens (primary → accent)
   const themeGradient =
-    "linear-gradient(to right, #065f46, #059669, #f59e0b)";
+    "linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary)), hsl(var(--accent)))";
 
   useEffect(() => {
     try {
@@ -162,9 +163,9 @@ const DashboardContent = () => {
           }}
         />
         
-        <div aria-hidden="true" className="absolute top-20 left-[10%] w-6 h-6 bg-emerald-200/20 rounded-full motion-safe:animate-pulse"></div>
+        <div aria-hidden="true" className="absolute top-20 left-[10%] w-6 h-6 bg-primary/20 rounded-full motion-safe:animate-pulse"></div>
         <div aria-hidden="true" className="absolute top-40 right-[15%] w-4 h-4 bg-teal-200/25 rounded-full motion-safe:animate-pulse delay-1000"></div>
-        <div aria-hidden="true" className="absolute bottom-32 left-[20%] w-5 h-5 bg-emerald-300/15 rounded-full motion-safe:animate-pulse delay-2000"></div>
+        <div aria-hidden="true" className="absolute bottom-32 left-[20%] w-5 h-5 bg-primary/15 rounded-full motion-safe:animate-pulse delay-2000"></div>
         <div aria-hidden="true" className="absolute bottom-20 right-[25%] w-3 h-3 bg-teal-300/20 rounded-full motion-safe:animate-pulse delay-3000"></div>
       </div>
 
