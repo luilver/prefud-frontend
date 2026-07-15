@@ -1,33 +1,38 @@
-## Goal
-The drink detail screen shown after a healthy drink is generated (`AIDrinkView.tsx`, opened via the `open-drink` event) currently only offers "Add to Cart" for selected ingredients. Add a matching "Add to Pantry" action so users can send selected drink ingredients straight to the pantry, mirroring what already exists for meals and in `DrinkShoppingModal`.
+## Problem
+In `src/components/AIDrinkView.tsx`, the recently added "Add to Pantry" button calls `updatePantry(userId, ingredients)` which hits `PUT /meal-plan/pantry/:userId` and **replaces the entire pantry** — wiping out all existing items. It should call the additive `/add-ingredients` endpoint, like `MealShoppingModal.tsx` does.
 
-## Scope
-Frontend only. One file: `src/components/AIDrinkView.tsx`.
+Additionally, the i18n key `drinkShoppingModal.addToCart` (and related pantry keys the new button uses) are missing and need to be added in `LanguageContext.tsx` for EN / ES / PT.
 
-## Changes
+## Fix
 
-1. In the Ingredients Selector tab (around the existing "Add to Cart" button, line ~372), render an "Add to Pantry" button next to it (stacked on mobile, side-by-side on desktop). Both buttons are disabled when `selectedIngredients.length === 0`.
+### 1. `src/components/AIDrinkView.tsx` — use the additive endpoint
+- Swap the `updatePantry` import for `addIngredientsToPantry` and `PantryIngredient` from `@/services/pantryService`.
+- Rewrite `addSelectedToPantry` to mirror `MealShoppingModal.addSelectedToPantry`:
+  - Build `PantryIngredient[]` with the exact shape the backend expects:
+    ```
+    { id, name, quantity, unit, category, purchased: true,
+      purchaseDate (ISO), carbonFootPrintToWaste,
+      daysToExpire, expiryDate (ISO), notes }
+    ```
+  - `category` = `ingredient.classification || ingredient.category || "drink-ingredient"`.
+  - Call `await addIngredientsToPantry(user.id, newPantryItems)` — NOT `updatePantry`.
+  - Do NOT spread existing pantry into the payload; this endpoint is additive.
+  - Merge results into local `pantryItems` state with `Date` objects for `purchaseDate` / `expiryDate` (same pattern as `MealShoppingModal`).
+- Keep the success toast + clear-selection behavior; wrap the network call in try/catch and show an error toast on failure.
 
-2. Add an `addSelectedToPantry` handler that:
-   - Uses `drink.apiData?.ingredientsList` when available (this is where the backend classification lives — `classification`, `daysToExpire`, `carbonFootPrintToWaste`) and falls back to `drink.ingredients` otherwise.
-   - Builds pantry items with the correct fields, using `classification` as `category` (fix consistent with the earlier pantry-category fix). Fallback chain: `ingredient.classification || ingredient.category || "drink-ingredient"`.
-   - Syncs to the backend via `updatePantry(user.id, [...existing, ...new])` (same pattern used in `DrinkShoppingModal.addSelectedToPantry`).
-   - Updates local `pantryItems` state via `setPantryItems` with `Date` objects.
-   - Shows a success toast using existing i18n keys (`drinkShoppingModal.addedToPantryTitle`, etc.).
-   - Clears `selectedIngredients` on success.
+### 2. Missing translations — add in `src/contexts/LanguageContext.tsx`
+Audit the i18n keys used by the new pantry button and its toasts in `AIDrinkView.tsx`. For each key missing from `LanguageContext.tsx`, add entries in EN / ES / PT using flat dot-notation, at minimum:
 
-3. Wire the required imports/hooks:
-   - `useUser` (for `pantryItems`, `setPantryItems`, `user`)
-   - `updatePantry` and `Ingredient` from `@/services/pantryService`
-   - Reuse the existing `useToast` (already used indirectly via `useAddToCart`; import `useToast` directly here)
-   - `Package` icon (already imported).
+- `drinkShoppingModal.addToCart` — "Add to Cart" / "Añadir al carrito" / "Adicionar ao carrinho"
+- `drinkShoppingModal.addToPantry` — "Add to Pantry" / "Añadir a la despensa" / "Adicionar à despensa"
+- `drinkShoppingModal.addedToPantryTitle` — "Added to Pantry!" / "¡Añadido a la despensa!" / "Adicionado à despensa!"
+- `drinkShoppingModal.addedToPantryDescription` — matching the format the component reads (static or with count), consistent with sibling modals.
 
-4. Styling uses semantic tokens (`bg-primary`, `variant="outline"`) to respect current theming — no hardcoded colors.
+No changes to `src/translations/*.ts`.
 
 ## Out of scope
-- No changes to `DrinkDetailView.tsx` (already has pantry support via `DrinkShoppingModal`).
-- No changes to backend, translations, or cart logic.
-- No changes to the "Add to Cart" button behavior.
+- No changes to `DrinkShoppingModal.tsx`, `MealShoppingModal.tsx`, or `pantryService.ts`.
+- No changes to the "Add to Cart" behavior or backend.
 
-## Technical notes
-- The pantry payload shape and `updatePantry` call mirror `DrinkShoppingModal.tsx` exactly, so category ("classification") flows through to `/add-ingredients` correctly — same fix applied recently for meal shopping list and meal plan view.
+## Why this is correct
+`addIngredientsToPantry` performs `PATCH /meal-plan/pantry/:userId/add-ingredients` with an array body — the exact endpoint/payload the user showed. `updatePantry` performs a full `PUT` replace, which is what wiped the pantry.
