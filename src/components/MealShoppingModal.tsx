@@ -14,9 +14,10 @@ interface MealShoppingModalProps {
   meal: any;
   isOpen: boolean;
   onClose: () => void;
+  planIngredientsList?: any[];
 }
 
-const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) => {
+const MealShoppingModal = ({ meal, isOpen, onClose, planIngredientsList }: MealShoppingModalProps) => {
   const { user, pantryItems, setPantryItems } = useUser();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -25,6 +26,29 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
 
   // Get ingredients with proper structure
   const getIngredientsData = () => {
+    // Build a lookup by normalized name from the plan's ingredientsList,
+    // which is where the real `classification`, `carbonFootPrintToWaste`
+    // and `daysToExpire` values live for meal-plan meals.
+    const lookupSource: any[] =
+      (planIngredientsList && Array.isArray(planIngredientsList) && planIngredientsList) ||
+      (meal.ingredientsList && Array.isArray(meal.ingredientsList) && meal.ingredientsList) ||
+      [];
+    const normalize = (s: string) => (s || "").toString().trim().toLowerCase();
+    const lookup = new Map<string, any>();
+    lookupSource.forEach((ing: any) => {
+      if (ing?.name) lookup.set(normalize(ing.name), ing);
+    });
+    const enrich = (name: string, fallback: any = {}) => {
+      const found = lookup.get(normalize(name));
+      return {
+        classification:
+          found?.classification ?? fallback.classification ?? "ingredient",
+        carbonFootPrintToWaste:
+          found?.carbonFootPrintToWaste ?? fallback.carbonFootPrintToWaste,
+        daysToExpire: found?.daysToExpire ?? fallback.daysToExpire ?? 7,
+      };
+    };
+
     // NEW: support ingredientsList (used by AI-created meals)
     if (meal.ingredientsList && Array.isArray(meal.ingredientsList)) {
       return meal.ingredientsList.map((ingredient: any) => ({
@@ -38,38 +62,59 @@ const MealShoppingModal = ({ meal, isOpen, onClose }: MealShoppingModalProps) =>
     }
 
     if (meal.ingredientsData && Array.isArray(meal.ingredientsData)) {
-      return meal.ingredientsData.map((ingredient: any) => ({
-        name: ingredient.name || ingredient,
-        quantity: ingredient.quantity || 1,
-        unit: ingredient.unit || 'unit',
-        classification: ingredient.classification || 'ingredient',
-        daysToExpire: ingredient.daysToExpire || 7,
-        // carbonFootPrintToWaste can come from meal data; if missing, we will default later when creating pantry items
-        carbonFootPrintToWaste: ingredient.carbonFootPrintToWaste
-      }));
+      return meal.ingredientsData.map((ingredient: any) => {
+        const name = ingredient.name || ingredient;
+        const enriched = enrich(name, ingredient);
+        return {
+          name,
+          quantity: ingredient.quantity || 1,
+          unit: ingredient.unit || 'unit',
+          classification: ingredient.classification || enriched.classification,
+          daysToExpire: ingredient.daysToExpire || enriched.daysToExpire,
+          carbonFootPrintToWaste:
+            ingredient.carbonFootPrintToWaste ?? enriched.carbonFootPrintToWaste,
+        };
+      });
     }
     
     if (meal.ingredients && Array.isArray(meal.ingredients)) {
-      return meal.ingredients.map((ingredient: string) => {
-        // Parse ingredient string to extract quantity and unit
-        const match = ingredient.match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
-        if (match) {
+      return meal.ingredients.map((ingredient: any) => {
+        // Support both string ingredients and object ingredients ({ name, quantity, unit })
+        if (ingredient && typeof ingredient === 'object') {
+          const name = ingredient.name;
+          const enriched = enrich(name);
           return {
-            name: match[3],
-            quantity: parseFloat(match[1]),
-            unit: match[2],
-            classification: 'ingredient',
-            daysToExpire: 7,
-            carbonFootPrintToWaste: undefined
+            name,
+            quantity: ingredient.quantity ?? 1,
+            unit: ingredient.unit ?? 'unit',
+            classification: ingredient.classification ?? enriched.classification,
+            daysToExpire: ingredient.daysToExpire ?? enriched.daysToExpire,
+            carbonFootPrintToWaste:
+              ingredient.carbonFootPrintToWaste ?? enriched.carbonFootPrintToWaste,
           };
         }
+        // Parse ingredient string to extract quantity and unit
+        const match = (ingredient as string).match(/^(\d+(?:\.\d+)?)\s*(\w+)\s+(.+)$/);
+        if (match) {
+          const name = match[3];
+          const enriched = enrich(name);
+          return {
+            name,
+            quantity: parseFloat(match[1]),
+            unit: match[2],
+            classification: enriched.classification,
+            daysToExpire: enriched.daysToExpire,
+            carbonFootPrintToWaste: enriched.carbonFootPrintToWaste,
+          };
+        }
+        const enriched = enrich(ingredient as string);
         return {
-          name: ingredient,
+          name: ingredient as string,
           quantity: 1,
           unit: 'unit',
-          classification: 'ingredient',
-          daysToExpire: 7,
-          carbonFootPrintToWaste: undefined
+          classification: enriched.classification,
+          daysToExpire: enriched.daysToExpire,
+          carbonFootPrintToWaste: enriched.carbonFootPrintToWaste,
         };
       });
     }
