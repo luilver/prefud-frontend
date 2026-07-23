@@ -174,6 +174,7 @@ const translations = {
     "profile.calorieTracking.dailyAverage": "Daily Average",
     "profile.calorieTracking.healthGoalsProgress": "Health Goals Progress",
     "profile.calorieTracking.noHealthGoals": "No health goals set",
+    "profile.calorieTracking.history": "6-Month Calorie History",
 
     // Environmental Impact
     "profile.environmental.title": "Environmental Impact",
@@ -195,6 +196,7 @@ const translations = {
     "profile.environmental.improvementOpportunity": "Improvement Opportunity",
     "profile.environmental.checkExpiration":
       "Check expiration dates more frequently to reduce waste by 15%",
+    "profile.environmental.history": "6-Month Environmental Impact History",
 
     // Favorites
     "profile.checkFavorites": "Check Favorites",
@@ -2194,6 +2196,7 @@ const translations = {
       "Progreso de Objetivos de Salud",
     "profile.calorieTracking.noHealthGoals":
       "No hay objetivos de salud establecidos",
+      "profile.calorieTracking.history": "Historial de 6 meses de calorías",
 
     // Environmental Impact
     "profile.environmental.title": "Impacto Ambiental",
@@ -2216,6 +2219,7 @@ const translations = {
     "profile.environmental.improvementOpportunity": "Oportunidad de Mejora",
     "profile.environmental.checkExpiration":
       "Revisa las fechas de vencimiento más frecuentemente para reducir el desperdicio en 15%",
+      "profile.environmental.history": "6-Month Environmental Impact History",
 
     // Favorites
     "profile.checkFavorites": "Ver Favoritos",
@@ -4283,6 +4287,7 @@ const translations = {
       "Progresso dos Objetivos de Saúde",
     "profile.calorieTracking.noHealthGoals":
       "Nenhum objetivo de saúde definido",
+      "profile.calorieTracking.history": "Histórico de 6 meses de calorias",
 
     // Environmental Impact
     "profile.environmental.title": "Impacto Ambiental",
@@ -4305,6 +4310,7 @@ const translations = {
     "profile.environmental.improvementOpportunity": "Oportunidade de Melhoria",
     "profile.environmental.checkExpiration":
       "Verifique as datas de validade com mais frequência para reduzir o desperdício em 15%",
+      "profile.environmental.history": "Histórico de 6 meses de impacto ambiental",
 
     // Favorites
     "profile.checkFavorites": "Ver Favoritos",

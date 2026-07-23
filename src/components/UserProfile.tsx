@@ -14,6 +14,21 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -44,6 +59,7 @@ import {
   Heart,
   Camera,
   Palette,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,6 +69,8 @@ import { useTheme, THEMES, ThemeId } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import PasswordUpdate from "./PasswordUpdate";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
+import SubscriptionManager from "./SubscriptionManager";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import DeleteAccountModal from "./DeleteAccountModal";
 import { authService } from "@/services/authService";
 import axios from "axios";
@@ -108,6 +126,14 @@ interface HealthGoals {
   _id: string;
 }
 
+
+interface ConsumptionData {
+  monthName: string;
+  year: string;
+  carbonConsumed: number;
+  caloriesConsumed: number;
+}
+
 interface TrackingData {
   caloriesTrak: CalorieTrack | null;
   carbonTrak: CarbonTrack | null;
@@ -131,6 +157,7 @@ const UserProfile = () => {
     useState<CurrentSubscriptionInfo | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || "",
@@ -139,6 +166,7 @@ const UserProfile = () => {
     country: user?.country || "",
   });
   const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
+  const [consumptionHistory, setConsumptionHistory] = useState<ConsumptionData[]>([]);
 
   // Fetch subscription types, current subscription, and tracking data on component mount
   useEffect(() => {
@@ -173,8 +201,32 @@ const UserProfile = () => {
       }
     };
 
+
+    const fetchConsumptionData = async () => {
+      try {
+        if (authUser?.userId) {
+          const response = await axios.get(
+            `${API_BASE_URL}/user-profile/${authUser.userId}/consumption?months=6`
+          );
+          
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const formattedData = response.data.map((item: any) => ({
+            monthName: monthNames[parseInt(item.month) - 1] || item.month,
+            year: item.year,
+            carbonConsumed: item.carbonConsumed || 0,
+            caloriesConsumed: item.caloriesConsumed || 0
+          })).reverse(); // Reverse so it goes oldest to newest
+          
+          setConsumptionHistory(formattedData);
+        }
+      } catch (error) {
+        console.error("Error fetching consumption history:", error);
+      }
+    };
+
     fetchSubscriptionData();
     fetchTrackingData();
+    fetchConsumptionData();
   }, [authUser?.userId]);
 
   // Calculate daily average for calories
@@ -296,7 +348,7 @@ const UserProfile = () => {
 
       <div className="relative z-10 space-y-4 sm:space-y-6 max-w-4xl mx-auto p-4">
         {/* Header */}
-        <div className="bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20">
+        <div className="bg-primary/40 backdrop-blur-sm rounded-xl p-3 sm:p-6 border border-primary/20 flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="p-1.5 sm:p-2 bg-gradient-to-r from-primary to-accent rounded-lg">
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -310,36 +362,68 @@ const UserProfile = () => {
               </p>
             </div>
           </div>
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+                <SettingsIcon className="w-4 h-4 mr-2" />
+                Configuration
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Configuration</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6 pt-4">
+                <SettingsSection />
+                <PasswordUpdate />
+                <div className="bg-red-50 rounded-lg p-4 border border-red-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-semibold text-red-600">
+                        {t("profile.deleteAccount.section") || "Danger Zone"}
+                      </h3>
+                      <p className="text-xs text-red-500 mt-0.5">
+                        {t("profile.deleteAccount.sectionDesc") || "Permanently delete your account and all data"}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDeleteAccountModal(true)}
+                      className="text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700 bg-white"
+                    >
+                      {t("profile.deleteAccount.button") || "Delete Account"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        {/* Profile Information Accordion */}
+        {/* Profile Information */}
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-0">
-            <Accordion type="single" collapsible>
-              <AccordionItem value="profile-info" className="border-none">
-                <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                  <div className="flex items-center space-x-2">
-                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                    <span className="text-lg sm:text-xl font-semibold">
-                      {t("profile.personalInfo") || "Profile Information"}
-                    </span>
-                  </div>
-                {!isEditing && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsEditing(true);
-                    }}
-                    className="border-primary text-primary hover:bg-primary/5 ml-4"
-                  >
-                    <Edit2 className="h-4 w-4 mr-2" />
-                    {t("profile.edit") || "Edit"}
-                  </Button>
-                )}
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-2">
+                <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <span className="text-lg sm:text-xl font-semibold">
+                  {t("profile.personalInfo") || "Profile Information"}
+                </span>
+              </div>
+              {!isEditing && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  className="border-primary text-primary hover:bg-primary/5"
+                >
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  {t("profile.edit") || "Edit"}
+                </Button>
+              )}
+            </div>
                 <div className="space-y-4 sm:space-y-6">
                   {isEditing && (
                     <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 mb-4">
@@ -523,32 +607,252 @@ const UserProfile = () => {
                     </div>
                   </div>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
         </CardContent>
       </Card>
 
-        {/* Subscription Information Accordion */}
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-0">
-            <Accordion type="single" collapsible>
-              <AccordionItem value="subscription-info" className="border-none">
-                <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                  <div className="flex items-center space-x-2">
-                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                    <span className="text-lg sm:text-xl font-semibold">
-                      {t("profile.subscription") || "My Subscription"}
-                    </span>
-                    <div className="ml-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                      {currentSubscriptionName} Plan
+
+      {/* Tabs Section for tracking and subscription */}
+            <Tabs defaultValue="calories" className="w-full space-y-4">
+<TabsList className="w-full grid grid-cols-3 bg-white/95 shadow-md h-12">
+          <TabsTrigger value="calories" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary h-full">
+            <Flame className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Calories</span>
+          </TabsTrigger>
+          <TabsTrigger value="environmental" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary h-full">
+            <Leaf className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Impact</span>
+          </TabsTrigger>
+          <TabsTrigger value="subscription" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary h-full">
+            <Trophy className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Subscription</span>
+          </TabsTrigger>
+        </TabsList>
+          <TabsContent value="calories">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-2 mb-6">
+                <Flame className="h-5 w-5 text-orange-600" />
+                <h3 className="text-xl font-semibold">
+                  {t("profile.calorieTracking.title") || "Calorie Tracking"}
+                </h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                  {t("profile.calorieTracking.description") || "Track your monthly calorie consumption and goals"}
+                </p>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Daily Goal */}
+                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Target className="h-5 w-5 text-orange-600" />
+                      <span className="text-2xl font-bold text-orange-600">
+                        {dailyCaloriesGoal.toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyGoal") || "Daily Goal"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesPerDay") || "Calories per day"}</p>
+                  </div>
+
+                  {/* Monthly Consumed */}
+                  <div className="bg-red-50 rounded-lg p-4 border border-red-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Activity className="h-5 w-5 text-red-600" />
+                      <span className="text-2xl font-bold text-red-600">
+                        {caloriesConsumed.toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.thisMonth") || "This Month"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesConsumed") || "Calories consumed"}</p>
+                  </div>
+
+                  {/* Average Daily */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <TrendingDown className="h-5 w-5 text-blue-600" />
+                      <span className="text-2xl font-bold text-blue-600">
+                        {dailyCaloriesAverage.toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyAverage") || "Daily Average"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.thisMonth") || "This month"}</p>
+                  </div>
+                </div>
+
+
+                <div className="mt-6">
+                  <h4 className="text-base font-medium mb-3">{t("profile.calorieTracking.history") || "6-Month Calorie History"}</h4>
+                  <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={consumptionHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis dataKey="monthName" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
+                        <Tooltip 
+                          cursor={{ fill: '#f9f9f9' }}
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        />
+                        <Bar dataKey="caloriesConsumed" name="Calories" fill="#f97316" radius={[4, 4, 0, 0]} barSize={40} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h4 className="text-base font-medium mb-3">{t("profile.calorieTracking.healthGoalsProgress") || "Health Goals Progress"}</h4>
+                  <div className="space-y-2">
+                    {healthGoals.length > 0 ? (
+                      healthGoals.map((goal, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <span className="text-sm font-medium">{goal}</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-4 h-4 bg-primary/10 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-primary rounded-full" />
+                            </div>
+                            <span className="text-xs text-primary">Active</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-lg text-center">
+                        <span className="text-sm text-gray-500">{t("profile.calorieTracking.noGoals") || "No health goals set"}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+            </CardContent>
+          </Card>
+          </TabsContent>
+          <TabsContent value="environmental">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-2 mb-6">
+                <Leaf className="h-5 w-5 text-primary" />
+                <h3 className="text-xl font-semibold">
+                  {t("profile.environmental.title") || "Environmental Impact"}
+                </h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                  {t("profile.environmental.description") || "Track your monthly carbon emissions from ingredients and meals"}
+                </p>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                  {/* Consumed Meals Impact */}
+                  <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <Utensils className="h-5 w-5 text-primary" />
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-primary">{carbonConsumed.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.consumedMeals") || "Consumed Meals"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonUsed") || "Carbon footprint used"}</p>
+                  </div>
+
+                  {/* Total Monthly Impact */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <Leaf className="h-6 w-6 text-blue-600" />
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-blue-600">{carbonConsumed.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
+                    <p className="text-xs text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <h4 className="text-base font-medium mb-3">{t("profile.environmental.history") || "6-Month Carbon Footprint History"}</h4>
+                  <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={consumptionHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis dataKey="monthName" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#888' }} />
+                        <Tooltip 
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        />
+                        <Line type="monotone" dataKey="carbonConsumed" name="Carbon (kg CO₂)" stroke="#16a34a" strokeWidth={3} dot={{ r: 4, fill: '#16a34a', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                {/* Environmental Tips */}
+                <div className="space-y-3">
+                  <h4 className="text-base font-medium">💡 {t("profile.environmental.sustainabilityTips") || "Sustainability Tips"}</h4>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                        <p className="text-sm font-medium text-primary">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
+                        <p className="text-xs text-primary">
+                          {t("profile.environmental.preventedWaste") || "You've prevented 2.1 kg CO₂ by using ingredients before expiration"}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-accent/10 rounded-lg border border-accent/30">
+                        <p className="text-sm font-medium text-primary">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
+                        <p className="text-xs text-primary">
+                          {t("profile.environmental.wasteReduction") || "Your meal planning has reduced food waste by 78% this month"}
+                        </p>
+                      </div>
+                    <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+                      <p className="text-sm font-medium text-yellow-800">{t("profile.environmental.improvementOpportunity") || "Improvement Opportunity"}</p>
+                      <p className="text-xs text-yellow-600">
+                        {t("profile.environmental.checkExpiration") || "Check expiration dates more frequently to reduce waste by 15%"}
+                      </p>
                     </div>
                   </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6">
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
-                </p>
+                </div>
+
+                
+            </CardContent>
+          </Card>
+          </TabsContent>
+          <TabsContent value="subscription">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-2">
+                  <Trophy className="h-5 w-5 text-primary" />
+                  <h3 className="text-xl font-semibold">
+                    {t("profile.subscription") || "My Subscription"}
+                  </h3>
+                  <div className="ml-2 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                    {currentSubscriptionName} Plan
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  {hasActiveSubscription && !showSubscriptionManager ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowCancelModal(true)}
+                      className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 hidden sm:flex"
+                    >
+                      Cancel Subscription
+                    </Button>
+                  ) : null}
+                  {showSubscriptionManager && (
+                    <Button
+                      size="sm"
+                      onClick={() => setShowSubscriptionManager(false)}
+                      variant="outline"
+                    >
+                      Back to Usage
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {showSubscriptionManager ? (
+                <div className="mt-6">
+                  <SubscriptionManager />
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
+                  </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {[
                 {
@@ -661,171 +965,30 @@ const UserProfile = () => {
                 </p>
               )}
             </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </CardContent>
-      </Card>
-
-        {/* Calorie Tracking Accordion */}
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-0">
-            <Accordion type="single" collapsible>
-              <AccordionItem value="calorie-tracking" className="border-none">
-                <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                  <div className="flex items-center space-x-2">
-                    <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
-                    <span className="text-lg sm:text-xl font-semibold">
-                      {t("profile.calorieTracking.title") || "Calorie Tracking"}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6">
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t("profile.calorieTracking.description") || "Track your monthly calorie consumption and goals"}
-                </p>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  {/* Daily Goal */}
-                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <Target className="h-5 w-5 text-orange-600" />
-                      <span className="text-2xl font-bold text-orange-600">
-                        {dailyCaloriesGoal.toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyGoal") || "Daily Goal"}</p>
-                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesPerDay") || "Calories per day"}</p>
-                  </div>
-
-                  {/* Monthly Consumed */}
-                  <div className="bg-red-50 rounded-lg p-4 border border-red-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <Activity className="h-5 w-5 text-red-600" />
-                      <span className="text-2xl font-bold text-red-600">
-                        {caloriesConsumed.toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.thisMonth") || "This Month"}</p>
-                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.caloriesConsumed") || "Calories consumed"}</p>
-                  </div>
-
-                  {/* Average Daily */}
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <TrendingDown className="h-5 w-5 text-blue-600" />
-                      <span className="text-2xl font-bold text-blue-600">
-                        {dailyCaloriesAverage.toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{t("profile.calorieTracking.dailyAverage") || "Daily Average"}</p>
-                    <p className="text-xs text-gray-500">{t("profile.calorieTracking.thisMonth") || "This month"}</p>
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <h4 className="text-base font-medium mb-3">{t("profile.calorieTracking.healthGoalsProgress") || "Health Goals Progress"}</h4>
-                  <div className="space-y-2">
-                    {healthGoals.length > 0 ? (
-                      healthGoals.map((goal, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <span className="text-sm font-medium">{goal}</span>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-4 h-4 bg-primary/10 rounded-full flex items-center justify-center">
-                              <div className="w-2 h-2 bg-primary rounded-full" />
-                            </div>
-                            <span className="text-xs text-primary">Active</span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-3 bg-gray-50 rounded-lg text-center">
-                        <span className="text-sm text-gray-500">{t("profile.calorieTracking.noGoals") || "No health goals set"}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </CardContent>
-      </Card>
-
-        {/* Environmental Impact Accordion */}
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-0">
-            <Accordion type="single" collapsible>
-              <AccordionItem value="environmental-impact" className="border-none">
-                <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                  <div className="flex items-center space-x-2">
-                    <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                    <span className="text-lg sm:text-xl font-semibold">
-                      {t("profile.environmental.title") || "Environmental Impact"}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6">
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t("profile.environmental.description") || "Track your monthly carbon emissions from ingredients and meals"}
-                </p>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                  {/* Consumed Meals Impact */}
-                  <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
-                    <div className="flex items-center justify-between mb-2">
-                      <Utensils className="h-5 w-5 text-primary" />
-                      <div className="text-right">
-                        <span className="text-2xl font-bold text-primary">{carbonConsumed.toLocaleString()}</span>
-                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
-                      </div>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.consumedMeals") || "Consumed Meals"}</p>
-                    <p className="text-xs text-gray-500">{t("profile.environmental.carbonUsed") || "Carbon footprint used"}</p>
-                  </div>
-
-                  {/* Total Monthly Impact */}
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <Leaf className="h-6 w-6 text-blue-600" />
-                      <div className="text-right">
-                        <span className="text-2xl font-bold text-blue-600">{carbonConsumed.toLocaleString()}</span>
-                        <span className="text-sm text-gray-500 ml-1">kg CO₂</span>
-                      </div>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{t("profile.environmental.totalMonthly") || "Total Monthly Impact"}</p>
-                    <p className="text-xs text-gray-500">{t("profile.environmental.combinedFootprint") || "Combined carbon footprint"}</p>
-                  </div>
-                </div>
-
-                {/* Environmental Tips */}
-                <div className="space-y-3">
-                  <h4 className="text-base font-medium">💡 {t("profile.environmental.sustainabilityTips") || "Sustainability Tips"}</h4>
-                    <div className="grid grid-cols-1 gap-3">
-                      <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
-                        <p className="text-sm font-medium text-primary">{t("profile.environmental.reduceFoodWaste") || "Reduce Food Waste"}</p>
-                        <p className="text-xs text-primary">
-                          {t("profile.environmental.preventedWaste") || "You've prevented 2.1 kg CO₂ by using ingredients before expiration"}
-                        </p>
-                      </div>
-                      <div className="p-3 bg-accent/10 rounded-lg border border-accent/30">
-                        <p className="text-sm font-medium text-primary">{t("profile.environmental.mealPlanBenefits") || "Meal Planning Benefits"}</p>
-                        <p className="text-xs text-primary">
-                          {t("profile.environmental.wasteReduction") || "Your meal planning has reduced food waste by 78% this month"}
-                        </p>
-                      </div>
-                    <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
-                      <p className="text-sm font-medium text-yellow-800">{t("profile.environmental.improvementOpportunity") || "Improvement Opportunity"}</p>
-                      <p className="text-xs text-yellow-600">
-                        {t("profile.environmental.checkExpiration") || "Check expiration dates more frequently to reduce waste by 15%"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </CardContent>
-      </Card>
+              
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={() => setShowSubscriptionManager(true)}
+                  className="w-full bg-primary text-white hover:bg-primary/90"
+                >
+                  Update Subscription
+                </Button>
+                {hasActiveSubscription && (
+                  <Button
+                    variant="outline"
+                    className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 sm:hidden"
+                    onClick={() => setShowCancelModal(true)}
+                  >
+                    Cancel Subscription
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
+            </CardContent>
+          </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Check Favorites Button */}
         <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
@@ -837,52 +1000,6 @@ const UserProfile = () => {
               <Heart className="h-4 w-4" />
               <span>{t("profile.checkFavorites")}</span>
             </Button>
-          </CardContent>
-        </Card>
-
-        {/* Settings (Theme) Section */}
-        <SettingsSection />
-
-        {/* Mobile Logout Button */}
-        {isMobile && (
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-4">
-              <Button
-                variant="outline"
-                onClick={logout}
-                className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 flex items-center justify-center space-x-2"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>{t('dashboard.header.logout')}</span>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Password Update Section */}
-        <PasswordUpdate />
-
-        {/* Delete Account Section */}
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-red-600">
-                  {t("profile.deleteAccount.section") || "Danger Zone"}
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {t("profile.deleteAccount.sectionDesc") || "Permanently delete your account and all data"}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowDeleteAccountModal(true)}
-                className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-              >
-                {t("profile.deleteAccount.button") || "Delete Account"}
-              </Button>
-            </div>
           </CardContent>
         </Card>
 
