@@ -582,21 +582,7 @@ const SubscriptionManager = () => {
         })}
       </div>
 
-      <div className="text-center space-y-4 pt-8 border-t">
-        <h3 className="text-lg font-semibold text-gray-800">
-          All plans include:
-        </h3>
-        <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-          <div className="flex items-center space-x-2 text-sm text-gray-700">
-            <Check className="h-4 w-4 text-emerald-500" />
-            <span className="font-medium">Cancel anytime</span>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-700">
-            <Check className="h-4 w-4 text-emerald-500" />
-            <span className="font-medium">Secure payment processing</span>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Modals */}
       <SubscriptionCancelModal

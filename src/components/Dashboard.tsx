@@ -364,7 +364,7 @@ const DashboardContent = () => {
                 <TabsContent value="profile" className="mt-0">
                   <div className="grid gap-6">
                     <UserProfile />
-                    <SubscriptionManager />
+                    
                   </div>
                 </TabsContent>
               </Tabs>

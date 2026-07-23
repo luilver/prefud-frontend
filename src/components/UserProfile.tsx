@@ -157,7 +157,6 @@ const UserProfile = () => {
     useState<CurrentSubscriptionInfo | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
-  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || "",
@@ -691,7 +690,7 @@ const UserProfile = () => {
                           cursor={{ fill: '#f9f9f9' }}
                           contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         />
-                        <Bar dataKey="caloriesConsumed" name="Calories" fill="#f97316" radius={[4, 4, 0, 0]} barSize={40} />
+                        <Bar dataKey="caloriesConsumed" name="Calories" fill="#ea580c" radius={[4, 4, 0, 0]} barSize={40} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -774,7 +773,7 @@ const UserProfile = () => {
                         <Tooltip 
                           contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         />
-                        <Line type="monotone" dataKey="carbonConsumed" name="Carbon (kg CO₂)" stroke="#16a34a" strokeWidth={3} dot={{ r: 4, fill: '#16a34a', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                        <Line type="monotone" dataKey="carbonConsumed" name="Carbon (kg CO₂)" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 0 }} activeDot={{ r: 6 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -822,7 +821,7 @@ const UserProfile = () => {
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  {hasActiveSubscription && !showSubscriptionManager ? (
+                  {hasActiveSubscription ? (
                     <Button
                       variant="outline"
                       size="sm"
@@ -832,159 +831,12 @@ const UserProfile = () => {
                       Cancel Subscription
                     </Button>
                   ) : null}
-                  {showSubscriptionManager && (
-                    <Button
-                      size="sm"
-                      onClick={() => setShowSubscriptionManager(false)}
-                      variant="outline"
-                    >
-                      Back to Usage
-                    </Button>
-                  )}
                 </div>
               </div>
               
-              {showSubscriptionManager ? (
-                <div className="mt-6">
-                  <SubscriptionManager />
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {t("profile.subscriptionDesc") || "Your current plan usage and limits"}
-                  </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {[
-                {
-                  icon: Calendar,
-                  label: "Meal Plans",
-                  desc: "Available this month",
-                  remaining: currentSubscriptionInfo?.mealPlans,
-                  limit: currentSubscriptionType?.mealPlans,
-                  color: "emerald",
-                },
-                {
-                  icon: Star,
-                  label: "Special Meals",
-                  desc: "Premium recipes",
-                  remaining: currentSubscriptionInfo?.specialMeals,
-                  limit: currentSubscriptionType?.specialMeals,
-                  color: "teal",
-                },
-                {
-                  icon: Coffee,
-                  label: "Healthy Drinks",
-                  desc: "Custom beverages",
-                  remaining: currentSubscriptionInfo?.healthyDrinks,
-                  limit: currentSubscriptionType?.healthyDrinks,
-                  color: "cyan",
-                },
-                {
-                  icon: ChefHat,
-                  label: "Generated Meals",
-                  desc: "AI-powered recipes",
-                  remaining: currentSubscriptionInfo?.generateMeals,
-                  limit: currentSubscriptionType?.generatedMeals,
-                  color: "orange",
-                },
-                {
-                  icon: Camera,
-                  label: t("profile.processImages") || "Process Images",
-                  desc: t("profile.processImagesDesc") || "Image ingredient scans",
-                  remaining: currentSubscriptionInfo?.processImages,
-                  limit: currentSubscriptionType?.processImages,
-                  color: "violet",
-                },
-              ].map((card, idx) => {
-                const Icon = card.icon;
-                const remaining = card.remaining ?? 0;
-                const limit = card.limit ?? 0;
-                const pct = limit > 0 ? Math.min(100, Math.round((remaining / limit) * 100)) : 0;
-                const palette: Record<string, { ring: string; bg: string; badgeBg: string; text: string; bar: string; from: string }> = {
-                  emerald: { ring: "border-primary/20", bg: "from-primary/10", badgeBg: "bg-primary/10", text: "text-primary", bar: "bg-primary", from: "" },
-                  teal:    { ring: "border-accent/30",    bg: "from-accent/10",    badgeBg: "bg-accent/20",    text: "text-primary",    bar: "bg-accent",    from: "" },
-                  cyan:    { ring: "border-cyan-100",    bg: "from-cyan-50",    badgeBg: "bg-cyan-100",    text: "text-cyan-600",    bar: "bg-cyan-500",    from: "" },
-                  orange:  { ring: "border-orange-100",  bg: "from-orange-50",  badgeBg: "bg-orange-100",  text: "text-orange-600",  bar: "bg-orange-500",  from: "" },
-                  violet:  { ring: "border-violet-100",  bg: "from-violet-50",  badgeBg: "bg-violet-100",  text: "text-violet-600",  bar: "bg-violet-500",  from: "" },
-                };
-                const c = palette[card.color];
-                return (
-                  <div
-                    key={idx}
-                    role="group"
-                    aria-label={`${card.label}: ${remaining}${currentSubscriptionType ? ` of ${limit}` : ""} remaining`}
-                    className={`group bg-gradient-to-br ${c.bg} to-white rounded-xl p-4 border ${c.ring} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between ${idx === 4 ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""}`}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`h-9 w-9 rounded-full ${c.badgeBg} flex items-center justify-center`}>
-                        <Icon className={`h-4 w-4 ${c.text}`} aria-hidden="true" />
-                      </div>
-                      <div className="text-right leading-none">
-                        <span className={`text-2xl font-bold ${c.text}`}>{remaining}</span>
-                        {currentSubscriptionType && (
-                          <span className="text-sm text-muted-foreground">/{limit}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800 leading-tight">{card.label}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{card.desc}</p>
-                      <div
-                        className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden"
-                        role="progressbar"
-                        aria-valuenow={pct}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-label={`${card.label} usage`}
-                      >
-                        <div className={`h-full ${c.bar} transition-all duration-500`} style={{ width: `${pct}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Subscription Status */}
-            <div className="mt-6 p-4 bg-white rounded-lg border">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Target className="h-4 w-4 text-primary" />
-                  <span className="font-medium">Plan Status</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${currentSubscriptionInfo?.status ? 'bg-primary' : 'bg-red-500'}`}></div>
-                  <span className={`text-sm font-medium ${currentSubscriptionInfo?.status ? 'text-primary' : 'text-red-600'}`}>
-                    {currentSubscriptionInfo?.status ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
+              <div className="mt-6">
+                <SubscriptionManager />
               </div>
-              {currentSubscriptionInfo?.dateStarted && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Started: {new Date(currentSubscriptionInfo.dateStarted).toLocaleDateString()}
-                </p>
-              )}
-            </div>
-              
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={() => setShowSubscriptionManager(true)}
-                  className="w-full bg-primary text-white hover:bg-primary/90"
-                >
-                  Update Subscription
-                </Button>
-                {hasActiveSubscription && (
-                  <Button
-                    variant="outline"
-                    className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 sm:hidden"
-                    onClick={() => setShowCancelModal(true)}
-                  >
-                    Cancel Subscription
-                  </Button>
-                )}
-              </div>
-            </>
-          )}
             </CardContent>
           </Card>
           </TabsContent>
