@@ -160,7 +160,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
 
       {/* Navigation Items */}
       <div className="flex-1 p-2 space-y-1">
-        <Button
+        {/* <Button
           variant="ghost"
           onClick={() => navigate("/assistant")}
           aria-label="prefud AI Assistant"
@@ -172,7 +172,7 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
         >
           <Bot className={cn("h-5 w-5", !isCollapsed && "mr-3")} aria-hidden="true" />
           {!isCollapsed && <span className="text-sm font-medium">AI Assistant</span>}
-        </Button>
+        </Button> */}
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
