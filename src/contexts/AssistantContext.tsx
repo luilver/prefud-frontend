@@ -139,7 +139,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         {
           id: uid(),
           role: "ai",
-          text: "Lo siento, hubo un error al procesar tu solicitud. Por favor intenta nuevamente.",
+          text: t("assistant.errors.processRequest"),
         },
       ]);
     });
@@ -170,7 +170,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setIsTyping(false);
           setMessages((m) => [
             ...m,
-            { id: uid(), role: "ai", text: "Error de conexión al iniciar la tarea." },
+            { id: uid(), role: "ai", text: t("assistant.errors.connectionTask") },
           ]);
         }
       });
@@ -179,7 +179,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.error("Socket not connected");
       setMessages((m) => [
         ...m,
-        { id: uid(), role: "ai", text: "El chat está desconectado." },
+        { id: uid(), role: "ai", text: t("assistant.errors.chatDisconnected") },
       ]);
     }
   }, [socket, messages, authUser]);
@@ -203,7 +203,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const chipMsg: ChatMessage = {
       id: uid(),
       role: "ai",
-      text: "Aqui tienes el resumen del carrito. Como deseas recibir tu pedido?",
+      text: t("assistant.checkout.summaryIntro"),
       questions: [
         { ask: "__co_address_saved" },
         { ask: "__co_address_new" },

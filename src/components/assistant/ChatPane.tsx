@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAssistant } from "@/contexts/AssistantContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import MessageBubble from "./MessageBubble";
 import ActionChips from "./ActionChips";
@@ -14,6 +15,7 @@ import { Bot, FileText } from "lucide-react";
 
 const ChatPane: React.FC = () => {
   const { messages, isTyping, sendUserMessage, pickQuestion, openInWorkspace, startCheckout } = useAssistant();
+  const { t } = useLanguage();
   const isMobile = useIsMobile();
   const endRef = useRef<HTMLDivElement>(null);
   const [sheetMeal, setSheetMeal] = useState<MealBase | null>(null);
@@ -47,7 +49,7 @@ const ChatPane: React.FC = () => {
 
   const handleAddToCart = (items: IngredientListItem[]) => startCheckout(items);
   const handleAddToPantry = (items: IngredientListItem[]) => {
-    toast({ title: "Anadido a despensa", description: `${items.length} ingredientes` });
+    toast({ title: t("assistant.chat.addedToPantry"), description: `${items.length} ${t("assistant.chat.ingredients")}` });
   };
 
   return (
@@ -58,7 +60,7 @@ const ChatPane: React.FC = () => {
         </div>
         <div className="min-w-0">
           <div className="text-sm font-semibold">prefud AI</div>
-          <div className="text-[11px] text-muted-foreground">Tu asistente de comida saludable</div>
+          <div className="text-[11px] text-muted-foreground">{t("assistant.chat.subtitle")}</div>
         </div>
       </div>
 
@@ -87,15 +89,15 @@ const ChatPane: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium">
-                      {m.payload.type === 'mealPlan' ? 'Plan de Comidas' : 
-                       m.payload.type === 'specialMeal' ? 'Receta Especial' : 
-                       m.payload.type === 'healthyDrink' ? 'Bebida Saludable' : 
+                      {m.payload.type === 'mealPlan' ? t("assistant.chat.typeMealPlan") : 
+                       m.payload.type === 'specialMeal' ? t("assistant.chat.typeSpecialMeal") : 
+                       m.payload.type === 'healthyDrink' ? t("assistant.chat.typeHealthyDrink") : 
                        m.payload.type === 'generatedMeals' ? 'Opciones Generadas' :
-                       m.payload.type === 'cart' ? 'Carrito' :
-                       m.payload.type === 'pantry' ? 'Despensa' :
+                       m.payload.type === 'cart' ? t("assistant.chat.typeCart") :
+                       m.payload.type === 'pantry' ? t("assistant.chat.typePantry") :
                        'Resultado'}
                     </h4>
-                    <p className="text-xs text-muted-foreground">Haz clic para ver detalles</p>
+                    <p className="text-xs text-muted-foreground">{t("assistant.chat.clickDetails")}</p>
                   </div>
                 </div>
               </div>

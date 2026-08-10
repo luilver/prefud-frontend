@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { MealPlanPayload, MealBase } from "@/types/assistant";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, Flame, ShoppingCart, PackagePlus, Leaf } from "lucide-react";
@@ -15,12 +16,13 @@ interface Props {
 const MealPlanWidget: React.FC<Props> = ({ data, onOpenMeal, onAddToCart, onAddToPantry, compact }) => {
   const days = data.mealPlan.mealPlan;
   const [activeDay, setActiveDay] = useState(0);
+  const { t, language } = useLanguage();
   const day = days[activeDay];
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">Plan de comidas</h3>
+        <h3 className="text-sm font-semibold text-foreground">{t("assistant.widgets.mealPlanTitle")}</h3>
         <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
           <Leaf className="h-3 w-3" /> CO2 total {data.totalCarbonFootprint}
         </span>
@@ -38,7 +40,7 @@ const MealPlanWidget: React.FC<Props> = ({ data, onOpenMeal, onAddToCart, onAddT
                 : "border-border bg-background text-muted-foreground hover:bg-accent")
             }
           >
-            {d.dayOfWeek} · Dia {d.day}
+            {d.dayOfWeek} · {language === "en" ? "Day" : language === "pt" ? "Dia" : "Día"} {d.day}
           </button>
         ))}
       </div>
@@ -56,7 +58,7 @@ const MealPlanWidget: React.FC<Props> = ({ data, onOpenMeal, onAddToCart, onAddT
                   <span className="inline-flex items-center gap-1"><Leaf className="h-3 w-3" />CO2 {m.carbonFootprint}</span>
                 </div>
               </div>
-              <Button size="sm" variant="outline" onClick={() => onOpenMeal(m)}>Ver receta</Button>
+              <Button size="sm" variant="outline" onClick={() => onOpenMeal(m)}>{t("assistant.widgets.viewRecipe")}</Button>
             </div>
           </Card>
         ))}
@@ -65,10 +67,10 @@ const MealPlanWidget: React.FC<Props> = ({ data, onOpenMeal, onAddToCart, onAddT
       {!compact && (
         <div className="flex flex-col sm:flex-row gap-2 pt-1">
           <Button onClick={onAddToCart} className="flex-1">
-            <ShoppingCart className="h-4 w-4 mr-2" /> Anadir al carrito
+            <ShoppingCart className="h-4 w-4 mr-2" /> {t("assistant.widgets.addToCart")}
           </Button>
           <Button onClick={onAddToPantry} variant="outline" className="flex-1">
-            <PackagePlus className="h-4 w-4 mr-2" /> Anadir a despensa
+            <PackagePlus className="h-4 w-4 mr-2" /> {t("assistant.widgets.addToPantry")}
           </Button>
         </div>
       )}
