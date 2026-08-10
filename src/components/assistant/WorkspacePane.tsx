@@ -7,7 +7,7 @@ import type { IngredientListItem, MealBase } from "@/types/assistant";
 import { toast } from "@/hooks/use-toast";
 
 const WorkspacePane: React.FC = () => {
-  const { workspacePayload, openInWorkspace, startCheckout } = useAssistant();
+  const { workspacePayload, openInWorkspace, startCheckout, addToPantry } = useAssistant();
   const { t } = useLanguage();
 
   if (!workspacePayload) {
@@ -47,9 +47,7 @@ const WorkspacePane: React.FC = () => {
           })
         }
         onAddToCart={(items) => startCheckout(items)}
-        onAddToPantry={(items) =>
-          toast({ title: t("assistant.chat.addedToPantry"), description: `${items.length} ${t("assistant.chat.ingredients")}` })
-        }
+        onAddToPantry={(items) => addToPantry(items)}
       />
     </div>
   );

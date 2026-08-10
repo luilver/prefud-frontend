@@ -2,6 +2,8 @@ import React, { createContext, useContext, useMemo, useState, useCallback, useEf
 import type { AssistantPayload, ChatMessage, CheckoutStep, IngredientListItem } from "@/types/assistant";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { addIngredientsToPantry } from "@/services/pantryService";
 
 interface AssistantContextValue {
   messages: ChatMessage[];
@@ -13,6 +15,7 @@ interface AssistantContextValue {
   pickQuestion: (ask: string) => Promise<void>;
   openInWorkspace: (payload: AssistantPayload | null) => void;
   startCheckout: (items: IngredientListItem[]) => void;
+  addToPantry: (items: IngredientListItem[]) => Promise<void>;
   advanceCheckout: (step: CheckoutStep) => void;
   resetCheckout: () => void;
 }
@@ -221,6 +224,26 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setCheckoutCart([]);
   }, []);
 
+  const addToPantry = useCallback(async (items: IngredientListItem[]) => {
+    if (!authUser) {
+      toast({ title: "Error", description: t("assistant.errors.processRequest") || "Debes iniciar sesión para añadir a la despensa.", variant: "destructive" });
+      return;
+    }
+    if (items.length === 0) return;
+    try {
+      const pantryItems = items.map(i => ({
+        name: i.name,
+        quantity: i.quantity,
+        unit: i.unit,
+        category: i.classification || "General",
+      }));
+      await addIngredientsToPantry(authUser.id, pantryItems as any);
+      toast({ title: t("assistant.chat.addedToPantry"), description: `${items.length} ${t("assistant.chat.ingredients")}` });
+    } catch (err) {
+      toast({ title: "Error", description: t("assistant.errors.processRequest"), variant: "destructive" });
+    }
+  }, [authUser, t]);
+
   const value = useMemo(
     () => ({
       messages,
@@ -234,8 +257,9 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       startCheckout,
       advanceCheckout,
       resetCheckout,
+      addToPantry,
     }),
-    [messages, isTyping, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout]
+    [messages, isTyping, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout, addToPantry]
   );
 
   return <AssistantContext.Provider value={value}>{children}</AssistantContext.Provider>;

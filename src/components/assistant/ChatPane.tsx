@@ -14,7 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import { Bot, FileText } from "lucide-react";
 
 const ChatPane: React.FC = () => {
-  const { messages, isTyping, sendUserMessage, pickQuestion, openInWorkspace, startCheckout } = useAssistant();
+  const { messages, isTyping, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, addToPantry } = useAssistant();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const endRef = useRef<HTMLDivElement>(null);
@@ -49,20 +49,11 @@ const ChatPane: React.FC = () => {
 
   const handleAddToCart = (items: IngredientListItem[]) => startCheckout(items);
   const handleAddToPantry = (items: IngredientListItem[]) => {
-    toast({ title: t("assistant.chat.addedToPantry"), description: `${items.length} ${t("assistant.chat.ingredients")}` });
+    addToPantry(items);
   };
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-background">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <div className="h-8 w-8 rounded-full bg-primary/15 text-primary flex items-center justify-center">
-          <Bot className="h-4 w-4" />
-        </div>
-        <div className="min-w-0">
-          <div className="text-sm font-semibold">prefud AI</div>
-          <div className="text-[11px] text-muted-foreground">{t("assistant.chat.subtitle")}</div>
-        </div>
-      </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {messages.map((m) => (
