@@ -26,6 +26,7 @@ import Highlights from "./Highlights";
 import Environment from "./Environment";
 import AIMealCreator from "./AIMealCreator";
 import AIDrinkCreator from "./AIDrinkCreator";
+import Assistant from "@/pages/Assistant";
 
 import LanguageSelector from "./LanguageSelector";
 
@@ -358,6 +359,12 @@ const DashboardContent = () => {
                 <TabsContent value="calories" className="mt-0">
                   <div className="space-y-6">
                     <CalorieTracker />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="assistant" className="mt-0">
+                  <div className="space-y-6">
+                    <Assistant isEmbedded={true} />
                   </div>
                 </TabsContent>
 

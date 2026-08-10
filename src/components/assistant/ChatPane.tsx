@@ -8,15 +8,16 @@ import PayloadRenderer from "./PayloadRenderer";
 import AssistantCheckout from "./checkout/AssistantCheckout";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import RecipeDetail from "./widgets/RecipeDetail";
-import type { MealBase, IngredientListItem } from "@/types/assistant";
+import type { MealBase, IngredientListItem, AssistantPayload } from "@/types/assistant";
 import { toast } from "@/hooks/use-toast";
-import { Bot } from "lucide-react";
+import { Bot, FileText } from "lucide-react";
 
 const ChatPane: React.FC = () => {
   const { messages, isTyping, sendUserMessage, pickQuestion, openInWorkspace, startCheckout } = useAssistant();
   const isMobile = useIsMobile();
   const endRef = useRef<HTMLDivElement>(null);
   const [sheetMeal, setSheetMeal] = useState<MealBase | null>(null);
+  const [mobilePayload, setMobilePayload] = useState<AssistantPayload | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -71,12 +72,32 @@ const ChatPane: React.FC = () => {
             )}
             {m.payload && (
               <div className="pl-9 pr-2">
-                <PayloadRenderer
-                  payload={m.payload}
-                  onOpenMeal={handleOpenMeal}
-                  onAddToCart={handleAddToCart}
-                  onAddToPantry={handleAddToPantry}
-                />
+                <div 
+                  onClick={() => {
+                    if (isMobile) {
+                      setMobilePayload(m.payload!);
+                    } else {
+                      openInWorkspace(m.payload!);
+                    }
+                  }}
+                  className="bg-card border border-border rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:bg-muted/50 transition-colors shadow-sm"
+                >
+                  <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium">
+                      {m.payload.type === 'mealPlan' ? 'Plan de Comidas' : 
+                       m.payload.type === 'specialMeal' ? 'Receta Especial' : 
+                       m.payload.type === 'healthyDrink' ? 'Bebida Saludable' : 
+                       m.payload.type === 'generatedMeals' ? 'Opciones Generadas' :
+                       m.payload.type === 'cart' ? 'Carrito' :
+                       m.payload.type === 'pantry' ? 'Despensa' :
+                       'Resultado'}
+                    </h4>
+                    <p className="text-xs text-muted-foreground">Haz clic para ver detalles</p>
+                  </div>
+                </div>
               </div>
             )}
             {m.role === "ai" && m.questions && m.questions.length > 0 && (
@@ -104,6 +125,19 @@ const ChatPane: React.FC = () => {
       <Sheet open={!!sheetMeal} onOpenChange={(o) => !o && setSheetMeal(null)}>
         <SheetContent side="bottom" className="h-[90dvh] overflow-y-auto">
           {sheetMeal && <RecipeDetail meal={sheetMeal} />}
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={!!mobilePayload} onOpenChange={(o) => !o && setMobilePayload(null)}>
+        <SheetContent side="bottom" className="h-[100dvh] w-full overflow-y-auto rounded-none pt-12">
+          {mobilePayload && (
+            <PayloadRenderer
+              payload={mobilePayload}
+              onOpenMeal={handleOpenMeal}
+              onAddToCart={handleAddToCart}
+              onAddToPantry={handleAddToPantry}
+            />
+          )}
         </SheetContent>
       </Sheet>
     </div>

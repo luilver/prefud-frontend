@@ -5,6 +5,7 @@ import { computeCartTotal } from "../widgets/CartSummaryWidget";
 import ActionChips from "../ActionChips";
 import CartSummaryWidget from "../widgets/CartSummaryWidget";
 import { toast } from "@/hooks/use-toast";
+import { X } from "lucide-react";
 
 const AssistantCheckout: React.FC = () => {
   const { checkoutStep, checkoutCart, advanceCheckout, resetCheckout } = useAssistant();
@@ -14,6 +15,12 @@ const AssistantCheckout: React.FC = () => {
 
   return (
     <div className="border-t border-border bg-muted/40 p-3 space-y-3">
+      <div className="flex items-center justify-between pb-1 border-b border-border/50">
+        <span className="text-sm font-medium text-foreground">Tu Carrito</span>
+        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={resetCheckout}>
+          <X className="h-4 w-4 text-muted-foreground" />
+        </Button>
+      </div>
       <CartSummaryWidget items={checkoutCart} />
 
       {checkoutStep === "summary" && (
