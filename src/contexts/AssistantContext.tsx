@@ -77,7 +77,19 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     socketInstance.on("generationCompleted", (data) => {
       console.log("Background job completed successfully!", data);
       setIsTyping(false);
-      
+      if (data.result?.success === false && data.result?.message === "No meal plans available according to your subscription") {
+        setMessages((m) => [
+          ...m,
+          {
+            id: uid(),
+            role: "ai",
+            text: t("assistant.errors.noSubscription"),
+            payload: { type: "subscription_error" }
+          },
+        ]);
+        return;
+      }
+
       const responseText = data.result?.message?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
       const questions = data.result?.message?.questions || data.result?.questions;
       let payload = data.result?.message?.payload || data.result?.payload;

@@ -12,11 +12,14 @@ import RecipeDetail from "./widgets/RecipeDetail";
 import type { MealBase, IngredientListItem, AssistantPayload } from "@/types/assistant";
 import { toast } from "@/hooks/use-toast";
 import { Bot, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const ChatPane: React.FC = () => {
   const { messages, isTyping, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, addToPantry } = useAssistant();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const endRef = useRef<HTMLDivElement>(null);
   const [sheetMeal, setSheetMeal] = useState<MealBase | null>(null);
   const [mobilePayload, setMobilePayload] = useState<AssistantPayload | null>(null);
@@ -65,8 +68,16 @@ const ChatPane: React.FC = () => {
             )}
             {m.payload && (
               <div className="pl-9 pr-2">
-                <div 
-                  onClick={() => {
+                {m.payload.type === 'subscription_error' ? (
+                  <Button 
+                    className="w-full mt-2" 
+                    onClick={() => navigate('/pricing')}
+                  >
+                    {t("assistant.errors.upgradeSubscription")}
+                  </Button>
+                ) : (
+                  <div 
+                    onClick={() => {
                     if (isMobile) {
                       setMobilePayload(m.payload!);
                     } else {
@@ -91,6 +102,7 @@ const ChatPane: React.FC = () => {
                     <p className="text-xs text-muted-foreground">{t("assistant.chat.clickDetails")}</p>
                   </div>
                 </div>
+                )}
               </div>
             )}
             {m.role === "ai" && m.questions && m.questions.length > 0 && (
