@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +39,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import PaymentForm from "./PaymentForm";
 import axios from "axios";
-import { getAllSubscriptionTypes } from "@/services/payments";
+import { getAllSubscriptionTypes, subscribeUser } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
 import { trackEvent } from "@/services/analytics";
 import { authService } from "@/services/authService";
@@ -47,7 +47,15 @@ import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
 import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
-import { isNativePlatform } from "@/services/revenueCatService";
+import { 
+  isNativePlatform, 
+  initRevenueCat, 
+  getNativeOfferings, 
+  purchaseNativePackage, 
+  getActiveEntitlement 
+} from "@/services/revenueCatService";
+import { RC_PRODUCT_TO_PLAN_NAME } from "@/utils/rcProductMap";
+import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
@@ -101,6 +109,8 @@ const SignupSteps = () => {
   const [customerId, setCustomerId] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
   const [subscriptionTypes, setSubscriptionTypes] = useState<Plan[]>([]);
+  const [nativePackages, setNativePackages] = useState<PurchasesPackage[]>([]);
+  const rcInitedRef = useRef(false);
 
   useEffect(() => {
     const fetchSubscriptionTypes = async () => {
@@ -115,6 +125,53 @@ const SignupSteps = () => {
 
     fetchSubscriptionTypes();
   }, []);
+
+  const getFilteredPlans = () => {
+    if (isNativePlatform() && nativePackages.length > 0) {
+      return subscriptionTypes.filter((plan) => {
+        if (plan.price === 0) return true;
+        return nativePackages.some((pkg) => {
+          const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
+          return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+        });
+      });
+    }
+    return subscriptionTypes;
+  };
+
+  const findNativePackageForPlan = (plan: Plan): PurchasesPackage | null => {
+    if (!isNativePlatform() || nativePackages.length === 0) return null;
+    return (
+      nativePackages.find((pkg) => {
+        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
+        return (
+          mappedName && mappedName.toLowerCase() === plan.name.toLowerCase()
+        );
+      }) ?? null
+    );
+  };
+
+  const getDisplayPrice = (plan: Plan): string => {
+    if (plan.price === 0) return t("signup.plan.free") || "Free";
+
+    const nativePackage = findNativePackageForPlan(plan);
+    if (nativePackage?.product?.priceString) {
+      return nativePackage.product.priceString;
+    }
+
+    return `$${(plan.price / 100).toFixed(2)}`;
+  };
+
+  useEffect(() => {
+    if (!isNativePlatform()) return;
+    
+    (async () => {
+      // Re-initialize if user ID changes to ensure purchase is linked correctly
+      await initRevenueCat(signupData.userId);
+      const pkgs = await getNativeOfferings();
+      setNativePackages(pkgs);
+    })();
+  }, [signupData.userId]);
 
   const handleBasicInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -271,7 +328,75 @@ const SignupSteps = () => {
       // Handle Free subscription - register directly without payment
       await handleFreeSubscription(planId);
     } else {
-      setCurrentStep(4);
+      if (isNativePlatform()) {
+        await handleNativePurchase(selectedPlan!);
+      } else {
+        setCurrentStep(4);
+      }
+    }
+  };
+
+  const handleNativePurchase = async (plan: Plan) => {
+    setIsLoading(true);
+    try {
+      const pkg = nativePackages.find((pkg) => {
+        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
+        return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+      });
+
+      if (!pkg) {
+        toast({
+          title: "Plan unavailable",
+          description: "This plan is not configured for in-app purchase yet. Try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { customerInfo, productIdentifier, transactionIdentifier } = await purchaseNativePackage(pkg);
+      const activeEntitlement = getActiveEntitlement(customerInfo);
+      
+      if (!activeEntitlement) {
+        toast({
+          title: "Purchase incomplete",
+          description: "No active entitlement found after purchase.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!signupData.userId) {
+        throw new Error("Missing user ID");
+      }
+
+      // Record subscription on our backend
+      await subscribeUser(signupData.userId, plan.id, transactionIdentifier);
+      
+      toast({
+        title: "✅ Subscription Activated!",
+        description: "Your subscription has been activated successfully.",
+        duration: 5000,
+      });
+      
+      trackEvent("subscription_purchase_native_onboarding", {
+        plan: plan.name,
+        productId: productIdentifier,
+      });
+
+      completeSignup();
+    } catch (err: any) {
+      if (err?.userCancelled || err?.code === "1") {
+        // User cancelled
+        return;
+      }
+      console.error("Native purchase failed", err);
+      toast({
+        title: "Purchase failed",
+        description: err?.message || "Could not complete the purchase.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -695,7 +820,7 @@ const SignupSteps = () => {
               : "grid-cols-1 lg:grid-cols-3 gap-6"
               } px-1 sm:px-0`}
           >
-            {subscriptionTypes.map((plan, index) => (
+            {getFilteredPlans().map((plan, index) => (
               <div key={plan.id} className="relative group">
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${plan.gradient} opacity-0 group-hover:opacity-10 rounded-2xl blur-xl transition-all duration-500`}
@@ -735,17 +860,11 @@ const SignupSteps = () => {
                     </CardTitle>
 
                     <div className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-                      {plan.price === 0 ? (
-                        <span className="bg-gradient-to-r from-muted-foreground to-foreground bg-clip-text text-transparent">
-                          {t("signup.plan.free") || "Free"}
-                        </span>
-                      ) : (
-                        <span
-                          className={`bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent`}
-                        >
-                          ${plan.price / 100}
-                        </span>
-                      )}
+                      <span
+                        className={`bg-gradient-to-r ${plan.price === 0 ? "from-muted-foreground to-foreground" : plan.gradient} bg-clip-text text-transparent`}
+                      >
+                        {getDisplayPrice(plan)}
+                      </span>
                       {plan.price > 0 && (
                         <span className="text-sm font-normal text-muted-foreground">
                           /{plan.interval}
