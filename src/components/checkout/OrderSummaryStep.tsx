@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, CreditCard, AlertCircle, ShoppingCart, Package } from "lucide-react";
+import { ArrowLeft, CreditCard, AlertCircle, ShoppingCart, Package, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CheckoutData } from "@/components/CheckoutFlow";
 import { CartItem, useCart } from "@/contexts/CartContext";
 import { OrderQuote } from "@/services/addressService";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface OrderSummaryStepProps {
   items: CartItem[];
@@ -29,6 +31,11 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
 }) => {
   const { t } = useLanguage();
   const { getDisplayQuantity } = useCart();
+  const { user: authUser } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
 
   const formatCents = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
@@ -39,8 +46,80 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
     ? Math.max(0, quoteData.totalAmountCents - quoteData.productCostCents) / 100
     : data.deliveryFee;
 
-  const handleProcessPayment = () => {
-    onNext();
+  const handleProcessPayment = async () => {
+    if (!data.selectedAddress) {
+      setError("Please select a shipping address first");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      setError(null);
+
+      const itemsPayload = quoteData
+        ? quoteData.items.map((item) => ({
+            url: item.matchedProduct.product_id.startsWith('http')
+              ? item.matchedProduct.product_id
+              : `https://www.walmart.com/ip/${item.matchedProduct.product_id}`,
+            quantity: Math.ceil(item.quantity)
+          }))
+        : items.map((item) => ({
+            url: `https://www.walmart.com/ip/${item.id}`,
+            quantity: Math.ceil(item.amount || 1)
+          }));
+
+      const payload = {
+        userId: authUser?.userId || "64b9f1e2c3d4a5b6e7f8a9b1",
+        max_price: Math.ceil(totalAmount),
+        items: itemsPayload,
+        shipping_address: {
+          first_name: authUser?.profile?.name || "Kevin",
+          last_name: authUser?.profile?.lastName || "Morales",
+          address_line1: data.selectedAddress.line1,
+          address_line2: data.selectedAddress.line2 || "apartment d423",
+          city: data.selectedAddress.city,
+          state: data.selectedAddress.state,
+          postal_code: data.selectedAddress.zipcode,
+          phone_number: authUser?.profile?.phone || "+13852250301",
+          country: data.selectedAddress.country_code || "US"
+        },
+        metadata: {
+          quote_id: quoteData?.quoteId || "0fe6cfc7-274c-4b38-887a-116ea811769c",
+          retailer: quoteData?.retailer || data.store || "walmart",
+          shipping_method: "cheapest",
+          fulfillment_type: data.deliveryMethod || "delivery"
+        }
+      };
+
+      const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+      const response = await fetch(`${BASE_URL}/api/v1/orders/checkout-simple`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "*/*"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        
+        if (Array.isArray(errData.message)) {
+          setErrorMessages(errData.message);
+          setShowErrorModal(true);
+          return;
+        }
+        
+        throw new Error(errData.message || "Failed to process payment");
+      }
+
+      onNext();
+    } catch (err: any) {
+      console.error("Payment error:", err);
+      setError(err.message || "An error occurred while processing payment");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -56,11 +135,11 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
         </div>
       </div>
 
-      {/* Quote error banner */}
-      {quoteError && (
+      {/* Quote or payment error banner */}
+      {(quoteError || error) && (
         <div className="flex items-start gap-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
           <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-destructive">{quoteError}</p>
+          <p className="text-sm text-destructive">{quoteError || error}</p>
         </div>
       )}
 
@@ -217,10 +296,41 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
       </Card>
 
       {/* Place Order */}
-      <Button className="w-full h-12" onClick={handleProcessPayment}>
-        <CreditCard className="h-4 w-4 mr-2" />
+      <Button className="w-full h-12" onClick={handleProcessPayment} disabled={isProcessing}>
+        {isProcessing ? (
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        ) : (
+          <CreditCard className="h-4 w-4 mr-2" />
+        )}
         {t('checkout.summary.processPayment')} {formatPrice(totalAmount)}
       </Button>
+
+      {/* Error Modal */}
+      <Dialog open={showErrorModal} onOpenChange={setShowErrorModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              Validation Error
+            </DialogTitle>
+            <DialogDescription>
+              Please correct the following issues before continuing:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            {errorMessages.map((msg, index) => (
+              <div key={index} className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
+                {msg}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowErrorModal(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
