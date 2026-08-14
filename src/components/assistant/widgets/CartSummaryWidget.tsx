@@ -1,5 +1,6 @@
 import React from "react";
 import type { IngredientListItem } from "@/types/assistant";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   items: IngredientListItem[];
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const CartSummaryWidget: React.FC<Props> = ({ items, pricePerItem = 1.75 }) => {
+  const { t } = useLanguage();
   const subtotal = items.length * pricePerItem;
   const delivery = 4.99;
   const service = subtotal * 0.05;
@@ -14,8 +16,8 @@ const CartSummaryWidget: React.FC<Props> = ({ items, pricePerItem = 1.75 }) => {
   return (
     <div className="rounded-xl border border-border bg-card">
       <div className="p-3 border-b border-border">
-        <div className="text-sm font-semibold">Resumen del carrito</div>
-        <div className="text-xs text-muted-foreground">{items.length} articulos</div>
+        <div className="text-sm font-semibold">{t("assistant.widgets.cartSummary")}</div>
+        <div className="text-xs text-muted-foreground">{items.length} {t("assistant.chat.ingredients")}</div>
       </div>
       <ul className="max-h-40 overflow-auto text-sm">
         {items.map((it, i) => (
@@ -27,7 +29,7 @@ const CartSummaryWidget: React.FC<Props> = ({ items, pricePerItem = 1.75 }) => {
       </ul>
       <div className="p-3 text-xs space-y-1">
         <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-        <div className="flex justify-between"><span>Envio</span><span>${delivery.toFixed(2)}</span></div>
+        <div className="flex justify-between"><span>{t("assistant.widgets.shipping")}</span><span>${delivery.toFixed(2)}</span></div>
         <div className="flex justify-between"><span>Servicio</span><span>${service.toFixed(2)}</span></div>
         <div className="flex justify-between font-semibold text-sm text-foreground pt-1 border-t border-border">
           <span>Total</span><span>${total.toFixed(2)}</span>

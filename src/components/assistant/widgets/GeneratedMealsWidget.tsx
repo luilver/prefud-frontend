@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { GeneratedMealsPayload, MealBase } from "@/types/assistant";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, Flame, Leaf } from "lucide-react";
@@ -11,12 +12,13 @@ interface Props {
 }
 
 const GeneratedMealsWidget: React.FC<Props> = ({ data, onOpenMeal }) => {
+  const { t } = useLanguage();
   const meals = data.generatedMeals.generatedMeals;
   const [expanded, setExpanded] = useState<number | null>(null);
   return (
     <div className="space-y-2">
       <div className="text-[11px] text-muted-foreground">
-        Ideas con tu despensa · CO2 total {data.totalCarbonFootprint}
+        {t("assistant.widgets.ideasPantry")} {data.totalCarbonFootprint}
       </div>
       {meals.map((m, i) => (
         <Card key={i} className="p-3">
@@ -32,9 +34,9 @@ const GeneratedMealsWidget: React.FC<Props> = ({ data, onOpenMeal }) => {
             </div>
             <div className="flex gap-1">
               <Button size="sm" variant="ghost" onClick={() => setExpanded(expanded === i ? null : i)}>
-                {expanded === i ? "Ocultar" : "Detalles"}
+                {expanded === i ? t("assistant.widgets.hide") : t("assistant.widgets.details")}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => onOpenMeal(m)}>Abrir</Button>
+              <Button size="sm" variant="outline" onClick={() => onOpenMeal(m)}>{t("assistant.widgets.open")}</Button>
             </div>
           </div>
           {expanded === i && (

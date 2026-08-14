@@ -1,12 +1,14 @@
 import React from "react";
 import { useAssistant } from "@/contexts/AssistantContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import PayloadRenderer from "./PayloadRenderer";
 import { Sparkles } from "lucide-react";
 import type { IngredientListItem, MealBase } from "@/types/assistant";
 import { toast } from "@/hooks/use-toast";
 
 const WorkspacePane: React.FC = () => {
-  const { workspacePayload, openInWorkspace, startCheckout } = useAssistant();
+  const { workspacePayload, openInWorkspace, startCheckout, addToPantry } = useAssistant();
+  const { t } = useLanguage();
 
   if (!workspacePayload) {
     return (
@@ -15,9 +17,9 @@ const WorkspacePane: React.FC = () => {
           <div className="mx-auto h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
             <Sparkles className="h-7 w-7" />
           </div>
-          <h2 className="text-lg font-semibold">Espacio de trabajo</h2>
+          <h2 className="text-lg font-semibold">{t("assistant.workspace.title")}</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Selecciona un elemento del chat para verlo aqui: planes de comida, recetas, bebidas o despensa.
+            {t("assistant.workspace.selectItem")}
           </p>
         </div>
       </div>
@@ -30,7 +32,7 @@ const WorkspacePane: React.FC = () => {
         onClick={() => openInWorkspace(null)}
         className="text-xs text-muted-foreground hover:text-foreground mb-3"
       >
-        Cerrar
+        {t("assistant.workspace.close")}
       </button>
       <PayloadRenderer
         payload={workspacePayload}
@@ -45,9 +47,7 @@ const WorkspacePane: React.FC = () => {
           })
         }
         onAddToCart={(items) => startCheckout(items)}
-        onAddToPantry={(items) =>
-          toast({ title: "Anadido a despensa", description: `${items.length} ingredientes` })
-        }
+        onAddToPantry={(items) => addToPantry(items)}
       />
     </div>
   );

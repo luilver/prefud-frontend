@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   onSend: (text: string) => void;
@@ -10,6 +11,7 @@ interface Props {
 const ChatComposer: React.FC<Props> = ({ onSend, disabled }) => {
   const [value, setValue] = useState("");
   const ref = useRef<HTMLTextAreaElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => { ref.current?.focus(); }, []);
 
@@ -33,7 +35,7 @@ const ChatComposer: React.FC<Props> = ({ onSend, disabled }) => {
           if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); }
         }}
         rows={1}
-        placeholder="Escribe un mensaje..."
+        placeholder={t("assistant.composer.placeholder")}
         disabled={disabled}
         className="flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-base leading-6 outline-none focus:ring-2 focus:ring-ring max-h-32"
       />

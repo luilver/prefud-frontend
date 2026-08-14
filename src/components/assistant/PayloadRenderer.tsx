@@ -18,26 +18,26 @@ const PayloadRenderer: React.FC<Props> = ({ payload, onOpenMeal, onAddToCart, on
     case "mealPlan":
       return (
         <MealPlanWidget
-          data={payload.data}
-          onOpenMeal={onOpenMeal}
-          onAddToCart={() => onAddToCart(payload.data.ingredientsList)}
-          onAddToPantry={() => onAddToPantry(payload.data.ingredientsList)}
+          data={payload.data as any}
+          onOpenMeal={onOpenMeal!}
+          onAddToCart={(items) => onAddToCart(items ?? (payload.data as any).ingredientsList)}
+          onAddToPantry={(items) => onAddToPantry(items ?? (payload.data as any).ingredientsList)}
         />
       );
     case "specialMeal":
       return (
         <SpecialMealWidget
-          payload={payload.data}
-          onAddToCart={() => onAddToCart(payload.data.ingredientsList)}
-          onAddToPantry={() => onAddToPantry(payload.data.ingredientsList)}
+          payload={payload.data as any}
+          onAddToCart={(items) => onAddToCart(items ?? (payload.data as any).ingredientsList)}
+          onAddToPantry={(items) => onAddToPantry(items ?? (payload.data as any).ingredientsList)}
         />
       );
     case "healthyDrink":
       return (
         <SpecialMealWidget
-          payload={payload.data}
-          onAddToCart={() => onAddToCart(payload.data.ingredientsList)}
-          onAddToPantry={() => onAddToPantry(payload.data.ingredientsList)}
+          payload={payload.data as any}
+          onAddToCart={(items) => onAddToCart(items ?? (payload.data as any).ingredientsList)}
+          onAddToPantry={(items) => onAddToPantry(items ?? (payload.data as any).ingredientsList)}
           isDrink
         />
       );

@@ -11,12 +11,12 @@ interface Props {
 const ActionChips: React.FC<Props> = ({ chips, onPick, className }) => {
   if (!chips?.length) return null;
   return (
-    <div className={cn("flex gap-2 overflow-x-auto scrollbar-hide snap-x pb-1", className)}>
+    <div className={cn("flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible scrollbar-hide snap-x pb-1", className)}>
       {chips.map((c, i) => (
         <button
           key={i}
           onClick={() => onPick(c.ask)}
-          className="snap-start whitespace-nowrap rounded-full border border-border bg-background px-3 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="snap-start whitespace-nowrap md:whitespace-normal md:w-full text-left rounded-full md:rounded-xl border border-border bg-background px-3 py-1.5 md:py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           {c.ask}
         </button>
