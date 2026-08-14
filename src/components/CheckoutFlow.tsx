@@ -24,6 +24,7 @@ export interface CheckoutData {
   deliveryFee: number;
   serviceFee: number;
   total: number;
+  orderId?: string; // Add orderId for websocket connection
 }
 
 interface CheckoutFlowProps {
