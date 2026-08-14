@@ -91,9 +91,14 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
           {/* Central AI Assistant FAB */}
           <button
             type="button"
-            onClick={() => navigate("/assistant")}
+            onClick={() => onTabChange("assistant")}
             aria-label="prefud AI Assistant"
-            className="mx-1 -mt-6 h-14 w-14 rounded-full bg-white text-primary shadow-xl ring-2 ring-white/60 flex items-center justify-center hover:scale-105 transition-transform"
+            className={cn(
+              "mx-1 -mt-6 h-14 w-14 rounded-full shadow-xl ring-2 flex items-center justify-center hover:scale-105 transition-transform",
+              activeTab === "assistant"
+                ? "bg-primary text-primary-foreground ring-primary/60"
+                : "bg-white text-primary ring-white/60"
+            )}
           >
             <Bot className="h-7 w-7" />
           </button>
@@ -162,11 +167,15 @@ const Navigation = ({ activeTab, onTabChange }: NavigationProps) => {
       <div className="flex-1 p-2 space-y-1">
         <Button
           variant="ghost"
-          onClick={() => navigate("/assistant")}
+          onClick={() => onTabChange("assistant")}
           aria-label="prefud AI Assistant"
+          aria-current={activeTab === "assistant" ? "page" : undefined}
           className={cn(
-            "transition-all duration-300 rounded-xl bg-white/15 text-white hover:bg-white/25",
-            isCollapsed ? "w-full h-12 px-0 justify-center" : "w-full justify-start h-12 px-4"
+            "transition-all duration-300 rounded-xl",
+            isCollapsed ? "w-full h-12 px-0 justify-center" : "w-full justify-start h-12 px-4",
+            activeTab === "assistant"
+              ? "bg-white/20 text-white shadow-lg"
+              : "text-white/75 hover:bg-white/10 hover:text-white"
           )}
           title={isCollapsed ? "AI Assistant" : undefined}
         >

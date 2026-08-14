@@ -3,9 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, MapPin, Home, Plus } from "lucide-react";
+import { ArrowLeft, MapPin, Home, Plus, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CheckoutData } from "@/components/CheckoutFlow";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  getUserAddresses,
+  createUserAddress,
+  UserAddress,
+  CreateAddressPayload,
+} from "@/services/addressService";
 
 interface AddressStepProps {
   data: CheckoutData;
@@ -14,78 +21,137 @@ interface AddressStepProps {
   onBack: () => void;
 }
 
+const EMPTY_FORM: CreateAddressPayload = {
+  country_code: 'US',
+  zipcode: '',
+  state: '',
+  city: '',
+  line1: '',
+  line2: '',
+  nickname: '',
+};
+
+function formatAddressLabel(address: UserAddress): string {
+  const parts = [address.line1];
+  if (address.line2) parts.push(address.line2);
+  parts.push(`${address.city}, ${address.state} ${address.zipcode}`);
+  return parts.join(', ');
+}
+
 export const AddressStep: React.FC<AddressStepProps> = ({
   data,
   onUpdate,
   onNext,
-  onBack
+  onBack,
 }) => {
   const { t } = useLanguage();
-  const [selectedAddress, setSelectedAddress] = useState<string>('');
-  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
-  const [newAddress, setNewAddress] = useState({
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: ''
-  });
+  const { user: authUser } = useAuth();
 
-  // Mock user addresses
-  const savedAddresses = [
-    {
-      id: '1',
-      label: 'Home',
-      address: '123 Main St, New York, NY 10001',
-      isDefault: true
-    },
-    {
-      id: '2',
-      label: 'Work',
-      address: '456 Business Ave, New York, NY 10002',
-      isDefault: false
-    }
-  ];
+  const userId = authUser?.userId || '';
+
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  const [newAddress, setNewAddress] = useState<CreateAddressPayload>(EMPTY_FORM);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Set default address if available
-    const defaultAddress = savedAddresses.find(addr => addr.isDefault);
-    if (defaultAddress && !selectedAddress) {
-      setSelectedAddress(defaultAddress.address);
-      onUpdate({ address: defaultAddress.address });
+    if (userId) {
+      fetchAddresses();
     }
-  }, []);
+  }, [userId]);
 
-  const handleAddressSelect = (address: string) => {
-    setSelectedAddress(address);
-    onUpdate({ address });
+  const fetchAddresses = async () => {
+    setIsLoadingAddresses(true);
+    try {
+      const result = await getUserAddresses(userId);
+      setAddresses(result);
+
+      // Auto-select first address if none chosen
+      if (result.length > 0 && !selectedAddressId) {
+        setSelectedAddressId(result[0]._id);
+        onUpdate({
+          address: formatAddressLabel(result[0]),
+          selectedAddress: result[0],
+        });
+      }
+
+      // If no addresses, show the form
+      if (result.length === 0) {
+        setShowNewAddressForm(true);
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+    } finally {
+      setIsLoadingAddresses(false);
+    }
+  };
+
+  const handleAddressSelect = (address: UserAddress) => {
+    setSelectedAddressId(address._id);
+    onUpdate({
+      address: formatAddressLabel(address),
+      selectedAddress: address,
+    });
     setShowNewAddressForm(false);
   };
 
-  const handleNewAddressSubmit = () => {
-    const fullAddress = `${newAddress.street}, ${newAddress.city}, ${newAddress.state} ${newAddress.zipCode}`;
-    setSelectedAddress(fullAddress);
-    onUpdate({ address: fullAddress });
-    setShowNewAddressForm(false);
+  const handleNewAddressSubmit = async () => {
+    if (!newAddress.line1 || !newAddress.city || !newAddress.state || !newAddress.zipcode) {
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      const created = await createUserAddress(userId, {
+        country_code: newAddress.country_code || 'US',
+        zipcode: newAddress.zipcode,
+        state: newAddress.state,
+        city: newAddress.city,
+        line1: newAddress.line1,
+        ...(newAddress.line2 ? { line2: newAddress.line2 } : {}),
+        ...(newAddress.nickname ? { nickname: newAddress.nickname } : {}),
+      });
+
+      // Refresh list and select the new address
+      await fetchAddresses();
+      setSelectedAddressId(created._id);
+      onUpdate({
+        address: formatAddressLabel(created),
+        selectedAddress: created,
+      });
+      setShowNewAddressForm(false);
+      setNewAddress(EMPTY_FORM);
+    } catch (error: any) {
+      console.error('Error saving address:', error);
+      setSaveError(
+        error?.response?.data?.message || 'Failed to save address. Please try again.'
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleContinue = () => {
-    if (data.address || selectedAddress) {
+    if (data.address || selectedAddressId) {
       onNext();
     }
   };
 
-  // Show store selection for pickup instead of address
+  // ── Pickup mode: show store locations (unchanged logic) ──
   if (data.deliveryMethod === 'pickup') {
     const storeLocations = {
       walmart: [
         { id: '1', name: 'Walmart Supercenter', address: '123 Store St, New York, NY', distance: '2.1 miles' },
-        { id: '2', name: 'Walmart Neighborhood Market', address: '456 Market Ave, Brooklyn, NY', distance: '3.5 miles' }
+        { id: '2', name: 'Walmart Neighborhood Market', address: '456 Market Ave, Brooklyn, NY', distance: '3.5 miles' },
       ],
       target: [
         { id: '1', name: 'Target Store', address: '789 Target Blvd, Manhattan, NY', distance: '1.8 miles' },
-        { id: '2', name: 'Target Express', address: '321 Express Way, Queens, NY', distance: '4.2 miles' }
-      ]
+        { id: '2', name: 'Target Express', address: '321 Express Way, Queens, NY', distance: '4.2 miles' },
+      ],
     };
 
     const locations = data.store ? storeLocations[data.store] : [];
@@ -93,48 +159,36 @@ export const AddressStep: React.FC<AddressStepProps> = ({
     return (
       <div className="p-6 space-y-6">
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBack}
-            className="h-8 w-8 p-0"
-          >
+          <Button variant="ghost" size="sm" onClick={onBack} className="h-8 w-8 p-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h2 className="text-xl font-semibold">
-              {t('checkout.address.pickup.title')}
-            </h2>
-            <p className="text-muted-foreground text-sm">
-              {t('checkout.address.pickup.subtitle')}
-            </p>
+            <h2 className="text-xl font-semibold">{t('checkout.address.pickup.title')}</h2>
+            <p className="text-muted-foreground text-sm">{t('checkout.address.pickup.subtitle')}</p>
           </div>
         </div>
 
         <div className="space-y-3">
           {locations.map((location) => (
-            <Card 
+            <Card
               key={location.id}
               className={`cursor-pointer transition-colors ${
-                selectedAddress === location.address 
-                  ? 'ring-2 ring-primary bg-primary/5' 
+                selectedAddressId === location.id
+                  ? 'ring-2 ring-primary bg-primary/5'
                   : 'hover:bg-muted/50'
               }`}
-              onClick={() => handleAddressSelect(location.address)}
+              onClick={() => {
+                setSelectedAddressId(location.id);
+                onUpdate({ address: location.address });
+              }}
             >
               <CardContent className="p-4">
                 <div className="flex items-start space-x-3">
                   <MapPin className="h-5 w-5 text-primary mt-0.5" />
                   <div className="flex-1">
-                    <h3 className="font-medium">
-                      {location.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {location.address}
-                    </p>
-                    <p className="text-sm text-primary mt-1">
-                      {location.distance}
-                    </p>
+                    <h3 className="font-medium">{location.name}</h3>
+                    <p className="text-sm text-muted-foreground">{location.address}</p>
+                    <p className="text-sm text-primary mt-1">{location.distance}</p>
                   </div>
                 </div>
               </CardContent>
@@ -142,10 +196,10 @@ export const AddressStep: React.FC<AddressStepProps> = ({
           ))}
         </div>
 
-        <Button 
-          className="w-full h-12" 
+        <Button
+          className="w-full h-12"
           onClick={handleContinue}
-          disabled={!selectedAddress}
+          disabled={!selectedAddressId && !data.address}
         >
           {t('common.continue')}
         </Button>
@@ -153,39 +207,37 @@ export const AddressStep: React.FC<AddressStepProps> = ({
     );
   }
 
+  // ── Delivery mode ──
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          className="h-8 w-8 p-0"
-        >
+        <Button variant="ghost" size="sm" onClick={onBack} className="h-8 w-8 p-0">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h2 className="text-xl font-semibold">
-            {t('checkout.address.delivery.title')}
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            {t('checkout.address.delivery.subtitle')}
-          </p>
+          <h2 className="text-xl font-semibold">{t('checkout.address.delivery.title')}</h2>
+          <p className="text-muted-foreground text-sm">{t('checkout.address.delivery.subtitle')}</p>
         </div>
       </div>
 
-      {!showNewAddressForm ? (
+      {/* Loading state */}
+      {isLoadingAddresses ? (
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground text-sm">Loading addresses...</span>
+        </div>
+      ) : !showNewAddressForm ? (
         <>
           <div className="space-y-3">
-            {savedAddresses.map((address) => (
-              <Card 
-                key={address.id}
+            {addresses.map((address) => (
+              <Card
+                key={address._id}
                 className={`cursor-pointer transition-colors ${
-                  selectedAddress === address.address 
-                    ? 'ring-2 ring-primary bg-primary/5' 
+                  selectedAddressId === address._id
+                    ? 'ring-2 ring-primary bg-primary/5'
                     : 'hover:bg-muted/50'
                 }`}
-                onClick={() => handleAddressSelect(address.address)}
+                onClick={() => handleAddressSelect(address)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-3">
@@ -193,16 +245,16 @@ export const AddressStep: React.FC<AddressStepProps> = ({
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium">
-                          {address.label}
+                          {address.nickname || address.line1}
                         </h3>
-                        {address.isDefault && (
+                        {selectedAddressId === address._id && (
                           <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                             {t('checkout.address.default')}
                           </span>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {address.address}
+                        {formatAddressLabel(address)}
                       </p>
                     </div>
                   </div>
@@ -220,82 +272,139 @@ export const AddressStep: React.FC<AddressStepProps> = ({
             </Button>
           </div>
 
-          <Button 
-            className="w-full h-12" 
+          <Button
+            className="w-full h-12"
             onClick={handleContinue}
-            disabled={!selectedAddress}
+            disabled={!selectedAddressId && !data.address}
           >
             {t('common.continue')}
           </Button>
         </>
       ) : (
+        /* ── Add new address form ── */
         <div className="space-y-4">
-          <div className="space-y-4">
+          {/* Nickname */}
+          <div>
+            <Label htmlFor="nickname">
+              Nickname <span className="text-muted-foreground text-xs">(optional)</span>
+            </Label>
+            <Input
+              id="nickname"
+              value={newAddress.nickname}
+              onChange={(e) => setNewAddress({ ...newAddress, nickname: e.target.value })}
+              placeholder="Home, Work…"
+            />
+          </div>
+
+          {/* Line 1 */}
+          <div>
+            <Label htmlFor="line1">{t('checkout.address.form.street')}</Label>
+            <Input
+              id="line1"
+              value={newAddress.line1}
+              onChange={(e) => setNewAddress({ ...newAddress, line1: e.target.value })}
+              placeholder="123 Main Street"
+            />
+          </div>
+
+          {/* Line 2 */}
+          <div>
+            <Label htmlFor="line2">
+              Apt / Suite <span className="text-muted-foreground text-xs">(optional)</span>
+            </Label>
+            <Input
+              id="line2"
+              value={newAddress.line2}
+              onChange={(e) => setNewAddress({ ...newAddress, line2: e.target.value })}
+              placeholder="Apt 4B"
+            />
+          </div>
+
+          {/* City + State */}
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="street">{t('checkout.address.form.street')}</Label>
+              <Label htmlFor="city">{t('checkout.address.form.city')}</Label>
               <Input
-                id="street"
-                value={newAddress.street}
-                onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
-                placeholder="123 Main Street"
+                id="city"
+                value={newAddress.city}
+                onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                placeholder="Los Angeles"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="city">{t('checkout.address.form.city')}</Label>
-                <Input
-                  id="city"
-                  value={newAddress.city}
-                  onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                  placeholder="New York"
-                />
-              </div>
-              <div>
-                <Label htmlFor="state">{t('checkout.address.form.state')}</Label>
-                <Input
-                  id="state"
-                  value={newAddress.state}
-                  onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
-                  placeholder="NY"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="zipCode">{t('checkout.address.form.zipCode')}</Label>
-                <Input
-                  id="zipCode"
-                  value={newAddress.zipCode}
-                  onChange={(e) => setNewAddress({ ...newAddress, zipCode: e.target.value })}
-                  placeholder="10001"
-                />
-              </div>
-              <div>
-                <Label htmlFor="country">{t('checkout.address.form.country')}</Label>
-                <Input
-                  id="country"
-                  value={newAddress.country}
-                  onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })}
-                  placeholder="USA"
-                />
-              </div>
+            <div>
+              <Label htmlFor="state">{t('checkout.address.form.state')}</Label>
+              <Input
+                id="state"
+                value={newAddress.state}
+                onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                placeholder="California"
+              />
             </div>
           </div>
 
+          {/* Zip + Country */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="zipcode">{t('checkout.address.form.zipCode')}</Label>
+              <Input
+                id="zipcode"
+                value={newAddress.zipcode}
+                onChange={(e) => setNewAddress({ ...newAddress, zipcode: e.target.value })}
+                placeholder="12345"
+                maxLength={10}
+              />
+            </div>
+            <div>
+              <Label htmlFor="country_code">{t('checkout.address.form.country')}</Label>
+              <Input
+                id="country_code"
+                value={newAddress.country_code}
+                onChange={(e) => setNewAddress({ ...newAddress, country_code: e.target.value.toUpperCase() })}
+                placeholder="US"
+                maxLength={2}
+              />
+            </div>
+          </div>
+
+          {/* Error */}
+          {saveError && (
+            <p className="text-sm text-destructive">{saveError}</p>
+          )}
+
+          {/* Actions */}
           <div className="flex gap-3">
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => setShowNewAddressForm(false)}
+              onClick={() => {
+                setSaveError(null);
+                if (addresses.length > 0) {
+                  setShowNewAddressForm(false);
+                }
+              }}
+              disabled={isSaving}
             >
               {t('common.cancel')}
             </Button>
             <Button
               className="flex-1"
               onClick={handleNewAddressSubmit}
-              disabled={!newAddress.street || !newAddress.city || !newAddress.state || !newAddress.zipCode}
+              disabled={
+                isSaving ||
+                !newAddress.line1 ||
+                !newAddress.city ||
+                !newAddress.state ||
+                !newAddress.zipcode
+              }
             >
-              {t('checkout.address.form.save')}
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving…
+                </>
+              ) : (
+                t('checkout.address.form.save')
+              )}
             </Button>
           </div>
         </div>

@@ -8,9 +8,11 @@ import MacrosBar from "./MacrosBar";
 interface Props {
   meal: MealBase;
   extra?: React.ReactNode;
+  selectedIngredients?: boolean[];
+  onToggleIngredient?: (index: number) => void;
 }
 
-const RecipeDetail: React.FC<Props> = ({ meal, extra }) => {
+const RecipeDetail: React.FC<Props> = ({ meal, extra, selectedIngredients, onToggleIngredient }) => {
   return (
     <div className="space-y-4">
       <div>
@@ -40,7 +42,11 @@ const RecipeDetail: React.FC<Props> = ({ meal, extra }) => {
             <ul className="space-y-1.5">
               {(meal.ingredients ?? meal.ingredientsList ?? []).map((ing, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm">
-                  <Checkbox id={`ing-${i}`} />
+                  <Checkbox 
+                    id={`ing-${i}`} 
+                    checked={selectedIngredients ? selectedIngredients[i] : true}
+                    onCheckedChange={() => onToggleIngredient?.(i)}
+                  />
                   <label htmlFor={`ing-${i}`} className="flex-1 flex justify-between">
                     <span className="text-foreground">{ing.name}</span>
                     <span className="text-muted-foreground">{ing.quantity} {ing.unit}</span>

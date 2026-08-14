@@ -1,73 +1,201 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, CreditCard, Plus } from "lucide-react";
+import { ArrowLeft, CreditCard, Plus, Loader2, Lock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CheckoutData } from "@/components/CheckoutFlow";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  getUserPaymentMethods,
+  UserPaymentMethod,
+  createPaymentMethod,
+  attachPaymentMethod,
+  setDefaultPaymentMethod,
+} from "@/services/payments";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { Label } from "@/components/ui/label";
+
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLIC_KEY! ||
+    "pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0"
+);
 
 interface PaymentStepProps {
   data: CheckoutData;
   onUpdate: (data: Partial<CheckoutData>) => void;
   onNext: () => void;
   onBack: () => void;
+  /** True while the parent is fetching the order quote */
+  isQuoting?: boolean;
 }
+
+// Inner add-card form that uses Stripe hooks (must be inside <Elements>)
+interface AddCardFormProps {
+  customerId: string;
+  onSuccess: () => void;
+  onCancel: () => void;
+}
+
+const AddCardForm: React.FC<AddCardFormProps> = ({ customerId, onSuccess, onCancel }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) throw new Error("Card element not found");
+
+      // Create a Stripe token
+      const { token, error: tokenError } = await stripe.createToken(cardElement);
+      if (tokenError) {
+        setError(tokenError.message || "Failed to tokenize card");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Create payment method from token
+      const responsePaymentMethod = await createPaymentMethod(token.id);
+
+      // Attach payment method to customer
+      await attachPaymentMethod(responsePaymentMethod.id, customerId);
+
+      // Set as default
+      await setDefaultPaymentMethod(responsePaymentMethod.id, customerId);
+
+      onSuccess();
+    } catch (err: any) {
+      console.error("Error adding card:", err);
+      setError(err?.response?.data?.message || "Failed to add card. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label>Card Details</Label>
+        <div className="p-3 border rounded-md bg-white">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: "16px",
+                  color: "#1a1a1a",
+                  "::placeholder": { color: "#9ca3af" },
+                },
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {error && (
+        <p className="text-sm text-destructive">{error}</p>
+      )}
+
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Lock className="h-3 w-3" />
+        <span>Your payment is secured by Stripe</span>
+      </div>
+
+      <div className="flex gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          className="flex-1"
+          onClick={onCancel}
+          disabled={isProcessing}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          className="flex-1"
+          disabled={isProcessing || !stripe}
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Adding...
+            </>
+          ) : (
+            "Save Card"
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+};
 
 export const PaymentStep: React.FC<PaymentStepProps> = ({
   data,
   onUpdate,
   onNext,
-  onBack
+  onBack,
+  isQuoting = false,
 }) => {
   const { t } = useLanguage();
+  const { user: authUser } = useAuth();
+
+  const [paymentMethods, setPaymentMethods] = useState<UserPaymentMethod[]>([]);
+  const [isLoadingMethods, setIsLoadingMethods] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<string>('');
   const [showNewCardForm, setShowNewCardForm] = useState(false);
-  const [newCard, setNewCard] = useState({
-    number: '',
-    expiry: '',
-    cvv: '',
-    name: ''
-  });
 
-  // Mock saved payment methods
-  const savedPayments = [
-    {
-      id: '1',
-      type: 'card',
-      last4: '4242',
-      brand: 'Visa',
-      expiry: '12/25',
-      isDefault: true
-    },
-    {
-      id: '2',
-      type: 'card',
-      last4: '8888',
-      brand: 'Mastercard',
-      expiry: '06/24',
-      isDefault: false
+  const customerId = authUser?.profile?.ruku_client_id || '';
+
+  useEffect(() => {
+    if (customerId) {
+      fetchPaymentMethods();
     }
-  ];
+  }, [customerId]);
 
-  const handlePaymentSelect = (paymentMethod: any) => {
-    setSelectedPayment(paymentMethod.id);
-    onUpdate({ paymentMethod });
+  const fetchPaymentMethods = async () => {
+    setIsLoadingMethods(true);
+    try {
+      const methods = await getUserPaymentMethods(customerId);
+      setPaymentMethods(methods);
+
+      // Auto-select the default payment method or first one
+      const defaultMethod = methods.find((m) => m.isDefault);
+      if (defaultMethod) {
+        setSelectedPayment(defaultMethod.id);
+        onUpdate({ paymentMethod: defaultMethod });
+      } else if (methods.length > 0) {
+        setSelectedPayment(methods[0].id);
+        onUpdate({ paymentMethod: methods[0] });
+      }
+
+      // If no payment methods, show add card form
+      if (methods.length === 0) {
+        setShowNewCardForm(true);
+      }
+    } catch (error) {
+      console.error("Error fetching payment methods:", error);
+    } finally {
+      setIsLoadingMethods(false);
+    }
+  };
+
+  const handlePaymentSelect = (method: UserPaymentMethod) => {
+    setSelectedPayment(method.id);
+    onUpdate({ paymentMethod: method });
     setShowNewCardForm(false);
   };
 
-  const handleNewCardSubmit = () => {
-    const paymentMethod = {
-      id: 'new',
-      type: 'card',
-      last4: newCard.number.slice(-4),
-      brand: 'New Card',
-      expiry: newCard.expiry,
-      isDefault: false
-    };
-    setSelectedPayment('new');
-    onUpdate({ paymentMethod });
+  const handleCardAdded = async () => {
     setShowNewCardForm(false);
+    await fetchPaymentMethods();
   };
 
   const handleContinue = () => {
@@ -97,18 +225,24 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         </div>
       </div>
 
-      {!showNewCardForm ? (
+      {/* Loading state */}
+      {isLoadingMethods ? (
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground text-sm">Loading payment methods...</span>
+        </div>
+      ) : !showNewCardForm ? (
         <>
           <div className="space-y-3">
-            {savedPayments.map((payment) => (
-              <Card 
-                key={payment.id}
+            {paymentMethods.map((method) => (
+              <Card
+                key={method.id}
                 className={`cursor-pointer transition-colors ${
-                  selectedPayment === payment.id 
-                    ? 'ring-2 ring-primary bg-primary/5' 
+                  selectedPayment === method.id
+                    ? 'ring-2 ring-primary bg-primary/5'
                     : 'hover:bg-muted/50'
                 }`}
-                onClick={() => handlePaymentSelect(payment)}
+                onClick={() => handlePaymentSelect(method)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
@@ -117,17 +251,18 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-medium">
-                          {payment.brand} •••• {payment.last4}
+                        <h3 className="font-medium capitalize">
+                          {method.brand} •••• {method.last4}
                         </h3>
-                        {payment.isDefault && (
+                        {method.isDefault && (
                           <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                             {t('checkout.payment.default')}
                           </span>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {t('checkout.payment.expires')} {payment.expiry}
+                        {t('checkout.payment.expires')}{' '}
+                        {method.exp_month.toString().padStart(2, '0')}/{method.exp_year}
                       </p>
                     </div>
                   </div>
@@ -145,76 +280,47 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             </Button>
           </div>
 
-          <Button 
-            className="w-full h-12" 
+          <Button
+            className="w-full h-12"
             onClick={handleContinue}
-            disabled={!selectedPayment}
+            disabled={(!selectedPayment && !data.paymentMethod) || isQuoting}
           >
-            {t('common.continue')}
+            {isQuoting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Getting quote…
+              </>
+            ) : (
+              t('common.continue')
+            )}
           </Button>
         </>
       ) : (
+        /* Add new card form using Stripe Elements — same component as subscription section */
         <div className="space-y-4">
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="cardName">{t('checkout.payment.form.name')}</Label>
-              <Input
-                id="cardName"
-                value={newCard.name}
-                onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
-                placeholder="John Doe"
-              />
-            </div>
-            <div>
-              <Label htmlFor="cardNumber">{t('checkout.payment.form.number')}</Label>
-              <Input
-                id="cardNumber"
-                value={newCard.number}
-                onChange={(e) => setNewCard({ ...newCard, number: e.target.value })}
-                placeholder="1234 5678 9012 3456"
-                maxLength={19}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="expiry">{t('checkout.payment.form.expiry')}</Label>
-                <Input
-                  id="expiry"
-                  value={newCard.expiry}
-                  onChange={(e) => setNewCard({ ...newCard, expiry: e.target.value })}
-                  placeholder="MM/YY"
-                  maxLength={5}
-                />
-              </div>
-              <div>
-                <Label htmlFor="cvv">{t('checkout.payment.form.cvv')}</Label>
-                <Input
-                  id="cvv"
-                  value={newCard.cvv}
-                  onChange={(e) => setNewCard({ ...newCard, cvv: e.target.value })}
-                  placeholder="123"
-                  maxLength={4}
-                />
-              </div>
-            </div>
-          </div>
+          {paymentMethods.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Add a new payment method to your account.
+            </p>
+          )}
 
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setShowNewCardForm(false)}
-            >
-              {t('common.cancel')}
-            </Button>
-            <Button
-              className="flex-1"
-              onClick={handleNewCardSubmit}
-              disabled={!newCard.number || !newCard.expiry || !newCard.cvv || !newCard.name}
-            >
-              {t('checkout.payment.form.save')}
-            </Button>
-          </div>
+          {!customerId ? (
+            <div className="text-center py-6 text-muted-foreground text-sm">
+              Unable to load payment form. Please try again.
+            </div>
+          ) : (
+            <Elements stripe={stripePromise}>
+              <AddCardForm
+                customerId={customerId}
+                onSuccess={handleCardAdded}
+                onCancel={() => {
+                  if (paymentMethods.length > 0) {
+                    setShowNewCardForm(false);
+                  }
+                }}
+              />
+            </Elements>
+          )}
         </div>
       )}
     </div>

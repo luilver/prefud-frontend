@@ -74,6 +74,7 @@ const SubscriptionManager = () => {
   const [nativePackages, setNativePackages] = useState<PurchasesPackage[]>([]);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [expandedPlans, setExpandedPlans] = useState<Record<string, boolean>>({});
   const rcInitedRef = useRef(false);
 
   const { toast } = useToast();
@@ -160,7 +161,7 @@ const SubscriptionManager = () => {
         const apiPlans = await getAllSubscriptionTypes();
         console.log("this are the subscription plans ", apiPlans);
         let convertedPlans = convertApiToPlans(apiPlans);
-        
+
         // If native, only show plans that RevenueCat actually loaded (plus the Free plan)
         if (isNative && nativePackages.length > 0) {
           convertedPlans = convertedPlans.filter((plan) => {
@@ -171,7 +172,7 @@ const SubscriptionManager = () => {
             });
           });
         }
-        
+
         setPlans(convertedPlans);
 
         // Set current subscription ID for comparison
@@ -500,11 +501,10 @@ const SubscriptionManager = () => {
           return (
             <Card
               key={plan.id}
-              className={`relative ${
-                plan.popular
+              className={`relative ${plan.popular
                   ? "border-green-500 border-2 bg-gradient-to-b from-green-50 to-white"
                   : "border-gray-200"
-              } ${isCurrentPlan ? "ring-2 ring-blue-500" : ""}`}
+                } ${isCurrentPlan ? "ring-2 ring-blue-500" : ""}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -543,22 +543,31 @@ const SubscriptionManager = () => {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start space-x-3">
-                      <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-xs text-gray-500 hover:text-gray-700"
+                  onClick={() => setExpandedPlans(prev => ({ ...prev, [plan.id]: !prev[plan.id] }))}
+                >
+                  {expandedPlans[plan.id] ? "Hide Features" : "View Features"}
+                </Button>
+                {expandedPlans[plan.id] && (
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
                 <Button
                   onClick={() => handleSelectPlan(plan)}
-                  className={`w-full ${
-                    plan.popular
+                  className={`w-full ${plan.popular
                       ? "bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600"
                       : "bg-gray-800 hover:bg-gray-700"
-                  }`}
+                    }`}
                   disabled={isCurrentPlan || isPurchasing}
                 >
                   {isCurrentPlan
@@ -573,21 +582,7 @@ const SubscriptionManager = () => {
         })}
       </div>
 
-      <div className="text-center space-y-4 pt-8 border-t">
-        <h3 className="text-lg font-semibold text-gray-800">
-          All plans include:
-        </h3>
-        <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-          <div className="flex items-center space-x-2 text-sm text-gray-700">
-            <Check className="h-4 w-4 text-emerald-500" />
-            <span className="font-medium">Cancel anytime</span>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-700">
-            <Check className="h-4 w-4 text-emerald-500" />
-            <span className="font-medium">Secure payment processing</span>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Modals */}
       <SubscriptionCancelModal
