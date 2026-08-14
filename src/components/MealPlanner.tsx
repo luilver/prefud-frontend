@@ -40,6 +40,7 @@ import MealPlanCreatorStepper from "./MealPlanCreatorStepper";
 import MealPlanView from "./MealPlanView";
 import MealPlanSuccessModal from "./MealPlanSuccessModal";
 import PageSizeSelector from "./PageSizeSelector";
+import { OrdersWidget } from "./OrdersWidget";
 import {
   Pagination,
   PaginationContent,
@@ -365,6 +366,11 @@ const MealPlanner = () => {
             </Button>
           </div>
         </div>
+
+        {/* Real-time Orders Widget */}
+        {!showCreator && !selectedMealPlan && user?.id && (
+          <OrdersWidget />
+        )}
 
         {/* Page Size Selector and Results Info - desktop only */}
         {!isMobile && !isLoadingPlans && hasLoadedInitialPlans && (
