@@ -113,6 +113,11 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
         throw new Error(errData.message || "Failed to process payment");
       }
 
+      const responseData = await response.json();
+      if (responseData.orderId) {
+        onUpdate({ orderId: responseData.orderId });
+      }
+
       onNext();
     } catch (err: any) {
       console.error("Payment error:", err);
