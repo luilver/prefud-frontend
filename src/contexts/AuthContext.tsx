@@ -26,6 +26,7 @@ interface AuthUser {
     };
     dietTypes: string[];
     alergies: string[];
+    phonePrefix?: string;
     phone: string;
     userId: string;
     ruku_client_id: string;

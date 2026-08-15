@@ -80,7 +80,7 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
           city: data.selectedAddress.city,
           state: data.selectedAddress.state,
           postal_code: data.selectedAddress.zipcode,
-          phone_number: authUser?.profile?.phone || "+13852250301",
+          phone_number: authUser?.profile?.phone ? `${authUser?.profile?.phonePrefix || '+1'}${authUser.profile.phone}` : "+13852250301",
           country: data.selectedAddress.country_code || "US"
         },
         metadata: {
@@ -91,7 +91,7 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
         }
       };
 
-      const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+      const BASE_URL = import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
       const response = await fetch(`${BASE_URL}/api/v1/orders/checkout-simple`, {
         method: "POST",
         headers: {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Package, CheckCircle, AlertCircle, Loader2, ArrowRight, Clock, MapPin, Receipt, ShoppingBag } from 'lucide-react';
+import { Package, CheckCircle, AlertCircle, Loader2, ArrowRight, Clock, MapPin, Receipt, ShoppingBag, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useOrderSocket } from '@/hooks/useOrderSocket';
@@ -37,7 +37,7 @@ export const OrdersWidget = () => {
     const fetchOrders = async () => {
       if (!user?.id || !authUser?.token) return;
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const apiUrl = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
         const res = await fetch(`${apiUrl}/api/v1/orders/user/${user.id}`, {
           headers: {
             Authorization: `Bearer ${authUser.token}`,
