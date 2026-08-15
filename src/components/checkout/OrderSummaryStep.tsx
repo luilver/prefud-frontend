@@ -80,7 +80,7 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
           city: data.selectedAddress.city,
           state: data.selectedAddress.state,
           postal_code: data.selectedAddress.zipcode,
-          phone_number: authUser?.profile?.phone || "+13852250301",
+          phone_number: authUser?.profile?.phone ? `${authUser?.profile?.phonePrefix || '+1'}${authUser.profile.phone}` : "+13852250301",
           country: data.selectedAddress.country_code || "US"
         },
         metadata: {
