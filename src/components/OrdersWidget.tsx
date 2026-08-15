@@ -37,7 +37,7 @@ export const OrdersWidget = () => {
     const fetchOrders = async () => {
       if (!user?.id || !authUser?.token) return;
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const apiUrl = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
         const res = await fetch(`${apiUrl}/api/v1/orders/user/${user.id}`, {
           headers: {
             Authorization: `Bearer ${authUser.token}`,

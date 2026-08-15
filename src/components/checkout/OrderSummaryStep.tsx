@@ -91,7 +91,7 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
         }
       };
 
-      const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3001";
+      const BASE_URL = import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
       const response = await fetch(`${BASE_URL}/api/v1/orders/checkout-simple`, {
         method: "POST",
         headers: {
