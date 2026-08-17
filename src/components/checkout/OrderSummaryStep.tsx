@@ -30,7 +30,7 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
   onBack,
 }) => {
   const { t } = useLanguage();
-  const { getDisplayQuantity } = useCart();
+  const { getDisplayQuantity, clearCart } = useCart();
   const { user: authUser } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,11 +61,15 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
             url: item.matchedProduct.product_id.startsWith('http')
               ? item.matchedProduct.product_id
               : `https://www.walmart.com/ip/${item.matchedProduct.product_id}`,
-            quantity: Math.ceil(item.quantity)
+            quantity: Math.ceil(item.quantity),
+            name: item.matchedProduct.title || item.ingredient,
+            image: item.matchedProduct.image_url || item.matchedProduct.image || ''
           }))
         : items.map((item) => ({
             url: `https://www.walmart.com/ip/${item.id}`,
-            quantity: Math.ceil(item.amount || 1)
+            quantity: Math.ceil(item.amount || item.quantity || 1),
+            name: item.name,
+            image: ''
           }));
 
       const payload = {
@@ -118,6 +122,7 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
         onUpdate({ orderId: responseData.orderId });
       }
 
+      clearCart();
       onNext();
     } catch (err: any) {
       console.error("Payment error:", err);

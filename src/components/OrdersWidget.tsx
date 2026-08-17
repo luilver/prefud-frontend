@@ -10,6 +10,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface OrderItem {
   url: string;
   quantity: number;
+  name?: string;
+  image?: string;
 }
 
 interface Order {
@@ -24,7 +26,48 @@ interface Order {
   trackingNumbers?: any[];
 }
 
-export const OrdersWidget = () => {
+const OrderItemView = ({ item }: { item: OrderItem }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  return (
+    <div className="flex items-start text-sm p-2.5 bg-secondary/30 rounded-md gap-3">
+      <div 
+        className="flex-shrink-0 cursor-pointer" 
+        onClick={() => window.open(item.url, '_blank')}
+        title="View Product"
+      >
+        {item.image ? (
+          <img src={item.image} alt={item.name || 'Product'} className="w-12 h-12 object-cover rounded border border-border/50" />
+        ) : (
+          <div className="w-12 h-12 bg-secondary rounded flex items-center justify-center border border-border/50">
+            <Package className="w-6 h-6 text-muted-foreground" />
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col flex-1 min-w-0 justify-center min-h-[3rem]">
+        <span 
+          className={`text-primary font-medium text-sm leading-tight mb-1 cursor-pointer transition-all ${isExpanded ? '' : 'line-clamp-1'}`}
+          onClick={() => setIsExpanded(!isExpanded)}
+          title={isExpanded ? "Click to collapse" : "Click to expand"}
+        >
+          {item.name || 'Product Link'}
+        </span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground font-medium">Qty: {item.quantity}</span>
+          <a href={item.url} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline">
+            View Link
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface OrdersWidgetProps {
+  hideDelivered?: boolean;
+}
+
+export const OrdersWidget: React.FC<OrdersWidgetProps> = ({ hideDelivered }) => {
   const { user: authUser } = useAuth();
   const { user } = useUser();
   const { t } = useLanguage();
@@ -82,7 +125,7 @@ export const OrdersWidget = () => {
     }
   };
 
-  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatPrice = (amount: number) => `$${amount.toFixed(2)}`;
 
   if (loading) {
     return (
@@ -97,22 +140,31 @@ export const OrdersWidget = () => {
   }
 
   return (
-    <div className="w-full mb-8">
+    <div className="w-full min-w-0 max-w-full overflow-hidden">
       <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
         <ShoppingBag className="w-5 h-5" />
         Your Recent Orders
       </h2>
       
-      {/* Scrollable Container for Mobile, Grid for Desktop */}
-      <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible sm:pb-0">
-        {orders.slice(0, 5).map(order => {
+      {/* Grid Container */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+        {orders
+          .filter(order => {
+            if (hideDelivered) {
+              const status = realtimeStatuses[order._id] || order.status;
+              return status !== 'DELIVERED';
+            }
+            return true;
+          })
+          .slice(0, 5)
+          .map(order => {
           const status = realtimeStatuses[order._id] || order.status;
           const display = getStatusDisplay(status);
           
           return (
             <Card 
               key={order._id} 
-              className="min-w-[280px] sm:min-w-0 snap-center cursor-pointer hover:shadow-lg transition-all border border-border/50 bg-white/80 backdrop-blur-sm"
+              className="w-full cursor-pointer hover:shadow-lg transition-all border border-border/50 bg-white/80 backdrop-blur-sm"
               onClick={() => setSelectedOrder(order)}
             >
               <CardContent className="p-4">
@@ -147,11 +199,11 @@ export const OrdersWidget = () => {
       {/* Order Details Modal */}
       {selectedOrder && (
         <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md w-[95vw] max-h-[90vh] overflow-y-auto rounded-xl p-4 sm:p-6">
             <DialogHeader>
               <DialogTitle className="flex justify-between items-center pr-6">
                 <span>Order Details</span>
-                <span className="font-mono text-sm text-primary">
+                <span className="font-mono text-sm text-primary truncate max-w-[120px] sm:max-w-none text-right">
                   #{selectedOrder.zincOrderId?.split('-')[0].toUpperCase() || selectedOrder._id.slice(-6).toUpperCase()}
                 </span>
               </DialogTitle>
@@ -209,12 +261,7 @@ export const OrdersWidget = () => {
                 </p>
                 <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
                   {selectedOrder.items?.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-sm p-2 bg-secondary/30 rounded-md">
-                      <span className="truncate pr-4 text-blue-600 hover:underline cursor-pointer" onClick={() => window.open(item.url, '_blank')}>
-                        Product Link
-                      </span>
-                      <span className="font-medium">Qty: {item.quantity}</span>
-                    </div>
+                    <OrderItemView key={idx} item={item} />
                   ))}
                 </div>
               </div>

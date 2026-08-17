@@ -28,7 +28,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { OrdersWidget } from "@/components/OrdersWidget";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -148,6 +150,8 @@ const UserProfile = () => {
   const { t } = useLanguage();
   const isMobile = useIsMobile();
   const [isEditing, setIsEditing] = useState(false);
+  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
   const [subscriptionTypes, setSubscriptionTypes] = useState<
     SubscriptionType[]
   >([]);
@@ -452,11 +456,14 @@ const UserProfile = () => {
                   </p>
 
                   {/* Personal Information */}
-                  <div className="space-y-3 sm:space-y-4">
-                    <h3 className="text-base sm:text-lg font-medium">
-                      {t("profile.personalInfo") || "Personal Information"}
-                    </h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="personal-info" className="border-b-0">
+                      <AccordionTrigger className="text-base sm:text-lg font-medium hover:no-underline py-2">
+                        {t("profile.personalInfo") || "Personal Information"}
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-4">
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name" className="text-sm">
                           {t("profile.fullName") || "Full Name"}
@@ -583,8 +590,11 @@ const UserProfile = () => {
                       </div>
                     </div>
                   </div>
-
-                  <Separator />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            
+            <Separator />
 
                   {/* Language Preference */}
                   <div className="space-y-3 sm:space-y-4">
@@ -606,8 +616,31 @@ const UserProfile = () => {
                     </div>
                   </div>
                 </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Orders Section */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden max-w-full">
+          <CardContent className="p-6">
+            <Button 
+              className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+              onClick={() => setShowOrders(true)}
+            >
+              {t("orders.title") || "Orders"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Dialog open={showOrders} onOpenChange={setShowOrders}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+            <DialogHeader>
+              <DialogTitle>{t("orders.title") || "Orders"}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4 min-w-0 max-w-full overflow-hidden">
+              <OrdersWidget />
+            </div>
+          </DialogContent>
+        </Dialog>
 
 
       {/* Tabs Section for tracking and subscription */}

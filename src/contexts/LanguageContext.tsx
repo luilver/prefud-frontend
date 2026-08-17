@@ -277,6 +277,7 @@ const translations = {
 
     // Profile
     "profile.title": "Profile Information",
+    "orders.title": "Orders",
     "profile.description": "Manage your personal information and preferences",
     "profile.edit": "Edit",
     "profile.personalInfo": "Personal Information",
@@ -342,6 +343,7 @@ const translations = {
       "Get customized recipes based on your preferences, dietary needs, and cooking skills",
     "mealPlanner.createYourFirstAIMeal": "Create Your First AI Meal Plan",
     "mealPlanner.noMorePlans":"No more meal plans to show",
+    "mealPlanner.emptyState": "You don't have any meal plans yet. Create one to get started!",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Create AI Meal Plan",
@@ -2344,6 +2346,7 @@ const translations = {
 
     // Profile
     "profile.title": "Información del Perfil",
+    "orders.title": "Pedidos",
     "profile.description": "Gestiona tu información personal y preferencias",
     "profile.edit": "Editar",
     "profile.personalInfo": "Información Personal",
@@ -2412,6 +2415,7 @@ const translations = {
     "mealPlanner.createYourFirstAIMeal":
       "Crea Tu Primer Plan de Comidas con IA",
       "mealPlanner.noMorePlans":"No tienes más planes de comidas.",
+      "mealPlanner.emptyState": "Aún no tienes planes de comidas. ¡Crea uno para empezar!",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Crear Plan de Comidas con IA",
@@ -4479,6 +4483,7 @@ const translations = {
 
     // Profile
     "profile.title": "Informações do Perfil",
+    "orders.title": "Pedidos",
     "profile.description": "Gerencie suas informações pessoais e preferências",
     "profile.edit": "Editar",
     "profile.personalInfo": "Informações Pessoais",
@@ -4547,6 +4552,7 @@ const translations = {
     "mealPlanner.createYourFirstAIMeal":
       "Crie Seu Primeiro Plano de Refeições com IA",
       "mealPlanner.noMorePlans":"Não há mais planos de refeições para mostrar",
+      "mealPlanner.emptyState": "Você ainda não tem planos de refeições. Crie um para começar!",
 
     // Meal Plan Creator
     "mealPlanCreator.title": "Criar Plano de Refeições com IA",

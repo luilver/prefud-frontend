@@ -369,7 +369,7 @@ const MealPlanner = () => {
 
         {/* Real-time Orders Widget */}
         {!showCreator && !selectedMealPlan && user?.id && (
-          <OrdersWidget />
+          <OrdersWidget hideDelivered={true} />
         )}
 
         {/* Page Size Selector and Results Info - desktop only */}
