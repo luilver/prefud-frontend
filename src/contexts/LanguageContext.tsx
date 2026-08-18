@@ -277,6 +277,7 @@ const translations = {
 
     // Profile
     "profile.title": "Profile Information",
+    "profile.preferences": "Preferences",
     "orders.title": "Orders",
     "profile.description": "Manage your personal information and preferences",
     "profile.edit": "Edit",
@@ -2399,6 +2400,7 @@ const translations = {
 
     // Profile
     "profile.title": "Información del Perfil",
+    "profile.preferences": "Preferencias",
     "orders.title": "Pedidos",
     "profile.description": "Gestiona tu información personal y preferencias",
     "profile.edit": "Editar",
@@ -4589,6 +4591,7 @@ const translations = {
 
     // Profile
     "profile.title": "Informações do Perfil",
+    "profile.preferences": "Preferências",
     "orders.title": "Pedidos",
     "profile.description": "Gerencie suas informações pessoais e preferências",
     "profile.edit": "Editar",

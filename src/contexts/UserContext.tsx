@@ -348,6 +348,39 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  // Listen for profile sync events from AuthContext
+  useEffect(() => {
+    const handleProfileSync = (event: CustomEvent) => {
+      const { profile } = event.detail;
+      console.log("Syncing profile from auth:", profile);
+
+      setUser((prevUser) => {
+        if (!prevUser) return prevUser;
+        const updatedUser = {
+          ...prevUser,
+          name: profile?.name || prevUser.name,
+          phone: profile?.phone || prevUser.phone,
+          country: profile?.country || prevUser.country,
+          language: profile?.languages || prevUser.language,
+          preferences: {
+            ...prevUser.preferences,
+            dietaryRestrictions: profile?.dietTypes || prevUser.preferences.dietaryRestrictions,
+            allergies: profile?.alergies || prevUser.preferences.allergies,
+          }
+        };
+        // Update local storage
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        return updatedUser;
+      });
+    };
+
+    window.addEventListener("profile-sync", handleProfileSync as EventListener);
+
+    return () => {
+      window.removeEventListener("profile-sync", handleProfileSync as EventListener);
+    };
+  }, []);
+
   // Enhanced setPantryItems function that also stores original response
   const setPantryItemsWithOriginal = useCallback(
     (items: PantryItem[], originalResponse?: any) => {
