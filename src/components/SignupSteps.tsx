@@ -47,12 +47,12 @@ import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
 import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
-import { 
-  isNativePlatform, 
-  initRevenueCat, 
-  getNativeOfferings, 
-  purchaseNativePackage, 
-  getActiveEntitlement 
+import {
+  isNativePlatform,
+  initRevenueCat,
+  getNativeOfferings,
+  purchaseNativePackage,
+  getActiveEntitlement
 } from "@/services/revenueCatService";
 import { RC_PRODUCT_TO_PLAN_NAME } from "@/utils/rcProductMap";
 import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
@@ -113,18 +113,22 @@ const SignupSteps = () => {
   const rcInitedRef = useRef(false);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
+
+  useEffect(() => {
     const fetchSubscriptionTypes = async () => {
       try {
         const responseSubscriptionTypes = await getAllSubscriptionTypes();
         console.log("this a response ", responseSubscriptionTypes);
-        setSubscriptionTypes(mapApiToPlan(responseSubscriptionTypes));
+        setSubscriptionTypes(mapApiToPlan(responseSubscriptionTypes, t));
       } catch (err: any) {
         console.log("error getting subscription types");
       }
     };
 
     fetchSubscriptionTypes();
-  }, []);
+  }, [t]);
 
   const getFilteredPlans = () => {
     if (isNativePlatform() && nativePackages.length > 0) {
@@ -164,7 +168,7 @@ const SignupSteps = () => {
 
   useEffect(() => {
     if (!isNativePlatform()) return;
-    
+
     (async () => {
       // Re-initialize if user ID changes to ensure purchase is linked correctly
       await initRevenueCat(signupData.userId);
@@ -355,7 +359,7 @@ const SignupSteps = () => {
 
       const { customerInfo, productIdentifier, transactionIdentifier } = await purchaseNativePackage(pkg);
       const activeEntitlement = getActiveEntitlement(customerInfo);
-      
+
       if (!activeEntitlement) {
         toast({
           title: "Purchase incomplete",
@@ -371,13 +375,13 @@ const SignupSteps = () => {
 
       // Record subscription on our backend
       await subscribeUser(signupData.userId, plan.id, transactionIdentifier);
-      
+
       toast({
         title: "✅ Subscription Activated!",
         description: "Your subscription has been activated successfully.",
         duration: 5000,
       });
-      
+
       trackEvent("subscription_purchase_native_onboarding", {
         plan: plan.name,
         productId: productIdentifier,

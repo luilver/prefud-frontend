@@ -64,20 +64,7 @@ const SignUp = () => {
         {/* Main Content */}
         <main className="flex-1 flex flex-col items-center px-4 py-6 md:py-10">
           <div className="w-full max-w-4xl">
-            {/* Welcome Card */}
-            <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden mb-6">
-              <CardHeader className="text-center space-y-3 pt-6 pb-4 px-6">
-                <div className="mx-auto p-3 bg-primary rounded-2xl w-fit shadow-lg">
-                  <Sparkles className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-xl md:text-2xl font-bold text-neutral-800 dark:text-neutral-100 tracking-tight">
-                  {t('signup.title')}
-                </CardTitle>
-                <CardDescription className="text-neutral-500 dark:text-neutral-400 text-sm md:text-base max-w-xl mx-auto">
-                  {t('signup.subtitle')}
-                </CardDescription>
-              </CardHeader>
-            </Card>
+           
             
             {/* Signup Steps Container */}
             <Card className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-3xl overflow-hidden">

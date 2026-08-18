@@ -22,6 +22,7 @@ import {
   ApiSubscriptionType,
   subscribeUser,
 } from "@/services/payments";
+import { useLanguage } from "@/contexts/LanguageContext";
 import PaymentForm from "./PaymentForm";
 import SubscriptionCancelModal from "./SubscriptionCancelModal";
 import PaymentMethodModal from "./PaymentMethodModal";
@@ -79,63 +80,62 @@ const SubscriptionManager = () => {
 
   const { toast } = useToast();
   const { user, updateSubscription } = useAuth();
+  const { t } = useLanguage();
   const isNative = isNativePlatform();
 
   // Convert API subscription types to UI subscription plans
-  const convertApiToPlans = (
-    apiPlans: ApiSubscriptionType[],
-  ): SubscriptionPlan[] => {
+  const convertApiToPlans = (apiPlans: ApiSubscriptionType[]): SubscriptionPlan[] => {
     return apiPlans.map((apiPlan) => {
-      const priceInDollars = apiPlan.price / 100; // Convert cents to dollars
+      const priceInDollars = apiPlan.price / 100;
+      const generatedMeals = apiPlan.generatedMeals || 0;
 
-      const generatedMeals =
-        apiPlan.generatedMeals ??
-        (apiPlan as ApiSubscriptionType & { generateMeals?: number })
-          .generateMeals ??
-        0;
+      const planNameKey = `pricing.plans.${apiPlan.name.toLowerCase()}.name`;
+      const planDescKey = `pricing.plans.${apiPlan.name.toLowerCase()}.description`;
 
-      // Generate features based on the plan data
-      const features = [
-        `${apiPlan.mealPlans} Meal Plans per month`,
-        // `${apiPlan.generatedMeals} Meal Creations with pantry ingredients`,
-        `${generatedMeals} Meal Creations with pantry ingredients`,
-        `${apiPlan.healthyDrinks} Healthy Drinks per month`,
-        `${apiPlan.specialMeals} Special Meals per month`,
-        `${apiPlan.processImages ?? 0} Process Images per month`,
+      const translatedName = t(planNameKey) === planNameKey ? apiPlan.name : t(planNameKey);
+      const translatedDesc = t(planDescKey) === planDescKey ? apiPlan.description : t(planDescKey);
+
+      // Map core features using standard texts
+      const features: string[] = [
+        `${apiPlan.mealPlans} ${t("pricing.features.meal-plans") || "Meal Plans per month"}`,
+        `${generatedMeals} ${t("pricing.features.meal-creations") || "Meal Creations"}`,
+        `${apiPlan.healthyDrinks} ${t("pricing.features.healthy-drinks") || "Healthy Drinks per month"}`,
+        `${apiPlan.specialMeals} ${t("pricing.features.special-meals") || "Special Meals per month"}`,
+        `${apiPlan.processImages ?? 0} ${t("pricing.features.process-images") || "Process Images per month"}`,
       ];
 
       // Add additional features based on plan type
       if (apiPlan.name.toLowerCase() === "free") {
         features.push(
-          "Basic Recipe Collection",
-          "Shopping List Generator",
-          "Email Support",
+          t("pricing.features.basic-recipes") || "Basic Recipe Collection",
+          t("pricing.features.shopping-list") || "Shopping List Generator",
+          t("pricing.features.email-support") || "Email Support"
         );
       } else if (apiPlan.name.toLowerCase() === "family") {
         features.push(
-          "AI Meal Recommendations",
-          "Advanced Recipe Collection",
-
-          "Nutritional Analysis",
-          "Priority Support",
+          t("pricing.features.ai-recommendations") || "AI Meal Recommendations",
+          t("pricing.features.advanced-recipes") || "Advanced Recipe Collection",
+          t("pricing.features.nutritional-analysis") || "Nutritional Analysis",
+          t("pricing.features.priority-support") || "Priority Support"
         );
       } else if (apiPlan.name.toLowerCase() === "professional") {
         features.push(
-          "10 Free Delivery Commissions",
-          "3 Free Home Deliveries",
-          "Advanced AI Recommendations",
-          "Custom Dietary Plans",
-          "Professional Analytics",
-          "Phone Support",
+          `10 ${t("pricing.features.delivery-commissions") || "Free Delivery Commissions"}`,
+          `3 ${t("pricing.features.home-deliveries") || "Free Home Deliveries"}`,
+          t("pricing.features.advanced-ai") || "Advanced AI Recommendations",
+          t("pricing.features.custom-dietary") || "Custom Dietary Plans",
+          t("pricing.features.professional-analytics") || "Professional Analytics",
+          t("pricing.features.phone-support") || "Phone Support"
         );
       }
 
       return {
         id: apiPlan._id,
-        name: apiPlan.name,
+        name: translatedName,
         price: priceInDollars,
-        interval: "month",
+        interval: t("pricing.interval.month") !== "pricing.interval.month" ? t("pricing.interval.month") : "month",
         features,
+        description: translatedDesc,
         limits: {
           plansPerMonth: apiPlan.mealPlans,
           mealCreations: generatedMeals,
