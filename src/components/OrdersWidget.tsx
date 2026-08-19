@@ -147,7 +147,7 @@ export const OrdersWidget: React.FC<OrdersWidgetProps> = ({ hideDelivered }) => 
       </h2>
       
       {/* Grid Container */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+      <div className="flex sm:grid flex-nowrap sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4 overflow-x-auto sm:overflow-visible snap-x snap-mandatory hide-scrollbar">
         {orders
           .filter(order => {
             if (hideDelivered) {
@@ -164,7 +164,7 @@ export const OrdersWidget: React.FC<OrdersWidgetProps> = ({ hideDelivered }) => 
           return (
             <Card 
               key={order._id} 
-              className="w-full cursor-pointer hover:shadow-lg transition-all border border-border/50 bg-white/80 backdrop-blur-sm"
+              className="w-[85vw] sm:w-full flex-shrink-0 snap-center cursor-pointer hover:shadow-lg transition-all border border-border/50 bg-white/80 backdrop-blur-sm"
               onClick={() => setSelectedOrder(order)}
             >
               <CardContent className="p-4">
