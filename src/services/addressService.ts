@@ -76,6 +76,19 @@ export async function createUserAddress(
   return response.data;
 }
 
+/**
+ * Delete an address for a user.
+ * DELETE /address/:userId/:addressId
+ */
+export async function deleteUserAddress(
+  userId: string,
+  addressId: string
+): Promise<void> {
+  await axios.delete(`${BASE_URL}/address/${userId}/${addressId}`, {
+    headers: getAuthHeaders(),
+  });
+}
+
 // ─── Orders / Quotes ───────────────────────────────────────────────────────
 
 export interface QuoteIngredient {

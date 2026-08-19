@@ -28,7 +28,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { OrdersWidget } from "@/components/OrdersWidget";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -60,9 +62,14 @@ import {
   Camera,
   Palette,
   Settings as SettingsIcon,
+  Home,
+  Plus,
+  Trash2,
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { getUserAddresses, createUserAddress, deleteUserAddress, UserAddress, CreateAddressPayload } from "@/services/addressService";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme, THEMES, ThemeId } from "@/contexts/ThemeContext";
@@ -139,15 +146,24 @@ interface TrackingData {
   carbonTrak: CarbonTrack | null;
   healthGoals: HealthGoals | null;
 }
+import { useToast } from "@/hooks/use-toast";
+
 const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
 
 const UserProfile = () => {
   const navigate = useNavigate();
   const { user, updateUserProfile, logout } = useUser();
-  const { user: authUser } = useAuth();
+  const { user: authUser, refreshProfile } = useAuth();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
-  const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
+
+  const [isEditingPersonal, setIsEditingPersonal] = useState(false);
+  const [isEditingPreferences, setIsEditingPreferences] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
   const [subscriptionTypes, setSubscriptionTypes] = useState<
     SubscriptionType[]
   >([]);
@@ -158,14 +174,218 @@ const UserProfile = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-  const [editData, setEditData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    country: user?.country || "",
+
+  // Address states
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  const [newAddress, setNewAddress] = useState<CreateAddressPayload>({
+    country_code: 'US',
+    zipcode: '',
+    state: '',
+    city: '',
+    line1: '',
+    line2: '',
+    nickname: '',
   });
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [addressSaveError, setAddressSaveError] = useState<string | null>(null);
+  const [addressToDelete, setAddressToDelete] = useState<UserAddress | null>(null);
+  const [isDeletingAddress, setIsDeletingAddress] = useState(false);
+  const [editPersonalData, setEditPersonalData] = useState({
+    phone: "",
+    phonePrefix: "+1",
+    country: "",
+  });
+
+  const [editPreferencesData, setEditPreferencesData] = useState({
+    language: "en",
+    weight: 0,
+    height: 0,
+    healthGoals: {
+      dailyCaloriesGoal: 2000,
+      goals: [] as string[],
+    },
+    dietTypes: [] as string[],
+    alergies: [] as string[],
+  });
+
   const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
   const [consumptionHistory, setConsumptionHistory] = useState<ConsumptionData[]>([]);
+
+  const healthGoalsOptions = [
+    { id: "loseWeight", label: t("signup.healthGoalsList.loseWeight") || "Lose weight" },
+    { id: "gainMuscle", label: t("signup.healthGoalsList.gainMuscle") || "Gain muscle" },
+    { id: "maintainWeight", label: t("signup.healthGoalsList.maintainWeight") || "Maintain weight" },
+    { id: "improveEnergy", label: t("signup.healthGoalsList.improveEnergy") || "Improve energy" },
+    { id: "betterDigestion", label: t("signup.healthGoalsList.betterDigestion") || "Better digestion" },
+    { id: "heartHealth", label: t("signup.healthGoalsList.heartHealth") || "Heart health" },
+    { id: "lowerCholesterol", label: t("signup.healthGoalsList.lowerCholesterol") || "Lower cholesterol" },
+    { id: "manageDiabetes", label: t("signup.healthGoalsList.manageDiabetes") || "Manage diabetes" },
+  ];
+
+  const dietTypesOptions = [
+    { id: "vegetarian", label: t("signup.diet.vegetarian") || "Vegetarian" },
+    { id: "vegan", label: t("signup.diet.vegan") || "Vegan" },
+    { id: "pescatarian", label: t("signup.diet.pescatarian") || "Pescatarian" },
+    { id: "keto", label: t("signup.diet.keto") || "Keto" },
+    { id: "paleo", label: t("signup.diet.paleo") || "Paleo" },
+    { id: "mediterranean", label: t("signup.diet.mediterranean") || "Mediterranean" },
+    { id: "lowCarb", label: t("signup.diet.lowCarb") || "Low-carb" },
+    { id: "glutenFree", label: t("signup.diet.glutenFree") || "Gluten-free" },
+    { id: "dairyFree", label: t("signup.diet.dairyFree") || "Dairy-free" },
+    { id: "noRestrictions", label: t("signup.diet.noRestrictions") || "No restrictions" },
+  ];
+
+  const allergiesOptions = [
+    { id: "nuts", label: t("signup.allergy.nuts") || "Nuts" },
+    { id: "shellfish", label: t("signup.allergy.shellfish") || "Shellfish" },
+    { id: "dairy", label: t("signup.allergy.dairy") || "Dairy" },
+    { id: "eggs", label: t("signup.allergy.eggs") || "Eggs" },
+    { id: "soy", label: t("signup.allergy.soy") || "Soy" },
+    { id: "gluten", label: t("signup.allergy.gluten") || "Gluten" },
+    { id: "fish", label: t("signup.allergy.fish") || "Fish" },
+    { id: "sesame", label: t("signup.allergy.sesame") || "Sesame" },
+    { id: "none", label: t("signup.allergy.none") || "None" },
+  ];
+
+  const languageOptions = [
+    { value: 'en', label: t('language.english') || 'English', flag: '🇺🇸' },
+    { value: 'es', label: t('language.spanish') || 'Spanish', flag: '🇪🇸' },
+    { value: 'pt', label: t('language.portuguese') || 'Portuguese', flag: '🇵🇹' }
+  ];
+
+  const handleToggleDiet = (label: string) => {
+    setEditPreferencesData(prev => {
+      const current = prev.dietTypes;
+      if (current.includes(label)) {
+        return { ...prev, dietTypes: current.filter(d => d !== label) };
+      } else {
+        return { ...prev, dietTypes: [...current, label] };
+      }
+    });
+  };
+
+  const handleToggleAllergy = (label: string) => {
+    setEditPreferencesData(prev => {
+      const current = prev.alergies;
+      if (current.includes(label)) {
+        return { ...prev, alergies: current.filter(a => a !== label) };
+      } else {
+        return { ...prev, alergies: [...current, label] };
+      }
+    });
+  };
+
+  const handleEditPersonal = () => {
+    setEditPersonalData({
+      phone: authUser?.profile?.phone || "",
+      phonePrefix: authUser?.profile?.phonePrefix || "+1",
+      country: authUser?.profile?.country || "",
+    });
+    setIsEditingPersonal(true);
+  };
+
+  const handleEditPreferences = () => {
+    setEditPreferencesData({
+      language: authUser?.profile?.languages || "en",
+      weight: authUser?.profile?.weight || 0,
+      height: authUser?.profile?.height || 0,
+      healthGoals: {
+        dailyCaloriesGoal: authUser?.profile?.healthGoals?.dailyCaloriesGoal || 2000,
+        goals: authUser?.profile?.healthGoals?.goals || [],
+      },
+      dietTypes: authUser?.profile?.dietTypes || [],
+      alergies: authUser?.profile?.alergies || [],
+    });
+    setIsEditingPreferences(true);
+  };
+
+  const handleSavePersonal = async () => {
+    if (!authUser?.userId || !authUser?.token) return;
+    setIsSaving(true);
+    try {
+      await authService.updateProfile(authUser.userId, authUser.token, {
+        phone: editPersonalData.phone,
+        phonePrefix: editPersonalData.phonePrefix,
+        country: editPersonalData.country
+      });
+      await refreshProfile();
+      setIsEditingPersonal(false);
+      toast({ title: t("profile.personalInfo") + " updated successfully", variant: "default" });
+    } catch (e) {
+      toast({ title: "Error updating profile", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    if (!authUser?.userId || !authUser?.token) return;
+    setIsSaving(true);
+    try {
+      await authService.updateProfile(authUser.userId, authUser.token, {
+        languages: editPreferencesData.language,
+        weight: editPreferencesData.weight,
+        height: editPreferencesData.height,
+        healthGoals: editPreferencesData.healthGoals,
+        dietTypes: editPreferencesData.dietTypes,
+        alergies: editPreferencesData.alergies
+      });
+      await refreshProfile();
+      setIsEditingPreferences(false);
+      toast({ title: t("profile.preferences") + " updated successfully", variant: "default" });
+    } catch (e) {
+      toast({ title: "Error updating preferences", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveAddress = async () => {
+    if (!authUser?.userId) return;
+    setAddressSaveError(null);
+    setIsSavingAddress(true);
+    try {
+      await createUserAddress(authUser.userId, newAddress);
+      const result = await getUserAddresses(authUser.userId);
+      setAddresses(result);
+      setShowNewAddressForm(false);
+      setNewAddress({
+        country_code: 'US',
+        zipcode: '',
+        state: '',
+        city: '',
+        line1: '',
+        line2: '',
+        nickname: '',
+      });
+      toast({ title: "Address added successfully", variant: "default" });
+    } catch (error: any) {
+      console.error('Error saving address:', error);
+      setAddressSaveError(error.response?.data?.message || 'Failed to save address');
+      toast({ title: "Failed to save address", variant: "destructive" });
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
+
+  const handleDeleteAddress = async () => {
+    if (!addressToDelete || !authUser?.userId) return;
+    setIsDeletingAddress(true);
+    try {
+      await deleteUserAddress(authUser.userId, addressToDelete._id);
+      const result = await getUserAddresses(authUser.userId);
+      setAddresses(result);
+      setAddressToDelete(null);
+      toast({ title: "Address deleted successfully", variant: "default" });
+    } catch (error: any) {
+      console.error('Error deleting address:', error);
+      toast({ title: "Failed to delete address", variant: "destructive" });
+    } finally {
+      setIsDeletingAddress(false);
+    }
+  };
 
   // Fetch subscription types, current subscription, and tracking data on component mount
   useEffect(() => {
@@ -222,10 +442,23 @@ const UserProfile = () => {
         console.error("Error fetching consumption history:", error);
       }
     };
+    const fetchAddresses = async () => {
+      if (!authUser?.userId) return;
+      setIsLoadingAddresses(true);
+      try {
+        const result = await getUserAddresses(authUser.userId);
+        setAddresses(result);
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
 
     fetchSubscriptionData();
     fetchTrackingData();
     fetchConsumptionData();
+    fetchAddresses();
   }, [authUser?.userId]);
 
   // Calculate daily average for calories
@@ -411,40 +644,8 @@ const UserProfile = () => {
                   {t("profile.personalInfo") || "Profile Information"}
                 </span>
               </div>
-              {!isEditing && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                  className="border-primary text-primary hover:bg-primary/5"
-                >
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  {t("profile.edit") || "Edit"}
-                </Button>
-              )}
-            </div>
+              </div>
                 <div className="space-y-4 sm:space-y-6">
-                  {isEditing && (
-                    <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 mb-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCancel}
-                        className="border-gray-300 w-full sm:w-auto"
-                      >
-                        <X className="h-4 w-4 mr-2" />
-                        {t("common.cancel")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={handleSave}
-                        className="bg-primary hover:bg-primary w-full sm:w-auto"
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        {t("common.save")}
-                      </Button>
-                    </div>
-                  )}
                   
                   <p className="text-sm text-muted-foreground mb-4">
                     {t("profile.description") ||
@@ -452,66 +653,67 @@ const UserProfile = () => {
                   </p>
 
                   {/* Personal Information */}
-                  <div className="space-y-3 sm:space-y-4">
-                    <h3 className="text-base sm:text-lg font-medium">
-                      {t("profile.personalInfo") || "Personal Information"}
-                    </h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="personal-info" className="border-b-0">
+                      <AccordionTrigger className="hover:no-underline py-3 px-1 data-[state=open]:text-primary transition-colors">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3 text-primary">
+                            <User className="h-4 w-4" />
+                          </div>
+                          <span className="font-semibold text-lg">{t("profile.personalInfo") || "Personal Information"}</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-4">
+                        <div className="flex justify-end mb-4">
+                          {!isEditingPersonal ? (
+                            <Button variant="outline" size="sm" onClick={handleEditPersonal} className="border-primary text-primary hover:bg-primary/5">
+                              <Edit2 className="h-4 w-4 mr-2" />
+                              {t("profile.edit") || "Edit"}
+                            </Button>
+                          ) : (
+                            <div className="flex space-x-2">
+                              <Button variant="outline" size="sm" onClick={() => setIsEditingPersonal(false)} className="border-gray-300">
+                                <X className="h-4 w-4 mr-2" />
+                                {t("common.cancel") || "Cancel"}
+                              </Button>
+                              <Button size="sm" onClick={handleSavePersonal} disabled={isSaving} className="bg-primary hover:bg-primary/90 text-white">
+                                <Save className="h-4 w-4 mr-2" />
+                                {isSaving ? "..." : (t("common.save") || "Save")}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name" className="text-sm">
                           {t("profile.fullName") || "Full Name"}
                         </Label>
-                        {isEditing ? (
-                          <Input
-                            id="name"
-                            value={editData.name}
-                            onChange={(e) =>
-                              setEditData((prev) => ({ ...prev, name: e.target.value }))
-                            }
-                            className="border-primary/20 focus:border-primary/40 text-sm"
-                          />
-                        ) : (
-                          <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
-                            <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
-                            <span className="text-sm truncate">{user.name}</span>
-                          </div>
-                        )}
+                        <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+                          <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
+                          <span className="text-sm truncate">{user.name}</span>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="email" className="text-sm">
                           {t("profile.email") || "Email Address"}
                         </Label>
-                        {isEditing ? (
-                          <Input
-                            id="email"
-                            type="email"
-                            value={editData.email}
-                            onChange={(e) =>
-                              setEditData((prev) => ({
-                                ...prev,
-                                email: e.target.value,
-                              }))
-                            }
-                            className="border-primary/20 focus:border-primary/40 text-sm"
-                          />
-                        ) : (
-                          <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
-                            <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
-                            <span className="text-sm truncate">{user.email}</span>
-                          </div>
-                        )}
+                        <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
+                          <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
+                          <span className="text-sm truncate">{user.email}</span>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
                         <Label htmlFor="country" className="text-sm">
                           {t("profile.country")}
                         </Label>
-                        {isEditing ? (
+                        {isEditingPersonal ? (
                           <CountrySelect
-                            value={editData.country}
+                            value={editPersonalData.country}
                             onValueChange={(value) =>
-                              setEditData((prev) => ({ ...prev, country: value }))
+                              setEditPersonalData((prev) => ({ ...prev, country: value }))
                             }
                             placeholder={t("profile.selectCountry") || "Select country"}
                             className="border-primary/20 focus:border-primary/40 text-sm"
@@ -538,28 +740,24 @@ const UserProfile = () => {
                         <Label htmlFor="phone" className="text-sm">
                           {t("profile.phone")}
                         </Label>
-                        {isEditing ? (
+                        {isEditingPersonal ? (
                           <div className="flex space-x-2">
-                            <div className="w-16 sm:w-20">
+                            <div className="w-20 sm:w-24">
                               <Input
-                                value={countryDisplay?.prefix || ""}
-                                disabled
-                                className="border-primary/20 bg-gray-50 text-center text-sm"
+                                value={editPersonalData.phonePrefix}
+                                onChange={(e) => setEditPersonalData(prev => ({ ...prev, phonePrefix: e.target.value }))}
+                                placeholder="+1"
+                                className="border-primary/20 text-center text-sm"
                               />
                             </div>
                             <Input
                               id="phone"
                               type="tel"
-                              value={editData.phone.replace(
-                                countryDisplay?.prefix || "",
-                                ""
-                              )}
+                              value={editPersonalData.phone}
                               onChange={(e) =>
-                                setEditData((prev) => ({
+                                setEditPersonalData((prev) => ({
                                   ...prev,
-                                  phone: `${countryDisplay?.prefix || ""}${
-                                    e.target.value
-                                  }`,
+                                  phone: e.target.value,
                                 }))
                               }
                               className="border-primary/20 focus:border-primary/40 flex-1 text-sm"
@@ -583,31 +781,346 @@ const UserProfile = () => {
                       </div>
                     </div>
                   </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                  <Separator />
-
-                  {/* Language Preference */}
-                  <div className="space-y-3 sm:space-y-4">
-                    <h3 className="text-base sm:text-lg font-medium">
-                      {t("profile.languagePreference") || "Language Preference"}
-                    </h3>
+              {/* Preferencias */}
+              <AccordionItem value="preferences" className="border-none mt-2">
+                <AccordionTrigger className="hover:no-underline py-3 px-1 data-[state=open]:text-primary transition-colors">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3 text-primary">
+                      <Heart className="h-4 w-4" />
+                    </div>
+                    <span className="font-semibold text-lg">{t("profile.preferences")}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex justify-end pt-4 px-1 mb-4">
+                    {!isEditingPreferences ? (
+                      <Button variant="outline" size="sm" onClick={handleEditPreferences} className="border-primary text-primary hover:bg-primary/5">
+                        <Edit2 className="h-4 w-4 mr-2" />
+                        {t("profile.edit") || "Edit"}
+                      </Button>
+                    ) : (
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => setIsEditingPreferences(false)} className="border-gray-300">
+                          <X className="h-4 w-4 mr-2" />
+                          {t("common.cancel") || "Cancel"}
+                        </Button>
+                        <Button size="sm" onClick={handleSavePreferences} disabled={isSaving} className="bg-primary hover:bg-primary/90 text-white">
+                          <Save className="h-4 w-4 mr-2" />
+                          {isSaving ? "..." : (t("common.save") || "Save")}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-4 pb-2 px-1">
+                    
+                    {/* Dieta */}
                     <div className="space-y-2">
-                      <Label className="text-sm">{t("profile.language")}</Label>
-                      <div className="flex items-center space-x-2 p-2.5 sm:p-3 bg-gray-50 rounded-md">
-                        <Languages className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 flex-shrink-0" />
-                        <span className="text-base sm:text-lg">
-                          {languageDisplay.flag}
-                        </span>
-                        <span className="text-sm flex-1">{languageDisplay.name}</span>
-                        <span className="text-xs text-gray-500 ml-auto hidden sm:inline">
-                          {t("profile.cannotChange") || "(Cannot be changed)"}
-                        </span>
+                      <Label className="text-sm text-gray-500">{t("signup.dietaryPreferences") || "Dietary Preferences"}</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {isEditingPreferences ? (
+                          dietTypesOptions.map((diet) => {
+                            const isSelected = editPreferencesData.dietTypes.includes(diet.label);
+                            return (
+                              <button
+                                key={diet.id}
+                                onClick={() => handleToggleDiet(diet.label)}
+                                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                                  isSelected ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                }`}
+                              >
+                                {diet.label}
+                              </button>
+                            );
+                          })
+                        ) : (
+                          authUser?.profile?.dietTypes && authUser.profile.dietTypes.length > 0 ? (
+                            authUser.profile.dietTypes.map((diet, index) => (
+                              <span key={index} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                                {diet}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-sm text-gray-400">{t("profile.notSpecified") || "Not specified"}</span>
+                          )
+                        )}
                       </div>
                     </div>
+
+                    {/* Alergias */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-gray-500">{t("signup.allergiesRestrictions") || "Allergies & Restrictions"}</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {isEditingPreferences ? (
+                          allergiesOptions.map((allergy) => {
+                            const isSelected = editPreferencesData.alergies.includes(allergy.label);
+                            return (
+                              <button
+                                key={allergy.id}
+                                onClick={() => handleToggleAllergy(allergy.label)}
+                                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                                  isSelected ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                }`}
+                              >
+                                {allergy.label}
+                              </button>
+                            );
+                          })
+                        ) : (
+                          authUser?.profile?.alergies && authUser.profile.alergies.length > 0 ? (
+                            authUser.profile.alergies.map((allergy, index) => (
+                              <span key={index} className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+                                {allergy}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-sm text-gray-400">{t("profile.notSpecified") || "Not specified"}</span>
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Peso */}
+                      <div className="space-y-2">
+                        <Label className="text-sm text-gray-500">{t("signup.weight") || "Weight"}</Label>
+                        {isEditingPreferences ? (
+                          <div className="flex items-center space-x-2">
+                            <Activity className="h-4 w-4 text-gray-400" />
+                            <Input
+                              type="number"
+                              value={editPreferencesData.weight || ""}
+                              onChange={(e) => setEditPreferencesData(prev => ({ ...prev, weight: parseFloat(e.target.value) || 0 }))}
+                              className="border-primary/20 focus:border-primary/40 text-sm"
+                            />
+                            <span className="text-sm text-gray-500">lbs</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
+                            <Activity className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm font-medium">
+                              {authUser?.profile?.weight ? `${authUser.profile.weight} lbs` : (t("profile.notSpecified") || "Not specified")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Estatura */}
+                      <div className="space-y-2">
+                        <Label className="text-sm text-gray-500">{t("signup.physicalInfo") || "Physical Info"}</Label>
+                        {isEditingPreferences ? (
+                          <div className="flex items-center space-x-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={editPreferencesData.height || ""}
+                              onChange={(e) => setEditPreferencesData(prev => ({ ...prev, height: parseFloat(e.target.value) || 0 }))}
+                              className="border-primary/20 focus:border-primary/40 text-sm"
+                            />
+                            <span className="text-sm text-gray-500">m</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
+                            <User className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm font-medium">
+                              {authUser?.profile?.height ? `${authUser.profile.height} m` : (t("profile.notSpecified") || "Not specified")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Metas de Salud (Calorías) */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-gray-500">{t("signup.dailyCaloriesGoal") || "Daily Calories Goal"}</Label>
+                      {isEditingPreferences ? (
+                        <div className="flex items-center space-x-2">
+                          <Flame className="h-4 w-4 text-orange-400" />
+                          <Input
+                            type="number"
+                            value={editPreferencesData.healthGoals.dailyCaloriesGoal || ""}
+                            onChange={(e) => setEditPreferencesData(prev => ({ 
+                              ...prev, 
+                              healthGoals: { ...prev.healthGoals, dailyCaloriesGoal: parseInt(e.target.value) || 0 }
+                            }))}
+                            className="border-primary/20 focus:border-primary/40 text-sm"
+                          />
+                          <span className="text-sm text-gray-500">kcal</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
+                          <Flame className="h-4 w-4 text-orange-500" />
+                          <span className="text-sm font-medium">
+                            {authUser?.profile?.healthGoals?.dailyCaloriesGoal ? `${authUser.profile.healthGoals.dailyCaloriesGoal} kcal` : (t("profile.notSpecified") || "Not specified")}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Idioma */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-gray-500">{t("profile.languagePreference") || "Language Preference"}</Label>
+                      {isEditingPreferences ? (
+                        <Select
+                          value={editPreferencesData.language}
+                          onValueChange={(value) => setEditPreferencesData(prev => ({ ...prev, language: value }))}
+                        >
+                          <SelectTrigger className="w-full border-primary/20 focus:ring-primary/40 text-sm">
+                            <SelectValue placeholder={t("language.english") || "English"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {languageOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                <div className="flex items-center space-x-2">
+                                  <span>{option.flag}</span>
+                                  <span>{option.label}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
+                          <Languages className="h-4 w-4 text-gray-500" />
+                          <span className="text-lg">
+                            {languageDisplay.flag}
+                          </span>
+                          <span className="text-sm font-medium flex-1">
+                            {languageDisplay.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
                   </div>
-                </div>
-        </CardContent>
-      </Card>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Addresses */}
+              <AccordionItem value="addresses" className="border-b-0 mt-2">
+                <AccordionTrigger className="hover:no-underline py-3 px-1 data-[state=open]:text-primary transition-colors">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3 text-primary">
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                    <span className="font-semibold text-lg">{t("checkout.address.delivery.title") || "Addresses"}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-4">
+                  {isLoadingAddresses ? (
+                    <div className="flex justify-center p-4"><span className="text-sm text-gray-500">Loading...</span></div>
+                  ) : showNewAddressForm ? (
+                    <div className="space-y-4 px-1">
+                      <h3 className="font-medium">{t("checkout.address.addNew") || "Add New Address"}</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="nickname" className="text-xs">Nickname (optional)</Label>
+                          <Input id="nickname" value={newAddress.nickname} onChange={e => setNewAddress(prev => ({...prev, nickname: e.target.value}))} placeholder="Home, Work..." />
+                        </div>
+                        <div>
+                          <Label htmlFor="line1" className="text-xs">{t("checkout.address.form.street") || "Street Address"}</Label>
+                          <Input id="line1" value={newAddress.line1} onChange={e => setNewAddress(prev => ({...prev, line1: e.target.value}))} placeholder="123 Main St" />
+                        </div>
+                        <div>
+                          <Label htmlFor="line2" className="text-xs">Apt/Suite (optional)</Label>
+                          <Input id="line2" value={newAddress.line2} onChange={e => setNewAddress(prev => ({...prev, line2: e.target.value}))} placeholder="Apt 4B" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor="city" className="text-xs">{t("checkout.address.form.city") || "City"}</Label>
+                            <Input id="city" value={newAddress.city} onChange={e => setNewAddress(prev => ({...prev, city: e.target.value}))} placeholder="City" />
+                          </div>
+                          <div>
+                            <Label htmlFor="state" className="text-xs">{t("checkout.address.form.state") || "State"}</Label>
+                            <Input id="state" value={newAddress.state} onChange={e => setNewAddress(prev => ({...prev, state: e.target.value}))} placeholder="State" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor="zipcode" className="text-xs">{t("checkout.address.form.zipCode") || "Zip Code"}</Label>
+                            <Input id="zipcode" value={newAddress.zipcode} onChange={e => setNewAddress(prev => ({...prev, zipcode: e.target.value}))} placeholder="12345" />
+                          </div>
+                          <div>
+                            <Label htmlFor="country_code" className="text-xs">{t("checkout.address.form.country") || "Country Code"}</Label>
+                            <Input id="country_code" value={newAddress.country_code} onChange={e => setNewAddress(prev => ({...prev, country_code: e.target.value.toUpperCase()}))} placeholder="US" maxLength={2} />
+                          </div>
+                        </div>
+                      </div>
+                      {addressSaveError && <p className="text-xs text-destructive">{addressSaveError}</p>}
+                      <div className="flex space-x-2 pt-2">
+                        <Button variant="outline" size="sm" onClick={() => setShowNewAddressForm(false)} className="w-full">
+                          {t("common.cancel") || "Cancel"}
+                        </Button>
+                        <Button size="sm" onClick={handleSaveAddress} disabled={isSavingAddress} className="w-full bg-primary text-white">
+                          {isSavingAddress ? "..." : (t("common.save") || "Save")}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 px-1">
+                      {addresses.length === 0 ? (
+                        <p className="text-sm text-gray-500 italic">No addresses found.</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {addresses.map((addr) => (
+                            <div key={addr._id} className="p-3 bg-gray-50 rounded-md flex items-start space-x-3">
+                              <Home className="h-5 w-5 text-gray-400 mt-0.5" />
+                              <div className="flex-1">
+                                <h4 className="text-sm font-medium">{addr.nickname || addr.line1}</h4>
+                                <p className="text-xs text-gray-500">{addr.line1} {addr.line2}</p>
+                                <p className="text-xs text-gray-500">{addr.city}, {addr.state} {addr.zipcode}</p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                                onClick={() => setAddressToDelete(addr)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <Button variant="outline" size="sm" className="w-full text-primary border-primary" onClick={() => setShowNewAddressForm(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t("checkout.address.addNew") || "Add New Address"}
+                      </Button>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            
+          </div>
+          </CardContent>
+        </Card>
+
+        {/* Orders Section */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl overflow-hidden max-w-full">
+          <CardContent className="p-6">
+            <Button 
+              className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+              onClick={() => setShowOrders(true)}
+            >
+              {t("orders.title") || "Orders"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Dialog open={showOrders} onOpenChange={setShowOrders}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+            <DialogHeader>
+              <DialogTitle>{t("orders.title") || "Orders"}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4 min-w-0 max-w-full overflow-hidden">
+              <OrdersWidget />
+            </div>
+          </DialogContent>
+        </Dialog>
 
 
       {/* Tabs Section for tracking and subscription */}
@@ -871,6 +1384,28 @@ const UserProfile = () => {
           onConfirm={handleDeleteAccount}
           isProcessing={isDeletingAccount}
         />
+
+        {/* Delete Address Modal */}
+        <Dialog open={!!addressToDelete} onOpenChange={(open) => !open && setAddressToDelete(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Address</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-gray-500">
+                Are you sure you want to delete this address? This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setAddressToDelete(null)} disabled={isDeletingAddress}>
+                {t("common.cancel") || "Cancel"}
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteAddress} disabled={isDeletingAddress} className="bg-red-600 text-white hover:bg-red-700">
+                {isDeletingAddress ? "..." : (t("common.delete") || "Delete")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

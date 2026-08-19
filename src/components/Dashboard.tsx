@@ -185,10 +185,10 @@ const DashboardContent = () => {
                 <button
                   onClick={() => setActiveTab("profile")}
                   aria-label={`${t('dashboard.header.welcome')} ${user?.name?.split(' ')[0] || 'Chef'}. Open profile`}
-                  className="flex items-center space-x-2 px-3 py-2 bg-white/20 backdrop-blur-md rounded-lg border border-white/30 hover:bg-white/30 transition-colors cursor-pointer [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
+                  className="flex items-center space-x-2 px-3 py-2 bg-white/20 backdrop-blur-md rounded-lg border border-white/90 hover:bg-white/30 transition-colors cursor-pointer [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
                 >
-                  <div aria-hidden="true" className="w-2 h-2 bg-white rounded-full motion-safe:animate-pulse"></div>
-                  <span className="text-sm text-white font-medium">
+                  <div aria-hidden="true" className="w-2 h-2 bg-black rounded-full motion-safe:animate-pulse"></div>
+                  <span className="text-sm text-black font-medium">
                     {t('dashboard.header.welcome')} {user?.name?.split(' ')[0] || 'Chef'}!
                   </span>
                 </button>

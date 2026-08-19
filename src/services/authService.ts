@@ -38,6 +38,7 @@ interface UserProfile {
   dietTypes: string[];
   alergies: string[];
   phone: string;
+  phonePrefix?: string;
   userId: string;
   ruku_client_id: string;
   suscription_id: string;
@@ -257,6 +258,33 @@ class AuthService {
       return profileData;
     } catch (error) {
       console.error('Get profile error:', error);
+      throw error;
+    }
+  }
+
+  async updateProfile(userId: string, token: string, data: Partial<UserProfile>): Promise<UserProfile> {
+    try {
+      const response = await fetch(`${this.baseURL}/user-profile/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData: ApiErrorResponse = await response.json();
+        const errorMessage = Array.isArray(errorData.message?.message) 
+          ? errorData.message.message[0] 
+          : errorData.message?.message || 'Failed to update profile';
+        throw new Error(errorMessage);
+      }
+
+      const updatedProfile: UserProfile = await response.json();
+      return updatedProfile;
+    } catch (error) {
+      console.error('Update profile error:', error);
       throw error;
     }
   }

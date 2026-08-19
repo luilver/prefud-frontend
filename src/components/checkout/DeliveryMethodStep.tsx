@@ -68,7 +68,7 @@ export const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
           </CardContent>
         </Card>
 
-        <Card 
+        {/* <Card 
           className={`cursor-pointer transition-colors ${
             data.deliveryMethod === 'pickup' 
               ? 'ring-2 ring-primary bg-primary/5' 
@@ -94,7 +94,7 @@ export const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       <Button 

@@ -18,13 +18,14 @@ const stores = [
     name: 'Walmart',
     description: 'Great everyday prices',
     logo: '🏪'
-  },
-  {
-    id: 'target' as StoreType,
-    name: 'Target',
-    description: 'Expect more, pay less',
-    logo: '🎯'
   }
+  // },
+  // {
+  //   id: 'target' as StoreType,
+  //   name: 'Target',
+  //   description: 'Expect more, pay less',
+  //   logo: '🎯'
+  // }
 ];
 
 export const StoreSelectionStep: React.FC<StoreSelectionStepProps> = ({

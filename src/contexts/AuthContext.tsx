@@ -87,6 +87,7 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
    updateSubscription: (subscription: AuthUser['subscription']) => void;
+   refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -305,6 +306,27 @@ const updateSubscription = (newSubscription: AuthUser['subscription']) => {
 };
 
 
+  const refreshProfile = async () => {
+    if (!user) return;
+    try {
+      const profile = await authService.getProfile(user.userId);
+      setUser(prev => {
+        if (!prev) return prev;
+        const updatedUser = { ...prev, profile };
+        localStorage.setItem('authUser', JSON.stringify(updatedUser));
+        
+        // Trigger profile-sync event for UserContext
+        window.dispatchEvent(
+          new CustomEvent('profile-sync', { detail: { profile } })
+        );
+        
+        return updatedUser;
+      });
+    } catch (error) {
+      console.error('Failed to refresh profile:', error);
+    }
+  };
+
   const value = {
     user,
     setUser,
@@ -313,7 +335,8 @@ const updateSubscription = (newSubscription: AuthUser['subscription']) => {
     loginFirebase,
     logout,
     isLoading,
-    updateSubscription
+    updateSubscription,
+    refreshProfile
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
