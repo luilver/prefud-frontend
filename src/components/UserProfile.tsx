@@ -62,10 +62,14 @@ import {
   Camera,
   Palette,
   Settings as SettingsIcon,
+  Home,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { getUserAddresses, createUserAddress, deleteUserAddress, UserAddress, CreateAddressPayload } from "@/services/addressService";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme, THEMES, ThemeId } from "@/contexts/ThemeContext";
@@ -171,6 +175,23 @@ const UserProfile = () => {
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
+  // Address states
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  const [newAddress, setNewAddress] = useState<CreateAddressPayload>({
+    country_code: 'US',
+    zipcode: '',
+    state: '',
+    city: '',
+    line1: '',
+    line2: '',
+    nickname: '',
+  });
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [addressSaveError, setAddressSaveError] = useState<string | null>(null);
+  const [addressToDelete, setAddressToDelete] = useState<UserAddress | null>(null);
+  const [isDeletingAddress, setIsDeletingAddress] = useState(false);
   const [editPersonalData, setEditPersonalData] = useState({
     phone: "",
     phonePrefix: "+1",
@@ -321,6 +342,51 @@ const UserProfile = () => {
     }
   };
 
+  const handleSaveAddress = async () => {
+    if (!authUser?.userId) return;
+    setAddressSaveError(null);
+    setIsSavingAddress(true);
+    try {
+      await createUserAddress(authUser.userId, newAddress);
+      const result = await getUserAddresses(authUser.userId);
+      setAddresses(result);
+      setShowNewAddressForm(false);
+      setNewAddress({
+        country_code: 'US',
+        zipcode: '',
+        state: '',
+        city: '',
+        line1: '',
+        line2: '',
+        nickname: '',
+      });
+      toast({ title: "Address added successfully", variant: "default" });
+    } catch (error: any) {
+      console.error('Error saving address:', error);
+      setAddressSaveError(error.response?.data?.message || 'Failed to save address');
+      toast({ title: "Failed to save address", variant: "destructive" });
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
+
+  const handleDeleteAddress = async () => {
+    if (!addressToDelete || !authUser?.userId) return;
+    setIsDeletingAddress(true);
+    try {
+      await deleteUserAddress(authUser.userId, addressToDelete._id);
+      const result = await getUserAddresses(authUser.userId);
+      setAddresses(result);
+      setAddressToDelete(null);
+      toast({ title: "Address deleted successfully", variant: "default" });
+    } catch (error: any) {
+      console.error('Error deleting address:', error);
+      toast({ title: "Failed to delete address", variant: "destructive" });
+    } finally {
+      setIsDeletingAddress(false);
+    }
+  };
+
   // Fetch subscription types, current subscription, and tracking data on component mount
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -376,10 +442,23 @@ const UserProfile = () => {
         console.error("Error fetching consumption history:", error);
       }
     };
+    const fetchAddresses = async () => {
+      if (!authUser?.userId) return;
+      setIsLoadingAddresses(true);
+      try {
+        const result = await getUserAddresses(authUser.userId);
+        setAddresses(result);
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
 
     fetchSubscriptionData();
     fetchTrackingData();
     fetchConsumptionData();
+    fetchAddresses();
   }, [authUser?.userId]);
 
   // Calculate daily average for calories
@@ -919,6 +998,101 @@ const UserProfile = () => {
                   </div>
                 </AccordionContent>
               </AccordionItem>
+
+              {/* Addresses */}
+              <AccordionItem value="addresses" className="border-b-0 mt-2">
+                <AccordionTrigger className="hover:no-underline py-3 px-1 data-[state=open]:text-primary transition-colors">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3 text-primary">
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                    <span className="font-semibold text-lg">{t("checkout.address.delivery.title") || "Addresses"}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-4">
+                  {isLoadingAddresses ? (
+                    <div className="flex justify-center p-4"><span className="text-sm text-gray-500">Loading...</span></div>
+                  ) : showNewAddressForm ? (
+                    <div className="space-y-4 px-1">
+                      <h3 className="font-medium">{t("checkout.address.addNew") || "Add New Address"}</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="nickname" className="text-xs">Nickname (optional)</Label>
+                          <Input id="nickname" value={newAddress.nickname} onChange={e => setNewAddress(prev => ({...prev, nickname: e.target.value}))} placeholder="Home, Work..." />
+                        </div>
+                        <div>
+                          <Label htmlFor="line1" className="text-xs">{t("checkout.address.form.street") || "Street Address"}</Label>
+                          <Input id="line1" value={newAddress.line1} onChange={e => setNewAddress(prev => ({...prev, line1: e.target.value}))} placeholder="123 Main St" />
+                        </div>
+                        <div>
+                          <Label htmlFor="line2" className="text-xs">Apt/Suite (optional)</Label>
+                          <Input id="line2" value={newAddress.line2} onChange={e => setNewAddress(prev => ({...prev, line2: e.target.value}))} placeholder="Apt 4B" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor="city" className="text-xs">{t("checkout.address.form.city") || "City"}</Label>
+                            <Input id="city" value={newAddress.city} onChange={e => setNewAddress(prev => ({...prev, city: e.target.value}))} placeholder="City" />
+                          </div>
+                          <div>
+                            <Label htmlFor="state" className="text-xs">{t("checkout.address.form.state") || "State"}</Label>
+                            <Input id="state" value={newAddress.state} onChange={e => setNewAddress(prev => ({...prev, state: e.target.value}))} placeholder="State" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor="zipcode" className="text-xs">{t("checkout.address.form.zipCode") || "Zip Code"}</Label>
+                            <Input id="zipcode" value={newAddress.zipcode} onChange={e => setNewAddress(prev => ({...prev, zipcode: e.target.value}))} placeholder="12345" />
+                          </div>
+                          <div>
+                            <Label htmlFor="country_code" className="text-xs">{t("checkout.address.form.country") || "Country Code"}</Label>
+                            <Input id="country_code" value={newAddress.country_code} onChange={e => setNewAddress(prev => ({...prev, country_code: e.target.value.toUpperCase()}))} placeholder="US" maxLength={2} />
+                          </div>
+                        </div>
+                      </div>
+                      {addressSaveError && <p className="text-xs text-destructive">{addressSaveError}</p>}
+                      <div className="flex space-x-2 pt-2">
+                        <Button variant="outline" size="sm" onClick={() => setShowNewAddressForm(false)} className="w-full">
+                          {t("common.cancel") || "Cancel"}
+                        </Button>
+                        <Button size="sm" onClick={handleSaveAddress} disabled={isSavingAddress} className="w-full bg-primary text-white">
+                          {isSavingAddress ? "..." : (t("common.save") || "Save")}
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 px-1">
+                      {addresses.length === 0 ? (
+                        <p className="text-sm text-gray-500 italic">No addresses found.</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {addresses.map((addr) => (
+                            <div key={addr._id} className="p-3 bg-gray-50 rounded-md flex items-start space-x-3">
+                              <Home className="h-5 w-5 text-gray-400 mt-0.5" />
+                              <div className="flex-1">
+                                <h4 className="text-sm font-medium">{addr.nickname || addr.line1}</h4>
+                                <p className="text-xs text-gray-500">{addr.line1} {addr.line2}</p>
+                                <p className="text-xs text-gray-500">{addr.city}, {addr.state} {addr.zipcode}</p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                                onClick={() => setAddressToDelete(addr)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <Button variant="outline" size="sm" className="w-full text-primary border-primary" onClick={() => setShowNewAddressForm(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t("checkout.address.addNew") || "Add New Address"}
+                      </Button>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
             
           </div>
@@ -1210,6 +1384,28 @@ const UserProfile = () => {
           onConfirm={handleDeleteAccount}
           isProcessing={isDeletingAccount}
         />
+
+        {/* Delete Address Modal */}
+        <Dialog open={!!addressToDelete} onOpenChange={(open) => !open && setAddressToDelete(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Address</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-gray-500">
+                Are you sure you want to delete this address? This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setAddressToDelete(null)} disabled={isDeletingAddress}>
+                {t("common.cancel") || "Cancel"}
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteAddress} disabled={isDeletingAddress} className="bg-red-600 text-white hover:bg-red-700">
+                {isDeletingAddress ? "..." : (t("common.delete") || "Delete")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
