@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { ChefHat, Sparkles, Plus, ShoppingCart } from "lucide-react";
+import { ChefHat, Sparkles, Plus, ShoppingCart, LogOut } from "lucide-react";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";

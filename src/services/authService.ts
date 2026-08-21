@@ -5,6 +5,7 @@ interface LoginResponse {
   updatedAt: string;
   expirationToken: string;
   token: string;
+  refreshToken?: string;
   userId: string;
 }
 
@@ -209,6 +210,46 @@ class AuthService {
       };
     } catch (error) {
       console.error('Firebase Login error:', error);
+      throw error;
+    }
+  }
+
+  async refreshToken(token: string): Promise<CompleteLoginResponse> {
+    try {
+      const response = await fetch(`${this.baseURL}/security/refresh-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refreshToken: token })
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = Array.isArray(responseData.message?.message) 
+          ? responseData.message.message[0] 
+          : responseData.message?.message || responseData.message;
+        throw new Error(errorMessage);
+      }
+
+      const loginData: LoginResponse = responseData;
+      
+      // Fetch user profile
+      const profile = await this.getProfile(loginData.userId);
+      // Fetch user pantry
+      const pantry = await this.getPantry(loginData.userId);
+      // Fetch user subscription
+      const subscription = await this.getSubscription(loginData.userId);
+      
+      return {
+        ...loginData,
+        profile,
+        pantry,
+        subscription
+      };
+    } catch (error) {
+      console.error('Refresh Token error:', error);
       throw error;
     }
   }

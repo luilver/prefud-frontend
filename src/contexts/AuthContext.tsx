@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
 import { isNativePlatform } from '@/services/revenueCatService';
+import { storageService } from '@/services/storageService';
 
 interface AuthUser {
   email: string;
@@ -104,50 +105,73 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount to persist session
+  // Load user from storage on mount to persist session
   useEffect(() => {
-    const restoreSession = () => {
+    const restoreSession = async () => {
       try {
-        const savedUser = localStorage.getItem('authUser');
-        const savedToken = localStorage.getItem('authToken');
+        const savedUser = await storageService.getItem('authUser');
+        const savedToken = await storageService.getItem('authToken');
         
         if (savedUser && savedToken) {
-          const parsedUser = JSON.parse(savedUser);
+          let parsedUser = JSON.parse(savedUser);
+          let tokenToUse = savedToken;
           
           // Check if token is expired
           if (authService.isTokenExpired(parsedUser.expirationToken)) {
-            // Token expired, clear storage
-            localStorage.removeItem('authUser');
-            localStorage.removeItem('authToken');
-            console.log('Session expired, cleared storage');
-          } else {
-            // Valid session, restore user
-            setUser(parsedUser);
-            console.log('Session restored successfully');
-            
-            // Trigger pantry sync event for UserContext
-            if (parsedUser.pantry) {
-              window.dispatchEvent(new CustomEvent('pantry-sync', { 
-                detail: { 
-                  pantry: parsedUser.pantry,
-                  originalPantryResponse: parsedUser.originalPantryResponse
-                } 
-              }));
+            if (parsedUser.refreshToken) {
+              console.log('Token expired, attempting refresh...');
+              try {
+                const refreshResponse = await authService.refreshToken(parsedUser.refreshToken);
+                // Update tokens and user data
+                parsedUser = refreshResponse;
+                tokenToUse = refreshResponse.token;
+                
+                await storageService.setItem('authUser', JSON.stringify(parsedUser));
+                await storageService.setItem('authToken', tokenToUse);
+                console.log('Session refreshed successfully');
+              } catch (refreshError) {
+                console.log('Refresh failed, clearing session');
+                await storageService.removeItem('authUser');
+                await storageService.removeItem('authToken');
+                setIsLoading(false);
+                return;
+              }
+            } else {
+              // Token expired, no refresh token, clear storage
+              await storageService.removeItem('authUser');
+              await storageService.removeItem('authToken');
+              console.log('Session expired, cleared storage');
+              setIsLoading(false);
+              return;
             }
+          }
+          
+          // Valid session, restore user
+          setUser(parsedUser);
+          console.log('Session restored successfully');
+          
+          // Trigger pantry sync event for UserContext
+          if (parsedUser.pantry) {
+            window.dispatchEvent(new CustomEvent('pantry-sync', { 
+              detail: { 
+                pantry: parsedUser.pantry,
+                originalPantryResponse: parsedUser.originalPantryResponse
+              } 
+            }));
+          }
 
-            // Trigger subscription sync event for SubscriptionContext
-            if (parsedUser.subscription) {
-              window.dispatchEvent(new CustomEvent('subscription-sync', { 
-                detail: { subscription: parsedUser.subscription } 
-              }));
-            }
+          // Trigger subscription sync event for SubscriptionContext
+          if (parsedUser.subscription) {
+            window.dispatchEvent(new CustomEvent('subscription-sync', { 
+              detail: { subscription: parsedUser.subscription } 
+            }));
           }
         }
       } catch (error) {
         console.error('Error restoring session:', error);
         // Clear potentially corrupted data
-        localStorage.removeItem('authUser');
-        localStorage.removeItem('authToken');
+        await storageService.removeItem('authUser');
+        await storageService.removeItem('authToken');
       } finally {
         setIsLoading(false);
       }
@@ -176,8 +200,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       };
 
       // Store user data and token for session persistence
-      localStorage.setItem('authUser', JSON.stringify(userData));
-      localStorage.setItem('authToken', response.token);
+      await storageService.setItem('authUser', JSON.stringify(userData));
+      await storageService.setItem('authToken', response.token);
       
       setUser(userData);
       console.log('Login successful, session saved');
@@ -229,8 +253,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       };
 
       // Store user data and token for session persistence
-      localStorage.setItem('authUser', JSON.stringify(userData));
-      localStorage.setItem('authToken', response.token);
+      await storageService.setItem('authUser', JSON.stringify(userData));
+      await storageService.setItem('authToken', response.token);
       
       setUser(userData);
       console.log('Firebase Login successful, session saved');
@@ -263,20 +287,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
 
-  const logout = () => {
+  const logout = async () => {
     console.log('Logging out and clearing all session data');
     
     // Clear user state
     setUser(null);
     
-    // Clean all session-related data from localStorage for security
+    // Clean all session-related data from storage for security
     const keysToRemove = [
       'authUser', 'authToken', 'userSubscription',
       'user', 'pantryItems', 'shoppingItems', 'mealPlans',
       'completedMeals', 'subscriptionInfo', 'aiMeals',
       'aiDrinks', 'favoriteMeals', 'pantry-cart'
     ];
-    keysToRemove.forEach(key => localStorage.removeItem(key));
+    for (const key of keysToRemove) {
+      await storageService.removeItem(key);
+    }
     
     // Clear subscription context via sync event
     window.dispatchEvent(new CustomEvent('subscription-sync', { detail: { subscription: null } }));
@@ -286,17 +312,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
 //update subscription
-const updateSubscription = (newSubscription: AuthUser['subscription']) => {
+const updateSubscription = async (newSubscription: AuthUser['subscription']) => {
   setUser(prevUser => 
     prevUser ? { ...prevUser, subscription: newSubscription } : prevUser
   );
 
   // Keep session persistence updated
-  const savedUser = localStorage.getItem('authUser');
+  const savedUser = await storageService.getItem('authUser');
   if (savedUser) {
     const parsedUser = JSON.parse(savedUser);
     parsedUser.subscription = newSubscription;
-    localStorage.setItem('authUser', JSON.stringify(parsedUser));
+    await storageService.setItem('authUser', JSON.stringify(parsedUser));
   }
 
   // Trigger subscription-sync event
@@ -313,7 +339,7 @@ const updateSubscription = (newSubscription: AuthUser['subscription']) => {
       setUser(prev => {
         if (!prev) return prev;
         const updatedUser = { ...prev, profile };
-        localStorage.setItem('authUser', JSON.stringify(updatedUser));
+        storageService.setItem('authUser', JSON.stringify(updatedUser)).catch(console.error);
         
         // Trigger profile-sync event for UserContext
         window.dispatchEvent(
