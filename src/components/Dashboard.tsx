@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { ChefHat, Sparkles, Plus, ShoppingCart } from "lucide-react";
+import { ChefHat, Sparkles, Plus, ShoppingCart, LogOut } from "lucide-react";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -197,22 +197,20 @@ const DashboardContent = () => {
               <div className="flex items-center space-x-4">
                 <LanguageSelector variant="button" />
                 
-                {/* Cart Icon with Badge - Hidden on native */}
-                {!isNative && (
-                  <Button
-                    variant="ghost"
-                    onClick={handleCartClick}
-                    aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
-                    className="relative text-white hover:bg-white/20 hover:text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.4))] focus-visible:ring-2 focus-visible:ring-white"
-                  >
-                    <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-                    {getTotalItems() > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
-                        {getTotalItems()}
-                      </span>
-                    )}
-                  </Button>
-                )}
+                {/* Cart Icon with Badge */}
+                <Button
+                  variant="ghost"
+                  onClick={handleCartClick}
+                  aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
+                  className="relative text-white hover:bg-white/20 hover:text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.4))] focus-visible:ring-2 focus-visible:ring-white"
+                >
+                  <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                  {getTotalItems() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+                      {getTotalItems()}
+                    </span>
+                  )}
+                </Button>
                 
                 <Button 
                   variant="ghost" 
@@ -246,22 +244,20 @@ const DashboardContent = () => {
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <LanguageSelector variant="button" className="mr-1 sm:mr-2" />
                 
-                {/* Cart Icon with Badge for Mobile - Hidden on native */}
-                {!isNative && (
-                  <Button
-                    variant="ghost"
-                    onClick={handleCartClick}
-                    aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
-                    className="relative text-white/90 hover:bg-white/15 hover:text-white w-11 h-11 p-0 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
-                  >
-                    <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-                    {getTotalItems() > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
-                        {getTotalItems() > 9 ? '9+' : getTotalItems()}
-                      </span>
-                    )}
-                  </Button>
-                )}
+                {/* Cart Icon with Badge for Mobile */}
+                <Button
+                  variant="ghost"
+                  onClick={handleCartClick}
+                  aria-label={`Shopping cart${getTotalItems() > 0 ? `, ${getTotalItems()} items` : ''}`}
+                  className="relative text-white/90 hover:bg-white/15 hover:text-white w-11 h-11 p-0 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+                >
+                  <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                  {getTotalItems() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-semibold rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
+                      {getTotalItems() > 9 ? '9+' : getTotalItems()}
+                    </span>
+                  )}
+                </Button>
                 
                 {/* Mobile Welcome - Now clickable to navigate to profile */}
                 <button

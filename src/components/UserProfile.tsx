@@ -1356,7 +1356,7 @@ const UserProfile = () => {
         </Tabs>
 
         {/* Check Favorites Button */}
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl mt-4">
           <CardContent className="p-4">
             <Button
               onClick={() => navigate("/favorites")}
@@ -1364,6 +1364,20 @@ const UserProfile = () => {
             >
               <Heart className="h-4 w-4" />
               <span>{t("profile.checkFavorites")}</span>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Logout Button */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl mt-4 md:hidden">
+          <CardContent className="p-4">
+            <Button
+              onClick={logout}
+              variant="destructive"
+              className="w-full transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>{t("dashboard.header.logout") || "Logout"}</span>
             </Button>
           </CardContent>
         </Card>
