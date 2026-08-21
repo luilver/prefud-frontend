@@ -13,8 +13,10 @@ dependencies {
     implementation project(':capacitor-firebase-analytics')
     implementation project(':capacitor-firebase-authentication')
     implementation project(':capacitor-camera')
+    implementation project(':capacitor-preferences')
     implementation project(':capacitor-splash-screen')
     implementation project(':revenuecat-purchases-capacitor')
+    implementation project(':capacitor-secure-storage-plugin')
 
 }
 
