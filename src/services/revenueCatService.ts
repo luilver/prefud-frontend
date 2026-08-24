@@ -17,6 +17,7 @@ export const isNativePlatform = (): boolean => {
 
 const IOS_KEY = import.meta.env.VITE_RC_IOS_KEY as string | undefined;
 const ANDROID_KEY = import.meta.env.VITE_RC_ANDROID_KEY as string | undefined;
+const TEST_KEY = import.meta.env.VITE_REVENUECAT_API_KEY as string | undefined;
 
 let configured = false;
 let configuringUserId: string | null = null;
@@ -29,12 +30,17 @@ export async function initRevenueCat(appUserId?: string): Promise<void> {
   if (!isNativePlatform()) return;
 
   const platform = Capacitor.getPlatform();
-  const apiKey = platform === 'ios' ? IOS_KEY : ANDROID_KEY;
+  let apiKey = platform === 'ios' ? IOS_KEY : ANDROID_KEY;
+
+  const isDev = import.meta.env.DEV || import.meta.env.ENV === 'development' || import.meta.env.VITE_ENV === 'development';
+  if (isDev && TEST_KEY) {
+    apiKey = TEST_KEY;
+  }
 
   if (!apiKey) {
     console.warn(
       `[RevenueCat] Missing public SDK key for ${platform}. ` +
-        `Set VITE_RC_IOS_KEY / VITE_RC_ANDROID_KEY.`
+        `Set VITE_RC_IOS_KEY / VITE_RC_ANDROID_KEY (or VITE_REVENUECAT_API_KEY in dev).`
     );
     return;
   }
@@ -64,9 +70,21 @@ export async function initRevenueCat(appUserId?: string): Promise<void> {
 export async function getNativeOfferings(): Promise<PurchasesPackage[]> {
   if (!isNativePlatform() || !configured) return [];
   try {
-    const { current } = await Purchases.getOfferings();
-    const offering: PurchasesOffering | null = current ?? null;
-    return offering?.availablePackages ?? [];
+    const offerings = await Purchases.getOfferings();
+    
+    // Collect all packages from all offerings to support the user's specific setup
+    const allPackages: PurchasesPackage[] = [];
+    for (const key in offerings.all) {
+      const offering = offerings.all[key];
+      // Force inject offeringIdentifier in case the native bridge omits it
+      const pkgs = offering.availablePackages.map(pkg => ({
+        ...pkg,
+        offeringIdentifier: offering.identifier
+      }));
+      allPackages.push(...pkgs);
+    }
+    
+    return allPackages;
   } catch (e) {
     console.error('[RevenueCat] getOfferings failed', e);
     return [];

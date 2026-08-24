@@ -46,6 +46,7 @@ import type { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 interface SubscriptionPlan {
   id: string;
   name: string;
+  originalName: string;
   price: number;
   interval: string;
   features: string[];
@@ -132,6 +133,7 @@ const SubscriptionManager = () => {
       return {
         id: apiPlan._id,
         name: translatedName,
+        originalName: apiPlan.name,
         price: priceInDollars,
         interval: t("pricing.interval.month") !== "pricing.interval.month" ? t("pricing.interval.month") : "month",
         features,
@@ -167,8 +169,10 @@ const SubscriptionManager = () => {
           convertedPlans = convertedPlans.filter((plan) => {
             if (plan.price === 0) return true;
             return nativePackages.some((pkg) => {
+              const offeringMatch = pkg.offeringIdentifier?.toLowerCase() === plan.originalName.toLowerCase();
               const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
-              return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+              const productMatch = mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
+              return offeringMatch || productMatch;
             });
           });
         }
@@ -218,10 +222,10 @@ const SubscriptionManager = () => {
     if (!isNative || nativePackages.length === 0) return null;
     return (
       nativePackages.find((pkg) => {
+        const offeringMatch = pkg.offeringIdentifier?.toLowerCase() === plan.originalName.toLowerCase();
         const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
-        return (
-          mappedName && mappedName.toLowerCase() === plan.name.toLowerCase()
-        );
+        const productMatch = mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
+        return offeringMatch || productMatch;
       }) ?? null
     );
   };

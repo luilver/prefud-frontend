@@ -71,7 +71,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     // Connect to the NestJS WebSocket Gateway (Ensure URL matches your backend environment)
-    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "ws://localhost:3001"); 
+    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "wss://pantry-ms-brain.onrender.com"); 
     setSocket(socketInstance);
 
     socketInstance.on("generationCompleted", (data) => {

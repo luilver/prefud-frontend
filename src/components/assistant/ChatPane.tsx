@@ -14,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import { Bot, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
 
 const ChatPane: React.FC = () => {
   const { messages, isTyping, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, addToPantry } = useAssistant();
@@ -41,6 +42,8 @@ const ChatPane: React.FC = () => {
     pickQuestion(ask);
   };
 
+  const { addItem } = useCart();
+
   const handleOpenMeal = (meal: MealBase) => {
     if (isMobile) setSheetMeal(meal);
     else openInWorkspace({ type: "specialMeal", data: {
@@ -50,7 +53,18 @@ const ChatPane: React.FC = () => {
     } });
   };
 
-  const handleAddToCart = (items: IngredientListItem[]) => startCheckout(items);
+  const handleAddToCart = (items: IngredientListItem[]) => {
+    items.forEach(item => {
+      addItem({
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        category: item.classification || "General"
+      });
+    });
+    startCheckout(items);
+    toast({ title: t("assistant.chat.addedToCart") || "Added to App Cart", description: `${items.length} ${t("assistant.chat.ingredients") || "items"} added` });
+  };
   const handleAddToPantry = (items: IngredientListItem[]) => {
     addToPantry(items);
   };
@@ -134,7 +148,7 @@ const ChatPane: React.FC = () => {
       </Sheet>
 
       <Sheet open={!!mobilePayload} onOpenChange={(o) => !o && setMobilePayload(null)}>
-        <SheetContent side="bottom" className="h-[100dvh] w-full overflow-y-auto rounded-none pt-12">
+        <SheetContent side="bottom" className="h-[90dvh] w-full overflow-y-auto rounded-t-2xl pt-12">
           {mobilePayload && (
             <PayloadRenderer
               payload={mobilePayload}

@@ -7,13 +7,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { User, ArrowLeft, ArrowRight, Languages, ExternalLink, Activity, Apple, Sparkles, Check } from "lucide-react";
+import { User, ArrowLeft, ArrowRight, Languages, ExternalLink, Activity, Apple, Sparkles, Check, Calendar as CalendarIcon } from "lucide-react";
 import CountrySelect, { countries } from "./CountrySelect";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 import { trackEvent } from "@/services/analytics";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
 
@@ -21,11 +26,13 @@ interface UserProfileFormProps {
   onComplete: (profileData: any) => void;
   onBack: () => void;
   userId?: string;
+  initialName?: string;
+  authProvider?: 'apple' | 'google' | '';
   setCustomer: (customerId: string) => void;
   setUserId: (userId: string) => void;
 }
 
-const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }: UserProfileFormProps) => {
+const UserProfileForm = ({ onComplete, onBack, userId, initialName, authProvider, setCustomer, setUserId }: UserProfileFormProps) => {
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -36,9 +43,35 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentStep]);
+
+  const splitName = (fullName?: string) => {
+    if (!fullName) return { name: "", lastName: "" };
+    const parts = fullName.trim().split(" ");
+    const name = parts[0] || "";
+    const lastName = parts.length > 1 ? parts.slice(1).join(" ") : "";
+    return { name, lastName };
+  };
+
+  const initialNameParts = splitName(initialName);
+  const isAppleSignIn = authProvider === 'apple';
+  const hideNameFields = isAppleSignIn || !!initialName;
+
+  // Generate a random name for Apple sign-in users when Apple doesn't provide one
+  const generateRandomName = () => {
+    const adjectives = ['Happy', 'Bright', 'Fresh', 'Healthy', 'Smart', 'Cool', 'Green', 'Sunny', 'Swift', 'Bold'];
+    const nouns = ['Chef', 'Cook', 'Foodie', 'Planner', 'Gourmet', 'Taster', 'Baker', 'Eater', 'Diner', 'Picker'];
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    return { name: adj, lastName: noun };
+  };
+
+  const [generatedName] = useState(() => generateRandomName());
+
+  console.log("[UserProfileForm] initialName prop:", JSON.stringify(initialName), "authProvider:", authProvider, "hideNameFields:", hideNameFields, "split:", JSON.stringify(initialNameParts));
+
   const [formData, setFormData] = useState({
-    name: "",
-    lastName: "",
+    name: initialNameParts.name,
+    lastName: initialNameParts.lastName,
     country: "",
     phone: "",
     weight: "",
@@ -98,8 +131,10 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
     const errors: Record<string, string> = {};
 
     if (step === 1) {
-      if (!formData.name.trim()) errors.name = (t("signup.firstName") || "First Name") + " is required";
-      if (!formData.lastName.trim()) errors.lastName = (t("signup.lastName") || "Last Name") + " is required";
+      if (!hideNameFields) {
+        if (!formData.name.trim()) errors.name = (t("signup.firstName") || "First Name") + " is required";
+        if (!formData.lastName.trim()) errors.lastName = (t("signup.lastName") || "Last Name") + " is required";
+      }
       if (!formData.phone.trim()) errors.phone = (t("signup.phoneNumber") || "Phone Number") + " is required";
       
       if (!formData.birthday) {
@@ -169,9 +204,17 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
       const phonePrefix = selectedCountry?.prefix || '';
 
       // Prepare data for API
+      // When Apple sign-in doesn't provide a name, use a generated random name
+      let effectiveName = formData.name;
+      let effectiveLastName = formData.lastName;
+      if (isAppleSignIn && !effectiveName) {
+        effectiveName = initialNameParts.name || generatedName.name;
+        effectiveLastName = initialNameParts.lastName || generatedName.lastName;
+      }
+
       const profileData = {
-        name: formData.name,
-        lastName: formData.lastName,
+        name: effectiveName,
+        lastName: effectiveLastName,
         weight: parseFloat(formData.weight) || 0,
         height: parseFloat(formData.heightMeters) || 0,
         birthday: formData.birthday,
@@ -320,30 +363,49 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
           
           {currentStep === 1 && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium text-foreground">{t("signup.firstName") || "First Name"}</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => { setFormData(prev => ({ ...prev, name: e.target.value })); setFormErrors(prev => { const { name, ...rest } = prev; return rest; }); }}
-                    className={`h-12 bg-background border-border focus:border-primary focus:ring-primary/20 transition-all ${formErrors.name ? 'border-destructive focus:border-destructive' : ''}`}
-                    placeholder="e.g. John"
-                  />
-                  {formErrors.name && <p className="text-destructive text-xs">{formErrors.name}</p>}
+              {hideNameFields ? (
+                <div className="space-y-2 bg-muted/50 p-4 rounded-xl border border-border">
+                  <div className="flex items-center gap-2">
+                    <Apple className="h-5 w-5 text-foreground" />
+                    <Label className="text-sm font-medium text-foreground">{t("signup.fullName") || "Full Name"}</Label>
+                  </div>
+                  {initialName ? (
+                    <p className="text-lg font-semibold text-foreground">{initialName}</p>
+                  ) : (
+                    <>
+                      <p className="text-lg font-semibold text-foreground">{generatedName.name} {generatedName.lastName}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {t("signup.nameLinkedFromApple") || "Your name is linked from your Apple ID"}
+                      </p>
+                    </>
+                  )}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-sm font-medium text-foreground">{t("signup.lastName") || "Last Name"}</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => { setFormData(prev => ({ ...prev, lastName: e.target.value })); setFormErrors(prev => { const { lastName, ...rest } = prev; return rest; }); }}
-                    className={`h-12 bg-background border-border focus:border-primary focus:ring-primary/20 transition-all ${formErrors.lastName ? 'border-destructive focus:border-destructive' : ''}`}
-                    placeholder="e.g. Doe"
-                  />
-                  {formErrors.lastName && <p className="text-destructive text-xs">{formErrors.lastName}</p>}
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium text-foreground">{t("signup.firstName") || "First Name"}</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => { setFormData(prev => ({ ...prev, name: e.target.value })); setFormErrors(prev => { const { name, ...rest } = prev; return rest; }); }}
+                      className={`h-12 bg-background border-border focus:border-primary focus:ring-primary/20 transition-all ${formErrors.name ? 'border-destructive focus:border-destructive' : ''}`}
+                      placeholder="e.g. John"
+                    />
+                    {formErrors.name && <p className="text-destructive text-xs">{formErrors.name}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName" className="text-sm font-medium text-foreground">{t("signup.lastName") || "Last Name"}</Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => { setFormData(prev => ({ ...prev, lastName: e.target.value })); setFormErrors(prev => { const { lastName, ...rest } = prev; return rest; }); }}
+                      className={`h-12 bg-background border-border focus:border-primary focus:ring-primary/20 transition-all ${formErrors.lastName ? 'border-destructive focus:border-destructive' : ''}`}
+                      placeholder="e.g. Doe"
+                    />
+                    {formErrors.lastName && <p className="text-destructive text-xs">{formErrors.lastName}</p>}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="country" className="text-sm font-medium text-foreground">{t("signup.country") || "Country"}</Label>
@@ -384,13 +446,38 @@ const UserProfileForm = ({ onComplete, onBack, userId, setCustomer, setUserId }:
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <Label htmlFor="birthday" className="text-sm font-medium text-foreground">{t("signup.birthday") || "Birthday"}</Label>
-                  <Input
-                    id="birthday"
-                    type="date"
-                    value={formData.birthday}
-                    onChange={(e) => { setFormData(prev => ({ ...prev, birthday: e.target.value })); setFormErrors(prev => { const { birthday, ...rest } = prev; return rest; }); }}
-                    className={`h-12 bg-background border-border focus:border-primary focus:ring-primary/20 transition-all ${formErrors.birthday ? 'border-destructive focus:border-destructive' : ''}`}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full h-12 justify-start text-left font-normal bg-background border-border hover:bg-muted/50",
+                          !formData.birthday && "text-muted-foreground",
+                          formErrors.birthday && "border-destructive focus:border-destructive"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {formData.birthday ? (
+                          format(new Date(formData.birthday + 'T12:00:00'), "PPP")
+                        ) : (
+                          <span>{t("signup.birthdayPlaceholder") || "Pick a date"}</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.birthday ? new Date(formData.birthday + 'T12:00:00') : undefined}
+                        onSelect={(date) => {
+                          const dateString = date ? format(date, "yyyy-MM-dd") : "";
+                          setFormData(prev => ({ ...prev, birthday: dateString }));
+                          setFormErrors(prev => { const { birthday, ...rest } = prev; return rest; });
+                        }}
+                        initialFocus
+                        defaultMonth={new Date(2000, 0)}
+                      />
+                    </PopoverContent>
+                  </Popover>
                   {formErrors.birthday && <p className="text-destructive text-xs">{formErrors.birthday}</p>}
                 </div>
                 <div className="space-y-2">

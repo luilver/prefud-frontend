@@ -67,6 +67,8 @@ interface SignupData {
   password: string;
   userId?: string;
   firebaseToken?: string;
+  initialName?: string;
+  authProvider?: 'apple' | 'google' | '';
   wantsSubscription: boolean;
   selectedPlan?: string;
   profile?: {
@@ -88,7 +90,7 @@ const BasicURL =
 
 const SignupSteps = () => {
   const location = useLocation();
-  const incompleteState = location.state as { accountIncomplete?: boolean; email?: string; userId?: string; firebaseToken?: string } | null;
+  const incompleteState = location.state as { accountIncomplete?: boolean; email?: string; name?: string; userId?: string; firebaseToken?: string; authProvider?: 'apple' | 'google' | '' } | null;
   const isAccountIncomplete = incompleteState?.accountIncomplete === true;
 
   const [currentStep, setCurrentStep] = useState(isAccountIncomplete ? 2 : 1);
@@ -97,8 +99,13 @@ const SignupSteps = () => {
     password: "",
     userId: incompleteState?.userId || undefined,
     firebaseToken: incompleteState?.firebaseToken || undefined,
+    initialName: incompleteState?.name || "",
+    authProvider: incompleteState?.authProvider || "",
     wantsSubscription: false,
   });
+
+  console.log("[SignupSteps] incompleteState:", JSON.stringify(incompleteState));
+  console.log("[SignupSteps] initialName from state:", JSON.stringify(signupData.initialName));
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useUser();
@@ -258,6 +265,7 @@ const SignupSteps = () => {
     setIsLoading(true);
     let token = "";
     let email = "";
+    let name = "";
     try {
       if (isNativePlatform()) {
         console.log('it is native platform ');
@@ -265,19 +273,40 @@ const SignupSteps = () => {
           const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
           console.log('google login ', result);
           email = result.user?.email || "";
+          name = result.user?.displayName || "";
         } else if (provider === appleProvider) {
-          const result = await FirebaseAuthentication.signInWithApple();
+          const result = await FirebaseAuthentication.signInWithApple({
+            scopes: ['email', 'name'],
+          });
           console.log('apple login ', result);
           email = result.user?.email || "";
+          // Apple may return displayName as null after the first authorization.
+          // Try multiple sources for the name.
+          name = result.user?.displayName || "";
+          if (!name && result.additionalUserInfo?.profile) {
+            const profile = result.additionalUserInfo.profile as any;
+            const firstName = profile?.name?.firstName || "";
+            const lastName = profile?.name?.lastName || "";
+            if (firstName || lastName) {
+              name = `${firstName} ${lastName}`.trim();
+            }
+          }
         }
 
         // Get the Firebase ID token (JWT), not the Google/Apple ID token
         const tokenResult = await FirebaseAuthentication.getIdToken();
         token = tokenResult.token || "";
+
+        // Fallback: try Firebase currentUser displayName
+        if (!name) {
+          const currentUser = await FirebaseAuthentication.getCurrentUser();
+          name = currentUser.user?.displayName || "";
+        }
       } else {
         const result = await signInWithPopup(auth, provider);
         token = await result.user.getIdToken();
         email = result.user.email || "";
+        name = result.user.displayName || "";
       }
 
       const responseData = await authService.signupFirebase(token, { email });
@@ -293,6 +322,8 @@ const SignupSteps = () => {
           ...prev,
           userId: responseData.response.userId,
           email: email || prev.email,
+          initialName: name || prev.initialName,
+          authProvider: provider === appleProvider ? 'apple' : provider === googleProvider ? 'google' : '',
           firebaseToken: token,
         }));
         setCurrentStep(2);
@@ -796,6 +827,8 @@ const SignupSteps = () => {
           onComplete={handleProfileComplete}
           onBack={() => setCurrentStep(1)}
           userId={signupData.userId}
+          initialName={signupData.initialName}
+          authProvider={signupData.authProvider}
           setCustomer={setCustomerId}
           setUserId={setUserId}
         />

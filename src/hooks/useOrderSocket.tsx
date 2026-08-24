@@ -10,7 +10,7 @@ export function useOrderSocket(orderIds: string[]) {
     if (!orderIds || orderIds.length === 0) return;
 
     // Connect to the NestJS backend
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'ws://localhost:3001';
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'wss://pantry-ms-brain.onrender.com';
     const socket = io(socketUrl);
     socketRef.current = socket;
 
