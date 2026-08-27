@@ -71,7 +71,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     // Connect to the NestJS WebSocket Gateway (Ensure URL matches your backend environment)
-    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "ws://localhost:3001"); 
+    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "wss://pantry-ms-brain.onrender.com"); 
     setSocket(socketInstance);
 
     socketInstance.on("generationCompleted", (data) => {
@@ -92,6 +92,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       const responseText = data.result?.message?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
       const questions = data.result?.message?.questions || data.result?.questions;
+      const links = data.result?.message?.links || data.result?.links;
       let payload = data.result?.message?.payload || data.result?.payload;
       const genMeals = data.result?.message?.generatedMeals;
       if (genMeals) {
@@ -142,6 +143,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           text: responseText,
           questions: questions,
           payload: payload,
+          links: links,
         },
       ]);
     });

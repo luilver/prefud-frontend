@@ -1,0 +1,1228 @@
+{
+    "all": {
+        "default": {
+            "identifier": "default",
+            "serverDescription": "The standard set of packages",
+            "metadata": {},
+            "availablePackages": [
+                {
+                    "identifier": "$rc_monthly",
+                    "packageType": "MONTHLY",
+                    "product": {
+                        "identifier": "monthly",
+                        "description": "",
+                        "title": "Monthly",
+                        "price": 9.99,
+                        "priceString": "$9.99",
+                        "currencyCode": "USD",
+                        "introPrice": null,
+                        "discounts": null,
+                        "pricePerWeek": 2.299068,
+                        "pricePerMonth": 9.99,
+                        "pricePerYear": 119.88,
+                        "pricePerWeekString": "$2.29",
+                        "pricePerMonthString": "$9.99",
+                        "pricePerYearString": "$119.88",
+                        "productCategory": "SUBSCRIPTION",
+                        "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                        "subscriptionPeriod": "P1M",
+                        "defaultOption": {
+                            "id": "testBasePlanId",
+                            "storeProductId": "monthly",
+                            "productId": "monthly",
+                            "pricingPhases": [
+                                {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                }
+                            ],
+                            "tags": [],
+                            "isBasePlan": true,
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "isPrepaid": false,
+                            "fullPricePhase": {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            },
+                            "freePhase": null,
+                            "introPhase": null,
+                            "presentedOfferingIdentifier": "offering",
+                            "presentedOfferingContext": {
+                                "offeringIdentifier": "offering",
+                                "placementIdentifier": null,
+                                "targetingContext": null
+                            },
+                            "installmentsInfo": null
+                        },
+                        "subscriptionOptions": [
+                            {
+                                "id": "testBasePlanId",
+                                "storeProductId": "monthly",
+                                "productId": "monthly",
+                                "pricingPhases": [
+                                    {
+                                        "billingPeriod": {
+                                            "unit": "MONTH",
+                                            "value": 1,
+                                            "iso8601": "P1M"
+                                        },
+                                        "recurrenceMode": 1,
+                                        "billingCycleCount": null,
+                                        "price": {
+                                            "formatted": "$9.99",
+                                            "amountMicros": 9990000,
+                                            "currencyCode": "USD"
+                                        },
+                                        "offerPaymentMode": null
+                                    }
+                                ],
+                                "tags": [],
+                                "isBasePlan": true,
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "isPrepaid": false,
+                                "fullPricePhase": {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                },
+                                "freePhase": null,
+                                "introPhase": null,
+                                "presentedOfferingIdentifier": "offering",
+                                "presentedOfferingContext": {
+                                    "offeringIdentifier": "offering",
+                                    "placementIdentifier": null,
+                                    "targetingContext": null
+                                },
+                                "installmentsInfo": null
+                            }
+                        ],
+                        "presentedOfferingIdentifier": "default",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "default",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        }
+                    },
+                    "offeringIdentifier": "default",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "default",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    },
+                    "webCheckoutUrl": null
+                }
+            ],
+            "lifetime": null,
+            "annual": null,
+            "sixMonth": null,
+            "threeMonth": null,
+            "twoMonth": null,
+            "monthly": {
+                "identifier": "$rc_monthly",
+                "packageType": "MONTHLY",
+                "product": {
+                    "identifier": "monthly",
+                    "description": "",
+                    "title": "Monthly",
+                    "price": 9.99,
+                    "priceString": "$9.99",
+                    "currencyCode": "USD",
+                    "introPrice": null,
+                    "discounts": null,
+                    "pricePerWeek": 2.299068,
+                    "pricePerMonth": 9.99,
+                    "pricePerYear": 119.88,
+                    "pricePerWeekString": "$2.29",
+                    "pricePerMonthString": "$9.99",
+                    "pricePerYearString": "$119.88",
+                    "productCategory": "SUBSCRIPTION",
+                    "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                    "subscriptionPeriod": "P1M",
+                    "defaultOption": {
+                        "id": "testBasePlanId",
+                        "storeProductId": "monthly",
+                        "productId": "monthly",
+                        "pricingPhases": [
+                            {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            }
+                        ],
+                        "tags": [],
+                        "isBasePlan": true,
+                        "billingPeriod": {
+                            "unit": "MONTH",
+                            "value": 1,
+                            "iso8601": "P1M"
+                        },
+                        "isPrepaid": false,
+                        "fullPricePhase": {
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "recurrenceMode": 1,
+                            "billingCycleCount": null,
+                            "price": {
+                                "formatted": "$9.99",
+                                "amountMicros": 9990000,
+                                "currencyCode": "USD"
+                            },
+                            "offerPaymentMode": null
+                        },
+                        "freePhase": null,
+                        "introPhase": null,
+                        "presentedOfferingIdentifier": "offering",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "offering",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        },
+                        "installmentsInfo": null
+                    },
+                    "subscriptionOptions": [
+                        {
+                            "id": "testBasePlanId",
+                            "storeProductId": "monthly",
+                            "productId": "monthly",
+                            "pricingPhases": [
+                                {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                }
+                            ],
+                            "tags": [],
+                            "isBasePlan": true,
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "isPrepaid": false,
+                            "fullPricePhase": {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            },
+                            "freePhase": null,
+                            "introPhase": null,
+                            "presentedOfferingIdentifier": "offering",
+                            "presentedOfferingContext": {
+                                "offeringIdentifier": "offering",
+                                "placementIdentifier": null,
+                                "targetingContext": null
+                            },
+                            "installmentsInfo": null
+                        }
+                    ],
+                    "presentedOfferingIdentifier": "default",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "default",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    }
+                },
+                "offeringIdentifier": "default",
+                "presentedOfferingContext": {
+                    "offeringIdentifier": "default",
+                    "placementIdentifier": null,
+                    "targetingContext": null
+                },
+                "webCheckoutUrl": null
+            },
+            "weekly": null,
+            "webCheckoutUrl": null
+        },
+        "family": {
+            "identifier": "family",
+            "serverDescription": "Family Subscription",
+            "metadata": {},
+            "availablePackages": [
+                {
+                    "identifier": "$rc_monthly",
+                    "packageType": "MONTHLY",
+                    "product": {
+                        "identifier": "monthly",
+                        "description": "",
+                        "title": "Monthly",
+                        "price": 9.99,
+                        "priceString": "$9.99",
+                        "currencyCode": "USD",
+                        "introPrice": null,
+                        "discounts": null,
+                        "pricePerWeek": 2.299068,
+                        "pricePerMonth": 9.99,
+                        "pricePerYear": 119.88,
+                        "pricePerWeekString": "$2.29",
+                        "pricePerMonthString": "$9.99",
+                        "pricePerYearString": "$119.88",
+                        "productCategory": "SUBSCRIPTION",
+                        "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                        "subscriptionPeriod": "P1M",
+                        "defaultOption": {
+                            "id": "testBasePlanId",
+                            "storeProductId": "monthly",
+                            "productId": "monthly",
+                            "pricingPhases": [
+                                {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                }
+                            ],
+                            "tags": [],
+                            "isBasePlan": true,
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "isPrepaid": false,
+                            "fullPricePhase": {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            },
+                            "freePhase": null,
+                            "introPhase": null,
+                            "presentedOfferingIdentifier": "offering",
+                            "presentedOfferingContext": {
+                                "offeringIdentifier": "offering",
+                                "placementIdentifier": null,
+                                "targetingContext": null
+                            },
+                            "installmentsInfo": null
+                        },
+                        "subscriptionOptions": [
+                            {
+                                "id": "testBasePlanId",
+                                "storeProductId": "monthly",
+                                "productId": "monthly",
+                                "pricingPhases": [
+                                    {
+                                        "billingPeriod": {
+                                            "unit": "MONTH",
+                                            "value": 1,
+                                            "iso8601": "P1M"
+                                        },
+                                        "recurrenceMode": 1,
+                                        "billingCycleCount": null,
+                                        "price": {
+                                            "formatted": "$9.99",
+                                            "amountMicros": 9990000,
+                                            "currencyCode": "USD"
+                                        },
+                                        "offerPaymentMode": null
+                                    }
+                                ],
+                                "tags": [],
+                                "isBasePlan": true,
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "isPrepaid": false,
+                                "fullPricePhase": {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                },
+                                "freePhase": null,
+                                "introPhase": null,
+                                "presentedOfferingIdentifier": "offering",
+                                "presentedOfferingContext": {
+                                    "offeringIdentifier": "offering",
+                                    "placementIdentifier": null,
+                                    "targetingContext": null
+                                },
+                                "installmentsInfo": null
+                            }
+                        ],
+                        "presentedOfferingIdentifier": "family",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "family",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        }
+                    },
+                    "offeringIdentifier": "family",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "family",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    },
+                    "webCheckoutUrl": null
+                }
+            ],
+            "lifetime": null,
+            "annual": null,
+            "sixMonth": null,
+            "threeMonth": null,
+            "twoMonth": null,
+            "monthly": {
+                "identifier": "$rc_monthly",
+                "packageType": "MONTHLY",
+                "product": {
+                    "identifier": "monthly",
+                    "description": "",
+                    "title": "Monthly",
+                    "price": 9.99,
+                    "priceString": "$9.99",
+                    "currencyCode": "USD",
+                    "introPrice": null,
+                    "discounts": null,
+                    "pricePerWeek": 2.299068,
+                    "pricePerMonth": 9.99,
+                    "pricePerYear": 119.88,
+                    "pricePerWeekString": "$2.29",
+                    "pricePerMonthString": "$9.99",
+                    "pricePerYearString": "$119.88",
+                    "productCategory": "SUBSCRIPTION",
+                    "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                    "subscriptionPeriod": "P1M",
+                    "defaultOption": {
+                        "id": "testBasePlanId",
+                        "storeProductId": "monthly",
+                        "productId": "monthly",
+                        "pricingPhases": [
+                            {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            }
+                        ],
+                        "tags": [],
+                        "isBasePlan": true,
+                        "billingPeriod": {
+                            "unit": "MONTH",
+                            "value": 1,
+                            "iso8601": "P1M"
+                        },
+                        "isPrepaid": false,
+                        "fullPricePhase": {
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "recurrenceMode": 1,
+                            "billingCycleCount": null,
+                            "price": {
+                                "formatted": "$9.99",
+                                "amountMicros": 9990000,
+                                "currencyCode": "USD"
+                            },
+                            "offerPaymentMode": null
+                        },
+                        "freePhase": null,
+                        "introPhase": null,
+                        "presentedOfferingIdentifier": "offering",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "offering",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        },
+                        "installmentsInfo": null
+                    },
+                    "subscriptionOptions": [
+                        {
+                            "id": "testBasePlanId",
+                            "storeProductId": "monthly",
+                            "productId": "monthly",
+                            "pricingPhases": [
+                                {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                }
+                            ],
+                            "tags": [],
+                            "isBasePlan": true,
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "isPrepaid": false,
+                            "fullPricePhase": {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            },
+                            "freePhase": null,
+                            "introPhase": null,
+                            "presentedOfferingIdentifier": "offering",
+                            "presentedOfferingContext": {
+                                "offeringIdentifier": "offering",
+                                "placementIdentifier": null,
+                                "targetingContext": null
+                            },
+                            "installmentsInfo": null
+                        }
+                    ],
+                    "presentedOfferingIdentifier": "family",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "family",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    }
+                },
+                "offeringIdentifier": "family",
+                "presentedOfferingContext": {
+                    "offeringIdentifier": "family",
+                    "placementIdentifier": null,
+                    "targetingContext": null
+                },
+                "webCheckoutUrl": null
+            },
+            "weekly": null,
+            "webCheckoutUrl": null
+        },
+        "professional": {
+            "identifier": "professional",
+            "serverDescription": "Professional Subscription",
+            "metadata": {},
+            "availablePackages": [
+                {
+                    "identifier": "$rc_monthly",
+                    "packageType": "MONTHLY",
+                    "product": {
+                        "identifier": "monthly",
+                        "description": "",
+                        "title": "Monthly",
+                        "price": 9.99,
+                        "priceString": "$9.99",
+                        "currencyCode": "USD",
+                        "introPrice": null,
+                        "discounts": null,
+                        "pricePerWeek": 2.299068,
+                        "pricePerMonth": 9.99,
+                        "pricePerYear": 119.88,
+                        "pricePerWeekString": "$2.29",
+                        "pricePerMonthString": "$9.99",
+                        "pricePerYearString": "$119.88",
+                        "productCategory": "SUBSCRIPTION",
+                        "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                        "subscriptionPeriod": "P1M",
+                        "defaultOption": {
+                            "id": "testBasePlanId",
+                            "storeProductId": "monthly",
+                            "productId": "monthly",
+                            "pricingPhases": [
+                                {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                }
+                            ],
+                            "tags": [],
+                            "isBasePlan": true,
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "isPrepaid": false,
+                            "fullPricePhase": {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            },
+                            "freePhase": null,
+                            "introPhase": null,
+                            "presentedOfferingIdentifier": "offering",
+                            "presentedOfferingContext": {
+                                "offeringIdentifier": "offering",
+                                "placementIdentifier": null,
+                                "targetingContext": null
+                            },
+                            "installmentsInfo": null
+                        },
+                        "subscriptionOptions": [
+                            {
+                                "id": "testBasePlanId",
+                                "storeProductId": "monthly",
+                                "productId": "monthly",
+                                "pricingPhases": [
+                                    {
+                                        "billingPeriod": {
+                                            "unit": "MONTH",
+                                            "value": 1,
+                                            "iso8601": "P1M"
+                                        },
+                                        "recurrenceMode": 1,
+                                        "billingCycleCount": null,
+                                        "price": {
+                                            "formatted": "$9.99",
+                                            "amountMicros": 9990000,
+                                            "currencyCode": "USD"
+                                        },
+                                        "offerPaymentMode": null
+                                    }
+                                ],
+                                "tags": [],
+                                "isBasePlan": true,
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "isPrepaid": false,
+                                "fullPricePhase": {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                },
+                                "freePhase": null,
+                                "introPhase": null,
+                                "presentedOfferingIdentifier": "offering",
+                                "presentedOfferingContext": {
+                                    "offeringIdentifier": "offering",
+                                    "placementIdentifier": null,
+                                    "targetingContext": null
+                                },
+                                "installmentsInfo": null
+                            }
+                        ],
+                        "presentedOfferingIdentifier": "professional",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "professional",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        }
+                    },
+                    "offeringIdentifier": "professional",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "professional",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    },
+                    "webCheckoutUrl": null
+                }
+            ],
+            "lifetime": null,
+            "annual": null,
+            "sixMonth": null,
+            "threeMonth": null,
+            "twoMonth": null,
+            "monthly": {
+                "identifier": "$rc_monthly",
+                "packageType": "MONTHLY",
+                "product": {
+                    "identifier": "monthly",
+                    "description": "",
+                    "title": "Monthly",
+                    "price": 9.99,
+                    "priceString": "$9.99",
+                    "currencyCode": "USD",
+                    "introPrice": null,
+                    "discounts": null,
+                    "pricePerWeek": 2.299068,
+                    "pricePerMonth": 9.99,
+                    "pricePerYear": 119.88,
+                    "pricePerWeekString": "$2.29",
+                    "pricePerMonthString": "$9.99",
+                    "pricePerYearString": "$119.88",
+                    "productCategory": "SUBSCRIPTION",
+                    "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                    "subscriptionPeriod": "P1M",
+                    "defaultOption": {
+                        "id": "testBasePlanId",
+                        "storeProductId": "monthly",
+                        "productId": "monthly",
+                        "pricingPhases": [
+                            {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            }
+                        ],
+                        "tags": [],
+                        "isBasePlan": true,
+                        "billingPeriod": {
+                            "unit": "MONTH",
+                            "value": 1,
+                            "iso8601": "P1M"
+                        },
+                        "isPrepaid": false,
+                        "fullPricePhase": {
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "recurrenceMode": 1,
+                            "billingCycleCount": null,
+                            "price": {
+                                "formatted": "$9.99",
+                                "amountMicros": 9990000,
+                                "currencyCode": "USD"
+                            },
+                            "offerPaymentMode": null
+                        },
+                        "freePhase": null,
+                        "introPhase": null,
+                        "presentedOfferingIdentifier": "offering",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "offering",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        },
+                        "installmentsInfo": null
+                    },
+                    "subscriptionOptions": [
+                        {
+                            "id": "testBasePlanId",
+                            "storeProductId": "monthly",
+                            "productId": "monthly",
+                            "pricingPhases": [
+                                {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                }
+                            ],
+                            "tags": [],
+                            "isBasePlan": true,
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "isPrepaid": false,
+                            "fullPricePhase": {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            },
+                            "freePhase": null,
+                            "introPhase": null,
+                            "presentedOfferingIdentifier": "offering",
+                            "presentedOfferingContext": {
+                                "offeringIdentifier": "offering",
+                                "placementIdentifier": null,
+                                "targetingContext": null
+                            },
+                            "installmentsInfo": null
+                        }
+                    ],
+                    "presentedOfferingIdentifier": "professional",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "professional",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    }
+                },
+                "offeringIdentifier": "professional",
+                "presentedOfferingContext": {
+                    "offeringIdentifier": "professional",
+                    "placementIdentifier": null,
+                    "targetingContext": null
+                },
+                "webCheckoutUrl": null
+            },
+            "weekly": null,
+            "webCheckoutUrl": null
+        }
+    },
+    "current": {
+        "identifier": "family",
+        "serverDescription": "Family Subscription",
+        "metadata": {},
+        "availablePackages": [
+            {
+                "identifier": "$rc_monthly",
+                "packageType": "MONTHLY",
+                "product": {
+                    "identifier": "monthly",
+                    "description": "",
+                    "title": "Monthly",
+                    "price": 9.99,
+                    "priceString": "$9.99",
+                    "currencyCode": "USD",
+                    "introPrice": null,
+                    "discounts": null,
+                    "pricePerWeek": 2.299068,
+                    "pricePerMonth": 9.99,
+                    "pricePerYear": 119.88,
+                    "pricePerWeekString": "$2.29",
+                    "pricePerMonthString": "$9.99",
+                    "pricePerYearString": "$119.88",
+                    "productCategory": "SUBSCRIPTION",
+                    "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                    "subscriptionPeriod": "P1M",
+                    "defaultOption": {
+                        "id": "testBasePlanId",
+                        "storeProductId": "monthly",
+                        "productId": "monthly",
+                        "pricingPhases": [
+                            {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            }
+                        ],
+                        "tags": [],
+                        "isBasePlan": true,
+                        "billingPeriod": {
+                            "unit": "MONTH",
+                            "value": 1,
+                            "iso8601": "P1M"
+                        },
+                        "isPrepaid": false,
+                        "fullPricePhase": {
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "recurrenceMode": 1,
+                            "billingCycleCount": null,
+                            "price": {
+                                "formatted": "$9.99",
+                                "amountMicros": 9990000,
+                                "currencyCode": "USD"
+                            },
+                            "offerPaymentMode": null
+                        },
+                        "freePhase": null,
+                        "introPhase": null,
+                        "presentedOfferingIdentifier": "offering",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "offering",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        },
+                        "installmentsInfo": null
+                    },
+                    "subscriptionOptions": [
+                        {
+                            "id": "testBasePlanId",
+                            "storeProductId": "monthly",
+                            "productId": "monthly",
+                            "pricingPhases": [
+                                {
+                                    "billingPeriod": {
+                                        "unit": "MONTH",
+                                        "value": 1,
+                                        "iso8601": "P1M"
+                                    },
+                                    "recurrenceMode": 1,
+                                    "billingCycleCount": null,
+                                    "price": {
+                                        "formatted": "$9.99",
+                                        "amountMicros": 9990000,
+                                        "currencyCode": "USD"
+                                    },
+                                    "offerPaymentMode": null
+                                }
+                            ],
+                            "tags": [],
+                            "isBasePlan": true,
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "isPrepaid": false,
+                            "fullPricePhase": {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            },
+                            "freePhase": null,
+                            "introPhase": null,
+                            "presentedOfferingIdentifier": "offering",
+                            "presentedOfferingContext": {
+                                "offeringIdentifier": "offering",
+                                "placementIdentifier": null,
+                                "targetingContext": null
+                            },
+                            "installmentsInfo": null
+                        }
+                    ],
+                    "presentedOfferingIdentifier": "family",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "family",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    }
+                },
+                "offeringIdentifier": "family",
+                "presentedOfferingContext": {
+                    "offeringIdentifier": "family",
+                    "placementIdentifier": null,
+                    "targetingContext": null
+                },
+                "webCheckoutUrl": null
+            }
+        ],
+        "lifetime": null,
+        "annual": null,
+        "sixMonth": null,
+        "threeMonth": null,
+        "twoMonth": null,
+        "monthly": {
+            "identifier": "$rc_monthly",
+            "packageType": "MONTHLY",
+            "product": {
+                "identifier": "monthly",
+                "description": "",
+                "title": "Monthly",
+                "price": 9.99,
+                "priceString": "$9.99",
+                "currencyCode": "USD",
+                "introPrice": null,
+                "discounts": null,
+                "pricePerWeek": 2.299068,
+                "pricePerMonth": 9.99,
+                "pricePerYear": 119.88,
+                "pricePerWeekString": "$2.29",
+                "pricePerMonthString": "$9.99",
+                "pricePerYearString": "$119.88",
+                "productCategory": "SUBSCRIPTION",
+                "productType": "AUTO_RENEWABLE_SUBSCRIPTION",
+                "subscriptionPeriod": "P1M",
+                "defaultOption": {
+                    "id": "testBasePlanId",
+                    "storeProductId": "monthly",
+                    "productId": "monthly",
+                    "pricingPhases": [
+                        {
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "recurrenceMode": 1,
+                            "billingCycleCount": null,
+                            "price": {
+                                "formatted": "$9.99",
+                                "amountMicros": 9990000,
+                                "currencyCode": "USD"
+                            },
+                            "offerPaymentMode": null
+                        }
+                    ],
+                    "tags": [],
+                    "isBasePlan": true,
+                    "billingPeriod": {
+                        "unit": "MONTH",
+                        "value": 1,
+                        "iso8601": "P1M"
+                    },
+                    "isPrepaid": false,
+                    "fullPricePhase": {
+                        "billingPeriod": {
+                            "unit": "MONTH",
+                            "value": 1,
+                            "iso8601": "P1M"
+                        },
+                        "recurrenceMode": 1,
+                        "billingCycleCount": null,
+                        "price": {
+                            "formatted": "$9.99",
+                            "amountMicros": 9990000,
+                            "currencyCode": "USD"
+                        },
+                        "offerPaymentMode": null
+                    },
+                    "freePhase": null,
+                    "introPhase": null,
+                    "presentedOfferingIdentifier": "offering",
+                    "presentedOfferingContext": {
+                        "offeringIdentifier": "offering",
+                        "placementIdentifier": null,
+                        "targetingContext": null
+                    },
+                    "installmentsInfo": null
+                },
+                "subscriptionOptions": [
+                    {
+                        "id": "testBasePlanId",
+                        "storeProductId": "monthly",
+                        "productId": "monthly",
+                        "pricingPhases": [
+                            {
+                                "billingPeriod": {
+                                    "unit": "MONTH",
+                                    "value": 1,
+                                    "iso8601": "P1M"
+                                },
+                                "recurrenceMode": 1,
+                                "billingCycleCount": null,
+                                "price": {
+                                    "formatted": "$9.99",
+                                    "amountMicros": 9990000,
+                                    "currencyCode": "USD"
+                                },
+                                "offerPaymentMode": null
+                            }
+                        ],
+                        "tags": [],
+                        "isBasePlan": true,
+                        "billingPeriod": {
+                            "unit": "MONTH",
+                            "value": 1,
+                            "iso8601": "P1M"
+                        },
+                        "isPrepaid": false,
+                        "fullPricePhase": {
+                            "billingPeriod": {
+                                "unit": "MONTH",
+                                "value": 1,
+                                "iso8601": "P1M"
+                            },
+                            "recurrenceMode": 1,
+                            "billingCycleCount": null,
+                            "price": {
+                                "formatted": "$9.99",
+                                "amountMicros": 9990000,
+                                "currencyCode": "USD"
+                            },
+                            "offerPaymentMode": null
+                        },
+                        "freePhase": null,
+                        "introPhase": null,
+                        "presentedOfferingIdentifier": "offering",
+                        "presentedOfferingContext": {
+                            "offeringIdentifier": "offering",
+                            "placementIdentifier": null,
+                            "targetingContext": null
+                        },
+                        "installmentsInfo": null
+                    }
+                ],
+                "presentedOfferingIdentifier": "family",
+                "presentedOfferingContext": {
+                    "offeringIdentifier": "family",
+                    "placementIdentifier": null,
+                    "targetingContext": null
+                }
+            },
+            "offeringIdentifier": "family",
+            "presentedOfferingContext": {
+                "offeringIdentifier": "family",
+                "placementIdentifier": null,
+                "targetingContext": null
+            },
+            "webCheckoutUrl": null
+        },
+        "weekly": null,
+        "webCheckoutUrl": null
+    }
+}

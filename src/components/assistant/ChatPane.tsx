@@ -9,11 +9,12 @@ import PayloadRenderer from "./PayloadRenderer";
 import AssistantCheckout from "./checkout/AssistantCheckout";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import RecipeDetail from "./widgets/RecipeDetail";
-import type { MealBase, IngredientListItem, AssistantPayload } from "@/types/assistant";
+import type { MealBase, IngredientListItem, AssistantPayload, SourceLink } from "@/types/assistant";
 import { toast } from "@/hooks/use-toast";
-import { Bot, FileText } from "lucide-react";
+import { Bot, FileText, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
 
 const ChatPane: React.FC = () => {
   const { messages, isTyping, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, addToPantry } = useAssistant();
@@ -23,6 +24,7 @@ const ChatPane: React.FC = () => {
   const endRef = useRef<HTMLDivElement>(null);
   const [sheetMeal, setSheetMeal] = useState<MealBase | null>(null);
   const [mobilePayload, setMobilePayload] = useState<AssistantPayload | null>(null);
+  const [sourceLinks, setSourceLinks] = useState<SourceLink[] | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -41,6 +43,8 @@ const ChatPane: React.FC = () => {
     pickQuestion(ask);
   };
 
+  const { addItem } = useCart();
+
   const handleOpenMeal = (meal: MealBase) => {
     if (isMobile) setSheetMeal(meal);
     else openInWorkspace({ type: "specialMeal", data: {
@@ -50,7 +54,18 @@ const ChatPane: React.FC = () => {
     } });
   };
 
-  const handleAddToCart = (items: IngredientListItem[]) => startCheckout(items);
+  const handleAddToCart = (items: IngredientListItem[]) => {
+    items.forEach(item => {
+      addItem({
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        category: item.classification || "General"
+      });
+    });
+    startCheckout(items);
+    toast({ title: t("assistant.chat.addedToCart") || "Added to App Cart", description: `${items.length} ${t("assistant.chat.ingredients") || "items"} added` });
+  };
   const handleAddToPantry = (items: IngredientListItem[]) => {
     addToPantry(items);
   };
@@ -105,6 +120,19 @@ const ChatPane: React.FC = () => {
                 )}
               </div>
             )}
+            {m.links && m.links.length > 0 && (
+              <div className="pl-9 pr-2 pt-1 flex gap-2">
+                <Button 
+                  variant="default"
+                  size="sm" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full text-xs h-7 px-3 shadow-sm" 
+                  onClick={() => setSourceLinks(m.links!)}
+                >
+                  <ExternalLink className="w-3 h-3 mr-1.5" />
+                  Source
+                </Button>
+              </div>
+            )}
             {m.role === "ai" && m.questions && m.questions.length > 0 && (
               <div className="pl-9 pr-2">
                 <ActionChips chips={m.questions.filter((q) => !q.ask.startsWith("__"))} onPick={handlePick} />
@@ -134,7 +162,7 @@ const ChatPane: React.FC = () => {
       </Sheet>
 
       <Sheet open={!!mobilePayload} onOpenChange={(o) => !o && setMobilePayload(null)}>
-        <SheetContent side="bottom" className="h-[100dvh] w-full overflow-y-auto rounded-none pt-12">
+        <SheetContent side="bottom" className="h-[90dvh] w-full overflow-y-auto rounded-t-2xl pt-12">
           {mobilePayload && (
             <PayloadRenderer
               payload={mobilePayload}
@@ -143,6 +171,31 @@ const ChatPane: React.FC = () => {
               onAddToPantry={handleAddToPantry}
             />
           )}
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={!!sourceLinks} onOpenChange={(o) => !o && setSourceLinks(null)}>
+        <SheetContent side="bottom" className="h-[75dvh] w-full overflow-y-auto rounded-t-2xl pt-6">
+          <div className="space-y-4 max-w-2xl mx-auto">
+            <h2 className="text-xl font-bold mb-4">Sources</h2>
+            <div className="flex flex-col gap-4">
+              {sourceLinks?.map((link, idx) => (
+                <div key={idx} className="bg-card border border-border rounded-xl p-4 shadow-sm flex flex-col gap-2">
+                  <h3 className="font-semibold text-lg">{link.source}</h3>
+                  <p className="text-sm text-muted-foreground">{link.description}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="self-start mt-2 border-primary/20 hover:bg-primary/5" 
+                    onClick={() => window.open(link.url, "_blank")}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 mr-2" />
+                    Visit Source
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
         </SheetContent>
       </Sheet>
     </div>

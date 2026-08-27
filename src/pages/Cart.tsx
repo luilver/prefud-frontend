@@ -46,7 +46,7 @@ const Cart = () => {
       {/* Cart panel */}
       <div className="w-full lg:w-[40%] lg:h-full lg:overflow-y-auto lg:flex lg:flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b lg:static lg:z-auto" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b lg:static lg:z-auto">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center">
               <Button

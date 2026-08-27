@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,6 +26,7 @@ import useDocumentTitle from "@/hooks/useDocumentTitle";
 import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 import { authService } from "@/services/authService";
 import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 
@@ -42,6 +43,15 @@ const SignIn = () => {
   const { toast } = useToast();
   const { t, setLanguage } = useLanguage();
   const logoUrl = useThemeLogo();
+  const [appVersion, setAppVersion] = useState<string>("");
+
+  useEffect(() => {
+    if (isNativePlatform()) {
+      App.getInfo().then(info => {
+        setAppVersion(`${info.version} (${info.build})`);
+      }).catch(err => console.error("Error getting app info:", err));
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,23 +146,45 @@ const SignIn = () => {
     setIsLoading(true);
     let token = "";
     let email = "";
+    let name = "";
     try {
       if (isNativePlatform()) {
         if (provider === googleProvider) {
           const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
           email = result.user?.email || "";
+          name = result.user?.displayName || "";
         } else if (provider === appleProvider) {
-          const result = await FirebaseAuthentication.signInWithApple();
+          const result = await FirebaseAuthentication.signInWithApple({
+            scopes: ['email', 'name'],
+          });
           email = result.user?.email || "";
+          // Apple may return displayName as null after the first authorization.
+          // Try multiple sources for the name.
+          name = result.user?.displayName || "";
+          if (!name && result.additionalUserInfo?.profile) {
+            const profile = result.additionalUserInfo.profile as any;
+            const firstName = profile?.name?.firstName || "";
+            const lastName = profile?.name?.lastName || "";
+            if (firstName || lastName) {
+              name = `${firstName} ${lastName}`.trim();
+            }
+          }
         }
 
         // Get the Firebase ID token (JWT), not the Google/Apple ID token
         const tokenResult = await FirebaseAuthentication.getIdToken();
         token = tokenResult.token || "";
+
+        // Fallback: try Firebase currentUser displayName
+        if (!name) {
+          const currentUser = await FirebaseAuthentication.getCurrentUser();
+          name = currentUser.user?.displayName || "";
+        }
       } else {
         const result = await signInWithPopup(auth, provider);
         token = await result.user.getIdToken();
         email = result.user.email || "";
+        name = result.user.displayName || "";
       }
 
       const userData = await loginFirebase(token);
@@ -172,6 +204,7 @@ const SignIn = () => {
       navigate("/");
     } catch (error) {
       console.log("Firebase Login error caught:", error);
+      console.log("[Apple/Google Auth] Name captured from provider:", JSON.stringify(name));
 
       if (error instanceof Error && (error as any).statusCode === 404) {
         // User not found, call signupFirebase
@@ -185,14 +218,18 @@ const SignIn = () => {
               title: "✅ Account Created Successfully!",
               description: "Please complete your profile to continue.",
             });
-            navigate("/signup", {
-              state: {
-                accountIncomplete: true,
-                email: email,
-                userId: responseData.response.userId,
-                firebaseToken: token,
-              },
-            });
+            setTimeout(() => {
+              navigate("/signup", {
+                state: {
+                  accountIncomplete: true,
+                  email: email,
+                  name: name,
+                  authProvider: provider === appleProvider ? 'apple' : provider === googleProvider ? 'google' : '',
+                  userId: responseData.response.userId,
+                  firebaseToken: token,
+                },
+              });
+            }, 300);
             return;
           }
         } catch (signupError: any) {
@@ -216,13 +253,17 @@ const SignIn = () => {
             "Your account needs to be completed. Please verify your email to continue.",
           variant: "destructive",
         });
-        navigate("/signup", {
-          state: {
-            accountIncomplete: true,
-            email: (error as any).email || "",
-            userId: (error as any).userId,
-          },
-        });
+        setTimeout(() => {
+          navigate("/signup", {
+            state: {
+              accountIncomplete: true,
+              email: (error as any).email || "",
+              name: name,
+              authProvider: provider === appleProvider ? 'apple' : provider === googleProvider ? 'google' : '',
+              userId: (error as any).userId,
+            },
+          });
+        }, 300);
         return;
       }
 
@@ -452,6 +493,14 @@ const SignIn = () => {
                       </Button>
                     )}
                   </div>
+
+                  {appVersion && (
+                    <div className="text-center mt-2">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                        v{appVersion}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
                     <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
