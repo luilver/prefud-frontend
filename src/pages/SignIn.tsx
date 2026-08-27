@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,6 +26,7 @@ import useDocumentTitle from "@/hooks/useDocumentTitle";
 import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 import { authService } from "@/services/authService";
 import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 
@@ -42,6 +43,15 @@ const SignIn = () => {
   const { toast } = useToast();
   const { t, setLanguage } = useLanguage();
   const logoUrl = useThemeLogo();
+  const [appVersion, setAppVersion] = useState<string>("");
+
+  useEffect(() => {
+    if (isNativePlatform()) {
+      App.getInfo().then(info => {
+        setAppVersion(`${info.version} (${info.build})`);
+      }).catch(err => console.error("Error getting app info:", err));
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -483,6 +493,14 @@ const SignIn = () => {
                       </Button>
                     )}
                   </div>
+
+                  {appVersion && (
+                    <div className="text-center mt-2">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                        v{appVersion}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800">
                     <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm">
