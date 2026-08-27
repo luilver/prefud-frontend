@@ -1,3 +1,4 @@
+export interface SourceLink { url: string; source: string; description: string; }
 export interface IngredientRef { name: string; quantity: number; unit: string; }
 export interface IngredientListItem extends IngredientRef { classification: string; carbonFootPrintToWaste: number; daysToExpire: number; }
 export interface NutritionalInfo { protein: number; fat: number; carbohydrates: number; fiber: number; vitamins?: string[]; }
@@ -15,6 +16,6 @@ export type AssistantPayload =
   | { type: "pantry"; data: { ingredientsList: IngredientListItem[] } }
   | { type: "cart"; data: { ingredientsList: IngredientListItem[] } };
 export interface QuestionChip { ask: string; }
-export interface AssistantResponse { response: string; questions?: QuestionChip[]; payload?: AssistantPayload; }
-export interface ChatMessage { id: string; role: "user" | "ai"; text?: string; questions?: QuestionChip[]; payload?: AssistantPayload; typing?: boolean; }
+export interface AssistantResponse { response: string; questions?: QuestionChip[]; payload?: AssistantPayload; links?: SourceLink[]; }
+export interface ChatMessage { id: string; role: "user" | "ai"; text?: string; questions?: QuestionChip[]; payload?: AssistantPayload; typing?: boolean; links?: SourceLink[]; }
 export type CheckoutStep = "idle" | "summary" | "address" | "payment" | "confirm" | "success";

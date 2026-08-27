@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 import { trackEvent } from "@/services/analytics";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
@@ -137,9 +136,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, initialName, authProvider
       }
       if (!formData.phone.trim()) errors.phone = (t("signup.phoneNumber") || "Phone Number") + " is required";
       
-      if (!formData.birthday) {
-        errors.birthday = (t("signup.birthday") || "Birthday") + " is required";
-      } else {
+      if (formData.birthday) {
         const birthDate = new Date(formData.birthday);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
@@ -512,7 +509,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, initialName, authProvider
             <div className="space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-3 bg-muted/50 p-4 rounded-xl border border-border">
-                  <Label htmlFor="weight" className="text-sm font-semibold text-foreground">{t("signup.weight") || "Weight (kg/lbs)"}</Label>
+                  <Label htmlFor="weight" className="text-sm font-semibold text-foreground">{t("signup.weight") || "Weight (lbs)"}</Label>
                   <Input
                     id="weight"
                     type="number"

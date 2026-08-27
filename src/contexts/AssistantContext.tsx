@@ -92,6 +92,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       const responseText = data.result?.message?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
       const questions = data.result?.message?.questions || data.result?.questions;
+      const links = data.result?.message?.links || data.result?.links;
       let payload = data.result?.message?.payload || data.result?.payload;
       const genMeals = data.result?.message?.generatedMeals;
       if (genMeals) {
@@ -142,6 +143,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           text: responseText,
           questions: questions,
           payload: payload,
+          links: links,
         },
       ]);
     });
