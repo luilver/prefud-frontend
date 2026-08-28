@@ -142,8 +142,8 @@ const SignupSteps = () => {
       return subscriptionTypes.filter((plan) => {
         if (plan.price === 0) return true;
         return nativePackages.some((pkg) => {
-          const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
-          return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+          const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier] || pkg.offeringIdentifier;
+          return mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
         });
       });
     }
@@ -154,9 +154,9 @@ const SignupSteps = () => {
     if (!isNativePlatform() || nativePackages.length === 0) return null;
     return (
       nativePackages.find((pkg) => {
-        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
+        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier] || pkg.offeringIdentifier;
         return (
-          mappedName && mappedName.toLowerCase() === plan.name.toLowerCase()
+          mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase()
         );
       }) ?? null
     );
@@ -355,11 +355,11 @@ const SignupSteps = () => {
     const selectedPlan = subscriptionTypes.find((plan) => plan.id === planId);
     setSignupData((prev) => ({
       ...prev,
-      wantsSubscription: selectedPlan?.name !== "Free",
+      wantsSubscription: selectedPlan?.originalName !== "free" && selectedPlan?.originalName !== "Free",
       selectedPlan: planId,
     }));
 
-    if (selectedPlan?.name === "Free") {
+    if (selectedPlan?.originalName === "free" || selectedPlan?.originalName === "Free") {
       // Handle Free subscription - register directly without payment
       await handleFreeSubscription(planId);
     } else {
@@ -375,8 +375,8 @@ const SignupSteps = () => {
     setIsLoading(true);
     try {
       const pkg = nativePackages.find((pkg) => {
-        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
-        return mappedName && mappedName.toLowerCase() === plan.name.toLowerCase();
+        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier] || pkg.offeringIdentifier;
+        return mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
       });
 
       if (!pkg) {

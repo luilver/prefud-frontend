@@ -14,6 +14,7 @@ export interface ApiSubscriptionType {
 export interface Plan {
   id: string;
   name: string;
+  originalName: string;
   price: number;
   interval: string;
   description: string;
@@ -70,6 +71,7 @@ export const mapApiToPlan = (apiPlan: ApiSubscriptionType[], t?: (key: string) =
     plan.push({
       id: received._id,
       name: translatedName,
+      originalName: received.name,
       price: received.price,
       interval: safeT("pricing.interval.month") !== "pricing.interval.month" ? safeT("pricing.interval.month") : "month",
       description: translatedDesc,
