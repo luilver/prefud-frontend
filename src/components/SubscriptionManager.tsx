@@ -169,10 +169,8 @@ const SubscriptionManager = () => {
           convertedPlans = convertedPlans.filter((plan) => {
             if (plan.price === 0) return true;
             return nativePackages.some((pkg) => {
-              const offeringMatch = pkg.offeringIdentifier?.toLowerCase() === plan.originalName.toLowerCase();
-              const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
-              const productMatch = mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
-              return offeringMatch || productMatch;
+              const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier] || pkg.offeringIdentifier;
+              return mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
             });
           });
         }
@@ -222,10 +220,8 @@ const SubscriptionManager = () => {
     if (!isNative || nativePackages.length === 0) return null;
     return (
       nativePackages.find((pkg) => {
-        const offeringMatch = pkg.offeringIdentifier?.toLowerCase() === plan.originalName.toLowerCase();
-        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier];
-        const productMatch = mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
-        return offeringMatch || productMatch;
+        const mappedName = RC_PRODUCT_TO_PLAN_NAME[pkg.product.identifier] || pkg.offeringIdentifier;
+        return mappedName && mappedName.toLowerCase() === plan.originalName.toLowerCase();
       }) ?? null
     );
   };

@@ -711,7 +711,7 @@ const UserProfileForm = ({ onComplete, onBack, userId, initialName, authProvider
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <span>Complete Interview</span>
+                    <span>{t('pagination.next') || 'Next'}</span>
                     <Sparkles className="h-4 w-4 group-hover:scale-110 transition-transform" />
                   </div>
                 )}
