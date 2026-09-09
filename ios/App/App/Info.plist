@@ -62,18 +62,18 @@
     
     <!-- Privacy Purpose Strings Added Below -->
     <key>NSCameraUsageDescription</key>
-    <string>Prefud needs access to the camera to take photos.</string>
+    <string>Prefud needs access to the camera to allow you to scan ingredient barcodes or take photos of food items to automatically add them to your digital pantry.</string>
     
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Prefud needs access to your photos so you can upload images.</string>
+    <string>Prefud needs access to your photo library to let you select existing photos of ingredients or recipes to add them to your digital pantry.</string>
     
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Prefud needs permission to save images to your camera roll.</string>
+    <string>Prefud needs permission to save generated meal plans and photos of your ingredients directly to your photo library for easy access.</string>
     
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Prefud needs your location to provide location-based features.</string>
+    <string>Prefud uses your location to show you nearby grocery stores for pickup and tailor local recipe suggestions.</string>
     
     <key>NSMicrophoneUsageDescription</key>
-    <string>Prefud needs microphone access to record audio.</string>
+    <string>Prefud needs microphone access to allow you to record audio notes when creating custom recipes or taking video of your cooking process.</string>
 </dict>
 </plist>
