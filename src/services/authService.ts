@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "@/services/firebaseAuthService";
+
 interface LoginResponse {
   email: string;
   isActive: boolean;
@@ -280,11 +282,10 @@ class AuthService {
 
   async getProfile(userId: string): Promise<UserProfile> {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${this.baseURL}/user-profile/${userId}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers
       });
 
       if (!response.ok) {
@@ -305,12 +306,13 @@ class AuthService {
 
   async updateProfile(userId: string, token: string, data: Partial<UserProfile>): Promise<UserProfile> {
     try {
+      const headers = await getAuthHeaders();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
       const response = await fetch(`${this.baseURL}/user-profile/${userId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(data)
       });
 
@@ -332,11 +334,10 @@ class AuthService {
 
   async getPantry(userId: string): Promise<{ originalResponse: PantryApiResponse; transformedItems: PantryItem[] }> {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${this.pantryURL}/meal-plan/pantry/${userId}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers
       });
 
       if (!response.ok) {
@@ -391,11 +392,10 @@ class AuthService {
 
   async getSubscription(userId: string): Promise<SubscriptionInfo | null> {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${this.baseURL}/subscription/${userId}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers
       });
 
       if (!response.ok) {

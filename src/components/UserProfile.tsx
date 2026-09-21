@@ -80,6 +80,7 @@ import SubscriptionManager from "./SubscriptionManager";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import DeleteAccountModal from "./DeleteAccountModal";
 import { authService } from "@/services/authService";
+import { getAuthHeaders } from "@/services/firebaseAuthService";
 import axios from "axios";
 
 interface SubscriptionType {
@@ -391,9 +392,11 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchSubscriptionData = async () => {
       try {
+        const headers = await getAuthHeaders();
         // Fetch subscription types
         const typesResponse = await axios.get(
-          `${API_BASE_URL}/subscriptionType/all`
+          `${API_BASE_URL}/subscriptionType/all`,
+          { headers }
         );
         setSubscriptionTypes(typesResponse.data);
 
@@ -410,8 +413,10 @@ const UserProfile = () => {
     const fetchTrackingData = async () => {
       try {
         if (authUser?.userId) {
+          const headers = await getAuthHeaders();
           const response = await axios.get(
-            `${API_BASE_URL}/meal-plan/trakking/${authUser.userId}?type=all`
+            `${API_BASE_URL}/meal-plan/trakking/${authUser.userId}?type=all`,
+            { headers }
           );
           setTrackingData(response.data);
         }
@@ -424,8 +429,10 @@ const UserProfile = () => {
     const fetchConsumptionData = async () => {
       try {
         if (authUser?.userId) {
+          const headers = await getAuthHeaders();
           const response = await axios.get(
-            `${API_BASE_URL}/user-profile/${authUser.userId}/consumption?months=6`
+            `${API_BASE_URL}/user-profile/${authUser.userId}/consumption?months=6`,
+            { headers }
           );
           
           const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
