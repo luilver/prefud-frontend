@@ -1,5 +1,5 @@
-
 import axios from "axios";
+import { getAuthHeaders } from "@/services/firebaseAuthService";
 
 export interface Ingredient {
   name: string;
@@ -47,11 +47,7 @@ export const analyzeImageJob = async (
     filename || (image as File).name || "photo.jpg";
   form.append("image", image, finalName);
 
-  const headers: Record<string, string> = {};
-  try {
-    const token = localStorage.getItem("authToken");
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-  } catch {}
+  const headers = await getAuthHeaders(null);
 
   const response = await axios.post(
     `${BASE_URL}/meal-plan/analyze-image`,
@@ -77,10 +73,11 @@ export const updatePantry = async (
     console.log('Updating pantry for user:', userId);
     console.log('With ingredients:', ingredients);
     
+    const headers = await getAuthHeaders();
     const response = await axios.put(
       `${BASE_URL}/meal-plan/pantry/${userId}`,
       { user_id: userId, ingredients },
-      { headers: { "Content-Type": "application/json" } }
+      { headers }
     );
     
     console.log('Pantry update response:', response.data);
@@ -99,10 +96,11 @@ export const addIngredientsToPantry = async (
     console.log('Adding ingredients to pantry for user:', userId);
     console.log('With ingredients:', ingredients);
     
+    const headers = await getAuthHeaders();
     const response = await axios.patch(
       `${BASE_URL}/meal-plan/pantry/${userId}/add-ingredients`,
       ingredients,
-      { headers: { "Content-Type": "application/json" } }
+      { headers }
     );
     
     console.log('Add ingredients response:', response.data);
@@ -115,9 +113,10 @@ export const addIngredientsToPantry = async (
 
 export const getPantry = async (userId: string): Promise<any> => {
   try {
+    const headers = await getAuthHeaders();
     const response = await axios.get(
       `${BASE_URL}/meal-plan/pantry/${userId}`,
-      { headers: { "Content-Type": "application/json" } }
+      { headers }
     );
     return response.data;
   } catch (error: any) {
@@ -135,10 +134,11 @@ export const updateMealConsumed = async (
   try {
     console.log(`Updating meal consumed for plan: ${planId}, meal: ${mealId}`);
 
+    const headers = await getAuthHeaders();
     const response = await axios.patch(
       `${BASE_URL}/meal-plan/updateconsumed?plan=${planId}&meal=${mealId}`,
       { consumed, day },
-      { headers: { "Content-Type": "application/json" } }
+      { headers }
     );
 
     console.log("Update meal consumed response:", response.data);
@@ -161,6 +161,7 @@ export const generateMealsFromPantry = async (
   try {
     console.log('Generating meals from pantry for user:', userId);
     
+    const headers = await getAuthHeaders();
     const response = await axios.post(
       `${BASE_URL}/meal-plan/generateMeals`,
       {
@@ -169,7 +170,7 @@ export const generateMealsFromPantry = async (
         servings,
         language
       },
-      { headers: { "Content-Type": "application/json" } }
+      { headers }
     );
     
     console.log('Generate meals response:', response.data);
@@ -205,6 +206,7 @@ export const generateMealsFromPantryJob = async (
   language: string
 ): Promise<{ jobId: string }> => {
   try {
+    const headers = await getAuthHeaders();
     const response = await axios.post(
       `${BASE_URL}/meal-plan/generateMeals`,
       {
@@ -213,7 +215,7 @@ export const generateMealsFromPantryJob = async (
         servings,
         language,
       },
-      { headers: { "Content-Type": "application/json" } }
+      { headers }
     );
 
     const data = response.data || {};

@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "@/services/firebaseAuthService";
+
 const API_MEALS = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
 
 interface AIMealRequest {
@@ -25,11 +27,10 @@ export const createAIMeal = async (mealData: AIMealRequest): Promise<AIMealRespo
   try {
     console.log("Sending AI meal request with payload:", mealData);
 
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_MEALS}/meal-plan/special`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(mealData)
     });
 
@@ -61,9 +62,10 @@ export const createAIMealJob = async (
 ): Promise<CreateAIMealJobResponse> => {
   console.log('createAIMealJob payload:', mealData);
 
+  const headers = await getAuthHeaders();
   const response = await fetch(`${API_MEALS}/meal-plan/special`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(mealData),
   });
 

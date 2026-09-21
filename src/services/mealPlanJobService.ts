@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import type { CreateMealPlanRequest } from "./mealPlanService";
+import { getAuthHeaders } from "@/services/firebaseAuthService";
 
 const API_BASE_URL = import.meta.env.VITE_PANTRY_URL || "https://pantry-ms-brain.onrender.com";
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "wss://pantry-ms-brain.onrender.com";
@@ -11,9 +12,10 @@ export interface CreateMealPlanJobResponse {
 export const createMealPlanJob = async (
   planData: CreateMealPlanRequest
 ): Promise<CreateMealPlanJobResponse> => {
+  const headers = await getAuthHeaders();
   const response = await fetch(`${API_BASE_URL}/meal-plan`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(planData),
   });
 

@@ -1,4 +1,6 @@
 
+import { getAuthHeaders } from "@/services/firebaseAuthService";
+
 const API_BASE_URL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
 
 export interface ApiDrinkIngredient {
@@ -91,11 +93,10 @@ export const getDrinksByUser = async (userId: string, page: number = 1, limit: n
   try {
     console.log('Fetching drinks for user:', userId);
     
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/meal-plan/healthy-drink/${userId}?page=${page}&limit=${limit}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -115,11 +116,10 @@ export const createHealthyDrink = async (drinkData: CreateDrinkRequest): Promise
   try {
     console.log('Creating healthy drink with data:', drinkData);
     
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/meal-plan/healthy-drink`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(drinkData),
     });
 
@@ -153,9 +153,10 @@ export interface CreateHealthyDrinkJobResponse {
 export const createHealthyDrinkJob = async (
   drinkData: CreateDrinkRequest
 ): Promise<CreateHealthyDrinkJobResponse> => {
+  const headers = await getAuthHeaders();
   const response = await fetch(`${API_BASE_URL}/meal-plan/healthy-drink`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(drinkData),
   });
 

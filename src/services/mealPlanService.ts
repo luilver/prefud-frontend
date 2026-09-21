@@ -1,6 +1,8 @@
 // Mock service for meal plan operations
 // In a real app, these would be API calls to your backend
 
+import { getAuthHeaders } from "@/services/firebaseAuthService";
+
 export interface MealPlan {
   id: string;
   name: string;
@@ -219,11 +221,10 @@ export const getMealPlans = async (userId: string, page: number = 1, limit: numb
   console.log('Service: Fetching meal plans', { userId, page, limit });
   
   try {
+    const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/meal-plan/${userId}?page=${page}&limit=${limit}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers
     });
 
     if (!response.ok) {

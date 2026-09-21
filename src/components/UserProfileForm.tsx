@@ -13,6 +13,7 @@ import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
+import { getAuthHeaders } from "@/services/firebaseAuthService";
 import { trackEvent } from "@/services/analytics";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -228,12 +229,11 @@ const UserProfileForm = ({ onComplete, onBack, userId, initialName, authProvider
         addressId: ""
       };
 
+      const headers = await getAuthHeaders();
       const config = {
         method: 'post',
         url: `${API_BASE_URL}/user-profile/${userId}`,
-        headers: { 
-          'Content-Type': 'application/json'
-        },
+        headers,
         data: profileData
       };
 
