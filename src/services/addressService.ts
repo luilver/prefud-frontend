@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getAuthHeaders } from "@/services/firebaseAuthService";
 
 const BASE_URL =
   import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
@@ -27,17 +28,6 @@ export interface CreateAddressPayload {
   nickname?: string;
 }
 
-function getAuthHeaders(): Record<string, string> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-  try {
-    const token = localStorage.getItem("authToken");
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-  } catch {}
-  return headers;
-}
-
 /**
  * Fetch all addresses for a user.
  * GET /address/:userId
@@ -46,9 +36,10 @@ export async function getUserAddresses(
   userId: string
 ): Promise<UserAddress[]> {
   try {
+    const headers = await getAuthHeaders();
     const response = await axios.get<UserAddress[]>(
       `${BASE_URL}/address/${userId}`,
-      { headers: getAuthHeaders() }
+      { headers }
     );
     return response.data;
   } catch (error: any) {
@@ -68,10 +59,11 @@ export async function createUserAddress(
   userId: string,
   payload: CreateAddressPayload
 ): Promise<UserAddress> {
+  const headers = await getAuthHeaders();
   const response = await axios.post<UserAddress>(
     `${BASE_URL}/address/${userId}`,
     payload,
-    { headers: getAuthHeaders() }
+    { headers }
   );
   return response.data;
 }
@@ -84,8 +76,9 @@ export async function deleteUserAddress(
   userId: string,
   addressId: string
 ): Promise<void> {
+  const headers = await getAuthHeaders();
   await axios.delete(`${BASE_URL}/address/${userId}/${addressId}`, {
-    headers: getAuthHeaders(),
+    headers,
   });
 }
 
@@ -144,10 +137,11 @@ export interface QuotePayload {
 export async function quoteOrder(
   payload: QuotePayload
 ): Promise<OrderQuote> {
+  const headers = await getAuthHeaders();
   const response = await axios.post<OrderQuote>(
     `${BASE_URL}/api/v1/orders/quotes`,
     payload,
-    { headers: getAuthHeaders() }
+    { headers }
   );
   return response.data;
 }

@@ -43,6 +43,7 @@ import { getAllSubscriptionTypes, subscribeUser } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
 import { trackEvent } from "@/services/analytics";
 import { authService } from "@/services/authService";
+import { firebaseAuthService } from "@/services/firebaseAuthService";
 import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
@@ -195,28 +196,18 @@ const SignupSteps = () => {
         return;
       }
 
-      console.log("Sending signup request to API:", signupData.email);
+      console.log("Sending Firebase signup request:", signupData.email);
 
-      const requestData = {
-        email: signupData.email,
-        password: signupData.password,
-      };
+      const { token, responseData } = await firebaseAuthService.signupWithEmailAndPassword(
+        signupData.email,
+        signupData.password
+      );
 
-      const config = {
-        method: "post",
-        url: `${BasicURL}/security/signup`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: requestData,
-      };
+      console.log("Firebase Signup API response:", responseData);
 
-      const response = await axios.request(config);
-      console.log("Signup API response:", response.data);
+      const userId = responseData?.response?.userId || responseData?.userId;
 
-      if (
-        response.data.response?.userId
-      ) {
+      if (userId) {
         console.log("Showing success toast");
         toast({
           title: "✅ Account Created Successfully!",
@@ -226,36 +217,25 @@ const SignupSteps = () => {
 
         setSignupData((prev) => ({
           ...prev,
-          userId: response.data.response.userId,
+          userId,
+          firebaseToken: token,
         }));
         setCurrentStep(2);
       } else {
         console.log("Unexpected response format, throwing error");
-        throw new Error("Unexpected response format");
+        throw new Error("Unexpected response format from server");
       }
     } catch (error: any) {
       console.error("Signup failed:", error);
 
-      if (error.response?.data?.message) {
-        const errorMessage =
-          typeof error.response.data.message === "string"
-            ? error.response.data.message
-            : error.response.data.message.message || "Signup failed";
+      const errorMessage = error?.message || "Unable to create account. Please try again.";
 
-        toast({
-          title: "❌ Signup Failed",
-          description: errorMessage,
-          variant: "destructive",
-          duration: 5000,
-        });
-      } else {
-        toast({
-          title: "❌ Signup Failed",
-          description: "Unable to create account. Please try again.",
-          variant: "destructive",
-          duration: 5000,
-        });
-      }
+      toast({
+        title: "❌ Signup Failed",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
