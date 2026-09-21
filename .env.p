@@ -1,12 +1,19 @@
 ## prod
-VITE_BASE_URL=https://pantry-ms-brain.onrender.com
-VITE_PANTRY_URL=https://pantry-ms-brain.onrender.com
+# VITE_BASE_URL=https://pantry-ms-brain.onrender.com
+# VITE_PANTRY_URL=https://pantry-ms-brain.onrender.com
 VITE_PAYMENTS=https://zora-ms-stripe-1.onrender.com
 [REDACTED]
-VITE_STRIPE_PUBLIC_KEY=pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0
+#VITE_STRIPE_PUBLIC_KEY=pk_live_51R1tMqJXpWWLuVEYpa9L6b12LE2CEegclDZHdxVLwszUpCdrWW7xIxSqYl8KI5BGenJaniAnCwF0Z8EOoUUWLxV100Ff4uHql0
 VITE_REVENUECAT_API_KEY=appl_bHCcocrhZvibSBBZklMuRhgONYB
 VITE_SOCKET_URL=wss://pantry-ms-brain.onrender.com
 
+## local
+VITE_BASE_URL=http://localhost:3001
+VITE_PANTRY_URL=http://localhost:3001
+# VITE_PAYMENTS=http://localhost:3006 
+VITE_STRIPE_PUBLIC_KEY=pk_test_51R1tN0QtxIPdrkdTWoyJxB3qmuoh8FVEpRSQFEfCkGQFScfq8TRzCZz4ZJbXxkvhjwTw3vEuyrCizyg1APYcQcrJ00YgxWKyQ5
+#VITE_REVENUECAT_API_KEY=test_KFZibtSrGczqQOdxuSEcAsJuwLb
+# VITE_SOCKET_URL=ws://localhost:3001
 
 ### Firebase credentials
 VITE_FIREBASE_API_KEY=AIzaSyD8yOIxvefigdgf9i8YMUUCEn-s1xTpJRY
@@ -30,7 +37,7 @@ VITE_FIREBASE_MEASUREMENT_ID=G-C11WFRT11K
 VITE_RC_IOS_KEY=appl_bWMCWoFNmMmkCTFAfEoCBabTsoK
 VITE_RC_ANDROID_KEY=goog_eyJHIoJhJJLxikwLcoSNzhYKPBk
 
-
+VITE_ENV=production
 
 #keystore
 prefud2026
