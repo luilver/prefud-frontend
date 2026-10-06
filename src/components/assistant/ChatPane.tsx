@@ -7,6 +7,7 @@ import ActionChips from "./ActionChips";
 import ChatComposer from "./ChatComposer";
 import PayloadRenderer from "./PayloadRenderer";
 import AssistantCheckout from "./checkout/AssistantCheckout";
+import OrderBubbleRenderer from "./OrderBubbleRenderer";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import RecipeDetail from "./widgets/RecipeDetail";
 import type { MealBase, IngredientListItem, AssistantPayload, SourceLink } from "@/types/assistant";
@@ -80,6 +81,11 @@ const ChatPane: React.FC = () => {
               <MessageBubble role={m.role}>
                 <p className="whitespace-pre-wrap">{m.text}</p>
               </MessageBubble>
+            )}
+            {m.order && (
+              <div className={m.role === "ai" ? "pl-9 pr-2" : "pr-9 pl-2 flex justify-end"}>
+                <OrderBubbleRenderer order={m.order} />
+              </div>
             )}
             {m.payload && (
               <div className="pl-9 pr-2">

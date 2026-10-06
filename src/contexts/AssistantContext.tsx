@@ -18,6 +18,7 @@ interface AssistantContextValue {
   addToPantry: (items: IngredientListItem[]) => Promise<void>;
   advanceCheckout: (step: CheckoutStep) => void;
   resetCheckout: () => void;
+  confirmPurchase: (quoteId: string) => Promise<void>;
 }
 
 const AssistantContext = createContext<AssistantContextValue | null>(null);
@@ -36,6 +37,8 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("idle");
   const [checkoutCart, setCheckoutCart] = useState<IngredientListItem[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [activePlanId, setActivePlanId] = useState<string | null>(null);
+  const [activeMealType, setActiveMealType] = useState<string | null>(null);
 
   useEffect(() => {
     setMessages((prev) => {
@@ -93,6 +96,13 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const responseText = data.result?.message?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
       const questions = data.result?.message?.questions || data.result?.questions;
       const links = data.result?.message?.links || data.result?.links;
+      const order = data.result?.message?.order || data.result?.order;
+      const newPlanId = data.result?.message?.planId || data.result?.planId || data.result?.message?.generatedMeals?._id || data.result?.message?.generatedMeals?.id;
+      const newMealType = data.result?.message?.mealType || data.result?.mealType;
+      
+      if (newPlanId) setActivePlanId(newPlanId);
+      if (newMealType) setActiveMealType(newMealType);
+
       let payload = data.result?.message?.payload || data.result?.payload;
       const genMeals = data.result?.message?.generatedMeals;
       if (genMeals) {
@@ -144,6 +154,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           questions: questions,
           payload: payload,
           links: links,
+          order: order,
         },
       ]);
     });
@@ -166,7 +177,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, []);
 
-  const submit = useCallback(async (text: string) => {
+  const submit = useCallback(async (text: string, actionData?: any) => {
     const userMsg: ChatMessage = { id: uid(), role: "user", text };
     setMessages((m) => [...m, userMsg]);
     setIsTyping(true);
@@ -179,7 +190,15 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         content: msg.text
       }));
 
-      socket.emit("sendChatMessage", { user_id: userId, history: formattedHistory }, (response: any) => {
+      const emitPayload = {
+        user_id: userId,
+        history: formattedHistory,
+        mealType: activeMealType || "MEAL",
+        planId: activePlanId,
+        ...actionData
+      };
+
+      socket.emit("sendChatMessage", emitPayload, (response: any) => {
         if (response?.status === "success") {
           console.log(`Job ${response.jobId} started in room ${response.room}`);
         } else {
@@ -209,6 +228,13 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const pickQuestion = useCallback(async (ask: string) => {
     await submit(ask);
   }, [submit]);
+
+  const confirmPurchase = useCallback(async (quoteId: string) => {
+    await submit(t("assistant.chat.confirmPurchaseMessage") || "Yes, confirm purchase.", {
+      action: "CONFIRM_PURCHASE",
+      quoteId
+    });
+  }, [submit, t]);
 
   const openInWorkspace = useCallback((payload: AssistantPayload | null) => {
     setWorkspacePayload(payload);
@@ -272,8 +298,9 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       advanceCheckout,
       resetCheckout,
       addToPantry,
+      confirmPurchase,
     }),
-    [messages, isTyping, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout, addToPantry]
+    [messages, isTyping, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout, addToPantry, confirmPurchase]
   );
 
   return <AssistantContext.Provider value={value}>{children}</AssistantContext.Provider>;

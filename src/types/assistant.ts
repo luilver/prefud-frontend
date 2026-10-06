@@ -17,5 +17,10 @@ export type AssistantPayload =
   | { type: "cart"; data: { ingredientsList: IngredientListItem[] } };
 export interface QuestionChip { ask: string; }
 export interface AssistantResponse { response: string; questions?: QuestionChip[]; payload?: AssistantPayload; links?: SourceLink[]; }
-export interface ChatMessage { id: string; role: "user" | "ai"; text?: string; questions?: QuestionChip[]; payload?: AssistantPayload; typing?: boolean; links?: SourceLink[]; }
+export interface OrderCartItem { productTitle: string; imageUrl?: string; lineTotalCents: number; }
+export interface OrderCart { quoteId: string; items: OrderCartItem[]; totalAmountCents: number; }
+export interface OrderStep { title: string; status: string; description?: string; }
+export interface ChatOrder { status: string; cart?: OrderCart; errorCode?: string; steps?: OrderStep[]; }
+
+export interface ChatMessage { id: string; role: "user" | "ai"; text?: string; questions?: QuestionChip[]; payload?: AssistantPayload; typing?: boolean; links?: SourceLink[]; order?: ChatOrder; }
 export type CheckoutStep = "idle" | "summary" | "address" | "payment" | "confirm" | "success";
