@@ -97,16 +97,15 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const questions = data.result?.message?.questions || data.result?.questions;
       const links = data.result?.message?.links || data.result?.links;
       const order = data.result?.message?.order || data.result?.order;
-      const newPlanId = data.result?.message?.planId || data.result?.planId || data.result?.message?.generatedMeals?._id || data.result?.message?.generatedMeals?.id;
-      const newMealType = data.result?.message?.mealType || data.result?.mealType;
-      
-      if (newPlanId) setActivePlanId(newPlanId);
-      if (newMealType) setActiveMealType(newMealType);
-
       let payload = data.result?.message?.payload || data.result?.payload;
       const genMeals = data.result?.message?.generatedMeals;
+      
+      let inferredPlanId = data.result?.message?.planId || data.result?.planId || genMeals?._id || genMeals?.id;
+      let inferredMealType = data.result?.message?.mealType || data.result?.mealType;
+
       if (genMeals) {
         if (genMeals.mealPlan) {
+          inferredMealType = inferredMealType || "MEAL";
           payload = {
             type: "mealPlan",
             data: {
@@ -116,6 +115,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             },
           };
         } else if (genMeals.specialMeal) {
+          inferredMealType = inferredMealType || "SPECIAL";
           payload = {
             type: "specialMeal",
             data: {
@@ -125,6 +125,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             },
           };
         } else if (genMeals.drinkPlan || genMeals.healthyDrink) {
+          inferredMealType = inferredMealType || "DRINK";
           payload = {
             type: "healthyDrink",
             data: {
@@ -144,6 +145,9 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           };
         }
       }
+
+      if (inferredPlanId) setActivePlanId(inferredPlanId);
+      if (inferredMealType) setActiveMealType(inferredMealType);
 
       setMessages((m) => [
         ...m,
