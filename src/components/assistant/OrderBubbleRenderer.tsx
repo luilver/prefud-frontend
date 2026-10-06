@@ -15,7 +15,9 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  if (order.status === 'QUOTED' && order.cart) {
+  const statusUpper = order.status.toUpperCase();
+
+  if (statusUpper === 'QUOTED' && order.cart) {
     return (
       <div className="bg-card border border-border rounded-xl p-4 mt-2 space-y-4 shadow-sm w-full max-w-sm">
         <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -67,7 +69,7 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order }) => {
     );
   }
 
-  if (order.status === 'ORDER_STARTED' || order.status === 'PENDING') {
+  if (['ORDER_STARTED', 'PENDING', 'PROCESSING', 'ORDER.STARTED', 'ORDER.TRACKING_RECEIVED'].includes(statusUpper)) {
     return (
       <div className="bg-card border border-border rounded-xl p-4 mt-2 space-y-4 shadow-sm w-full max-w-sm">
         <div className="flex items-center gap-3 text-primary">
@@ -91,7 +93,7 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order }) => {
     );
   }
 
-  if (order.status === 'ORDER_NOT_STARTED' || order.status === 'FAILED') {
+  if (['ORDER_NOT_STARTED', 'FAILED', 'ORDER.FAILED', 'CANCELLED'].includes(statusUpper)) {
     return (
       <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 mt-2 space-y-3 shadow-sm w-full max-w-sm">
         <div className="flex items-center gap-2 text-destructive">
@@ -116,7 +118,7 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order }) => {
     );
   }
 
-  if (order.status === 'SUCCESS' || order.status === 'COMPLETED') {
+  if (['SUCCESS', 'COMPLETED', 'PLACED', 'SHIPPED', 'DELIVERED', 'ORDER.PLACED', 'ORDER.SHIPPED', 'ORDER.DELIVERED'].includes(statusUpper)) {
     return (
       <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 mt-2 space-y-3 shadow-sm w-full max-w-sm">
         <div className="flex items-center gap-2 text-green-600 dark:text-green-500">

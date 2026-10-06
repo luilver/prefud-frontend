@@ -139,8 +139,9 @@ const ChatPane: React.FC = () => {
                 </Button>
               </div>
             )}
-            {m.role === "ai" && m.questions && m.questions.length > 0 && (
-              <div className="pl-9 pr-2">
+            {m.role === "ai" && m.questions && m.questions.filter((q) => !q.ask.startsWith("__")).length > 0 && (
+              <div className="pl-9 pr-2 mt-1 space-y-2">
+                <p className="text-xs font-medium text-muted-foreground ml-1">{t("assistant.chat.questionsForYou")}</p>
                 <ActionChips chips={m.questions.filter((q) => !q.ask.startsWith("__"))} onPick={handlePick} />
               </div>
             )}

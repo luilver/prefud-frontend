@@ -93,11 +93,27 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      const responseText = data.result?.message?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
+      let responseText = data.result?.message?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
       const questions = data.result?.message?.questions || data.result?.questions;
       const links = data.result?.message?.links || data.result?.links;
       const order = data.result?.message?.order || data.result?.order;
       let payload = data.result?.message?.payload || data.result?.payload;
+      
+      if (order && ['ORDER_STARTED', 'PENDING', 'PROCESSING', 'ORDER.STARTED'].includes(order.status?.toUpperCase())) {
+         if (responseText === "Aquí tienes el resultado.") {
+            responseText = t("assistant.chat.orderInProcess");
+         }
+      }
+      
+      if (order && order.orderId) {
+        socketInstance.emit("joinOrderRoom", { orderId: order.orderId }, (res: any) => {
+          console.log("Chat joined order room:", res);
+          // If the response immediately gives us a newer status, we can update it
+          if (res?.currentStatus && order.status !== res.currentStatus) {
+            order.status = res.currentStatus;
+          }
+        });
+      }
       const genMeals = data.result?.message?.generatedMeals;
       
       let inferredPlanId = data.result?.message?.planId || data.result?.planId || genMeals?.planId || genMeals?._id || genMeals?.id;
@@ -178,6 +194,31 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           text: t("assistant.errors.processRequest"),
         },
       ]);
+    });
+
+    socketInstance.on("orderStatusUpdate", (data: { orderId: string; status: string; data: any }) => {
+      console.log("Chat received real-time order update:", data);
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        let updated = false;
+        
+        for (let i = newMessages.length - 1; i >= 0; i--) {
+          const msg = newMessages[i];
+          if (msg.order && msg.order.orderId === data.orderId) {
+            newMessages[i] = {
+              ...msg,
+              order: {
+                ...msg.order,
+                status: data.status,
+              }
+            };
+            updated = true;
+            break;
+          }
+        }
+        
+        return updated ? newMessages : prev;
+      });
     });
 
     return () => {
