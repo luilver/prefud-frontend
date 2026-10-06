@@ -100,12 +100,13 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       let payload = data.result?.message?.payload || data.result?.payload;
       const genMeals = data.result?.message?.generatedMeals;
       
-      let inferredPlanId = data.result?.message?.planId || data.result?.planId || genMeals?._id || genMeals?.id;
+      let inferredPlanId = data.result?.message?.planId || data.result?.planId || genMeals?.planId || genMeals?._id || genMeals?.id;
       let inferredMealType = data.result?.message?.mealType || data.result?.mealType;
 
       if (genMeals) {
         if (genMeals.mealPlan) {
           inferredMealType = inferredMealType || "MEAL";
+          inferredPlanId = inferredPlanId || genMeals.mealPlan._id || genMeals.mealPlan.id;
           payload = {
             type: "mealPlan",
             data: {
@@ -116,6 +117,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           };
         } else if (genMeals.specialMeal) {
           inferredMealType = inferredMealType || "SPECIAL";
+          inferredPlanId = inferredPlanId || genMeals.specialMeal._id || genMeals.specialMeal.id;
           payload = {
             type: "specialMeal",
             data: {
@@ -126,10 +128,12 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           };
         } else if (genMeals.drinkPlan || genMeals.healthyDrink) {
           inferredMealType = inferredMealType || "DRINK";
+          const drink = genMeals.drinkPlan || genMeals.healthyDrink;
+          inferredPlanId = inferredPlanId || drink._id || drink.id;
           payload = {
             type: "healthyDrink",
             data: {
-              healthyDrink: { healthyDrink: genMeals.drinkPlan || genMeals.healthyDrink },
+              healthyDrink: { healthyDrink: drink },
               totalCarbonFootprint: genMeals.totalCarbonFootprint,
               ingredientsList: genMeals.ingredientsList || [],
             },

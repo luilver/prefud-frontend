@@ -188,7 +188,7 @@ const AIMealCreator = () => {
   const handleViewApiMeal = (apiMeal: any) => {
     console.log('selected meal ',apiMeal)
     const transformedMeal = {
-      id: apiMeal._id,
+      id: apiMeal.planId || apiMeal._id,
       name: apiMeal.specialMeal.specialMeal.name,
       description: apiMeal.specialMeal.specialMeal.description,
       cuisine: apiMeal.cuisinePreferences?.[0] || 'Various',
@@ -356,7 +356,7 @@ const AIMealCreator = () => {
 
               {/* API Meals */}
               {(isMobile ? allApiMeals : apiMeals).map((meal, index) => (
-                <Card key={`api-${meal._id || index}`} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+                <Card key={`api-${meal.planId || meal._id || index}`} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
                   <div className="h-1.5 bg-gradient-to-r from-accent to-primary" />
                   <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
                     <div className="flex items-center justify-between">
@@ -394,7 +394,7 @@ const AIMealCreator = () => {
                       <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => handleViewApiMeal(meal)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiMealCreator.viewRecipeBtn") || "View Recipe"}
                       </Button>
-                      <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(meal._id, meal.specialMeal.specialMeal.name, true)}>
+                      <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(meal.planId || meal._id, meal.specialMeal.specialMeal.name, true)}>
                         <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>

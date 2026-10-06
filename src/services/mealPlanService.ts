@@ -31,7 +31,8 @@ export interface Meal {
 
 // Updated API response interface to match the new structure you provided
 interface ApiMealPlan {
-  _id: string;
+  _id?: string;
+  planId?: string;
   user_id: string;
   plan_name: string;
   plan_description?: string;
@@ -331,7 +332,7 @@ export const transformApiMealPlanToLocal = (apiPlan: ApiMealPlan): LocalMealPlan
 
   // Make sure preferences object matches what the cards expect
   const transformedPlan: LocalMealPlan = {
-    id: apiPlan._id,
+    id: apiPlan.planId || apiPlan._id || 'unknown_id',
     name: apiPlan.plan_name || 'Unnamed Meal Plan',
     startDate: startDate.toISOString().split('T')[0],
     endDate: endDate.toISOString().split('T')[0],

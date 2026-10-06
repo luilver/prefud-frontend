@@ -292,7 +292,7 @@ const AIDrinkCreator = () => {
 
             <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
               {(isMobile ? allApiDrinks : apiDrinks).map((drink) => (
-                <Card key={drink._id} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+                <Card key={drink.planId || drink._id} className="group bg-card/95 backdrop-blur-sm border border-border/50 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 overflow-hidden">
                   <div className="h-1.5 bg-gradient-to-r from-primary to-accent" />
                   <CardHeader className="pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
                     <div className="flex items-center justify-between">
@@ -335,7 +335,7 @@ const AIDrinkCreator = () => {
                       <Button variant="outline" size="sm" className="flex-1 text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => handleViewApiDrink(drink)}>
                         <Eye className="h-3.5 w-3.5 mr-1" />{t("aiDrinkCreator.viewRecipe") || "View Recipe"}
                       </Button>
-                      <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(drink._id, drink.drink_name, true)}>
+                      <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white" onClick={() => handleMarkAsDone(drink.planId || drink._id || '', drink.drink_name, true)}>
                         <CheckCircle2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>

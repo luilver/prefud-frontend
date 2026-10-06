@@ -47,7 +47,8 @@ export interface ApiDrinkPlan {
 }
 
 export interface ApiDrink {
-  _id: string;
+  _id?: string;
+  planId?: string;
   user_id: string;
   drink_name: string;
   drinkPlan: ApiDrinkPlan;
