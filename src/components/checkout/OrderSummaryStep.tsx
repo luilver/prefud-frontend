@@ -9,6 +9,7 @@ import { CheckoutData } from "@/components/CheckoutFlow";
 import { CartItem, useCart } from "@/contexts/CartContext";
 import { OrderQuote } from "@/services/addressService";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_BASE_URL } from "@/config/api";
 
 interface OrderSummaryStepProps {
   items: CartItem[];
@@ -95,7 +96,7 @@ export const OrderSummaryStep: React.FC<OrderSummaryStepProps> = ({
         }
       };
 
-      const BASE_URL = import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
+      const BASE_URL = API_BASE_URL;
       const response = await fetch(`${BASE_URL}/api/v1/orders/checkout-simple`, {
         method: "POST",
         headers: {

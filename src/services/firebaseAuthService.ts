@@ -9,18 +9,35 @@ import { isNativePlatform } from "@/services/revenueCatService";
 import { authService } from "@/services/authService";
 import { storageService } from "@/services/storageService";
 
-export const getAuthToken = async (): Promise<string | null> => {
+export const getFirebaseToken = async (
+  forceRefresh = false
+): Promise<string | null> => {
   try {
     if (isNativePlatform()) {
-      const tokenResult = await FirebaseAuthentication.getIdToken();
+      const tokenResult = await FirebaseAuthentication.getIdToken({ forceRefresh });
       if (tokenResult?.token) return tokenResult.token;
-    } else if (auth.currentUser) {
-      const token = await auth.currentUser.getIdToken();
-      if (token) return token;
+    } else {
+      if (!auth.currentUser && typeof (auth as any).authStateReady === "function") {
+        await Promise.race([
+          auth.authStateReady(),
+          new Promise((resolve) => setTimeout(resolve, 800)),
+        ]);
+      }
+      if (auth.currentUser) {
+        const token = await auth.currentUser.getIdToken(forceRefresh);
+        if (token) return token;
+      }
     }
   } catch (e) {
     console.warn("Could not retrieve Firebase token directly:", e);
   }
+  return null;
+};
+
+export const getAuthToken = async (): Promise<string | null> => {
+  const firebaseToken = await getFirebaseToken();
+  if (firebaseToken) return firebaseToken;
+
   return (
     (await storageService.getItem("authToken")) ||
     localStorage.getItem("authToken")

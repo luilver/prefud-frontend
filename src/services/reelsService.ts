@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { PANTRY_API_URL } from '@/config/api';
 
-const BASE_URL = 'https://pantry-ms-brain.onrender.com';
+const BASE_URL = PANTRY_API_URL;
 
 export interface ReelIngredient {
   name: string;

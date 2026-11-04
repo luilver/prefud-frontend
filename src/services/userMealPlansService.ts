@@ -1,7 +1,7 @@
 import { getAuthHeaders } from "@/services/firebaseAuthService";
+import { API_BASE_URL, PANTRY_API_URL } from "@/config/api";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://lovable-meal-planner.onrender.com/api';
-const API_MEALS = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
+const API_MEALS = PANTRY_API_URL;
 
 export const getMealPlansByUser = async (userId: string, page: number = 1, limit: number = 5) => {
   try {

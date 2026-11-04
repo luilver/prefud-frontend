@@ -1,6 +1,7 @@
 import { getAuthHeaders } from "@/services/firebaseAuthService";
+import { PANTRY_API_URL } from "@/config/api";
 
-const API_MEALS = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
+const API_MEALS = PANTRY_API_URL;
 
 interface AIMealRequest {
   userId: string;

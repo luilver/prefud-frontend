@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getAuthHeaders } from "@/services/firebaseAuthService";
+import { PANTRY_API_URL } from "@/config/api";
 
 export interface Ingredient {
   name: string;
@@ -25,7 +26,7 @@ export interface PantryIngredient {
   notes: string;
 }
 
-const BASE_URL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
+const BASE_URL = PANTRY_API_URL;
 
 export interface AnalyzeImageJobResponse {
   jobId: string;

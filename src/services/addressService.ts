@@ -1,8 +1,8 @@
 import axios from "axios";
 import { getAuthHeaders } from "@/services/firebaseAuthService";
+import { API_BASE_URL } from "@/config/api";
 
-const BASE_URL =
-  import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
+const BASE_URL = API_BASE_URL;
 
 export interface UserAddress {
   _id: string;

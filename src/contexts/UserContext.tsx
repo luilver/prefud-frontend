@@ -298,7 +298,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         };
       } catch (error) {
         console.error("Failed to fetch meal plans from API:", error);
-        throw error;
+        return {
+          data: [],
+          totalPages: 1,
+          currentPage: 1,
+          totalCount: 0,
+        };
       }
     },
     []

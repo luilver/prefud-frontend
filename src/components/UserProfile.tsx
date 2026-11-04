@@ -82,6 +82,7 @@ import DeleteAccountModal from "./DeleteAccountModal";
 import { authService } from "@/services/authService";
 import { getAuthHeaders } from "@/services/firebaseAuthService";
 import axios from "axios";
+import { API_BASE_URL } from "@/config/api";
 
 interface SubscriptionType {
   _id: string;
@@ -148,8 +149,6 @@ interface TrackingData {
   healthGoals: HealthGoals | null;
 }
 import { useToast } from "@/hooks/use-toast";
-
-const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
 
 const UserProfile = () => {
   const navigate = useNavigate();

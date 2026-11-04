@@ -17,7 +17,9 @@ interface OTPVerificationProps {
   onBack: () => void;
   useEmailVerification?: boolean; // When true, uses request-otp/validate-otp with email instead of userId
 }
-const BasicURL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
+import { API_BASE_URL } from "@/config/api";
+
+const BasicURL = API_BASE_URL;
 
 const OTPVerification = ({ email, userId, onVerified, onBack, useEmailVerification = false }: OTPVerificationProps) => {
   const [otp, setOtp] = useState("");

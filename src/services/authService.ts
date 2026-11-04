@@ -1,4 +1,5 @@
 import { getAuthHeaders } from "@/services/firebaseAuthService";
+import { API_BASE_URL, PANTRY_API_URL } from "@/config/api";
 
 interface LoginResponse {
   email: string;
@@ -113,8 +114,8 @@ interface CompleteLoginResponse extends LoginResponse {
 }
 
 class AuthService {
-  private baseURL = import.meta.env.VITE_BASE_URL ||'https://pantry-ms-brain.onrender.com';
-  private pantryURL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
+  private baseURL = API_BASE_URL;
+  private pantryURL = PANTRY_API_URL;
 
   async login(email: string, password: string): Promise<CompleteLoginResponse> {
     try {

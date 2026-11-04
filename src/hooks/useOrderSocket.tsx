@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { SOCKET_URL } from '@/config/api';
 
 export function useOrderSocket(orderIds: string[]) {
   const [ordersStatus, setOrdersStatus] = useState<Record<string, string>>({});
@@ -10,7 +11,7 @@ export function useOrderSocket(orderIds: string[]) {
     if (!orderIds || orderIds.length === 0) return;
 
     // Connect to the NestJS backend
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'wss://pantry-ms-brain.onrender.com';
+    const socketUrl = SOCKET_URL;
     const socket = io(socketUrl);
     socketRef.current = socket;
 

@@ -19,8 +19,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-
-const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
+import { API_BASE_URL } from "@/config/api";
 
 interface UserProfileFormProps {
   onComplete: (profileData: any) => void;

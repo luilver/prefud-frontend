@@ -4,6 +4,7 @@ import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { addIngredientsToPantry } from "@/services/pantryService";
+import { SOCKET_URL } from "@/config/api";
 
 interface AssistantContextValue {
   messages: ChatMessage[];
@@ -74,7 +75,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     // Connect to the NestJS WebSocket Gateway (Ensure URL matches your backend environment)
-    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "wss://pantry-ms-brain.onrender.com"); 
+    const socketInstance = io(SOCKET_URL); 
     setSocket(socketInstance);
 
     socketInstance.on("generationCompleted", (data) => {

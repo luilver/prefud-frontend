@@ -43,7 +43,8 @@ import { getAllSubscriptionTypes, subscribeUser } from "@/services/payments";
 import { mapApiToPlan, Plan } from "@/utils/mapSubscriptionPlans";
 import { trackEvent } from "@/services/analytics";
 import { authService } from "@/services/authService";
-import { firebaseAuthService } from "@/services/firebaseAuthService";
+import { API_BASE_URL } from "@/config/api";
+import { firebaseAuthService, getAuthHeaders } from "@/services/firebaseAuthService";
 import { auth, googleProvider, appleProvider } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { Capacitor } from "@capacitor/core";
@@ -86,8 +87,7 @@ interface SignupData {
     allergies: string[];
   };
 }
-const BasicURL =
-  import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
+const BasicURL = API_BASE_URL;
 
 const SignupSteps = () => {
   const location = useLocation();
@@ -435,12 +435,11 @@ const SignupSteps = () => {
         subscriptionTypeId: planId, // API expects only this in the body
       };
 
+      const headers = await getAuthHeaders();
       const config = {
         method: "post",
         url: `${BasicURL}/subscription/${userId}`, // userId only in the path
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         data: subscriptionData,
       };
 

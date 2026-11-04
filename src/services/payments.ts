@@ -1,9 +1,13 @@
 import axios from "axios";
+import { API_BASE_URL, PAYMENTS_URL } from "@/config/api";
+import {
+  getAuthHeaders,
+  getFirebaseToken,
+  getAuthToken,
+} from "@/services/firebaseAuthService";
 
-const API_PAYMENTS =
-  import.meta.env.VITE_PAYMENTS || "https://zora-ms-stripe-1.onrender.com";
-const BASE_URL =
-  import.meta.env.VITE_BASE_URL || "https://pantry-ms-brain.onrender.com";
+const API_PAYMENTS = PAYMENTS_URL;
+const BASE_URL = API_BASE_URL;
 
 interface PaymentMethodResponse {
   id: string;
@@ -434,13 +438,12 @@ export async function persistUserSubscription(
     rukusubscriptionID: responseCreateSubscription,
   });
   console.log("data to send to persist subscription ", data);
+  const headers = await getAuthHeaders();
   const config = {
     method: "post",
     maxBodyLength: Infinity,
     url: `${BASE_URL}/subscription/${userId}`,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     data: data,
   };
 
@@ -503,11 +506,12 @@ export async function cancelUserSubscription(
   subscription?: any;
   code: string;
 }> {
+  const headers = await getAuthHeaders();
   const config = {
     method: "delete",
     maxBodyLength: Infinity,
     url: `${BASE_URL}/subscription/${userId}`,
-    headers: {},
+    headers,
   };
 
   try {
@@ -569,9 +573,21 @@ export interface SubscribeUserResponse {
 export const subscribeUser = async (
   userId: string,
   subscriptionTypeId: string,
-  rukusubscriptionID: string
+  rukusubscriptionID: string,
+  token?: string
 ): Promise<SubscribeUserResponse> => {
   try {
+    const firebaseToken =
+      token || (await getFirebaseToken()) || (await getAuthToken());
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (firebaseToken) {
+      headers["Authorization"] = `Bearer ${firebaseToken}`;
+    }
+
     const response = await axios.post(
       `${BASE_URL}/subscription/subscribe/${userId}`,
       {
@@ -579,9 +595,7 @@ export const subscribeUser = async (
         rukusubscriptionID,
       },
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
       }
     );
 

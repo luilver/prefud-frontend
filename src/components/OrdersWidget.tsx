@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useOrderSocket } from '@/hooks/useOrderSocket';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { API_BASE_URL } from '@/config/api';
+import { getAuthToken } from '@/services/firebaseAuthService';
 
 interface OrderItem {
   url: string;
@@ -77,27 +79,54 @@ export const OrdersWidget: React.FC<OrdersWidgetProps> = ({ hideDelivered }) => 
 
   // Fetch orders
   useEffect(() => {
+    let isMounted = true;
     const fetchOrders = async () => {
-      if (!user?.id || !authUser?.token) return;
+      const userId = user?.id || authUser?.userId;
+      if (!userId) {
+        if (isMounted) setLoading(false);
+        return;
+      }
+
       try {
-        const apiUrl = import.meta.env.VITE_BASE_URL || 'https://pantry-ms-brain.onrender.com';
-        const res = await fetch(`${apiUrl}/api/v1/orders/user/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${authUser.token}`,
-          },
+        const token = authUser?.token || (await getAuthToken());
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const apiUrl = API_BASE_URL;
+        const res = await fetch(`${apiUrl}/api/v1/orders/user/${userId}`, {
+          headers,
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
+
         if (res.ok) {
           const data = await res.json();
-          setOrders(data);
+          if (isMounted) {
+            setOrders(Array.isArray(data) ? data : []);
+          }
+        } else {
+          if (isMounted) setOrders([]);
         }
       } catch (error) {
         console.error("Failed to fetch orders", error);
+        if (isMounted) setOrders([]);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     fetchOrders();
-  }, [user?.id, authUser?.token]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, authUser?.userId, authUser?.token]);
 
   // Setup WebSocket listening for active orders
   const activeOrderIds = orders
@@ -127,16 +156,8 @@ export const OrdersWidget: React.FC<OrdersWidgetProps> = ({ hideDelivered }) => 
 
   const formatPrice = (amount: number) => `$${amount.toFixed(2)}`;
 
-  if (loading) {
-    return (
-      <div className="py-4 flex justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (orders.length === 0) {
-    return null; // Don't show anything if no orders
+  if (loading || orders.length === 0) {
+    return null; // Don't block the screen while loading or if no orders
   }
 
   return (

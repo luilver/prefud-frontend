@@ -91,6 +91,9 @@ const MealPlanner = () => {
       } else {
         loadMealPlans(currentPage, pageSize, false);
       }
+    } else if (!user?.id && !showCreator && !selectedMealPlan) {
+      setIsLoadingPlans(false);
+      setHasLoadedInitialPlans(true);
     }
   }, [user?.id, currentPage, pageSize, showCreator, selectedMealPlan, isMobile]);
 
@@ -126,32 +129,35 @@ const MealPlanner = () => {
   };
 
   const loadMealPlans = async (page: number, limit: number, isInfiniteScroll: boolean = false) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setIsLoadingPlans(false);
+      setHasLoadedInitialPlans(true);
+      return;
+    }
 
     setIsLoadingPlans(true);
     try {
       console.log(`Loading meal plans for page: ${page}, limit: ${limit}`);
       const response = await fetchMealPlansFromAPI(user.id, page, limit);
-      console.log("this si the data of meal plans ", response.data);
+      console.log("this is the data of meal plans ", response?.data);
       
+      const plans = response?.data || [];
       if (isInfiniteScroll) {
-        setAllPlans(response.data || []);
+        setAllPlans(plans);
       }
-      setCurrentPagePlans(response.data || []);
-      setTotalPages(response.totalPages || 1);
-      setHasLoadedInitialPlans(true);
+      setCurrentPagePlans(plans);
+      setTotalPages(response?.totalPages || 1);
 
       console.log("Loaded meal plans for current page:", response);
     } catch (error) {
       console.error("Error loading meal plans:", error);
-      toast({
-        title: "Error loading meal plans",
-        description: "Failed to load your meal plans. Please try again.",
-        variant: "destructive",
-      });
       setCurrentPagePlans([]);
+      if (isInfiniteScroll) {
+        setAllPlans([]);
+      }
     } finally {
       setIsLoadingPlans(false);
+      setHasLoadedInitialPlans(true);
     }
   };
 
@@ -681,9 +687,28 @@ const MealPlanner = () => {
           !isLoadingPlans &&
           hasLoadedInitialPlans && (
             isMobile ? (
-              <p className="text-center text-neutral-400 text-sm py-12">
-                {t("mealPlanner.emptyState") || "No tienes más planes de comidas."}
-              </p>
+              <div className="text-center py-8 px-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                <Sparkles className="h-8 w-8 text-white mx-auto mb-3" />
+                <h3 className="text-base font-semibold text-white mb-1">
+                  {t("mealPlanner.welcomeToAIMeal") || "Welcome to AI Meal Planning"}
+                  , {user?.name?.split(" ")[0] || "Chef"}!
+                </h3>
+                <p className="text-white/70 text-xs mb-4">
+                  {t("mealPlanner.createYourPersonalized") || "Create your first personalized meal plan with our AI assistant."}
+                </p>
+                <Button
+                  onClick={() => {
+                    setShowCreator(true);
+                    setSelectedMealPlan(null);
+                    setIsEditing(false);
+                    isNavigatingBack.current = false;
+                  }}
+                  className="w-full bg-white text-primary hover:bg-white/90 font-semibold shadow-md text-sm"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  {t("mealPlanner.createYourFirstAIMeal") || "Create Your First AI Meal Plan"}
+                </Button>
+              </div>
             ) : (
               <Card className="text-center py-12 bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl">
                 <CardContent>

@@ -1,9 +1,9 @@
 import { io, Socket } from "socket.io-client";
 import type { CreateMealPlanRequest } from "./mealPlanService";
 import { getAuthHeaders } from "@/services/firebaseAuthService";
+import { PANTRY_API_URL, SOCKET_URL } from "@/config/api";
 
-const API_BASE_URL = import.meta.env.VITE_PANTRY_URL || "https://pantry-ms-brain.onrender.com";
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "wss://pantry-ms-brain.onrender.com";
+const API_BASE_URL = PANTRY_API_URL;
 
 export interface CreateMealPlanJobResponse {
   jobId: string;

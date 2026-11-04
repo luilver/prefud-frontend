@@ -2,6 +2,7 @@
 // In a real app, these would be API calls to your backend
 
 import { getAuthHeaders } from "@/services/firebaseAuthService";
+import { PANTRY_API_URL } from "@/config/api";
 
 export interface MealPlan {
   id: string;
@@ -134,7 +135,7 @@ export interface CreateMealPlanRequest {
   plan_description?: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_PANTRY_URL || 'https://pantry-ms-brain.onrender.com';
+const API_BASE_URL = PANTRY_API_URL;
 
 
 export const createMealPlan = async (planData: CreateMealPlanRequest): Promise<ApiMealPlan> => {
@@ -223,19 +224,41 @@ export const getMealPlans = async (userId: string, page: number = 1, limit: numb
   
   try {
     const headers = await getAuthHeaders();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const response = await fetch(`${API_BASE_URL}/meal-plan/${userId}?page=${page}&limit=${limit}`, {
       method: 'GET',
-      headers
+      headers,
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
+      if (response.status === 404) {
+        console.log('Service: No meal plans found (404), returning empty array');
+        return { data: [], total: 0, page, totalPages: 1 };
+      }
       throw new Error(`Failed to fetch meal plans: ${response.status}`);
     }
 
-    const data: MealPlansApiResponse = await response.json();
-    console.log('Service: Meal plans fetched successfully', data);
+    const rawData = await response.json();
+    console.log('Service: Meal plans fetched successfully', rawData);
     
-    return data;
+    const list = Array.isArray(rawData)
+      ? rawData
+      : Array.isArray(rawData?.data)
+      ? rawData.data
+      : Array.isArray(rawData?.mealPlans)
+      ? rawData.mealPlans
+      : [];
+
+    return {
+      data: list,
+      total: rawData?.total ?? list.length,
+      page: rawData?.page ?? page,
+      totalPages: rawData?.totalPages ?? Math.max(1, Math.ceil(list.length / limit)),
+    };
   } catch (error) {
     console.error('Service: Error fetching meal plans', error);
     throw error;
