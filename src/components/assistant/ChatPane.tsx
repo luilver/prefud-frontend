@@ -75,7 +75,7 @@ const ChatPane: React.FC = () => {
     <div className="flex flex-col h-full min-h-0 bg-background">
 
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
-        {messages.map((m) => (
+        {messages.map((m, idx) => (
           <div key={m.id} className="space-y-2">
             {m.text && (
               <MessageBubble role={m.role}>
@@ -84,7 +84,7 @@ const ChatPane: React.FC = () => {
             )}
             {m.order && (
               <div className={m.role === "ai" ? "pl-9 pr-2" : "pr-9 pl-2 flex justify-end"}>
-                <OrderBubbleRenderer order={m.order} />
+                <OrderBubbleRenderer order={m.order} isLatest={idx === messages.length - 1} />
               </div>
             )}
             {m.payload && (

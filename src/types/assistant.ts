@@ -20,7 +20,16 @@ export interface AssistantResponse { response: string; questions?: QuestionChip[
 export interface OrderCartItem { productTitle: string; imageUrl?: string; lineTotalCents: number; }
 export interface OrderCart { quoteId: string; items: OrderCartItem[]; totalAmountCents: number; }
 export interface OrderStep { title: string; status: string; description?: string; }
-export interface ChatOrder { status: string; orderId?: string; cart?: OrderCart; errorCode?: string; steps?: OrderStep[]; }
+export interface ChatOrder {
+  status: string;
+  orderId?: string;
+  cart?: OrderCart;
+  errorCode?: string;
+  steps?: OrderStep[];
+  requiresPaymentMethod?: boolean;
+  insufficientFunds?: boolean;
+  actionRequired?: "ADD_PAYMENT_METHOD" | "PROVIDE_ANOTHER_PAYMENT_METHOD" | string;
+}
 
 export interface ChatMessage { id: string; role: "user" | "ai"; text?: string; questions?: QuestionChip[]; payload?: AssistantPayload; typing?: boolean; links?: SourceLink[]; order?: ChatOrder; }
 export type CheckoutStep = "idle" | "summary" | "address" | "payment" | "confirm" | "success";

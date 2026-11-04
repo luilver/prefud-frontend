@@ -20,6 +20,7 @@ interface AssistantContextValue {
   advanceCheckout: (step: CheckoutStep) => void;
   resetCheckout: () => void;
   confirmPurchase: (quoteId: string) => Promise<void>;
+  retryPurchase: (targetQuoteId?: string) => Promise<void>;
 }
 
 const AssistantContext = createContext<AssistantContextValue | null>(null);
@@ -40,6 +41,8 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [socket, setSocket] = useState<Socket | null>(null);
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
   const [activeMealType, setActiveMealType] = useState<string | null>(null);
+  const [lastQuoteId, setLastQuoteId] = useState<string | null>(null);
+  const [lastUserMessage, setLastUserMessage] = useState<string>("");
 
   useEffect(() => {
     setMessages((prev) => {
@@ -94,16 +97,47 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-      let responseText = data.result?.message?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
-      const questions = data.result?.message?.questions || data.result?.questions;
-      const links = data.result?.message?.links || data.result?.links;
-      const order = data.result?.message?.order || data.result?.order;
-      let payload = data.result?.message?.payload || data.result?.payload;
+      const msgObj = data.result?.message;
+      let responseText = msgObj?.response || data.result?.response || (typeof data.result === 'string' ? data.result : "Aquí tienes el resultado.");
+      const questions = msgObj?.questions || data.result?.questions;
+      const links = msgObj?.links || data.result?.links;
+      let order = msgObj?.order || data.result?.order;
+      let payload = msgObj?.payload || data.result?.payload;
+
+      const requiresPaymentMethod = msgObj?.requiresPaymentMethod ?? data.result?.requiresPaymentMethod ?? order?.requiresPaymentMethod;
+      const insufficientFunds = msgObj?.insufficientFunds ?? data.result?.insufficientFunds ?? order?.insufficientFunds;
+      const actionRequired = msgObj?.actionRequired ?? data.result?.actionRequired ?? order?.actionRequired;
+      const errorCode = order?.errorCode ?? msgObj?.order?.errorCode ?? msgObj?.errorCode ?? data.result?.errorCode;
+
+      // Handle payment method error cases A, B, and C
+      if (requiresPaymentMethod || actionRequired || errorCode === 'NO_DEFAULT_PAYMENT_METHOD' || errorCode === 'INSUFFICIENT_FUNDS' || errorCode === 'CARD_DECLINED') {
+        order = {
+          ...(order || {}),
+          status: order?.status || "FAILED",
+          errorCode: errorCode || (insufficientFunds ? "INSUFFICIENT_FUNDS" : "NO_DEFAULT_PAYMENT_METHOD"),
+          requiresPaymentMethod: true,
+          insufficientFunds: !!insufficientFunds,
+          actionRequired: actionRequired || (insufficientFunds ? "PROVIDE_ANOTHER_PAYMENT_METHOD" : "ADD_PAYMENT_METHOD"),
+        };
+
+        // Localize responseText according to user's language in the context
+        if (order.errorCode === 'NO_DEFAULT_PAYMENT_METHOD' || order.actionRequired === 'ADD_PAYMENT_METHOD') {
+          responseText = t("assistant.order.noDefaultPayment") || responseText;
+        } else if (order.errorCode === 'INSUFFICIENT_FUNDS' || order.insufficientFunds) {
+          responseText = t("assistant.order.insufficientFunds") || responseText;
+        } else if (order.errorCode === 'CARD_DECLINED') {
+          responseText = t("assistant.order.cardDeclined") || responseText;
+        }
+      }
       
       if (order && ['ORDER_STARTED', 'PENDING', 'PROCESSING', 'ORDER.STARTED'].includes(order.status?.toUpperCase())) {
          if (responseText === "Aquí tienes el resultado.") {
             responseText = t("assistant.chat.orderInProcess");
          }
+      }
+      
+      if (order?.cart?.quoteId) {
+        setLastQuoteId(order.cart.quoteId);
       }
       
       if (order && order.orderId) {
@@ -115,10 +149,10 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           }
         });
       }
-      const genMeals = data.result?.message?.generatedMeals;
+      const genMeals = msgObj?.generatedMeals || data.result?.generatedMeals;
       
-      let inferredPlanId = data.result?.message?.planId || data.result?.planId || genMeals?.planId || genMeals?._id || genMeals?.id;
-      let inferredMealType = data.result?.message?.mealType || data.result?.mealType;
+      let inferredPlanId = msgObj?.planId || data.result?.planId || genMeals?.planId || genMeals?._id || genMeals?.id;
+      let inferredMealType = msgObj?.mealType || data.result?.mealType;
 
       if (genMeals) {
         if (genMeals.mealPlan) {
@@ -228,6 +262,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const submit = useCallback(async (text: string, actionData?: any) => {
+    setLastUserMessage(text);
     const userMsg: ChatMessage = { id: uid(), role: "user", text };
     setMessages((m) => [...m, userMsg]);
     setIsTyping(true);
@@ -280,11 +315,23 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [submit]);
 
   const confirmPurchase = useCallback(async (quoteId: string) => {
+    setLastQuoteId(quoteId);
     await submit(t("assistant.chat.confirmPurchaseMessage") || "Yes, confirm purchase.", {
       action: "CONFIRM_PURCHASE",
       quoteId
     });
   }, [submit, t]);
+
+  const retryPurchase = useCallback(async (targetQuoteId?: string) => {
+    const qId = targetQuoteId || lastQuoteId;
+    if (qId) {
+      await confirmPurchase(qId);
+    } else if (lastUserMessage) {
+      await sendUserMessage(lastUserMessage);
+    } else {
+      await sendUserMessage(t("assistant.chat.confirmPurchaseMessage") || "Yes, confirm purchase.");
+    }
+  }, [confirmPurchase, sendUserMessage, lastQuoteId, lastUserMessage, t]);
 
   const openInWorkspace = useCallback((payload: AssistantPayload | null) => {
     setWorkspacePayload(payload);
@@ -349,8 +396,9 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       resetCheckout,
       addToPantry,
       confirmPurchase,
+      retryPurchase,
     }),
-    [messages, isTyping, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout, addToPantry, confirmPurchase]
+    [messages, isTyping, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout, addToPantry, confirmPurchase, retryPurchase]
   );
 
   return <AssistantContext.Provider value={value}>{children}</AssistantContext.Provider>;

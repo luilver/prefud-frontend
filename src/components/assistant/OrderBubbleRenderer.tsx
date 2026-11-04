@@ -1,21 +1,72 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAssistant } from '@/contexts/AssistantContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChatOrder } from '@/types/assistant';
-import { CheckCircle, AlertCircle, Clock, Package } from 'lucide-react';
+import { CheckCircle, AlertCircle, Clock, Package, CreditCard } from 'lucide-react';
+import ChatPaymentMethodModal from './ChatPaymentMethodModal';
 
 interface Props {
   order: ChatOrder;
+  isLatest?: boolean;
 }
 
-const OrderBubbleRenderer: React.FC<Props> = ({ order }) => {
-  const { confirmPurchase, sendUserMessage } = useAssistant();
+const OrderBubbleRenderer: React.FC<Props> = ({ order, isLatest }) => {
+  const { confirmPurchase, sendUserMessage, retryPurchase } = useAssistant();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
+
   const statusUpper = order.status.toUpperCase();
+
+  const isNoDefaultPayment =
+    order.errorCode === 'NO_DEFAULT_PAYMENT_METHOD' ||
+    order.actionRequired === 'ADD_PAYMENT_METHOD';
+
+  const isInsufficientFunds =
+    order.errorCode === 'INSUFFICIENT_FUNDS' ||
+    Boolean(order.insufficientFunds);
+
+  const isCardDeclined =
+    order.errorCode === 'CARD_DECLINED';
+
+  const isPaymentRequired =
+    Boolean(order.requiresPaymentMethod) ||
+    isNoDefaultPayment ||
+    isInsufficientFunds ||
+    isCardDeclined ||
+    order.actionRequired === 'PROVIDE_ANOTHER_PAYMENT_METHOD';
+
+  useEffect(() => {
+    if (isLatest && isPaymentRequired && !hasAutoOpened) {
+      setShowPaymentModal(true);
+      setHasAutoOpened(true);
+    }
+  }, [isLatest, isPaymentRequired, hasAutoOpened]);
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    retryPurchase(order.cart?.quoteId);
+  };
+
+  const getErrorMessage = () => {
+    if (isInsufficientFunds) {
+      return t("assistant.order.insufficientFunds");
+    }
+    if (isCardDeclined) {
+      return t("assistant.order.cardDeclined");
+    }
+    if (isNoDefaultPayment) {
+      return t("assistant.order.noDefaultPayment");
+    }
+    if (order.errorCode === 'NO_ADDRESS') {
+      return t("assistant.order.addAddress");
+    }
+    return order.errorCode || t("assistant.order.genericError") || "An error occurred while processing your order.";
+  };
 
   if (statusUpper === 'QUOTED' && order.cart) {
     return (
@@ -93,27 +144,46 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order }) => {
     );
   }
 
-  if (['ORDER_NOT_STARTED', 'FAILED', 'ORDER.FAILED', 'CANCELLED'].includes(statusUpper)) {
+  if (isPaymentRequired || ['ORDER_NOT_STARTED', 'FAILED', 'ORDER.FAILED', 'CANCELLED'].includes(statusUpper)) {
+    const paymentButtonText = isNoDefaultPayment
+      ? (t("assistant.order.addPayment") || "Add Payment Method")
+      : (t("assistant.order.addAnotherPayment") || "Provide Another Payment Method");
+
     return (
       <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 mt-2 space-y-3 shadow-sm w-full max-w-sm">
         <div className="flex items-center gap-2 text-destructive">
-          <AlertCircle className="w-5 h-5" />
-          <h3 className="font-semibold">{t("assistant.order.failed") || "Order Failed"}</h3>
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <h3 className="font-semibold text-sm sm:text-base">{t("assistant.order.failed") || "Order Failed"}</h3>
         </div>
         
-        <p className="text-sm">{order.errorCode || t("assistant.order.genericError") || "An error occurred while processing your order."}</p>
+        <p className="text-sm leading-relaxed text-foreground/90">{getErrorMessage()}</p>
         
-        {order.errorCode === 'NO_ADDRESS' && (
+        {isPaymentRequired ? (
+          <>
+            <Button
+              className="w-full mt-2 font-medium flex items-center justify-center gap-2 shadow-sm"
+              onClick={() => setShowPaymentModal(true)}
+            >
+              <CreditCard className="w-4 h-4" />
+              {paymentButtonText}
+            </Button>
+            <ChatPaymentMethodModal
+              isOpen={showPaymentModal}
+              onClose={() => setShowPaymentModal(false)}
+              onSuccess={handlePaymentSuccess}
+              title={
+                isNoDefaultPayment
+                  ? (t("assistant.order.addCardTitle") || "Add Payment Method")
+                  : (t("assistant.order.addAnotherPayment") || "Provide Another Payment Method")
+              }
+              description={getErrorMessage()}
+            />
+          </>
+        ) : order.errorCode === 'NO_ADDRESS' ? (
           <Button className="w-full mt-2" onClick={() => navigate('/profile')}>
             {t("assistant.order.addAddress") || "Add Delivery Address"}
           </Button>
-        )}
-        
-        {order.errorCode === 'NO_DEFAULT_PAYMENT_METHOD' && (
-          <Button className="w-full mt-2" onClick={() => navigate('/profile')}>
-            {t("assistant.order.addPayment") || "Add Payment Method"}
-          </Button>
-        )}
+        ) : null}
       </div>
     );
   }
