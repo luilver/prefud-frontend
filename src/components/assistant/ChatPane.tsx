@@ -8,6 +8,7 @@ import ChatComposer from "./ChatComposer";
 import PayloadRenderer from "./PayloadRenderer";
 import AssistantCheckout from "./checkout/AssistantCheckout";
 import OrderBubbleRenderer from "./OrderBubbleRenderer";
+import ChatTypingIndicator from "./ChatTypingIndicator";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import RecipeDetail from "./widgets/RecipeDetail";
 import type { MealBase, IngredientListItem, AssistantPayload, SourceLink } from "@/types/assistant";
@@ -140,22 +141,14 @@ const ChatPane: React.FC = () => {
               </div>
             )}
             {m.role === "ai" && m.questions && m.questions.filter((q) => !q.ask.startsWith("__")).length > 0 && (
-              <div className="pl-9 pr-2 mt-1 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground ml-1">{t("assistant.chat.questionsForYou")}</p>
-                <ActionChips chips={m.questions.filter((q) => !q.ask.startsWith("__"))} onPick={handlePick} />
+              <div className="pl-9 pr-2 mt-2 space-y-1.5">
+                <p className="text-xs font-semibold text-muted-foreground/90 ml-0.5">{t("assistant.chat.questionsForYou")}</p>
+                <ActionChips variant="dots" chips={m.questions.filter((q) => !q.ask.startsWith("__"))} onPick={handlePick} />
               </div>
             )}
           </div>
         ))}
-        {isTyping && (
-          <MessageBubble role="ai">
-            <span className="inline-flex gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:150ms]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:300ms]" />
-            </span>
-          </MessageBubble>
-        )}
+        {isTyping && <ChatTypingIndicator />}
         <div ref={endRef} />
       </div>
 

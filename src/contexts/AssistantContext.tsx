@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useMemo, useState, useCallback, useEffect, useRef } from "react";
 import type { AssistantPayload, ChatMessage, CheckoutStep, IngredientListItem } from "@/types/assistant";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +9,7 @@ import { SOCKET_URL } from "@/config/api";
 interface AssistantContextValue {
   messages: ChatMessage[];
   isTyping: boolean;
+  isReady: boolean;
   workspacePayload: AssistantPayload | null;
   checkoutStep: CheckoutStep;
   checkoutCart: IngredientListItem[];
@@ -21,6 +22,7 @@ interface AssistantContextValue {
   resetCheckout: () => void;
   confirmPurchase: (quoteId: string) => Promise<void>;
   retryPurchase: (targetQuoteId?: string) => Promise<void>;
+  proceedWithOrderAfterAddress: (targetQuoteId?: string) => Promise<void>;
 }
 
 const AssistantContext = createContext<AssistantContextValue | null>(null);
@@ -35,6 +37,8 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const readyTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [workspacePayload, setWorkspacePayload] = useState<AssistantPayload | null>(null);
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("idle");
   const [checkoutCart, setCheckoutCart] = useState<IngredientListItem[]>([]);
@@ -83,8 +87,10 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     socketInstance.on("generationCompleted", (data) => {
       console.log("Background job completed successfully!", data);
-      setIsTyping(false);
       if (data.result?.success === false && data.result?.message === "No meal plans available according to your subscription") {
+        if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
+        setIsTyping(false);
+        setIsReady(false);
         setMessages((m) => [
           ...m,
           {
@@ -128,6 +134,16 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         } else if (order.errorCode === 'CARD_DECLINED') {
           responseText = t("assistant.order.cardDeclined") || responseText;
         }
+      }
+
+      if (order?.errorCode === 'NO_ADDRESS' || errorCode === 'NO_ADDRESS' || actionRequired === 'ADD_ADDRESS') {
+        responseText = t("assistant.order.noAddress") || responseText;
+        order = {
+          ...(order || {}),
+          status: order?.status || "FAILED",
+          errorCode: "NO_ADDRESS",
+          actionRequired: "ADD_ADDRESS",
+        };
       }
       
       if (order && ['ORDER_STARTED', 'PENDING', 'PROCESSING', 'ORDER.STARTED'].includes(order.status?.toUpperCase())) {
@@ -204,23 +220,32 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (inferredPlanId) setActivePlanId(inferredPlanId);
       if (inferredMealType) setActiveMealType(inferredMealType);
 
-      setMessages((m) => [
-        ...m,
-        {
-          id: uid(),
-          role: "ai",
-          text: responseText,
-          questions: questions,
-          payload: payload,
-          links: links,
-          order: order,
-        },
-      ]);
+      // Trigger "Voilà!" when the answer is received, then reveal the response
+      setIsReady(true);
+      if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
+      readyTimerRef.current = setTimeout(() => {
+        setIsTyping(false);
+        setIsReady(false);
+        setMessages((m) => [
+          ...m,
+          {
+            id: uid(),
+            role: "ai",
+            text: responseText,
+            questions: questions,
+            payload: payload,
+            links: links,
+            order: order,
+          },
+        ]);
+      }, 900);
     });
 
     socketInstance.on("generationFailed", (data) => {
       console.error("Background job failed:", data.error);
+      if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
       setIsTyping(false);
+      setIsReady(false);
       setMessages((m) => [
         ...m,
         {
@@ -257,15 +282,18 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     return () => {
+      if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
       socketInstance.disconnect();
     };
   }, []);
 
   const submit = useCallback(async (text: string, actionData?: any) => {
+    if (readyTimerRef.current) clearTimeout(readyTimerRef.current);
     setLastUserMessage(text);
     const userMsg: ChatMessage = { id: uid(), role: "user", text };
     setMessages((m) => [...m, userMsg]);
     setIsTyping(true);
+    setIsReady(false);
 
     if (socket) {
       const userId = authUser?.userId || "unknown-user";
@@ -333,6 +361,21 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [confirmPurchase, sendUserMessage, lastQuoteId, lastUserMessage, t]);
 
+  const proceedWithOrderAfterAddress = useCallback(async (targetQuoteId?: string) => {
+    const qId = targetQuoteId || lastQuoteId;
+    const msgText = t("assistant.order.addressAddedProceed") || "I have added my delivery address. Please proceed with my order.";
+    if (qId) {
+      await submit(msgText, {
+        action: "CONFIRM_PURCHASE",
+        quoteId: qId,
+      });
+    } else {
+      await submit(msgText, {
+        action: "CONFIRM_PURCHASE",
+      });
+    }
+  }, [submit, lastQuoteId, t]);
+
   const openInWorkspace = useCallback((payload: AssistantPayload | null) => {
     setWorkspacePayload(payload);
   }, []);
@@ -385,6 +428,7 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     () => ({
       messages,
       isTyping,
+      isReady,
       workspacePayload,
       checkoutStep,
       checkoutCart,
@@ -397,8 +441,9 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       addToPantry,
       confirmPurchase,
       retryPurchase,
+      proceedWithOrderAfterAddress,
     }),
-    [messages, isTyping, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout, addToPantry, confirmPurchase, retryPurchase]
+    [messages, isTyping, isReady, workspacePayload, checkoutStep, checkoutCart, sendUserMessage, pickQuestion, openInWorkspace, startCheckout, advanceCheckout, resetCheckout, addToPantry, confirmPurchase, retryPurchase, proceedWithOrderAfterAddress]
   );
 
   return <AssistantContext.Provider value={value}>{children}</AssistantContext.Provider>;

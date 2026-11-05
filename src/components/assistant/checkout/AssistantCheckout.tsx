@@ -29,6 +29,7 @@ const AssistantCheckout: React.FC = () => {
         <>
           <p className="text-xs text-muted-foreground">{t("assistant.checkout.selectAddress")}</p>
           <ActionChips
+            variant="buttons"
             chips={[{ ask: t("assistant.checkout.savedAddress") }, { ask: t("assistant.checkout.newAddress") }]}
             onPick={() => advanceCheckout("payment")}
           />
@@ -39,6 +40,7 @@ const AssistantCheckout: React.FC = () => {
         <>
           <p className="text-xs text-muted-foreground">{t("assistant.checkout.selectPayment")}</p>
           <ActionChips
+            variant="buttons"
             chips={[{ ask: t("assistant.checkout.applePay") }, { ask: t("assistant.checkout.cardEnding") }]}
             onPick={() => advanceCheckout("confirm")}
           />

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAssistant } from '@/contexts/AssistantContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChatOrder } from '@/types/assistant';
-import { CheckCircle, AlertCircle, Clock, Package, CreditCard } from 'lucide-react';
+import { CheckCircle, AlertCircle, Clock, Package, CreditCard, MapPin } from 'lucide-react';
 import ChatPaymentMethodModal from './ChatPaymentMethodModal';
+import ChatAddressModal from './ChatAddressModal';
 
 interface Props {
   order: ChatOrder;
@@ -13,14 +13,19 @@ interface Props {
 }
 
 const OrderBubbleRenderer: React.FC<Props> = ({ order, isLatest }) => {
-  const { confirmPurchase, sendUserMessage, retryPurchase } = useAssistant();
+  const { confirmPurchase, sendUserMessage, retryPurchase, proceedWithOrderAfterAddress } = useAssistant();
   const { t } = useLanguage();
-  const navigate = useNavigate();
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [hasAutoOpenedAddress, setHasAutoOpenedAddress] = useState(false);
 
   const statusUpper = order.status.toUpperCase();
+
+  const isNoAddress =
+    order.errorCode === 'NO_ADDRESS' ||
+    order.actionRequired === 'ADD_ADDRESS';
 
   const isNoDefaultPayment =
     order.errorCode === 'NO_DEFAULT_PAYMENT_METHOD' ||
@@ -47,12 +52,27 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order, isLatest }) => {
     }
   }, [isLatest, isPaymentRequired, hasAutoOpened]);
 
+  useEffect(() => {
+    if (isLatest && isNoAddress && !hasAutoOpenedAddress) {
+      setShowAddressModal(true);
+      setHasAutoOpenedAddress(true);
+    }
+  }, [isLatest, isNoAddress, hasAutoOpenedAddress]);
+
   const handlePaymentSuccess = () => {
     setShowPaymentModal(false);
     retryPurchase(order.cart?.quoteId);
   };
 
+  const handleAddressSuccess = () => {
+    setShowAddressModal(false);
+    proceedWithOrderAfterAddress(order.cart?.quoteId);
+  };
+
   const getErrorMessage = () => {
+    if (isNoAddress) {
+      return t("assistant.order.noAddress");
+    }
     if (isInsufficientFunds) {
       return t("assistant.order.insufficientFunds");
     }
@@ -61,9 +81,6 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order, isLatest }) => {
     }
     if (isNoDefaultPayment) {
       return t("assistant.order.noDefaultPayment");
-    }
-    if (order.errorCode === 'NO_ADDRESS') {
-      return t("assistant.order.addAddress");
     }
     return order.errorCode || t("assistant.order.genericError") || "An error occurred while processing your order.";
   };
@@ -144,7 +161,7 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order, isLatest }) => {
     );
   }
 
-  if (isPaymentRequired || ['ORDER_NOT_STARTED', 'FAILED', 'ORDER.FAILED', 'CANCELLED'].includes(statusUpper)) {
+  if (isPaymentRequired || isNoAddress || ['ORDER_NOT_STARTED', 'FAILED', 'ORDER.FAILED', 'CANCELLED'].includes(statusUpper)) {
     const paymentButtonText = isNoDefaultPayment
       ? (t("assistant.order.addPayment") || "Add Payment Method")
       : (t("assistant.order.addAnotherPayment") || "Provide Another Payment Method");
@@ -179,10 +196,23 @@ const OrderBubbleRenderer: React.FC<Props> = ({ order, isLatest }) => {
               description={getErrorMessage()}
             />
           </>
-        ) : order.errorCode === 'NO_ADDRESS' ? (
-          <Button className="w-full mt-2" onClick={() => navigate('/profile')}>
-            {t("assistant.order.addAddress") || "Add Delivery Address"}
-          </Button>
+        ) : isNoAddress ? (
+          <>
+            <Button
+              className="w-full mt-2 font-medium flex items-center justify-center gap-2 shadow-sm"
+              onClick={() => setShowAddressModal(true)}
+            >
+              <MapPin className="w-4 h-4" />
+              {t("assistant.order.addAddress") || "Add Delivery Address"}
+            </Button>
+            <ChatAddressModal
+              isOpen={showAddressModal}
+              onClose={() => setShowAddressModal(false)}
+              onSuccess={handleAddressSuccess}
+              title={t("assistant.order.addAddressTitle") || "Add Delivery Address"}
+              description={t("assistant.order.noAddress") || "Please add a delivery address to complete your order."}
+            />
+          </>
         ) : null}
       </div>
     );

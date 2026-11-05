@@ -31,7 +31,7 @@ import Assistant from "@/pages/Assistant";
 import LanguageSelector from "./LanguageSelector";
 
 const DashboardContent = () => {
-  const [activeTab, setActiveTab] = useState("planner");
+  const [activeTab, setActiveTab] = useState("assistant");
   const { user, logout } = useUser();
   const { t } = useLanguage();
   const { getTotalItems } = useCart();
@@ -68,8 +68,20 @@ const DashboardContent = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (hash === 'profile') {
-        setActiveTab('profile');
+      const validTabs = [
+        'assistant',
+        'planner',
+        'ai-meals',
+        'ai-drinks',
+        'highlights',
+        'environment',
+        'ingredients',
+        'shopping',
+        'calories',
+        'profile',
+      ];
+      if (validTabs.includes(hash)) {
+        setActiveTab(hash);
         // Clear the hash after navigation
         window.location.hash = '';
       }
